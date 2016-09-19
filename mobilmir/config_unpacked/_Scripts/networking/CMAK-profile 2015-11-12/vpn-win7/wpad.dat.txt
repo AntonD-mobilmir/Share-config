@@ -1,0 +1,9 @@
+function FindProxyForURL(url, host) 
+{
+    if (isPlainHostName(host)	||
+	isInNet(host, "127.0.0.1", "255.255.255.255")
+       ) 
+	return "DIRECT";
+
+    return "PROXY 192.168.1.1:3128"; 
+}

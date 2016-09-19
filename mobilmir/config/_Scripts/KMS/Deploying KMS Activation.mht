@@ -1,0 +1,3301 @@
+Content-Type: multipart/related; start=<op.mhtml.1361258556104.6a94ad792841b878@169.254.228.174>; boundary=----------0PFjSWUR514VPR887wh4vr
+Content-Location: http://technet.microsoft.com/en-us/library/ff793409.aspx
+Subject: =?utf-8?Q?Deploying=20KMS=20Activation?=
+MIME-Version: 1.0
+
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline; filename=ff793409.htm
+Content-Type: text/html; charset=utf-8; name=ff793409.htm
+Content-ID: <op.mhtml.1361258556104.6a94ad792841b878@169.254.228.174>
+Content-Location: http://technet.microsoft.com/en-us/library/ff793409.aspx
+Content-Transfer-Encoding: Quoted-Printable
+
+<!DOCTYPE html>
+
+<html dir=3D"ltr" xmlns=3D"http://www.w3.org/1999/xhtml">
+    <head><link rel=3D"canonical" href=3D"http://technet.microsoft.com/e=
+n-us/library/ff793409.aspx" />
+        <title>Deploying KMS Activation</title>
+
+
+
+
+<meta name=3D"DCS.dcsuri" content=3D"/en-us/library/ff793409(d=3Ddefault=
+,l=3Den-us,v=3Dtechnet.10).aspx" />
+
+<meta name=3D"NormalizedUrl" content=3D"http://technet.microsoft.com/en-=
+us/library/ff793409(d=3Ddefault,l=3Den-us,v=3Dtechnet.10).aspx" />
+
+<meta name=3D"VotingContextUrl" content=3D"http://technet.microsoft.com/=
+en-us/library/ff793409(d=3Ddefault,l=3Den-us,v=3Dtechnet.10).aspx" />
+
+<meta name=3D"MN" content=3D"61C41DD3-10:14:23 PM" />
+
+<meta name=3D"Search.ShortId" content=3D"ff793409" />
+
+<meta name=3D"Ms.Locale" content=3D"en-us" />
+
+
+
+
+
+
+
+
+        =
+
+    <link rel=3D"stylesheet" type=3D"text/css" href=3D"http://i3.technet=
+.microsoft.com/Combined.css?resources=3D0:Topic,0:CodeSnippet,0:Programm=
+ingSelector,0:ExpandableCollapsibleArea,0:CommunityContent,0:TopicNotInS=
+cope,0:FeedViewerBasic,0:ImageSprite,1:megablade.1,2:Header.1,2:ImageSpr=
+ite,3:Toc,3:NavigationResize,4:FeedbackCounter,4:Feedback,2:Footer.1,5:L=
+inkList,6:Content\LinkList,0:SiteFeedbackLink,5:Base,2:TechNet;/Areas/Ep=
+x/Content/Css:0,/Areas/Epx/Themes/Shared/Content:1,/Areas/Epx/Themes/Tec=
+hNet/Content:2,/Areas/Epx/Library/Content:3,/Areas/Epx/Shared/Content:4,=
+/Areas/Epx/Themes/Base/Content:5,/Areas/Epx/Themes/Base:6&amp;amp;hashKe=
+y=3DF6DA5B1603B8496E2F447B98A3E136B0" /></head>
+    <body class=3D"library">
+        <div id=3D"page">
+            =
+
+            =
+
+  =
+
+            =
+
+        <link type=3D"text/css" rel=3D"stylesheet" href=3D"http://i2.tec=
+hnet.microsoft.com/Areas/EPX/Themes/Shared/Content/Megablade.1.css" data=
+-do-not-move=3D"true" />
+    <div id=3D"megabladeContainer">
+        <div id=3D"megabladeContainerCenter">
+            <ul id=3D"megabladeItems">
+                <li class=3D"Logo"><a href=3D"http://technet.microsoft.c=
+om/" title=3D"TechNet">TechNet</a></li>
+                        <li data-value=3D"hh326172" class=3D"bladeItem b=
+ladeItemWithMenu"><a class=3D"label" href=3D"" onclick=3D"return false;"=
+>Products</a><span class=3D"caret"></span></li>
+                        <li data-value=3D"hh880860" class=3D"bladeItem b=
+ladeItemWithMenu"><a class=3D"label" href=3D"" onclick=3D"return false;"=
+>IT Resources</a><span class=3D"caret"></span></li>
+                        <li data-value=3D"hh371326" class=3D"bladeItem b=
+ladeItemWithMenu"><a class=3D"label" href=3D"" onclick=3D"return false;"=
+>Downloads</a><span class=3D"caret"></span></li>
+                        <li data-value=3D"jj837158" class=3D"bladeItem b=
+ladeItemWithMenu"><a class=3D"label" href=3D"" onclick=3D"return false;"=
+>Training</a><span class=3D"caret"></span></li>
+                        <li data-value=3D"hh371327" class=3D"bladeItem b=
+ladeItemWithMenu"><a class=3D"label" href=3D"" onclick=3D"return false;"=
+>Support</a><span class=3D"caret"></span></li>
+            </ul>
+            <div class=3D"bladeItemMenuContainer">
+                    <div data-value=3D"hh326172" class=3D"bladeItemMenu"=
+ style=3D"display: none;">
+                        <div class=3D"navpage">
+  <div>
+    <ul id=3D"Products">
+      <li style=3D"min-height:50px;width:176px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/windows">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:0;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 16px 0 16px=
+ 6px;vertical-align:top;" href=3D"http://technet.microsoft.com/windows">=
+Windows</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/windowsserver">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-429px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 7px 0 7px 6=
+px;vertical-align:top;" href=3D"http://technet.microsoft.com/windowsserv=
+er">Windows<br />Server</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/systemcenter">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-275px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 7px 0 7px 6=
+px;vertical-align:top;" href=3D"http://technet.microsoft.com/systemcente=
+r">System<br />Center</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/ie">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-330px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 7px 0 7px 6=
+px;vertical-align:top;" href=3D"http://technet.microsoft.com/ie">Interne=
+t<br />Explorer</a>
+      </li>
+    </ul>
+    <ul id=3D"">
+      <li style=3D"min-height:50px;width:176px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/office">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-110px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 16px 0 16px=
+ 6px;vertical-align:top;" href=3D"http://technet.microsoft.com/office">O=
+ffice</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/office365">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-110px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 16px 0 16px=
+ 6px;vertical-align:top;" href=3D"http://technet.microsoft.com/office365=
+">Office 365</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/exchange">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-55px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 7px 0 7px 6=
+px;vertical-align:top;" href=3D"http://technet.microsoft.com/exchange">E=
+xchange<br />Server</a>
+      </li>
+    </ul>
+    <ul>
+      <li style=3D"min-height:50px;width:176px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/sql">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-220px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 16px 0 16px=
+ 6px;vertical-align:top;" href=3D"http://technet.microsoft.com/sql">SQL =
+Server</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/sharepoint">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-165px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 7px 0 7px 6=
+px;vertical-align:top;" href=3D"http://technet.microsoft.com/sharepoint"=
+>SharePoint<br />Products</a>
+      </li>
+      <li style=3D"min-height:50px;width:176px;padding-top:10px;">
+        <a style=3D"height:50px;width:50px;position:relative;overflow:hi=
+dden;display:inline-block;background:#ccc;" href=3D"http://technet.micro=
+soft.com/lync">
+          <img alt=3D"" height=3D"470" src=3D"http://i.technet.microsoft=
+.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png" style=3D=
+"left:0;top:-165px;position:relative;" width=3D"50" />
+        </a>
+        <a style=3D"display:inline-block;width:auto;padding: 16px 0 16px=
+ 6px;vertical-align:top;" href=3D"http://technet.microsoft.com/lync">Lyn=
+c</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/en-us/bb421517.aspx?wt.s=
+vl=3Dmore_centers_link">See all products =C2=BB</a>
+      </li>
+    </ul>
+  </div>
+</div>
+                    </div>
+                    <div data-value=3D"hh880860" class=3D"bladeItemMenu"=
+ style=3D"display: none;">
+                        <div class=3D"navpage">
+  <div>
+    <ul id=3D"Resources">
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200157772">Evaluation Center</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/bb291022">Learning Resou=
+rces</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200157773">Microsoft IT Camps</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200157774">Microsoft Virtual Academy</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/scriptcenter">Script Cen=
+ter</a>
+      </li>
+      <li>
+        <a href=3D"http://blogs.technet.com/serverandtools">Server and T=
+ools Blogs</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/solutionaccelerators">So=
+lution Accelerators</a>
+      </li>
+      <li>
+        <a href=3D"http://blogs.technet.com/">TechNet Blogs</a>
+      </li>
+    </ul>
+    <ul>
+      <li>
+        <a href=3D"http://technet.microsoft.com/cc543196">TechNet Flash =
+Newsletter</a>
+      </li>
+      <li>
+        <a href=3D"http://gallery.technet.microsoft.com/">TechNet Galler=
+y</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/library/default.aspx">Te=
+chNet Library</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/magazine">TechNet Magazi=
+ne</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/subscriptions">TechNet S=
+ubscriptions</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/video">TechNet Video</a>=
+
+      </li>
+      <li>
+        <a href=3D"http://social.technet.microsoft.com/wiki">TechNet Wik=
+i</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/sysinternals">Windows Sy=
+sinternals</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/virtuallabs">Virtual Lab=
+s</a>
+      </li>
+    </ul>
+    <ul id=3D"Solutions">
+      <li>
+        <a href=3D"http://technet.microsoft.com/bi">Business Intelligenc=
+e</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/network">Networking</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/cloud/private-cloud">Pri=
+vate Cloud</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/security">Security</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/virtualization">Virtuali=
+zation</a>
+      </li>
+    </ul>
+    <p>=C2=A0</p>
+  </div>
+</div>
+                    </div>
+                    <div data-value=3D"hh371326" class=3D"bladeItemMenu"=
+ style=3D"display: none;">
+                        <div class=3D"navpage">
+  <div>
+    <ul id=3D"Updates">
+      <li>
+        <a href=3D"http://support.microsoft.com/default.aspx?id=3Dfh;en-=
+us;sp&amp;fr=3D0&amp;sd=3Dgn&amp;ln=3Den-us&amp;ct=3Dsd&amp;se=3Dnona">S=
+ervice Packs</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/security/bulletin">Secur=
+ity Bulletins</a>
+      </li>
+      <li>
+        <a href=3D"http://fe1.update.microsoft.com/microsoftupdate/v6/vi=
+stadefault.aspx?ln=3Den-US">Microsoft Update</a>
+      </li>
+    </ul>
+    <ul id=3D"Trials">
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200127473">Windows Server 2012</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200138112">System Center 2012 SP1</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200156426">Microsoft SQL Server 2012 SP1</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200138107">Windows 8 Enterprise</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200157775" title=3D"See all trials">See all trials =C2=BB</a>
+      </li>
+    </ul>
+    <ul id=3D"Related Sites">
+      <li>
+        <a href=3D"http://www.microsoft.com/downloads/search.aspx">Micro=
+soft Download Center</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200157776">TechNet Evaluation Center</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/download/driver.aspx?q=3Ddri=
+ver">Drivers</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/download/compatibility.aspx?=
+q=3Dcompatibility">Compatability &amp; Converters</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/sysinternals">Windows Sy=
+sinternals</a>
+      </li>
+      <li>
+        <a href=3D"http://gallery.technet.microsoft.com/">TechNet Galler=
+y</a>
+      </li>
+    </ul>
+  </div>
+</div>
+                    </div>
+                    <div data-value=3D"jj837158" class=3D"bladeItemMenu"=
+ style=3D"display: none;">
+                        <div class=3D"navpage">
+  <div>
+    <ul id=3D"Training">
+      <li>
+        <a href=3D"http://learning.microsoft.com/Manager/BrowseCatalog.a=
+spx?browse=3DPT">Training Catalog</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/classlocator.=
+aspx">Class Locator</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200155695">Microsoft Virtual Academy</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200155696">Free Windows Server 2012 courses</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200155697" title=3D"Free Windows 8 courses">Free Windows 8 cou=
+rses</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/training/sql-=
+server.aspx">SQL Server training</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/training/form=
+at-online.aspx">e-Learning overview</a>
+      </li>
+    </ul>
+    <ul id=3D"Certifications">
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/certification=
+/cert-overview.aspx">Certification overview</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/certification=
+/cert-windowsserver.aspx">Windows Server Certification (MCSE)</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/certification=
+/cert-private-cloud.aspx">Private Cloud Certification (MCSE)</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/certification=
+/cert-sql-server.aspx">SQL Server Certification (MCSE)</a>
+      </li>
+    </ul>
+    <ul id=3D"Other resources">
+      <li>
+        <a href=3D"http://www.technetevents.com/">TechNet Events</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/learning/en/us/offers/second=
+shot.aspx">Second shot for certification</a>
+      </li>
+      <li>
+        <a href=3D"http://borntolearn.mslearn.net/btl/b/default.aspx">Bo=
+rn To Learn blog</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/click/services/Redirect2.ash=
+x?CR_CC=3D200155694">IT Camps</a>
+      </li>
+    </ul>
+  </div>
+</div>
+                    </div>
+                    <div data-value=3D"hh371327" class=3D"bladeItemMenu"=
+ style=3D"display: none;">
+                        <div class=3D"navpage">
+  <div id=3D"">
+    <ul id=3D"Support by product">
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/13965">Exchange Serve=
+r</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/13029">Forefront Serv=
+er</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/815">Forefront Edge S=
+ecurity</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/14783/sl">Forefront S=
+erver Security</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/807">Internet Explore=
+r</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/8753">Office</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/935/en-us">SharePoint=
+</a>
+      </li>
+    </ul>
+    <ul>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/1044">SQL Server</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/16340/en-us">System C=
+enter</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/1163">Windows Server<=
+/a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/1173">Windows XP</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/11732">Windows Vista<=
+/a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/ph/14019">Windows 7</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/find-solutions/windows/w=
+indows-8/">Windows 8</a>
+      </li>
+    </ul>
+    <ul id=3D"Other support links">
+      <li>
+        <a href=3D"https://premier.microsoft.com/">Microsoft Premier Onl=
+ine</a>
+      </li>
+      <li>
+        <a href=3D"http://fixitcenter.support.microsoft.com/Portal">Micr=
+osoft Fix It Center</a>
+      </li>
+      <li>
+        <a href=3D"http://social.technet.microsoft.com/Forums/en-us/cate=
+gories/">TechNet Forums</a>
+      </li>
+      <li>
+        <a href=3D"http://social.msdn.microsoft.com/Forums/en-US/categor=
+ies/">MSDN Forums</a>
+      </li>
+      <li>
+        <a href=3D"http://technet.microsoft.com/en-us/security/bulletin"=
+>Security Bulletins &amp; Advisories</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/common/international.asp=
+x">International support solutions</a>
+      </li>
+      <li>
+        <a href=3D"http://support.microsoft.com/select/default.aspx?targ=
+et=3Dassistance">Log a support ticket</a>
+      </li>
+      <li>
+        <a href=3D"http://www.microsoft.com/technet/support/ee/ee_advanc=
+ed.aspx">Look up event IDs and error codes</a>
+      </li>
+    </ul>
+    <ul id=3D"Not an IT pro?">
+      <li>
+        <a href=3D"http://support.microsoft.com/">Microsoft Customer Sup=
+port</a>
+      </li>
+      <li>
+        <a href=3D"http://answers.microsoft.com/en-us">Microsoft Communi=
+ty Forums</a>
+      </li>
+    </ul>
+  </div>
+</div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    =
+
+
+    =
+
+    <div id=3D"ux-header" class=3D" ltr ">
+        <div class=3D"upperBand">
+            <a href=3D"http://technet.microsoft.com/" title=3D"Microsoft=
+ TechNet"><img alt=3D"Microsoft TechNet" src=3D"http://i.technet.microso=
+ft.com/Areas/Epx/Themes/TechNet/Content/Images/BrandLogoTechNet.png"></i=
+mg></a>               =
+
+            <div class=3D"upperRight">
+                <div class=3D"controls">
+                    =
+
+<a title=3D"Change your language" id=3D"SelectLocale" href=3D"http://tec=
+hnet.microsoft.com/en-us/SelectLocale?fromPage=3Dhttp%3a%2f%2ftechnet.mi=
+crosoft.com%2fen-us%2flibrary%2fff793409.aspx">United States (English)</=
+a>
+        =
+
+            =
+
+            =
+
+                    =
+
+<a class=3D"scarabLink" href=3D"https://login.live.com/login.srf?wa=3Dws=
+ignin1.0&amp;rpsnv=3D11&amp;ct=3D1361254463&amp;rver=3D6.0.5276.0&amp;wp=
+=3DMCLBI&amp;wlcxt=3DTechNet%24TechNet%24TechNet&amp;wreply=3Dhttp%3a%2f=
+%2ftechnet.microsoft.com%2fen-us%2flibrary%2fff793409.aspx&amp;lc=3D1033=
+&amp;id=3D254354&amp;mkt=3Den-US" title=3D"Sign in">Sign in</a>
+                </div>
+                =
+
+
+    =
+
+
+<div class=3D"SearchBox">
+              <form id=3D"HeaderSearchForm" name=3D"HeaderSearchForm" me=
+thod=3D"get" action=3D"http://social.technet.microsoft.com/Search" onsub=
+mit=3D"return Epx.Controls.SearchBox.searchBoxOnSubmit(this, this.title)=
+;">
+            <input id=3D"HeaderSearchTextBox" name=3D"query" type=3D"tex=
+t" maxlength=3D"200" onfocus=3D"Epx.Controls.SearchBox.watermarkFocus(th=
+is, this.title, 'TextBoxSearch')" onblur=3D"Epx.Controls.SearchBox.water=
+markBlur(this, this.title, 'TextBoxSearch')" />
+            <input id=3D"RefinementId" name=3D"refinement" type=3D"hidde=
+n" value=3D"" />
+            <button id=3D"HeaderSearchButton" value=3D"" type=3D"submit"=
+ class=3D"header-search-button"></button>
+        </form>
+        =
+
+    =
+
+</div>
+
+            </div>
+        </div>
+        <div class=3D"lowerBand">
+            <div class=3D"ux-nav">
+                    <div class=3D"menus">
+                        <a id=3D"isd_print" href=3D"http://technet.micro=
+soft.com/en-us/library/ff793409(d=3Dprinter).aspx" title=3D"Print/Export=
+" rel=3D"nofollow">
+                            <div class=3D"clip38x23">
+                                <img src=3D"http://i3.technet.microsoft.=
+com/Areas/Epx/Content/Images/ImageSprite.png" alt=3D"" class=3D"isd_prin=
+t_arrow" />
+                            </div>
+                        </a>
+                        <div id=3D"isd_print_menu" class=3D"isd_menu">
+                            <a href=3D"http://technet.microsoft.com/en-u=
+s/library/ff793409(d=3Dprinter).aspx">Print This Topic</a>
+                            <a href=3D"/en-us/library/export/help/?retur=
+nUrl=3D%2fen-us%2flibrary%2fff793409.aspx">Print Multiple Topics</a>
+                        </div>
+                    </div>
+                <div class=3D"TocNavigation">
+   =
+
+   <div class=3D"toclevel1">
+          <a class=3D"normal" href=3D"http://technet.microsoft.com/" tit=
+le=3D"Home">Home</a>
+          <a class=3D"active" href=3D"http://technet.microsoft.com/libra=
+ry/default.aspx" title=3D"Library">Library</a>
+          <a class=3D"normal" href=3D"http://social.technet.microsoft.co=
+m/wiki " title=3D"Wiki">Wiki</a>
+          <a class=3D"normal" href=3D"http://technet.microsoft.com/bb291=
+022" title=3D"Learn">Learn</a>
+          <a class=3D"normal" href=3D"http://gallery.technet.microsoft.c=
+om" title=3D"Gallery">Gallery</a>
+          <a class=3D"normal" href=3D"http://technet.microsoft.com/bb403=
+698" title=3D"Downloads">Downloads</a>
+          <a class=3D"normal" href=3D"http://technet.microsoft.com/ms772=
+425" title=3D"Support">Support</a>
+          <a class=3D"normal" href=3D"http://social.technet.microsoft.co=
+m/Forums/categories/" title=3D"Forums">Forums</a>
+          <a class=3D"normal" href=3D"http://blogs.technet.com" title=3D=
+"Blogs">Blogs</a>
+
+    </div>
+  =
+
+</div>
+            </div>
+        </div>
+    </div>
+
+    =
+
+
+        =
+
+            <div id=3D"body">
+                =
+
+
+
+
+
+
+
+
+<div id=3D"leftNav">
+
+
+
+<div id=3D"tocnav">
+            <div class=3D"toclevel0" data-toclevel=3D"0">
+<a data-tochassubtree=3D"true" href=3D"/en-us/library/aa991542.aspx" id=3D=
+"bb126093_TechNet.10_en-us" title=3D"TechNet Library">TechNet Library</a=
+>            </div>
+            <div class=3D"toclevel0" data-toclevel=3D"0">
+<a data-tochassubtree=3D"true" href=3D"/en-us/library/cc498715.aspx" id=3D=
+"cc440467_TechNet.10_en-us" title=3D"Deployment">Deployment</a>         =
+   </div>
+            <div class=3D"toclevel0" data-toclevel=3D"0">
+<a data-tochassubtree=3D"true" href=3D"/en-us/library/ff719787.aspx" id=3D=
+"bb871044_TechNet.10_en-us" title=3D"Volume Activation">Volume Activatio=
+n</a>            </div>
+            <div class=3D"toclevel0" data-toclevel=3D"0">
+<a data-tochassubtree=3D"true" href=3D"/en-us/library/dd996589.aspx" id=3D=
+"ee165987_TechNet.10_en-us" title=3D"Planning for Volume Activation">Pla=
+nning for Volume Activation</a>            </div>
+            <div class=3D"toclevel1" data-toclevel=3D"1">
+<a data-tochassubtree=3D"true" href=3D"/en-us/library/dd979804.aspx" id=3D=
+"ee248732_TechNet.10_en-us" title=3D"Customer-Hosted Guide">Customer-Hos=
+ted Guide</a>            </div>
+            <div class=3D"toclevel2" data-toclevel=3D"2">
+<a href=3D"/en-us/library/ff793434.aspx" title=3D"Understanding KMS">Und=
+erstanding KMS</a>            </div>
+            <div class=3D"toclevel2" data-toclevel=3D"2">
+<a href=3D"/en-us/library/ff793412.aspx" title=3D"Determining Product Ke=
+y Needs">Determining Product Key Needs</a>            </div>
+            <div class=3D"toclevel2 current" data-toclevel=3D"2">
+<a href=3D"/en-us/library/ff793409.aspx" title=3D"Deploying KMS Activati=
+on">Deploying KMS Activation</a>            </div>
+            <div class=3D"toclevel2" data-toclevel=3D"2">
+<a href=3D"/en-us/library/ff793428.aspx" title=3D"Reactivating Computers=
+">Reactivating Computers</a>            </div>
+</div>    =
+
+    =
+
+    =
+
+    =
+
+    =
+
+    =
+
+    =
+
+    =
+
+
+<a id=3D"NavigationResize" href=3D"javascript:void(0)">
+    <img class=3D"cl_nav_resize_open" src=3D"http://i3.technet.microsoft=
+.com/Areas/Epx/Content/Images/ImageSprite.png" title=3D"Expand" alt=3D"E=
+xpand" />
+    <img class=3D"cl_nav_resize_close" src=3D"http://i3.technet.microsof=
+t.com/Areas/Epx/Content/Images/ImageSprite.png" title=3D"Minimize" alt=3D=
+"Minimize" />
+</a>
+
+
+
+</div>
+<div id=3D"content" class=3D"content">
+
+
+
+
+
+
+
+
+
+
+    =
+
+    =
+
+
+    <div id=3D"ratingCounterSeperator" class=3D"cl_lw_vs_seperator" styl=
+e=3D"display: none;"></div>
+
+    <div id=3D"ratingCounter">
+        <span id=3D"rcA" class=3D"ratingText">
+            11 out of 20 rated this helpful <span id=3D"rateThisPrefix">=
+- </span><a id=3D"rateThisTopic" href=3D"#feedback" title=3D"Rate this t=
+opic">Rate this topic</a>
+            =
+
+        </span>
+    </div>
+
+        =
+
+
+<div class=3D"topic" xmlns=3D"http://www.w3.org/1999/xhtml">
+  <h1 class=3D"title">
+Deploying KMS Activation
+</h1>
+  =
+
+  <div id=3D"mainSection">
+<div id=3D"mainBody">
+<h5>On This Page</h5>
+<p>
+<a href=3D"#EW"></a>
+<a href=3D"#EW">Configuring KMS Hosts</a><br />
+<a href=3D"#E1B"></a>
+<a href=3D"#E1B">Configuring DNS</a><br />
+<a href=3D"#EIF"></a>
+<a href=3D"#EIF">Installing KMS Hosts</a><br />
+<a href=3D"#E4IAC"></a>
+<a href=3D"#E4IAC">Configuring KMS Clients</a><br /></p>
+<p>KMS activation works with minimal administrative intervention. If the=
+ network environment has Dynamic Domain Name System (DDNS) and allows co=
+mputers to publish services automatically, deploying a KMS host can requ=
+ire very little effort. If the organization has more than one KMS host o=
+r the network does not support DDNS
+, additional configuration tasks may be necessary.</p>
+<p><strong>Warning</strong>=C2=A0=C2=A0=C2=A0Some procedures in this sec=
+tion require changing the registry. Problems can occur if the registry i=
+s modified incorrectly by using Registry Editor or another method, and t=
+hese problems might require reinstalling the operating system. Microsoft=
+ cannot guarantee that these problems can be resolved. You modify the re=
+gistry at your own risk.</p>
+<p>The remainder of this section describes the following key tasks:</p>
+<ul>
+<li><p>Configuring KMS hosts</p></li>
+<li><p>Configuring DNS</p></li>
+<li><p>Installing KMS hosts</p></li>
+<li><p>Configuring KMS clients</p></li>
+</ul>
+<h3 id=3D"EW">Configuring KMS Hosts</h3>
+<p>Software License Manager, sometimes referred to as <em>SL=C2=A0Manage=
+r</em> (Slmgr.vbs), is a script used to configure and retrieve Volume Ac=
+tivation information. The script can be run locally on the target comput=
+er or remotely from another computer, but it should be run from an eleva=
+ted command prompt. If a standard user runs Slmgr.vbs, some license data=
+ may be missing or incorrect, and many operations are prohibited.</p>
+<p>Slmgr.vbs can use Wscript.exe or Cscript.exe, and you can specify whi=
+ch script engine to use. If no script engine is specified, Slmgr.vbs run=
+s using the default script engine, Wscript.exe.</p>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0KMS requires a firewall except=
+ion on the KMS host. If using the default TCP port, enable the<strong> K=
+MS Traffic </strong>exception in Windows Firewall. If using a different =
+firewall, open TCP port=C2=A01688. If using a non-default port, open the=
+ custom TCP port in the firewall.</p>
+<p>The Software Licensing Service must be restarted for any changes to t=
+ake effect. To restart the=C2=A0Software Licensing Service, use the Micr=
+osoft Management Console (MMC) Services snap-in, or run the following co=
+mmand at an elevated command prompt:</p>
+
+<div id=3D"code-snippet-1" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_a60df7be-f=
+5ab-4005-9675-8662365d7ca8');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_a60df7be-f5ab-4005-9675-8662=
+365d7ca8" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+net stop sppsvc &amp;&amp; net start sppsvc
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<p>Slmgr.vbs requires at least one parameter. If the script is run with =
+no parameters, it displays help information. Table=C2=A03 lists Slmgr.vb=
+s command-line options along with a description of each. Most of the par=
+ameters in Table=C2=A03 configure the KMS host. However, the parameters =
+<em>/sai</em> and <em>/sri</em> are passed to KMS clients after they mak=
+e contact with the host. The general syntax of Slmgr.vbs is as follows:<=
+/p>
+
+<div id=3D"code-snippet-2" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_085d7dd5-2=
+478-4e0d-ac90-1903c42bebd7');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_085d7dd5-2478-4e0d-ac90-1903=
+c42bebd7" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+slmgr.vbs /parameter
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<p><strong>Table=C2=A03. Slmgr.vbs Parameters</strong></p>
+<table>
+<tr><th><p>Parameter</p></th><th><p>Description</p></th></tr>
+<tr><td><p><em>/sprt PortNumber</em></p></td><td><p>Sets the TCP communi=
+cations port on a KMS host. Replace <em>PortNumber</em> with the TCP por=
+t number to use. The default setting is<strong> 1688.</strong></p></td><=
+/tr>
+<tr><td><p><em>/cdns</em></p></td><td><p>Disables automatic DNS publishi=
+ng by a KMS host.</p></td></tr>
+<tr><td><p><em>/sdns</em></p></td><td><p>Enables automatic DNS publishin=
+g by the KMS host.</p></td></tr>
+<tr><td><p><em>/cpri</em></p></td><td><p>Lowers the priority of KMS host=
+ processes.</p></td></tr>
+<tr><td><p><em>/spri</em></p></td><td><p>Sets the priority of KMS host p=
+rocesses to <strong>Normal.</strong></p></td></tr>
+<tr><td><p><em>/sai ActivationInterval</em></p></td><td><p>Changes how o=
+ften a KMS client attempts to activate itself when it cannot find a KMS =
+host. Replace <em>ActivationInterval</em> with a number of minutes. The =
+default setting is <strong>120.</strong></p></td></tr>
+<tr><td><p><em>/sri RenewalInterval</em></p></td><td><p>Changes how ofte=
+n a KMS client attempts to renew its activation by contacting a KMS host=
+. Replace <em>RenewalInterval</em> with a number of minutes. The default=
+ setting is <strong>10080 </strong>(7=C2=A0days). This setting overrides=
+ the local KMS client settings.</p></td></tr>
+<tr><td><p><em>/dli</em></p></td><td><p>Retrieves the current KMS activa=
+tion count from the KMS host.</p></td></tr>
+</table>
+<h4>Running Slmgr.vbs Remotely</h4>
+<p>To run Slmgr.vbs remotely, administrators must supply additional para=
+meters. They must include the computer name of the target computer as we=
+ll as a user name and password of a user account that has local administ=
+rator rights on the target computer. If run remotely without a specified=
+ user name and password, the script uses the credentials of the user run=
+ning the script.</p>
+<p>The following syntax shows the additional parameters needed to run Sl=
+mgr.vbs remotely:</p>
+
+<div id=3D"code-snippet-3" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_bc2162ff-4=
+005-4fe4-b041-f1246acc2a1f');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_bc2162ff-4005-4fe4-b041-f124=
+6acc2a1f" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+slmgr.vbs TargetComputerName [username] [password] /parameter [options]
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<h4>Configuring Windows Firewall for Remote Software License Manager Ope=
+rations</h4>
+<p>Slmgr.vbs uses Windows Management Instrumentation (WMI), so administr=
+ators must configure Windows Firewall to allow WMI traffic:</p>
+<ul>
+<li><p>For a single subnet, allow the<strong> Windows Management Instrum=
+entation (WMI) </strong>exception in Windows Firewall.</p></li>
+<li><p>To allow WMI traffic across multiple subnets, allow the connectio=
+n for <strong>Windows Management Instrumentation (ASync-In), Windows Man=
+agement Instrumentation (DCOM-In),</strong> and <strong>Windows Manageme=
+nt Instrumentation (WMI-In)</strong>. Additionally, allow remote access =
+in the scope. Configure these settings by using Windows Firewall with Ad=
+vanced Security, which is the Administrative Tools folder.</p></li>
+</ul>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0By default, Windows Firewall e=
+xceptions in the Private and Public profiles only apply exceptions to tr=
+affic originating on the local subnet. To expand the exception so that i=
+t applies to multiple subnets, change the exception settings in Windows =
+Firewall with Advanced Security or, if joined to an AD=C2=A0DS domain
+, choose the Domain profile.</p>
+<h4>Remote Operations Targeting Workgroup Computers</h4>
+<p>Administrators can allow Slmgr.vbs to run remotely against computers =
+that belong to a workgroup. To do so, create the <strong>DWORD</strong> =
+value<strong> LocalAccountTokenFilterPolicy</strong> in registry subkey =
+<strong>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Pol=
+icies\System </strong>on KMS clients. Set this value to<strong> 0x01</st=
+rong>.</p>
+<div>
+<a href=3D"#mainSection"></a>
+<a href=3D"#mainSection">Top of Page</a><br />
+</div>
+<h3 id=3D"E1B">Configuring DNS</h3>
+<p>The following sections describe concepts for configuring DNS to work =
+with Volume Activation:</p>
+<ul>
+<li><p>If more than one KMS host is used, see the section, =E2=80=9CChan=
+ging the Default DNS Permissions for SRV Records.=E2=80=9D</p></li>
+<li><p>To enable KMS clients using different DNS servers to find KMS hos=
+ts, see the section, =E2=80=9CPublishing to Multiple DNS Domains.=E2=80=9D=
+</p></li>
+<li><p>To manually add SRV resource records for KMS hosts, see the secti=
+ons, =E2=80=9CManually Creating SRV Records in DNS,=E2=80=9D =E2=80=9CMa=
+nually Creating SRV Records in a BIND=C2=A08.2 or Higher DNS Server,=E2=80=
+=9D and =E2=80=9CDisabling Publishing of KMS SRV Records to DNS.=E2=80=9D=
+</p></li>
+</ul>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0DNS changes may not be reflect=
+ed until all DNS servers have been replicated.</p>
+<h4>Changing the Default DNS Permissions for SRV Records</h4>
+<p>If you are using only one KMS host, you might not need to configure p=
+ermissions in DNS. The default behavior is to allow a computer to create=
+ an SRV RR,
+ and then update it. However, if you have more than one KMS host (the us=
+ual case), the other hosts will be unable to update the SRV RR unless SR=
+V default permissions are changed.</p>
+<p>The following high-level procedure is an example from Microsoft=E2=80=
+=99s own environment. It does not give detailed steps, which might be di=
+fferent from one organization to another, and it is not the only way to =
+achieve the desired result:</p>
+<ol>
+<li><p>Create a global security group in AD=C2=A0DS that will be used fo=
+r your KMS hosts. An example is <em>Key Management Service Group.</em></=
+p></li>
+<li><p>Add each of your KMS hosts to this group. They must all be joined=
+ to the same domain.</p></li>
+<li><p>Once the first KMS host is created, it will create the original S=
+RV record. If the first KMS host is unable to create the SRV resource re=
+cord, it may be because your organization has changed the default permis=
+sions. In this case, manually create the SRV RR as the section, =E2=80=9C=
+Manually Create SRV Records in DNS,=E2=80=9D describes.</p></li>
+<li><p>Set the permissions for the SRV group to allow updates by members=
+ of the Global Security group.</p></li>
+</ol>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0A domain administrator can del=
+egate the ability to carry out the preceding steps to administrators in =
+the organization. To do so,
+ create a security group in AD=C2=A0DS, give that group permission to ch=
+ange the SRV records, and then add the delegates.</p>
+<h4>Publishing to Multiple DNS Domains</h4>
+<p>By default, the KMS host is registered only in the DNS domain to whic=
+h the host belongs. If the network environment has only one DNS domain, =
+no further action is required.</p>
+<p>If there is more than one DNS domain name, you can create a list of D=
+NS domains for a KMS host to use when publishing its SRV RR. Setting thi=
+s registry value suspends the KMS host=E2=80=99s default behavior of pub=
+lishing only in the domain specified as the Primary DNS Suffix.</p>
+<p>Optionally, add <em>priority</em> and <em>weight</em> parameters to t=
+he <strong>DnsDomainPublishList</strong> registry value for KMS. This fe=
+ature enables you to establish KMS host priority groupings and weighting=
+ within each group to define which KMS host to try first and balance tra=
+ffic among multiple KMS hosts.
+</p>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0DNS changes might not be refle=
+cted until all DNS servers have been replicated. Changes made too freque=
+ntly (time &lt; replication time) can leave older records if the change =
+is performed on a server that has not been replicated.
+</p>
+<p>To automatically publish KMS in multiple DNS domains, add each DNS do=
+main suffix to whichever KMS should publish to the multi-string registry=
+ value <strong>DnsDomainPublishList</strong> in registry subkey <strong>=
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Software=
+ProtectionPlatform</strong>.=C2=A0After changing the value
+, restart the Software Licensing Service to create the SRV RRs.</p>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0This key has changed from the =
+Windows Vista location of <strong>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\=
+Windows NT\CurrentVersion\SL</strong>.</p>
+<p>After configuring a KMS host to publish to multiple domains, export t=
+he registry subkey, and then import it in to the registry on additional =
+KMS hosts. To verify that this procedure was successful, check the Appli=
+cation event log on each KMS host. Event ID=C2=A012294 indicates that th=
+e KMS host successfully created the SRV RRs. Event ID=C2=A012293 indicat=
+es that the attempt to create the SRV RRs was unsuccessful. For a comple=
+te list of error codes, see the <em>Volume Activation=C2=A02.0 Operation=
+s Guide</em> at <a href=3D"http://technet.microsoft.com/en-us/library/cc=
+303695.aspx">http://technet.microsoft.com/en-us/library/cc303695.aspx</a=
+><em>.</em></p>
+<h4>Manually Creating SRV Records in DNS</h4>
+<p>If the environment does not support DDNS, the SRV RRs must be manuall=
+y created to publish the KMS host. Environments that do not support DDNS=
+ should disable publishing on all KMS hosts to prevent event logs from c=
+ollecting failed DNS publishing events. To disable auto-publishing, use =
+the Slmgr.vbs script with the <strong>/cdns</strong> command-line option=
+. See the section, =E2=80=9CConfiguring KMS Hosts,=E2=80=9D for more inf=
+ormation about the Slmgr.vbs script.</p>
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0Manually created SRV RRs can c=
+oexist with SRV RRs that KMS hosts automatically publish in other domain=
+s as long as all records are maintained to prevent conflicts.</p>
+<p>Using DNS Manager, in the appropriate forwarding lookup zone, create =
+a new SRV RR using the appropriate information for the location. By defa=
+ult,
+ KMS listens on TCP port=C2=A01688, and the service is _VLMCS. Table=C2=A0=
+4 contains example settings for a SRV RR.</p>
+<p><strong>Table=C2=A04. SRV Resource Record</strong></p>
+<table>
+<tr><th>
+<p>
+Name
+</p>
+</th><th>
+<p>
+Setting
+</p>
+</th></tr>
+<tr><td>
+<p>
+Service
+</p>
+</td><td>
+<p>
+_VLMCS
+</p>
+</td></tr>
+<tr><td>
+<p>
+Protocol
+</p>
+</td><td>
+<p>
+_TCP
+</p>
+</td></tr>
+<tr><td>
+<p>
+Port number
+</p>
+</td><td>
+<p>
+1688
+</p>
+</td></tr>
+<tr><td>
+<p>
+Host offering the service
+</p>
+</td><td>
+<p>
+Fully qualified domain name (FQDN) of the KMS host
+</p>
+</td></tr>
+</table>
+<h4>Manually Creating SRV Records in a BIND=C2=A08.2 or Higher DNS Serve=
+r</h4>
+<p>If the organization uses a non-Microsoft DNS server, the needed SRV R=
+Rs can be created as long as the DNS server is compliant with BIND=C2=A0=
+8.2 or later. When creating the record, include the information shown in=
+ Table=C2=A05. The <em>Priority</em> and <em>Weight</em> settings shown =
+in Table=C2=A05 are only used by Windows=C2=A07 and Windows Server=C2=A0=
+2008=C2=A0R2.</p>
+<p><strong>Table=C2=A05. SRV RR Information</strong></p>
+<table>
+<tr><th>
+<p>
+Name
+</p>
+</th><th>
+<p>
+Setting
+</p>
+</th></tr>
+<tr><td>
+<p>
+Name
+</p>
+</td><td>
+<p>
+_vlmcs._tcp
+</p>
+</td></tr>
+<tr><td>
+<p>
+Type
+</p>
+</td><td>
+<p>
+SRV
+</p>
+</td></tr>
+<tr><td>
+<p>
+Priority
+</p>
+</td><td>
+<p>
+0
+</p>
+</td></tr>
+<tr><td>
+<p>
+Weight
+</p>
+</td><td>
+<p>
+0
+</p>
+</td></tr>
+<tr><td>
+<p>
+Port
+</p>
+</td><td>
+<p>
+1688
+</p>
+</td></tr>
+<tr><td>
+<p>
+Hostname
+</p>
+</td><td>
+<p>
+FQDN of the KMS host
+</p>
+</td></tr>
+</table><br />
+<p>To configure a BIND=C2=A08.2 or later DNS server to support KMS auto-=
+publishing, configure the BIND server to enable RR updates from KMS host=
+s. For example
+, add the following line to the zone definition in named.conf:</p>
+
+<div id=3D"code-snippet-4" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_a0a67478-5=
+f04-40ae-8c18-be7d1c4f7751');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_a0a67478-5f04-40ae-8c18-be7d=
+1c4f7751" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+allow-update { any; };
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<p><strong>Note</strong>=C2=A0=C2=A0=C2=A0You can also add an allow-upda=
+te statement in named.conf.options to allow DDNS for all zones hosted on=
+ this server.</p>
+<h4>Disabling Publishing of KMS SRV Records to DNS</h4>
+<p>KMS hosts automatically publish their existence by creating SRV RRs i=
+n DNS. To disable automatic DNS publishing by a KMS host, use the Slmgr.=
+vbs script with the <strong>/cdns</strong> command-line option.</p>
+<p>Using the Slmgr.vbs script to disable automatic DNS publishing is pre=
+ferred, but you can also perform this task by creating a new <strong>DWO=
+RD</strong> value called <strong>DisableDnsPublishing</strong> in the re=
+gistry and setting its value to 1. This value is in registry subkey <str=
+ong>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Soft=
+wareProtectionPlatform</strong>. To re-enable the default behavior for p=
+ublishing of KMS SRV records to DNS, set the value to <strong>0</strong>=
+.</p>
+<h3 id=3D"EIF">Installing KMS Hosts</h3>
+<p>To enable KMS functionality, a KMS key is installed on a KMS host; th=
+en, the host is activated over the Internet or by phone using Microsoft=E2=
+=80=99s activation services. Computers running Windows=C2=A07 or Windows=
+ Server=C2=A02008=C2=A0R2 can both serve as KMS hosts.</p>
+<p>Windows Vista, Windows Server=C2=A02003, and Windows Server=C2=A02008=
+ can also serve as KMS hosts. The KMS clients that a KMS host can activa=
+te depends on the host key used to activate the KMS host. For more infor=
+mation about KMS host keys, see the <em>Volume Activation=C2=A02.0 Plann=
+ing Guide</em> at <a href=3D"http://technet.microsoft.com/en-us/library/=
+cc303276.aspx">http://technet.microsoft.com/en-us/library/cc303276.aspx<=
+/a>.</p>
+<p>Install and activate a KMS key on a Windows=C2=A07 or Windows Server=C2=
+=A02008=C2=A0R2 computer by using an elevated command prompt:</p>
+<ul>
+<li><p>To install a KMS key, type <strong>slmgr.vbs /ipk <em>KmsKey</em>=
+</strong> at a command prompt.</p></li>
+<li><p>To active online, type <strong>slmgr.vbs /ato</strong> at a comma=
+nd prompt.</p></li>
+<li><p>To activate by using the telephone, type <strong>slui.exe 4</stro=
+ng> at a command prompt.</p></li>
+</ul>
+<p>After activating the KMS key, restart the Software Licensing Service.=
+</p>
+<p>Windows=C2=A07 and Windows Server=C2=A02008=C2=A0R2 display the warni=
+ng shown in Figure=C2=A02 any time you install a KMS host key using the =
+user interface (UI). (Users will not see this warning if they install a =
+KMS host key by using the Slmgr.vbs script.) This message prevents accid=
+entally installing a KMS key on computers that administrators do not int=
+end to be KMS hosts.</p>
+<p><img id=3D"GR8543" alt=3D"The KMS key warning" src=3D"http://i.techne=
+t.microsoft.com/dynimg/IC306257.jpg" title=3D"The KMS key warning" xmlns=
+=3D"" /></p>
+<p><strong>Figure=C2=A02. The KMS key warning</strong></p>
+<p>To verify that the KMS host is configured correctly, check the KMS co=
+unt to see whether it is increasing. In the Command Prompt window on the=
+ KMS host
+, type <strong>slmgr.vbs /dli</strong> to display the current KMS count.=
+ You can also check the Key Management Service log in the Applications a=
+nd Services Logs folder for event ID=C2=A012290. The Key Management Serv=
+ice log records activation requests from KMS clients. Each event display=
+s the name of the computer and the time stamp of each activation request=
+.</p>
+<div>
+<a href=3D"#mainSection"></a>
+<a href=3D"#mainSection">Top of Page</a><br />
+</div>
+<h3 id=3D"E4IAC">Configuring KMS Clients</h3>
+<p>This section describes concepts for installing and configuring comput=
+ers as KMS clients. By default, Volume Licensing editions of Windows Vis=
+ta, Windows=C2=A07
+, Windows Server=C2=A02008, and Windows Server=C2=A02008=C2=A0R2 are KMS=
+ clients. If the computers the organization wants to activate using KMS =
+are using any of these operating systems and the network allows DNS auto=
+-discovery, no further configuration is needed.</p>
+<p>If a KMS client is configured to search for a KMS host using DNS but =
+does not receive SRV records from DNS, Windows=C2=A07 and Windows Server=
+=C2=A02008=C2=A0R2 log the error in the event log.</p>
+<h4>Manually Specifying a KMS Host</h4>
+<p>You can manually assign a KMS host to KMS clients by using KMS host c=
+aching. Manually assigning a KMS host disables auto-discovery of KMS on =
+the KMS client. Manually assign a KMS host to a KMS client by running:</=
+p>
+
+<div id=3D"code-snippet-5" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_5d8df889-1=
+b8a-4c57-a2e3-aa828e61be23');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_5d8df889-1b8a-4c57-a2e3-aa82=
+8e61be23" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+slmgr.vbs /skms &lt;value&gt;:&lt;port&gt;
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<p>where <em>value</em> is either the <em>KMS_FQDN</em><em>,</em><em> IP=
+v4Address</em><em>,</em><em>=C2=A0</em>or <em>NetbiosName</em> of the KM=
+S host and <em>port</em> is the TCP port on the KMS host.</p>
+<h4>Enabling Auto-discovery for a KMS Client</h4>
+<p>By default, KMS clients automatically attempt to discover KMS hosts. =
+You can disable auto-discovery by manually assigning a KMS host to a KMS=
+ client. This action also clears the KMS host name from the KMS client=E2=
+=80=99s cache. If auto-discovery is disabled, you can re-enable it by ru=
+nning <strong>slmgr.vbs /ckms</strong> at a command prompt.</p>
+<h4>Adding Suffixed Entries to KMS Clients</h4>
+<p>By adding the address of a DNS server containing the SRV RR as a suff=
+ixed entry on KMS clients, you can advertise KMS hosts on one DNS server=
+ and allow KMS clients with other primary DNS servers to find it. For mo=
+re information about configuring a domain suffix search list on KMS clie=
+nts, see the Microsoft Help and Support article, =E2=80=9CHow to configu=
+re a domain suffix search list on the Domain Name System clients,=E2=80=9D=
+ at <a href=3D"http://support.microsoft.com/kb/275553">
+http://support.microsoft.com/kb/275553</a>.</p>
+<h4>Deploying KMS Clients</h4>
+<p>The information in this section is for Volume Licensing customers usi=
+ng the Windows Automated Installation Kit (Windows=C2=A0AIK) to deploy a=
+nd activate a Windows operating system. Prepare KMS clients for deployme=
+nt by using the System Preparation Tool (Sysprep) or the Slmgr.vbs scrip=
+t:</p>
+<ul>
+<li><p><strong>Sysprep.</strong> Before capturing an image, run Sysprep =
+with the <strong>/generalize </strong>command-line option to reset the a=
+ctivation timer, security identifier (SID), and other important settings=
+. Resetting the activation timer prevents the image=E2=80=99s grace peri=
+od from expiring before the image is deployed. Running Sysprep.exe does =
+not remove the installed product key, and you are not prompted for a new=
+ key during mini-setup. If no rearms are left, the Sysprep operation fin=
+ishes, but the activation timers are not changed and an error is returne=
+d that explains the situation.</p></li>
+<li><p><strong>Slmgr.vbs.</strong> When building demo virtual machines f=
+or internal use (for example, building virtual machines for the organiza=
+tion=E2=80=99s sales department or to set up a temporary training enviro=
+nment), running the Slmgr.vbs script with the <strong>/rearm</strong> co=
+mmand-line option extends the grace period another 30=C2=A0days, which i=
+n turn resets the activation timer but makes no other changes to the com=
+puter. The activation timer can be reset three times for computers runni=
+ng Windows=C2=A07 or Windows Server=C2=A02008=C2=A0R2.</p></li>
+</ul>
+<h4>Manually Activating a KMS Client</h4>
+<p>By default, KMS clients automatically attempt to activate themselves =
+at preset intervals. To manually activate KMS clients (for example, disc=
+onnected clients) before distributing them to users, use the Control Pan=
+el System item, or run <strong>slmgr.vbs /ato</strong> at an elevated co=
+mmand prompt. The Slmgr.vbs script reports activation success or failure=
+ and provides a result code. To perform activation, the KMS client must =
+have access to a KMS host on the organization=E2=80=99s network.</p>
+<h4>Converting MAK Clients to KMS and KMS Clients to MAK</h4>
+<p>By default, Windows=C2=A07 and Windows Server=C2=A02008=C2=A0R2 opera=
+ting systems use KMS for activation. To change existing KMS clients to M=
+ultiple Access Key (MAK) clients
+, simply install a MAK. Similarly, to change MAK clients to KMS clients,=
+ run:</p>
+
+<div id=3D"code-snippet-6" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_73d0547c-d=
+ed9-4dd2-b7c0-06f573c400be');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_73d0547c-ded9-4dd2-b7c0-06f5=
+73c400be" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+slmgr.vbs /ipk &lt;KmsSetupKey&gt;
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<p>where <em>KmsSetupKey</em> is one of the setup keys shown in Table=C2=
+=A06. After installing the KMS setup key, activate the KMS client by run=
+ning cscript slmgr.vbs /ato.</p>
+<p><strong>Table=C2=A06. KMS Client Setup Keys</strong></p>
+<table>
+<tr><th><p>Operating system edition</p></th><th><p>Product key</p></th><=
+/tr>
+<tr><td colspan=3D"2"><p><strong>Windows=C2=A07</strong></p></td></tr>
+<tr><td><p>Windows=C2=A07 Professional</p></td><td><p>FJ82H-XT6CR-J8D7P-=
+XQJJ2-GPDD4</p></td></tr>
+<tr><td><p>Windows=C2=A07 Professional N</p></td><td><p>MRPKT-YTG23-K7D7=
+T-X2JMM-QY7MG</p></td></tr>
+<tr><td><p>Windows=C2=A07 Enterprise</p></td><td><p>33PXH-7Y6KF-2VJC9-XB=
+BR8-HVTHH</p></td></tr>
+<tr><td><p>Windows=C2=A07 Enterprise N</p></td><td><p>YDRBP-3D83W-TY26F-=
+D46B2-XCKRJ</p></td></tr>
+<tr><td colspan=3D"2"><p><strong>Windows Server=C2=A02008=C2=A0R2</stron=
+g></p></td></tr>
+<tr><td><p>Windows Server=C2=A02008=C2=A0R2 HPC Edition</p></td><td><p>F=
+KJQ8-TMCVP-FRMR7-4WR42-3JCD7</p></td></tr>
+<tr><td><p>Windows Server=C2=A02008=C2=A0R2 Datacenter</p></td><td><p>74=
+YFP-3QFB3-KQT8W-PMXWJ-7M648</p></td></tr>
+<tr><td><p>Windows Server=C2=A02008=C2=A0R2 Enterprise</p></td><td><p>48=
+9J6-VHDMP-X63PK-3K798-CPX3Y</p></td></tr>
+<tr><td><p>Windows Server=C2=A02008=C2=A0R2 for Itanium-Based Systems</p=
+></td><td><p>GT63C-RJFQ3-4GMB6-BRFB9-CB83V</p></td></tr>
+<tr><td><p>Windows Server=C2=A02008=C2=A0R2 Standard</p></td><td><p>YC6K=
+T-GKW9T-YTKYR-T4X34-R7VHC</p></td></tr>
+<tr><td><p>Windows Web Server=C2=A02008=C2=A0R2</p></td><td><p>6TPJF-RBV=
+HG-WBW2R-86QPH-6RTM4</p></td></tr>
+</table>
+<h4>Converting Retail Editions to Volume Activation</h4>
+<p>Retail editions of Windows=C2=A07 Professional and Windows Server=C2=A0=
+2008=C2=A0R2 can be converted to KMS clients, provided that the organiza=
+tion has acquired the appropriate volume licenses and conforms to the Pr=
+oduct Use Rights. To convert Windows=C2=A07 Professional and all edition=
+s of Windows Server=C2=A02008=C2=A0R2 from retail to a KMS client
+, skip the <strong>Product Key</strong> page during operating system ins=
+tallation. When installation is complete, open an elevated Command Promp=
+t window and type:</p>
+
+<div id=3D"code-snippet-7" class=3D"codeSnippetContainer" xmlns=3D"">
+    <div class=3D"codeSnippetContainerTabs">
+        =
+
+    </div>
+    <div class=3D"codeSnippetContainerCodeContainer">
+        <div class=3D"codeSnippetToolBar">
+            <div class=3D"codeSnippetToolBarText">
+                <a name=3D"CodeSnippetCopyLink" style=3D"display: none;"=
+ title=3D"Copy to clipboard." href=3D"javascript:if (window.epx.codeSnip=
+pet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_cee56403-2=
+922-45c2-84c0-3dcdb580100c');">Copy</a>
+            </div>
+        </div>
+        <div id=3D"CodeSnippetContainerCode_cee56403-2922-45c2-84c0-3dcd=
+b580100c" class=3D"codeSnippetContainerCode" dir=3D"ltr">
+            <div style=3D"color:Black;"><pre>
+
+Slmgr.vbs /ipk &lt;SetupKey&gt;
+</pre></div>
+            =
+
+        </div>
+    </div>
+</div>
+<br />
+<p>where <em>SetupKey</em> is the KMS client setup key from Table=C2=A06=
+ that corresponds to the edition of Windows=C2=A07 or Windows Server=C2=A0=
+2008=C2=A0R2.</p>
+<div>
+<a href=3D"#mainSection"></a>
+<a href=3D"#mainSection">Top of Page</a><br />
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id=3D"contentFeedback">
+    <form method=3D"post" action=3D"/en-us/library/feedback/add/ff793409=
+.aspx">
+        <input name=3D"__RequestVerificationToken" type=3D"hidden" value=
+=3D"syX8KEXu1lHi43HaJADncEiD4Le9b7_9O5yarDGnLXArOYem-tpsT7QykCmDd_IqnXcn=
+6fS-TSpJrNAozHN18OKVxZuauV86GSjyWB_30KUIy3B8PKrF-pdzb9o6DvIcNqd6hw2" />
+    <div id=3D"contentFeedbackContainer">
+        <div class=3D"FeedbackTitleContainer">
+            <a name=3D"feedback"></a>
+        Did you find this helpful?
+            <input id=3D"rdIsUsefulYes" name=3D"rdIsUseful" type=3D"radi=
+o" value=3D"1" onclick=3D"toggleContentFeedback('Yes');" /><label for=3D=
+"rdIsUsefulYes">Yes</label>
+            <input id=3D"rdIsUsefulNo" name=3D"rdIsUseful" type=3D"radio=
+" value=3D"0" onclick=3D"toggleContentFeedback('No');" /><label for=3D"r=
+dIsUsefulNo">No</label>
+        =
+
+        </div>
+        =
+
+            <div id=3D"contentFeedbackQAContainer">
+                =
+
+                    <div id=3D"feedbackListNoContainer" class=3D"Feedbac=
+kListContainer">
+                        =
+
+                            <div>
+                                <input id=3D"chkbxNo201" name=3D"chkbxNo=
+" type=3D"checkbox" value=3D"201" />
+                                <label for=3D"chkbxNo201">Not accurate</=
+label>
+                            </div>
+                        =
+
+                            <div>
+                                <input id=3D"chkbxNo202" name=3D"chkbxNo=
+" type=3D"checkbox" value=3D"202" />
+                                <label for=3D"chkbxNo202">Not enough dep=
+th</label>
+                            </div>
+                        =
+
+                            <div>
+                                <input id=3D"chkbxNo203" name=3D"chkbxNo=
+" type=3D"checkbox" value=3D"203" />
+                                <label for=3D"chkbxNo203">Need more code=
+ examples</label>
+                            </div>
+                        =
+
+                    </div>
+                =
+
+                <div class=3D"FeedbackTellUsMoreContainer">
+                    <textarea id=3D"feedbackText" name=3D"feedbackText" =
+class=3D"TellUsMoreTextBoxSearchLoaded" onfocus=3D"WatermarkFocus(this, =
+'Tell us more...', 'TellUsMoreTextBoxSearch')" onblur=3D"WatermarkBlur(t=
+his, 'Tell us more...', 'TellUsMoreTextBoxSearchLoaded')" onmouseover=3D=
+"TextBoxCharactersCounter(this, document.getElementById('feedbackTextCou=
+nter'), 1500)" onkeydown=3D"TextBoxCharactersCounter(this, document.getE=
+lementById('feedbackTextCounter'), 1500)" onkeyup=3D"TextBoxCharactersCo=
+unter(this, document.getElementById('feedbackTextCounter'), 1500)">Tell =
+us more...</textarea>
+                </div>
+                <span class=3D"counter">(<span id=3D"feedbackTextCounter=
+">1500</span> characters remaining)</span>
+                <input type=3D"hidden" id=3D"returnUrl" name=3D"returnUr=
+l" value=3D"http://technet.microsoft.com/en-us/library/ff793409.aspx" />=
+
+                <input type=3D"submit" id=3D"submit" value=3D"Submit" ti=
+tle=3D"Click to Submit Feedback" onclick=3D"WatermarkOnSubmit(document.g=
+etElementById('feedbackText'), 'Tell us more...', 'TellUsMoreTextBoxSear=
+ch')" />
+                <div style=3D"clear: both;"></div>
+            </div>  =
+
+        =
+
+    </div>
+    </form>
+</div>
+    =
+
+
+
+
+</div>
+
+
+            </div>
+            <div class=3D"clear"></div>
+        =
+
+            =
+
+    =
+
+   <div id=3D"ux-footer" class=3D" ltr">
+
+    <div class=3D"ux-footer-clear"></div>
+    <div id=3D"footerRight">
+        <div id=3D"FooterLogoContainer"><div id=3D"FooterLogo"></div></d=
+iv>
+        <div id=3D"FooterCopyright">=C2=A9 2013 Microsoft</div>
+    </div>
+    <div id=3D"footerLeft">
+        <div id=3D"footerProfileLink">
+        <div data-fragmentName=3D"ManageProfileLink" id=3D"Fragment_Mana=
+geProfileLink" xmlns=3D"http://www.w3.org/1999/xhtml">
+  <a href=3D"http://go.microsoft.com/?linkid=3D8786243" xmlns=3D"http://=
+www.w3.org/1999/xhtml">Manage Your Profile</a>
+</div>
+        </div>
+        <div id=3D"footerGroup">
+            <div id=3D"LinkGroup">
+                <div id=3D"Links1"><div data-fragmentName=3D"FooterLinks=
+" id=3D"Fragment_FooterLinks" xmlns=3D"http://www.w3.org/1999/xhtml">
+  =
+
+  <div class=3D"LinkList">
+    <div>
+      <div class=3D"LinkColumn">
+        <a href=3D"http://technet.microsoft.com/cc543196.aspx" xmlns=3D"=
+http://www.w3.org/1999/xhtml">Newsletter</a>
+      </div>
+      <div class=3D"LinksDivider">|</div>
+      <div class=3D"LinkColumn">
+        <a href=3D"http://technet.microsoft.com/cc512759.aspx" xmlns=3D"=
+http://www.w3.org/1999/xhtml">Contact Us</a>
+      </div>
+      <div class=3D"LinksDivider">|</div>
+      <div class=3D"LinkColumn">
+        <a href=3D"http://go.microsoft.com/fwlink/?linkid=3D248681" xmln=
+s=3D"http://www.w3.org/1999/xhtml">Privacy Statement</a>
+      </div>
+      <div class=3D"LinksDivider">|</div>
+      <div class=3D"LinkColumn">
+        <a href=3D"http://technet.microsoft.com/cc300389.aspx" xmlns=3D"=
+http://www.w3.org/1999/xhtml">Terms of Use</a>
+      </div>
+      <div class=3D"LinksDivider">|</div>
+      <div class=3D"LinkColumn">
+        <a href=3D"http://www.microsoft.com/About/Legal/EN/US/Intellectu=
+alProperty/Trademarks/EN-US.aspx" xmlns=3D"http://www.w3.org/1999/xhtml"=
+>Trademarks</a>
+      </div>
+      <div class=3D"Clear"></div>
+    </div>
+  </div>
+</div></div>
+            </div>
+            <div id=3D"Feedback">
+                <div class=3D"feedbackListItem">
+                    <div class=3D"LinksDivider">|</div>
+                    <div class=3D"LinkColumn">
+                        =
+
+
+
+
+
+
+<div class=3D"FooterSiteFeedBack">
+    <a id=3D"SiteFeedbackLinkOpener" href=3D"javascript:void(0)">
+        <span class=3D"FeedbackButton clip20x21" id=3D"FeedbackButton">
+            <img id=3D"feedBackImg" class=3D"cl_footer_feedback_icon" sr=
+c=3D"http://i3.technet.microsoft.com/Areas/Epx/Content/Images/ImageSprit=
+e.png" alt=3D"Site Feedback" />
+        </span>
+        Site Feedback
+    </a>
+    =
+
+    <div id=3D"SiteFeedbackLinkContainer" class=3D"SiteFeedbackLinkConta=
+iner" style=3D"display: none;">
+    <form id=3D"siteFeedbackForm" method=3D"post" action=3D"/en-us/libra=
+ry/feedback/add/ff793409(v=3Dtechnet.10).aspx">
+        <input name=3D"__RequestVerificationToken" type=3D"hidden" value=
+=3D"LCy6fa1bBdMgFPd8GT5ljZCYpCdtZdo2EuwLIQl4Bdyw9O_kUiMOpPH8dlMldI6mTJBp=
+_1etW5xpCASX4kl93YQh8b4_aagvYPR9lDlHvHYLtC0l7M9GApK1UJLEagvJhTTerg2" />
+        <div class=3D"SiteFeedbackLinkTitleContainer">
+            <div class=3D"SiteFeedbackLinkTitle">
+                Site Feedback
+            </div>
+            <div class=3D"SiteFeedbackLinkCancel">
+                <a id=3D"SiteFeedbackLinkCloser" href=3D"javascript:void=
+(0)">x</a>
+            </div>
+        </div>
+        <div class=3D"SiteFeedbackLinkData">
+            <div class=3D"SiteFeedbackLinkInfoText">
+                Tell us about your experience...
+            </div>
+            <div class=3D"QuestionText">
+                Did the page load quickly?
+            </div>
+            <div class=3D"AnswerText">
+                =
+
+                <span>
+                    Yes<span>
+                        <input id=3D"searchBox" name=3D"searchBox" type=3D=
+"radio" value=3D"1" /></span></span>
+                =
+
+                <span>
+                    No<span>
+                        <input id=3D"searchBox" name=3D"searchBox" type=3D=
+"radio" value=3D"0" /></span></span>
+                =
+
+            </div>
+            <div class=3D"QuestionText">
+                Do you like the page design?
+            </div>
+            <div class=3D"AnswerText">
+                =
+
+                <span>
+                    Yes<span>
+                        <input id=3D"tabbedCode" name=3D"tabbedCode" typ=
+e=3D"radio" value=3D"1" /></span></span>
+                =
+
+                <span>
+                    No<span>
+                        <input id=3D"tabbedCode" name=3D"tabbedCode" typ=
+e=3D"radio" value=3D"0" /></span></span>
+                =
+
+            </div>
+            <div class=3D"QuestionText">
+                Tell us more
+            </div>
+            <div class=3D"SiteFeedbackLinkTextAreaContainer">
+                <textarea id=3D"feedbackText" data-maxlength=3D"4000" na=
+me=3D"feedbackText" cols=3D"25" rows=3D"5" class=3D"SiteFeedbackLinkText=
+Area"></textarea>
+                =
+
+                <textarea id=3D"feedbackDescription" name=3D"feedbackDes=
+cription" cols=3D"25" rows=3D"10" style=3D"display: none;">Enter descrip=
+tion here.</textarea>
+                <input type=3D"hidden" id=3D"feedbackPriority" name=3D"f=
+eedbackPriority" value=3D"" />
+                <input type=3D"hidden" id=3D"feedbackSourceUrl" name=3D"=
+feedbackSourceUrl" value=3D"" />
+                <input type=3D"hidden" id=3D"ClientIP" name=3D"ClientIP"=
+ value=3D"" />
+                <input type=3D"hidden" id=3D"ClientOS" name=3D"ClientOS"=
+ value=3D"" />
+                <input type=3D"hidden" id=3D"ClientBrowser" name=3D"Clie=
+ntBrowser" value=3D"" />
+                <input type=3D"hidden" id=3D"ClientTime" name=3D"ClientT=
+ime" value=3D"" />
+                <input type=3D"hidden" id=3D"ClientTimeZone" name=3D"Cli=
+entTimeZone" value=3D"" />
+                =
+
+            </div>
+            <div>
+                <input id=3D"siteFeedbackSubmit" type=3D"submit" value=3D=
+"Send" class=3D"SiteFeedbackLinkSubmit" />
+            </div>
+        </div>
+        <input type=3D"hidden" id=3D"returnUrl" name=3D"returnUrl" value=
+=3D"http://technet.microsoft.com/en-us/library/ee156802(v=3Dtechnet.10).=
+aspx" />
+    </form>
+</div>
+    =
+
+    =
+
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style=3D"clear:both"></div>
+        <div id=3D"Links2"></div>
+    </div>
+</div> =
+
+
+
+            <div class=3D"footerPrintView">
+                <div class=3D"footerCopyrightPrintView">=C2=A9 2013 Micr=
+osoft. All rights reserved.</div>
+            </div>
+
+            =
+
+            =
+
+    =
+
+    =
+
+    <input id=3D"tocPaddingPerLevel" type=3D"hidden" value=3D"17" />
+
+
+        =
+
+            <input id=3D"MtpsDevice" type=3D"hidden" value=3D"Lightweigh=
+t" />
+
+
+<![CDATA[ Third party scripts and code linked to or referenced from this=
+ website are licensed to you by the parties that own such code, not by M=
+icrosoft.  See ASP.NET Ajax CDN Terms of Use =E2=80=93 http://www.asp.ne=
+t/ajaxlibrary/CDN.ashx. ]]>
+        =
+
+            =
+
+            =
+
+            =
+
+            =
+
+            =
+
+        =
+
+
+
+
+
+
+<noscript><div><img alt=3D"DCSIMG" id=3D"Img1" width=3D"1" height=3D"1" =
+src=3D"http://m.webtrends.com/dcsjwb9vb00000c932fd0rjc7_5p3t/njs.gif?dcs=
+uri=3D/nojavascript&amp;WT.js=3DNo" /></div></noscript>
+
+
+
+
+
+
+
+
+
+<noscript>
+  <a href=3D"http://www.omniture.com" title=3D"Web Analytics">
+    <img src=3D"//msstonojstechnet.112.2o7.net/b/ss/msstonojstechnet/1/H=
+.20.2--NS/0" height=3D"1" width=3D"1" border=3D"0" alt=3D"" />
+  </a>
+</noscript>
+
+
+
+
+        </div>
+    <script type=3D"text/javascript" class=3D"mtps-injected">
+/*<![CDATA[*/
+(function(window,document){"use strict";function preload(scripts){for(va=
+r result=3D[],script,e,i=3D0;i<scripts.length;i++)script=3Dscripts[i],sc=
+ript.hasOwnProperty("url")&&(e=3Ddocument.createElement("script"),e.src=3D=
+script.url,script.throwaway=3De),result.push(script);return result}funct=
+ion inject(scripts,index){var script,elem;if(index>=3Dscripts.length){de=
+lete mtps.injectScripts;return}script=3Dscripts[index],elem=3Ddocument.c=
+reateElement("script"),elem.className=3D"mtps-injected",elem.async=3D!1;=
+var isLoaded=3D!1,timeoutId=3D0,injectNextFnName=3D"",injectNext=3Delem.=
+onerror=3Dfunction(){isLoaded||(isLoaded=3D!0,inject(scripts,index+1),wi=
+ndow.clearTimeout(timeoutId),elem.onload=3Delem.onerror=3Delem.onreadyst=
+atechange=3Dnull,injectNextFnName&&delete mtps[injectNextFnName],elem.re=
+moveEventListener&&elem.removeEventListener("load",injectNext,!1))};elem=
+.addEventListener?elem.addEventListener("load",injectNext,!1):elem.ready=
+State=3D=3D=3D"uninitialized"?elem.onreadystatechange=3Dfunction(){(this=
+.readyState=3D=3D=3D"loaded"||this.readyState=3D=3D=3D"complete")&&injec=
+tNext()}:elem.onload=3DinjectNext,script.hasOwnProperty("url")?(timeoutI=
+d=3Dwindow.setTimeout(injectNext,12e4),elem.src=3Dscript.url):(injectNex=
+tFnName=3D"_injectNextScript_"+index,mtps[injectNextFnName]=3DinjectNext=
+,timeoutId=3Dwindow.setTimeout(injectNext,2e3),elem.text=3D"try {\n"+scr=
+ipt.txt+"\n} finally { MTPS."+injectNextFnName+" && MTPS."+injectNextFnN=
+ame+"(); }"),parent.appendChild(elem)}var mtps=3Dwindow.MTPS||(window.MT=
+PS=3D{}),parent=3Ddocument.getElementsByTagName("head")[0];mtps.injectSc=
+ripts=3Dfunction(scripts){inject(preload(scripts),0)}})(window,document)=
+;
+MTPS.injectScripts([
+	{ txt: "/**/\r\n(window.MTPS || (window.MTPS =3D {})).cdnDomains || (wi=
+ndow.MTPS.cdnDomains =3D { \r\n\t\"image\": \"http://i.technet.microsoft=
+.com\", \r\n\t\"js\": \"http://i2.technet.microsoft.com\", \r\n\t\"css\"=
+: \"http://i3.technet.microsoft.com\"\r\n});\r\n/**/" },
+	{ txt: "//\n  var literalNormalizedUrl =3D \u0027/en-us/library/ff79340=
+9(d=3Ddefault,l=3Den-us,v=3Dtechnet.10).aspx\u0027;\n  var wt_nvr_ru =3D=
+ \u0027WT_NVR_RU\u0027;\n  var wt_fpcdom =3D \u0027.microsoft.com\u0027;=
+\n  var wt_domlist =3D \u0027technet.microsoft.com\u0027;\n  var wt_path=
+list =3D \u0027/technet/\u0027;\n  var wt_paramlist =3D \u0027DCSext.mtp=
+s_techcenter\u0027;\n  var wt_siteid =3D \u0027TECHNET\u0027;\n  var gDo=
+main =3D \u0027m.webtrends.com\u0027;\n  var gDcsId =3D \u0027dcsjwb9vb0=
+0000c932fd0rjc7_5p3t\u0027;\n  var gFpc =3D \u0027WT_FPC\u0027;\n\n\n\n =
+ if (document.cookie.indexOf(gFpc + \"=3D\") =3D=3D -1) {\n    var wtidJ=
+s =3D document.createElement(\"script\");\n    wtidJs.src =3D \"//\" + g=
+Domain + \"/\" + gDcsId + \"/wtid.js\";\n    document.getElementsByTagNa=
+me(\"head\")[0].appendChild(wtidJs);\n  }\n\n\n\n  var detectedLocale =3D=
+ \u0027en-us\u0027;\n  var wtsp =3D \u0027_technet_library_desktopdeploy=
+ment_\u0027;\n  var gTrackEvents =3D \u00270\u0027;\n/**/" },
+	{ txt: "/**/\n  var omni_guid =3D \"4636a3a3-2204-41ae-a2cc-5beb2fb3012=
+a\";\n/**/" },
+	{ url: "http://i2.technet.microsoft.com/Combined.js?resources=3D0:webtr=
+endsscript,1:omni_rsid_TechNet;/Areas/Global/Content/Webtrends/resources=
+:0,/Areas/Global/Content/Omniture/resources/TechNet:1&amp;hashKey=3D8FFA=
+6D1FF710842E9298ABD38B734B38" },
+	{ url: "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js" },
+	{ url: "http://i2.technet.microsoft.com/Areas/Epx/Content/Scripts/Utili=
+ties.js" },
+	{ txt: "var omnitureTracking =3D true;" },
+	{ url: "http://i2.technet.microsoft.com/Combined.js?resources=3D0:megab=
+lade.1,1:SearchBox;/Areas/Epx/Themes/Shared/Content:0,/Areas/Epx/Themes/=
+Base/Content:1&amp;hashKey=3D82823761E41AA5A4D030043FB1671ACB" },
+	{ url: "http://i2.services.social.microsoft.com/search/Widgets/SearchBo=
+x.jss?boxid=3DHeaderSearchTextBox&btnid=3DHeaderSearchButton&brand=3DTec=
+hNet&loc=3Den-us&watermark=3DTechNet&focusOnInit=3Dfalse" },
+	{ url: "http://i2.technet.microsoft.com/Combined.js?resources=3D0:Heade=
+r.1,1:Toc,1:NavigationResize,2:FeedbackCounter,2:Feedback,3:SiteFeedback=
+Link,3:Topic,3:CodeSnippet,3:TopicNotInScope,3:CollapsibleArea,3:Version=
+Selector,3:SurveyBroker;/Areas/Epx/Themes/TechNet/Content:0,/Areas/Epx/L=
+ibrary/Content:1,/Areas/Epx/Shared/Content:2,/Areas/Epx/Content/Scripts:=
+3&amp;hashKey=3D5E94EB6A4E6828B255FCA97B69229F5E" }
+]);
+
+/*]]>*/
+</script></body>
+</html>
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline
+Content-Type: image/png
+Content-Location: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAADBJREFUGFdj+P//vwAQvwdiZGDAAAJAEQMk0QSwIAwAJRKAeD6KIFQXpgRWo3BZDgCRkFcr/VArCwAAAABJRU5ErkJggg==
+Content-Transfer-Encoding: Base64
+
+iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAAXNSR0IArs4c6QAA
+AARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3
+YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAADBJREFUGFdj+P//vwAQvwdiZGDA
+AAJAEQMk0QSwIAwAJRKAeD6KIFQXpgRWo3BZDgCRkFcr/VArCwAAAABJRU5ErkJg
+gg==
+
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline; filename=Megablade.1.css
+Content-Type: text/css; name=Megablade.1.css
+Content-Location: http://i2.technet.microsoft.com/Areas/EPX/Themes/Shared/Content/Megablade.1.css
+Content-Transfer-Encoding: 8bit
+
+#megabladeContainer{z-index:2000;min-width:987px;width:100%;background:#424242;height:20px;line-height:1.2;color:#fff;top:0;left:0;position:absolute;text-align:center;font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif;}#megabladeContainer ul,#megabladeContainer li{margin:0;padding:0;background:0;line-height:normal;}#megabladeContainer .menuContainerLayout ul{padding-bottom:1px;}#megabladeContainer li{list-style:none;}#megabladeContainer a:focus{outline:0;}#megabladeContainer .bladeItemMenuContainer a:hover,#megabladeContainer .bladeItemMenuContainer a:focus,#megabladeContainer .Logo a:focus{text-decoration:underline;}#megabladeContainer #megabladeContainerCenter{margin:0 auto;width:980px;padding:0 0 0 5px;_padding:0 0 0 11px;}#megabladeContainer #megabladeItems{font-size:11px;margin:0;height:20px;line-height:1.3;}#megabladeContainer #megabladeItems .Logo{float:left;padding:3px 0 0;margin:0 14px 0 0;height:17px;background:0;}#megabladeContainer .bladeItem{float:left;padding:3px 14px 4px;height:13px;cursor:pointer;list-style:none;}#megabladeContainer a,#megabladeContainer a:hover,#megabladeContainer a:link,#megabladeContainer a:active,#megabladeContainer a:visited{text-decoration:none;color:#fff;font-weight:normal;}#megabladeContainer .bladeItemActive,#megabladeContainer .bladeItemExpanded{background:#666;}#megabladeContainer .bladeItemMenuContainer{background:#666;border-bottom:solid 5px #ccc;position:absolute;text-align:left;_margin:0 0 0 11px;overflow:hidden;}#megabladeContainer .bladeItemMenu{padding:0 40px 40px;min-height:265px;width:904px;_width:980px;overflow:hidden;}#megabladeContainer .bladeItemMenu ul{float:left;width:176px;padding-right:20px;overflow:hidden;}#megabladeContainer .bladeItemMenu li{margin:0;padding:15px 0 0;line-height:1.5;_line-height:1.25;}#megabladeContainer .bladeItemMenu li a{display:block;_display:inline;margin:0;padding:0;font-size:90%;}#megabladeContainer .bladeItemMenu a img{border:0;}#megabladeContainer .bladeItemMenu h5{font:165% 'Segoe UI Light','Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif;font-weight:100;color:#fff;min-height:30px;margin:0;white-space:nowrap;}#megabladeContainer .bladeItem .caret{width:6px;height:3px;margin:0 0 2px 4px;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAADBJREFUGFdj+P//vwAQvwdiZGDAAAJAEQMk0QSwIAwAJRKAeD6KIFQXpgRWo3BZDgCRkFcr/VArCwAAAABJRU5ErkJggg==') 0 0 no-repeat;_background:url('/Areas/Sto/Content/Images/carets.png') 0 0 no-repeat;display:inline-block;font-size:3px;}*:first-child+html #megabladeContainer .bladeItem .caret{background:url('/Areas/Sto/Content/Images/carets.png') 0 0 no-repeat;}#megabladeContainer .bladeItem .caret.caretActive{background-position:0 -3px;}#megabladeContainer .menuContainerLayout{float:left;width:196px;margin:0 25px 0 0;padding:13px 0 0;}#megabladeContainer .menuContainerLayoutSplashGuard{float:left;width:1px;height:200px;margin:50px 29px 0 -25px;border-left:1px solid #999;}@media print{#megabladeContainer{display:none;}}
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline; filename="ff404193.productLogoSprite_transparent(en-us,MSDN.10).png"
+Content-Type: image/png; name="ff404193.productLogoSprite_transparent(en-us,MSDN.10).png"
+Content-Location: http://i.technet.microsoft.com/ff404193.productLogoSprite_transparent(en-us,MSDN.10).png
+Content-Transfer-Encoding: Base64
+
+iVBORw0KGgoAAAANSUhEUgAAADIAAAHWCAYAAAA1ndqRAAAAGXRFWHRTb2Z0d2Fy
+ZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAA
+AAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5U
+Y3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6
+eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8x
+Mi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRw
+Oi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpE
+ZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5h
+ZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRv
+YmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0
+dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1l
+bnRJRD0ieG1wLmRpZDo1NDUxRTY0MTE3MDhFMjExQjBBREM4NzE3QzZBMjRCOCIg
+eG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo3MzQxNDE1QjA4MTcxMUUyOTQ3NDg0
+QTQyODBGQjE0NiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo3MzQxNDE1QTA4
+MTcxMUUyOTQ3NDg0QTQyODBGQjE0NiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQ
+aG90b3Nob3AgQ1M1LjEgV2luZG93cyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJl
+ZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjU2NTFFNjQxMTcwOEUyMTFCMEFEQzg3MTdD
+NkEyNEI4IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU0NTFFNjQxMTcwOEUy
+MTFCMEFEQzg3MTdDNkEyNEI4Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpS
+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
+tColFV9FtOozovL1FDd2oCkl99APkcNJSNg1RGPA+4bw61EhKV+kiiBTISTUqUf7
+UOeDdn12vSoe99GqnmhqTz8JLW8RiWiXyjkfuve4Xd7o0ackwl2iErGGDip8k1pF
+E6SqZxNbO4uogaim9Vj6vNVVtM7tCJ5q4ckECWGQTuHQotGllFiQc+vr9ToBJt6r
+g1E2ZvgzX6/6YtfjlVqLU2ItAsRzPWv4HoMe7T2oSwEDiPbGahpb9CYVRZKkKj8j
+tmY+TorQkjYT6Zn1R9Z9O23dJxVlP3zjen59XtTu2qNb6z1GDu06vFWrCCWTHlk8
+3TguJOMAU7GbpC6DOhfNie3+iB97a18RSfpZB6KfhbRqV3TKgJ37jpAuow7GGhpf
++CpAeKTWf0CsdBn0rpC+ME+ly98a9tCCH6ffqaS7VOhnhizt4X6YX8qnf7lswpGH
+DL1v8ICOrTQYk6eLciXxWcAVlZBLc3uPHnPE56cf2YqqX3h8dJZtRPkq3HfH3pea
+kTzqKNbT7wufp6KoT6piCiShQRTRZ9b5dMor/S+fN3f5WbZBS0O2mVIp0xBkWwaF
+Q6asro1PeuqFr8cvWrK+3rZEKkvPTJWmplSJ6jzlUXHrPJqWN+bS1xftILJq7Dpr
+LloY/V2bXt16dhZldGzR41QYgYZXfw0QCyGuYprT7nK6bsqgl8rWlt4ZCYkt5gZo
+YEnXn/7We3NudXRSDWMpB2AylVK1sHYEsJ38PiXDI1G1c1aBaLXKb99mbLtWFh0N
+dcoPS5KJlVAnGLYTorkdLqU3NhzoL5i35Law3Xjis5bE8lWVj8+Zt7ZBA9PMaDC6
+FqSugm4peMbifGhq3v5bDcTxfkm6Vnfrjm1GntB+KrWx1sLpICpd9zlRvaJFrU+h
+76PH0ZIFy+fX1MW/06lLiaTbKMUS7ro5C9Z9oHPNWEB6XwQGbJgm+a0Kdt1qY+/Z
+/pdPsuKOUTBxQHn3HcwZJBHJirKP0NlV0ZrCo2l63tlkuAlq1zrS/oA9+71hGpml
+wXlwwx1LCga4QV4j20jsp0+/IK/PVgP54Or/9ng6fybuRH9nusuKFPoohr6CylZR
+TWgUfVp4RaoCoi+TNHRwp7Yjdux6aKaP9HQyjk6S1llzKTvcSOqnTz9kF201kJ+/
+yKMXjDdZ8nTPK2XklBFbN4886kTTWv0JvVUhbhRPtaVmyveb/lxSA0ozr6tR4j5M
+v3AJ0ivU88YLnG4RyM8yyUPEjGOEv7oVN6qIlcG4EyZ93OZPtJrvQFHV8F+DqS29
+oLdJzvPmf1O/qSDTC0gk8ZnQS0TrhBzPt7PUIbLdyG/owOT6XlSHYLByHc2Mnklf
+irHUTtaS4kH1WXihT6YtWvH17JWTEAWnkrnYpgg2QbHxO7UJSLkRDIbB+sWLhEz3
++AVxp4Zox2YDyScmejC3rCvza4r4hmVUR73obXMicT9BenVpS3uZlLdhFE+45UtW
+VF4TtrcusN74Si0LXKqmTNJnM/g11peUA1uv2onVryEWq6NnQ5fRItmJekIauqCx
+hZ5Y/5ZWq25digcARGf0C6szHdeniu1tFJwermtLYUHmo7adDFKiGgMShjTymFvR
+jiXLOrGqFbQ03sN7lvY32opE6m1iHSOZPktFsByep1ePttHOHQpPWVVa82erkbeB
+NAgw26VX9zan6kxvL6VWlFqLxNX2IXU07AlWVaendBY0BwgGzuDXWz+c1a7FLyRo
+zoZ2V62JV57Kd8zrl+elwwoR6IN+QSMPcdW4/Qde9uikGe+jj5hhGHyLQ4FEwg3v
+s2f/Z/bbf+ieVQh7q6Cna9E/rYSBrI45VOo4ZPy43G+1vvofzQlRdJdkQK185pQO
+p5pKnB1ea4XonuSchU9UNSRoLUZ3FQBT7XKq9Tk1QDI1CZ969ymJ/uHIEW9Fw+Y4
+2Eyq00uN60HaPetoF3HbgH3G9J+8x96D9iyHVa9PKCpNYiyWVLRGg4gnKVnbQJHF
+q/4KTtY0R7Uw+Ob1MPBeFCvrrOIusYLwmyVFcV9VVDzUMG/JGWuH9uvB4LIkJAEn
+SS72I7CXZMynvgO6tD29beHbM79Z9tHiJetfR9gyB1LwIhG7V8cORXsN26nHUR26
+t8+rgJ+thQQ2oCHWolFKEbaUAUTM8yiydHVpuLruLmmIZtmI9kPV5NV1ZLFqkVq8
+wRAfdMqroeKoW1P97cJLEiWtX1NtW8Fl8tQ6O63R4nkAEsYAKQYw4aJ82uuAYfuO
+ijv7xhqSKddqhSwywxbG6mC6ASAgxUrslwPEOoBYl0hSHUCIiioqWrTqMiUwVmCN
+e61fUy3t1j2S9W1Jp+FxpjPvF7bNr6QB7TdQst5/nX363R3l1XW0Cl5nJUbWKz2e
+0vH10PUNULfyONSl3qdqZZAXzSM/L49quElrYypN2h404drVCahTIkE1er2S+hi1
+nr/qCdNTk1SGby78mkQ84tAupz6UCn3R6KS8KhIOHd5/Lk1e3Id4acMVYsq34dI9
+hpzXgNavBVP58FSFQlBeanJBpRYPEWzjmDy9ShLMgRrwWQMXVY3Wr3FcqgLpXlxU
+11Pr2YsfUt/8+6yyRZ+QdDZGDcdvJRCOqCS2gHj9PL30DOTjWfCvhZBT6TF9viF/
+T59eXDKU5pS558fem72ubKcBN5Z3aSVaWz6GqowiggMIx0CJpTrKjSGIzs5OIsKM
+wQFoFaoHxXU8hE+7tCLZau7Sa+vff+C+usVTd8IlehpocUYd6ZaiVFl+HvHaz/Qg
+e4RaL79GcxFr5d8A9fozVWmfCwv1TZpbWUIzSzvS/Pr2Y96zdrt5bpvBo1XrwtQI
+0NajvvRqL+l76gkGPaGt0n2EL339BgEZUM+8ZWs/KiivvbZm+lMzaua8o8cf4yj9
+Ir9ep6G8sWh6yxl083rgW5F6pY3q+Iuqmh9FpvKZJc9TSf4SSYb+UJmIUywSvkDH
+UO3ETHX4R6fu/YkacpLqXLivU1xQ4odtXUCF/tP169Z3YcwNcbKraldFyjb8266q
+e96Q9GGytpTKXr+aKenpqQadyKlfG9cZrmVbX11Wio1hsCJbTWQRWq0SbIKK8weB
+UJeX/gSebBH5xirQmlTQGHb8PJH4MLyy4sNIeWkraRqDfMvsB+qmDF6ke0zm+1XC
+8VaJpDOXe/4cCKxWhyDSCpNXuw79i+7bSefP6yzUBGX4il8upzEHJAckByQHJAck
+ByQHJAckByQHJAckByQHJAfkt7k1+nzkrnsf2nIrcE4h2yJbk5WqLtvDNIwhpmmU
+YH92sB7ofzaL27Q+voZe/vE+qo3VkPIZea4kH+S5avOlFINt+r0Lmgckw20Xxtho
+AFskhPghFLI/ALgzcUxXaUpxp5foTPpx+uDHp6k2uYE4s1MT39tMIpqBzW1SpZ4y
+7QXmL4MUzFDImhQOhb6LhENloVAoqSulCS70S+ip11ltI0wvzXmaVtUuJlOEM3rZ
+PqtANiR++d65np4qstueHzXzD7Nt86X8SH5nw2J+yA6db5pWBCBWWJbVwTAM/ZLx
+zSGAmFv+NX1bOo1sgJByO9jIx2smbU4arEt+/yMjoejLyYrqJ/bpffgxA1rvFK3z
+Ki41dCJMuPVB2l6Y0C/0qyc96a1+d+GklBQNPXvZAvVlM1h975c/yhiXq+rnH2F6
+7BVusF3fWPTQhuWx3U4i4e3Qu92g4gaqzl+44bvzh3YatcvIbnud8+acJ69aXrmQ
+Qloavto+XmtLVWU4N8st05hgh8XV3JCffrf+4wQXYvGP1TP7EZM1jko8ObP0k/js
+ss+Hf79mhrAN+3u0ia7Aod1PwzYHIuWWsxjgLtcIg99hhvj5wrBcxtmTwmRJztkJ
+YQqt8VW8y5TlbzwmlDkMNrOP78vxuKgz7lnOWGp+VxfTm07plctaFkjbLtEtAhEm
+J9MWKwDgPmGwVwyLf49jA5UiXSTvdkjoolDEmut76o3Ug1BXHuNyfzdc3AuA2kvJ
+rmUe/DCj2ZReEXwK0db55EaBtNkCkMCANuae6Bq+fzdMPglA/orPx3U9FHR2NQDc
+T+rlOhP+xQ7RS7CRawH8Ksbk1b7nkhCsu5R8HOf+9b5MVcvUK9q9lHUgTahl+ioT
+7EqA2BEO4Esu2DxhcaF81ROSmKZMOtVz5EozJA6XnnL1Y5fU2u/6WaiiWQCoSykc
+jMZ5GPc6BXQJpQscZwcIeoVM71UP5j5Da19rGCpkCHm7UuwY/dzQN8U3ULsC7Xnd
+uD/eZf4T0qejAXwEAEchldUep39xxgogvT/hXgNBL1O6VO5z2QESyjyuhIcrM4Rv
+R4TTSd9bEfvKlfwOhxknucQ+hD19DQcx0JcyCsDrQc/B6L9QSkmEM0cAWL5gNM33
+1TRcr3PiHwPp56lPNR+IaFIt7oqwcM8wud9OMPkXIDvFkuxV4atZiqynpc90UWOF
+nv8iuOw3U6lNvi5CzwYJn11DBj84VXI03dfoEtP7gO4NXPaMZsZamTsRxtQIg8tq
+S3in2dw9SxKb75Bxv6f8HoaUPT3Br4b61ejlOOG2/yBM8S4Xfgmu/JsU7AQ4h3U6
+GqZ0ARhdPVDnwuhVYM9rNhCVeX0+BPVqOGeq1OD+noL7VzDFV0J1XsYdvuZoENNg
+dzsstSbrAqjYX/BdqWGy4xyfPob32wHHfq8dZeDddT58eSCNG5qtWq7M2NiHYph2
+j1RsDK6ZAp+kvc8VnhSt0BiPYP9oz1FJne8Im5gDxt8B41NxfH0qQlapOl6fAsFb
+wSoZ8ay636TTeLiS+o7T75kpVjtSDIKKzfclnyEVj4FuwrELkr7ZKuEmT3Z8d5+k
+53YlacwCmLNBn5PKvBzuVgNx6uV/unLG9Shus+5qNNzrIYzzxRi/vIkWvQOn3+ZK
+Z7AjvUjSl7fGk7G8HQpHxfYZeIz9yeLX9/x00fuVKiXt5hT+bAKQTqsPgOeyKMaq
+6AfvXcpvZad+fJPH2u3QCR6a6hAZlcU9/nrSsA9RlDy4Q3hA8Q5Fu5e70rt/bd3S
+B/bvcnyXXsWDH+nTaljl4Ha706QvH6DV9SvARKjlgYTcVmQrO5V/u3phDRW0samg
+dSgVZ6VuYPCToRpxX7kFSVdJ0zKf8EWiunvBwPOO73HLxCK79V8UyZ1AYzEyn1ub
+qDY5E+G9eh0S71Hcn5794gGaNvcDBKe8ZYEo5qdJV2BGWFFboddPVxQtsAge5xoK
+GRc5MhnrUNTZH915nNc2r+Ptc6qnPTqm0+EUFtGT6t3qHwUTsyBE2A7TFdPa+so3
+6xI18ZL8rnTFQX+lgR1eoIfev5NiXgMJMlsGyC98LLpenWURi8UuMWy6GRinDuo4
+/N4TB19xcZu8DucQUxfsULzL67pEcMJrqIeDSOicNYztQ6k3K5iuY6pSrjDpJfQy
+wjRu6LHUs00/uuO162je8h8oaudvk3kt0/GTN/UsHnTbzh1/d8HQdrvvddygS72w
+yF9bn6j53vETbzhe4hbXcwYjdJ8ndXaRUtfBTfTD57M4VgnyN81xrE/UUf8OQ+nO
+Ex+lsSOPpLp4baq+aYtIJPUOlHSKsXN0l+IeKyYMO++L/FDB+xhI2RazroNXOlWr
+HtTnbSGEbtLnuVILUosoKPUCaCFCqg6phN7NvPylweSHC+myw/5MxdFW9OKnT5Eu
+j2gII3tANAhTmF326HHwrj+WffPm3n3Gr7N46LS4EyuwmX0Jvv8RMdRsgxnDPc87
+AFfowr22UrwW0ewC5su1WoUEF8WwlQTbwuIPaAx9Dp198BVUnNeWHv/gXvJ8F2DM
+7ADxldenONzu0E6tuj7QPq9LvGfxQGpINLxiGuI2xE19lTLfMcl4TwkJnuVr5LPJ
+SrnVhmGexonvC0d9BlPqa7RIFwik6tf6Dv1+Y61XRcfsfiK1yW8Lu/lTCkw2gESg
+r6fHYvGbMfCJd83v1zoeT46EFDojNt4HqjINzH1qGOJBhByzpU6ehSpJzh50Pd/H
+8Q/Qyp9Aww5B+HIe1GVKJo1XXV9FYwb8DgGxQbe8clVWgJyuC+SBp1GmVB0dzykR
+pl3vul5bSGMyGrcQqvQlQCyikF6r3T8ITBczxqfh+04ANUYZqlCQmMMkK5VMLsvU
+Lmvqq2lkrz3oonF/ygoQvRT5t2CoDMb6JbxQleO4A/D3YIQkx6G1J7pKvafLG0Jy
+ky3LukJw/iUM/jLYTHfSS28oeg22o6NehC7s06Z4oxoXYHqPzgoQ7QfzQN/p+dp4
+IqnLGE70ffOqZNIlPy/yhG2bM03DeMlzvQvB9CjDML7C53uwBF3jFG7W15MUwwGi
+DhKc31R/77jZsRG9ZIauxfii4zhvwB5O8DzxT9y8IhQKdUskkgdqLwXV+h4SGQsv
+9ToYZwBbAtUqBYAKK72g3aEA8pF2grhOr6y0bSfosL0GukX3CxoUWni263ldcelY
+md6qPM+/HcfP9KVxNZi9D5IYgM5uIOditO5bcH4BzjvYNM0/hMIhmjZtGq1es7pJ
+jN50442/PjptLDlzkwc9uhjrzZR+0/8OGPQHtmX5oZClw4+doVrXgelx+uGPru+L
+vzsYptEPLro7jg0Jh8OdYw0NR3/xxRdg6s8E6TYJyNany/5y0xNnb1J67Zxr0MI7
+xROJlx3XWadbGoyfIwTvadvWKDCuA8QYVAuGrV5F72zOmfPDv+664w5auHDh9pnE
+/tm2NJg808NSvfDJ5fBWPaR08nzPvx6S0NWa5+LYu8LhlTrECEFsANTh5ptu+mzl
+ihXH4fs1weTCB9sTyMZtMf2Us95FL0cDO+iCXt3G51BDiJ3gfl1IpgbGH47HGj6q
+rqparsdpoMGU5RK5GdnI/8qWe86eA5IDkgOSA7Jdtow6RHbU8y3x2xvLOuheXlcQ
+iAYz8Rh5UjdQPz0noV6ecF5L9uyZblbAqKawnl4NqENAnX5GJT+7fmFWJdKYwEi/
+854mPQDTJaT0ZG49pd9c6wlqHzBeHLR+Xob3rm8JIOGACc1M64A6By3ZOSDNsC5w
+r595PA26NlChFrfhTIH8NWC4TaAa7YP9Lf2QzmTQzzsSge7/Nowd28VNvG88AOJv
+K6+VqehqtsJucv1IDkgOSA5IDkizgTQ1lNGxlRlQczabssxgZdA3JDK8pz5fJ2Dq
+aZ9CasLy5JtsZnCfrAK5Jwj0MgWiYy1dUFUFMdrWANGR86psA9ELWBdQZpnHWnI6
+x1HnJer1riK0dRnL+j4/BsFn1oD0bGLw5wXAuwcS2dqtLtvG3lTV0OfrB0RuM43d
+yzaQXD+SA5IDkgPyvwWE/38Bop/3/QAqC8KUjf3ElnrsjVmX22zsnmnPPiEI4vSc
+VknQY/cIPrtQevJNz3nlBz36xljJ+q0BcQPSCWP6qew3mwnwNk57dgskUkrpl1t0
+eNM2aIQw/TSFmslvq2wDaWzTT/+XBfTZJsd1Xnsr+ml2Us9C6gk+PSvZlX6a9Ns4
+3Vrws9iszbYG0thYpjIAKQIqDMAVBqraLVDRHpuoakFgk5mFyrnH0zkgLbP9nwAD
+AKRJchqzWAtxAAAAAElFTkSuQmCC
+
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline; filename=BrandLogoTechNet.png
+Content-Type: image/png; name=BrandLogoTechNet.png
+Content-Location: http://i.technet.microsoft.com/Areas/Epx/Themes/TechNet/Content/Images/BrandLogoTechNet.png
+Content-Transfer-Encoding: Base64
+
+iVBORw0KGgoAAAANSUhEUgAAAGoAAABCCAYAAAC/3kPMAAAAGXRFWHRTb2Z0d2Fy
+ZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA7RpVFh0WE1MOmNvbS5hZG9iZS54bXAA
+AAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5U
+Y3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6
+eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8x
+Mi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRw
+Oi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpE
+ZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wUmlnaHRzPSJodHRwOi8v
+bnMuYWRvYmUuY29tL3hhcC8xLjAvcmlnaHRzLyIgeG1sbnM6eG1wTU09Imh0dHA6
+Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8v
+bnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4
+bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcFJpZ2h0czpNYXJr
+ZWQ9IlRydWUiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo2OUMy
+QTc4RTc2RjBFMTExOTRDQ0ZCOUU3RTE3NkNFMSIgeG1wTU06RG9jdW1lbnRJRD0i
+eG1wLmRpZDozRjdBNzQ5NEZDNTUxMUUxOTkxQUZENkEzRTM3RDlBNCIgeG1wTU06
+SW5zdGFuY2VJRD0ieG1wLmlpZDozRjdBNzQ5M0ZDNTUxMUUxOTkxQUZENkEzRTM3
+RDlBNCIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1LjEgV2lu
+ZG93cyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAu
+aWlkOkVEQ0ZFMDA2NTVGQ0UxMTFBNUY4QTg0RTYzMUVGNkIyIiBzdFJlZjpkb2N1
+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
+AElFTkSuQmCC
+
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline; filename=ImageSprite.png
+Content-Type: image/png; name=ImageSprite.png
+Content-Location: http://i3.technet.microsoft.com/Areas/Epx/Content/Images/ImageSprite.png
+Content-Transfer-Encoding: Base64
+
+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
+lUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlU
+KpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKp
+VCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVS
+qVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUql
+UqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVK
+pVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqV
+SqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQq
+lUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlU
+KpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqVSqVQqlUqlUqlUKpVKpVKp
+VCqVSqVSqVQqlUqlUqlUKpVKpVKpVCqVSqX6f/jEdUKu5a1bAAAAAElFTkSuQmCC
+
+------------0PFjSWUR514VPR887wh4vr
+Content-Disposition: inline; filename=IC306257.jpg
+Content-Type: image/jpg; name=IC306257.jpg
+Content-Location: http://i.technet.microsoft.com/dynimg/IC306257.jpg
+Content-Transfer-Encoding: Base64
+
+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
+rVa1j0h//9k=
+
+------------0PFjSWUR514VPR887wh4vr--

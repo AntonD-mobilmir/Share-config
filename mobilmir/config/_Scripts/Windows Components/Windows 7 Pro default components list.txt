@@ -1,0 +1,328 @@
+Dism /Online /get-features >list.txt & notepad2 /oem list.txt
+
+Cистема DISM
+Версия: 6.1.7600.16385
+
+Версия образа: 6.1.7601.17514
+
+Список компонентов для пакета : Microsoft-Windows-Foundation-Package~31bf3856ad364e35~x86~~6.1.7601.17514
+
+Имя функции : OEMHelpCustomization
+Состояние : Отключен
+
+Имя функции : CorporationHelpCustomization
+Состояние : Отключен
+
+Имя функции : SimpleTCP
+Состояние : Отключен
+
+Имя функции : SNMP
+Состояние : Отключен
+
+Имя функции : WMISnmpProvider
+Состояние : Отключен
+
+Имя функции : TelnetServer
+Состояние : Отключен
+
+Имя функции : TelnetClient
+Состояние : Отключен
+
+Имя функции : WindowsGadgetPlatform
+Состояние : Включен
+
+Имя функции : InboxGames
+Состояние : Отключен
+
+Имя функции : More Games
+Состояние : Отключен
+
+Имя функции : Solitaire
+Состояние : Отключен
+
+Имя функции : SpiderSolitaire
+Состояние : Отключен
+
+Имя функции : Hearts
+Состояние : Отключен
+
+Имя функции : FreeCell
+Состояние : Отключен
+
+Имя функции : Minesweeper
+Состояние : Отключен
+
+Имя функции : PurblePlace
+Состояние : Отключен
+
+Имя функции : Chess
+Состояние : Отключен
+
+Имя функции : Shanghai
+Состояние : Отключен
+
+Имя функции : Internet Games
+Состояние : Отключен
+
+Имя функции : Internet Checkers
+Состояние : Отключен
+
+Имя функции : Internet Backgammon
+Состояние : Отключен
+
+Имя функции : Internet Spades
+Состояние : Отключен
+
+Имя функции : IIS-WebServerRole
+Состояние : Отключен
+
+Имя функции : IIS-WebServer
+Состояние : Отключен
+
+Имя функции : IIS-CommonHttpFeatures
+Состояние : Отключен
+
+Имя функции : IIS-HttpErrors
+Состояние : Отключен
+
+Имя функции : IIS-HttpRedirect
+Состояние : Отключен
+
+Имя функции : IIS-ApplicationDevelopment
+Состояние : Отключен
+
+Имя функции : IIS-Security
+Состояние : Отключен
+
+Имя функции : IIS-URLAuthorization
+Состояние : Отключен
+
+Имя функции : IIS-RequestFiltering
+Состояние : Отключен
+
+Имя функции : IIS-NetFxExtensibility
+Состояние : Отключен
+
+Имя функции : IIS-HealthAndDiagnostics
+Состояние : Отключен
+
+Имя функции : IIS-HttpLogging
+Состояние : Отключен
+
+Имя функции : IIS-LoggingLibraries
+Состояние : Отключен
+
+Имя функции : IIS-RequestMonitor
+Состояние : Отключен
+
+Имя функции : IIS-HttpTracing
+Состояние : Отключен
+
+Имя функции : IIS-IPSecurity
+Состояние : Отключен
+
+Имя функции : IIS-Performance
+Состояние : Отключен
+
+Имя функции : IIS-HttpCompressionDynamic
+Состояние : Отключен
+
+Имя функции : IIS-WebServerManagementTools
+Состояние : Отключен
+
+Имя функции : IIS-ManagementScriptingTools
+Состояние : Отключен
+
+Имя функции : IIS-IIS6ManagementCompatibility
+Состояние : Отключен
+
+Имя функции : IIS-Metabase
+Состояние : Отключен
+
+Имя функции : WAS-WindowsActivationService
+Состояние : Отключен
+
+Имя функции : WAS-ProcessModel
+Состояние : Отключен
+
+Имя функции : WAS-NetFxEnvironment
+Состояние : Отключен
+
+Имя функции : WAS-ConfigurationAPI
+Состояние : Отключен
+
+Имя функции : IIS-HostableWebCore
+Состояние : Отключен
+
+Имя функции : IIS-ISAPIExtensions
+Состояние : Отключен
+
+Имя функции : IIS-ISAPIFilter
+Состояние : Отключен
+
+Имя функции : IIS-StaticContent
+Состояние : Отключен
+
+Имя функции : IIS-DefaultDocument
+Состояние : Отключен
+
+Имя функции : IIS-DirectoryBrowsing
+Состояние : Отключен
+
+Имя функции : IIS-WebDAV
+Состояние : Отключен
+
+Имя функции : IIS-ASPNET
+Состояние : Отключен
+
+Имя функции : IIS-ASP
+Состояние : Отключен
+
+Имя функции : IIS-CGI
+Состояние : Отключен
+
+Имя функции : IIS-ServerSideIncludes
+Состояние : Отключен
+
+Имя функции : IIS-CustomLogging
+Состояние : Отключен
+
+Имя функции : IIS-BasicAuthentication
+Состояние : Отключен
+
+Имя функции : IIS-HttpCompressionStatic
+Состояние : Отключен
+
+Имя функции : IIS-ManagementConsole
+Состояние : Отключен
+
+Имя функции : IIS-ManagementService
+Состояние : Отключен
+
+Имя функции : IIS-WMICompatibility
+Состояние : Отключен
+
+Имя функции : IIS-LegacyScripts
+Состояние : Отключен
+
+Имя функции : IIS-LegacySnapIn
+Состояние : Отключен
+
+Имя функции : IIS-FTPServer
+Состояние : Отключен
+
+Имя функции : IIS-FTPSvc
+Состояние : Отключен
+
+Имя функции : IIS-FTPExtensibility
+Состояние : Отключен
+
+Имя функции : IIS-WindowsAuthentication
+Состояние : Отключен
+
+Имя функции : IIS-DigestAuthentication
+Состояние : Отключен
+
+Имя функции : IIS-ClientCertificateMappingAuthentication
+Состояние : Отключен
+
+Имя функции : IIS-IISCertificateMappingAuthentication
+Состояние : Отключен
+
+Имя функции : IIS-ODBCLogging
+Состояние : Отключен
+
+Имя функции : MediaPlayback
+Состояние : Включен
+
+Имя функции : WindowsMediaPlayer
+Состояние : Включен
+
+Имя функции : MediaCenter
+Состояние : Включен
+
+Имя функции : OpticalMediaDisc
+Состояние : Включен
+
+Имя функции : NetFx3
+Состояние : Включен
+
+Имя функции : WCF-HTTP-Activation
+Состояние : Отключен
+
+Имя функции : WCF-NonHTTP-Activation
+Состояние : Отключен
+
+Имя функции : RasRip
+Состояние : Отключен
+
+Имя функции : RasCMAK
+Состояние : Отключен
+
+Имя функции : MSMQ-Container
+Состояние : Отключен
+
+Имя функции : MSMQ-Server
+Состояние : Отключен
+
+Имя функции : MSMQ-Triggers
+Состояние : Отключен
+
+Имя функции : MSMQ-ADIntegration
+Состояние : Отключен
+
+Имя функции : MSMQ-HTTP
+Состояние : Отключен
+
+Имя функции : MSMQ-Multicast
+Состояние : Отключен
+
+Имя функции : MSMQ-DCOMProxy
+Состояние : Отключен
+
+Имя функции : TabletPCOC
+Состояние : Включен
+
+Имя функции : Printing-Foundation-Features
+Состояние : Включен
+
+Имя функции : Printing-Foundation-LPRPortMonitor
+Состояние : Отключен
+
+Имя функции : Printing-Foundation-LPDPrintService
+Состояние : Отключен
+
+Имя функции : Printing-Foundation-InternetPrinting-Client
+Состояние : Включен
+
+Имя функции : FaxServicesClientPackage
+Состояние : Включен
+
+Имя функции : ScanManagementConsole
+Состояние : Отключен
+
+Имя функции : TFTP
+Состояние : Отключен
+
+Имя функции : MSRDC-Infrastructure
+Состояние : Включен
+
+Имя функции : Printing-XPSServices-Features
+Состояние : Включен
+
+Имя функции : Indexing-Service-Package
+Состояние : Отключен
+
+Имя функции : Internet-Explorer-Optional-x86
+Состояние : Включен
+
+Имя функции : Xps-Foundation-Xps-Viewer
+Состояние : Включен
+
+Имя функции : TIFFIFilter
+Состояние : Отключен
+
+Имя функции : SearchEngine-Client-Package
+Состояние : Включен
+
+Операция успешно завершена.

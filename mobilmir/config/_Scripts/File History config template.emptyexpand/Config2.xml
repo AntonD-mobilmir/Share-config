@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataProtectionUserConfig SchemaVersion="1">
+  <UserName>%USERNAME%</UserName>
+  <FriendlyName>%USERNAME%</FriendlyName>
+  <PCName>%COMPUTERNAME%</PCName>
+  <UserId>b8839fa1-9cc0-4a39-b33c-07842547a143</UserId>
+  <LocalCatalogPath1>%LOCAPAPPDATA%\Microsoft\Windows\FileHistory\Configuration\Catalog1.edb</LocalCatalogPath1>
+  <LocalCatalogPath2>%LOCAPAPPDATA%\Microsoft\Windows\FileHistory\Configuration\Catalog2.edb</LocalCatalogPath2>
+  <StagingArea>
+    <StagingAreaPath>%LOCAPAPPDATA%\Microsoft\Windows\FileHistory\Data</StagingAreaPath>
+    <StagingAreaMaximumCapacity>1073741824</StagingAreaMaximumCapacity>
+    <StagingAreaWarningThreshold>805306368</StagingAreaWarningThreshold>
+  </StagingArea>
+  <AvailabilityPolicies>
+    <TargetAbsenceTime>5</TargetAbsenceTime>
+    <TimeInUnprotectedState>3</TimeInUnprotectedState>
+  </AvailabilityPolicies>
+  <RetentionPolicies>
+    <RetentionPolicyType>NO LIMIT</RetentionPolicyType>
+    <MinimumRetentionAge>365</MinimumRetentionAge>
+  </RetentionPolicies>
+  <DPFrequency>3600</DPFrequency>
+  <DPStatus>ENABLED</DPStatus>
+  <Target>
+    <TargetName>\\localhost\File History$\</TargetName>
+    <TargetUrl>\\localhost\File History$\</TargetUrl>
+    <TargetDriveType>REMOTE</TargetDriveType>
+    <TargetConfigPath1>%USERNAME%\%COMPUTERNAME%\Configuration\Config1.xml</TargetConfigPath1>
+    <TargetConfigPath2>%USERNAME%\%COMPUTERNAME%\Configuration\Config2.xml</TargetConfigPath2>
+    <TargetCatalogPath1>%USERNAME%\%COMPUTERNAME%\Configuration\Catalog1.edb</TargetCatalogPath1>
+    <TargetCatalogPath2>%USERNAME%\%COMPUTERNAME%\Configuration\Catalog2.edb</TargetCatalogPath2>
+    <TargetBackupStorePath>%USERNAME%\%COMPUTERNAME%\Data</TargetBackupStorePath>
+    <TargetWarningThreshold>90</TargetWarningThreshold>
+  </Target>
+</DataProtectionUserConfig>

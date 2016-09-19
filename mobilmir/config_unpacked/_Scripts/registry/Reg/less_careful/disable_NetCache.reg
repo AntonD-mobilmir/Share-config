@@ -1,0 +1,6 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\NetCache]
+"Enabled"=dword:00000000
+"DefCacheSize"=dword:000003ea
+

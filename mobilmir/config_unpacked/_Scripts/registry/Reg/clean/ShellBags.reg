@@ -1,0 +1,18 @@
+REGEDIT4
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\BagMRU]
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\Bags]
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell]
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\ShellNoRoam\BagMRU]
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\ShellNoRoam\Bags]
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell]
+"BagMRU Size"=dword:00001388
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\ShellNoRoam]
+"BagMRU Size"=dword:00001388
+

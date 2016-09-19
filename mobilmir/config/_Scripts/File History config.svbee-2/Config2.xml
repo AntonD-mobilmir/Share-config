@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataProtectionUserConfig SchemaVersion="1">
+  <UserName>Пользователь</UserName>
+  <FriendlyName>Пользователь</FriendlyName>
+  <PCName>SVBEE-2</PCName>
+  <UserId>a593dd16-240f-455a-be0b-3071defdc6d7</UserId>
+  <Library>
+    <LibraryName>*2112ab0a-c86a-4ffe-a368-0de96e47012e</LibraryName>
+    <Folder>D:\Users\Пользователь\Music</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*491e922f-5643-4af4-a7eb-4e7a138d8174</LibraryName>
+    <Folder>D:\Users\Пользователь\Videos</Folder>
+  </Library>
+  <Library>
+    <LibraryName>Пленка</LibraryName>
+    <Folder>D:\Users\Пользователь\Pictures\Camera Roll</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*7b0db17d-9cd2-4a93-9733-46cc89022e7c</LibraryName>
+    <Folder>D:\Users\Пользователь\Documents</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*a990ae9f-a03b-4e80-94bc-9912d7504104</LibraryName>
+    <Folder>D:\Users\Пользователь\Pictures</Folder>
+  </Library>
+  <UserFolder>D:\Users\Пользователь\Desktop</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Pictures</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Documents</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Links</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Mail</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Searches</UserFolder>
+  <UserFolder>D:\Users\Пользователь\OneDrive</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Contacts</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Favorites</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Videos</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Music</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Downloads</UserFolder>
+  <UserFolder>D:\Users\Пользователь\Saved Games</UserFolder>
+  <FolderExclude>D:\Users\Пользователь\Mail</FolderExclude>
+  <FolderExclude>D:\Users\Пользователь\OneDrive</FolderExclude>
+  <FolderExclude>D:\Users\Пользователь\Downloads</FolderExclude>
+  <FolderExclude>D:\Users\Пользователь\Favorites</FolderExclude>
+  <FolderExclude>D:\Users\Пользователь\Contacts</FolderExclude>
+  <FolderExclude>D:\Users\Пользователь\Searches</FolderExclude>
+  <FolderExclude>D:\Users\Пользователь\Saved Games</FolderExclude>
+  <LibraryExclude>*2112ab0a-c86a-4ffe-a368-0de96e47012e</LibraryExclude>
+  <LibraryExclude>*491e922f-5643-4af4-a7eb-4e7a138d8174</LibraryExclude>
+  <LocalCatalogPath1>D:\Users\Пользователь\AppData\Local\Microsoft\Windows\FileHistory\Configuration\Catalog1.edb</LocalCatalogPath1>
+  <LocalCatalogPath2>D:\Users\Пользователь\AppData\Local\Microsoft\Windows\FileHistory\Configuration\Catalog2.edb</LocalCatalogPath2>
+  <StagingArea>
+    <StagingAreaPath>D:\Users\Пользователь\AppData\Local\Microsoft\Windows\FileHistory\Data</StagingAreaPath>
+    <StagingAreaMaximumCapacity>168831201</StagingAreaMaximumCapacity>
+    <StagingAreaWarningThreshold>126623400</StagingAreaWarningThreshold>
+  </StagingArea>
+  <AvailabilityPolicies>
+    <TargetAbsenceTime>5</TargetAbsenceTime>
+    <TimeInUnprotectedState>3</TimeInUnprotectedState>
+  </AvailabilityPolicies>
+  <RetentionPolicies>
+    <RetentionPolicyType>NO LIMIT</RetentionPolicyType>
+    <MinimumRetentionAge>365</MinimumRetentionAge>
+  </RetentionPolicies>
+  <DPFrequency>3600</DPFrequency>
+  <DPStatus>ENABLED</DPStatus>
+  <Target>
+    <TargetName>\\localhost\File History$</TargetName>
+    <TargetUrl>\\localhost\File History$\</TargetUrl>
+    <TargetDriveType>REMOTE</TargetDriveType>
+    <TargetConfigPath1>Пользователь\SVBEE-2\Configuration\Config1.xml</TargetConfigPath1>
+    <TargetConfigPath2>Пользователь\SVBEE-2\Configuration\Config2.xml</TargetConfigPath2>
+    <TargetCatalogPath1>Пользователь\SVBEE-2\Configuration\Catalog1.edb</TargetCatalogPath1>
+    <TargetCatalogPath2>Пользователь\SVBEE-2\Configuration\Catalog2.edb</TargetCatalogPath2>
+    <TargetBackupStorePath>Пользователь\SVBEE-2\Data</TargetBackupStorePath>
+    <TargetWarningThreshold>98</TargetWarningThreshold>
+  </Target>
+</DataProtectionUserConfig>

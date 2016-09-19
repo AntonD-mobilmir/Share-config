@@ -1,0 +1,19 @@
+REGEDIT4
+
+;GlobalMaxTcpWindowSize 
+;HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters Data type	Range	Default value
+;REG_DWORD 	
+;0x0–0x3FFFFFFF ( bytes ) 	
+;(See description.) 
+;Description
+;Determines the largest TCP receive window that the system offers. The receive window is the number of bytes a sender can transmit without receiving an acknowledgment. This entry takes precedence over TCP's negotiated maximum receive window size.
+;TCP uses a receive window that is four times the size of the maximum TCP segment size (MSS) negotiated during connection setup, up to a maximum size of 64 KB. TCP for Windows 2000 also supports windows scaling, as detailed in RFC 1323, TCP Extensions for High Performance. Scaling enables TCP to provide a receive window of up to 1 GB.
+;For Ethernet networks, the default value of this entry is 0x4470 (17,520, or 12 segments of 1,460 bytes each). For other networks, the default value is 0xFFFF (65,535), unless 0xFFFF is larger than each of the following:•	
+;- Four times the maximum TCP data size on the network.
+;- 0x2000 (8,192), rounded up to an even multiple of the network TCP data size.
+; Note
+;This entry determines the default maximum receive window size for all interfaces. When configuring any particular interface, the value of the TcpWindowSize entry for that interface takes precedence over the value of this entry.
+;Windows 2000 does not add this entry to the registry. You can add it by editing the registry or by using a program that edits the registry.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"GlobalMaxTcpWindowSize"=dword:0007d780

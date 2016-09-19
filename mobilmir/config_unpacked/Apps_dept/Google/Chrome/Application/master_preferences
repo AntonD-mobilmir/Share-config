@@ -1,0 +1,19 @@
+﻿{
+   "distribution" : {
+      "msi":true,"system_level":true,"verbose_logging":true,
+      "skip_first_run_ui" : true,
+      "show_welcome_page" : true,
+      "import_search_engine" : false,
+      "import_history" : false,
+      "create_all_shortcuts" : true,
+      "do_not_launch_chrome" : true,
+      "make_chrome_default" : true,
+      "import_bookmarks": false,
+      "import_bookmarks_from_file": "{ProgramFiles}\\Google\\Chrome\\Application\\bookmarks_retaildepts.html"
+   },
+   "first_run_tabs" : [
+      "http://help.mobilmir.ru/rules/info-for-newbies-in-retaildepts",
+      "new_tab_page",
+      "welcome_page"
+   ]
+}

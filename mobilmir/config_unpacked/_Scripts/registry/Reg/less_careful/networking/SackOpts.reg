@@ -1,0 +1,18 @@
+REGEDIT4
+
+;SackOpts 
+;HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters Data type	Range	Default value
+;REG_DWORD 	
+;0 | 1 	
+;1 
+;Description
+;Enables and disables the Selective Acknowledgment (SACK) feature of Windows 2000 TCP/IP. SACK is specified in RFC 2018, TCP Selective Acknowledgement Options.
+;SACK is an optimizing feature that lets you acknowledge receipt of individual blocks of data in a continuous sequence, rather than just the last sequence number. The recipient can tell the sender that one or more data blocks are missing from the middle of a sequence, and the sender can retransmit only the missing data.Value	Meaning
+;0	
+;Disables SACK.
+;1	
+;Enables SACK.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"SackOpts"=dword:00000001
+

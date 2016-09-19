@@ -1,0 +1,5 @@
+﻿http://kb.mozillazine.org/Installing_extensions#Multi-user_installation
+
+If you want to do a silent administrative install that immediately makes the extension available to limited users, you need either: 
+ to uncompress the .xpi file yourself (as a ZIP file) to an appropriately named (extension's ID) folder. On Linux/Unix platforms you can use a helper script to determine extension IDs in an automated fashion. 
+ start Firefox as a user who has write permissions to <installation directory>\extensions and agree to have the items installed; then Firefox will uncompress the .xpi file to the extension's folder.

@@ -1,0 +1,212 @@
+Windows Registry Editor Version 5.00
+
+; Created by: Shawn Brink
+; http://www.sevenforums.com
+; Tutorial: http://www.sevenforums.com/tutorials/581-libraries-restore-default.html
+
+
+[-HKEY_CLASSES_ROOT\.library-ms]
+
+[HKEY_CLASSES_ROOT\.library-ms]
+@="LibraryFolder"
+"Content Type"="application/windows-library+xml"
+
+[HKEY_CLASSES_ROOT\.library-ms\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+"NullFile"=""
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,\
+  00,6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,30,00,30,00,31,00,00,00
+
+[HKEY_CLASSES_ROOT\.library-ms\ShellNew\Config]
+"IsFolder"=""
+"IsOptIn"=""
+"NoEmptyFile"=""
+
+[HKEY_CLASSES_ROOT\LibraryFolder]
+@="Library Folder"
+"NeverShowExt"=""
+"NoOpenWith"=""
+"IncludeShare"=""
+"IncludeSync"=""
+"CanRecursivelySearch"=""
+"NoPreviousVersions"=""
+"FriendlyTypeName"="@shell32.dll,-34560"
+"EditFlags"=dword:00100000
+"DefaultDropEffect"=dword:00000004
+"TileInfo"="prop:System.ItemTypeText"
+"ExtendedTileInfo"="prop:System.ItemTypeText"
+"InfoTip"="prop:System.ItemTypeText;System.DateModified"
+"PreviewDetails"="prop:System.DateModified;*System.SharedWith"
+"FullDetails"="prop:System.ItemNameDisplay;System.ItemTypeText;System.DateModified;*System.SharedWith"
+"NoJumpListPathTooltip"=""
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shellex\ContextMenuHandlers\New]
+@="{D969A300-E7FF-11d0-A93B-00A0C90F2719}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\DefaultIcon]
+@="%SystemRoot%\\System32\\imageres.dll,-8"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\ContextMenuHandlers\LibraryFolder]
+@="{0af96ede-aebf-41ed-a1c8-cf7a685505b6}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\IconHandler]
+@="{14074e0b-7216-4862-96e6-53cada442a56}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\LibraryDescriptionHandler]
+@="{fe5afcf2-e681-4ada-9703-ef39b8ecb9bf}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\PropertySheetHandlers\{66275315-bfa5-451b-88b6-e56ebc8d9b58}]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\SharingHandler]
+@="{fe5afcf2-e681-4ada-9703-ef39b8ecb9bf}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}]
+@="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\{e357fccd-a995-4576-b01f-234630154e96}]
+@="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}"
+
+[HKEY_CLASSES_ROOT\LibraryLocation\ShellEx\ContextMenuHandlers\OpenContainingFolderMenu]
+@="{37ea3a21-7493-4208-a011-7f9ea79ce9f5}"
+
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.library-ms]
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.library-ms]
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.library-ms\OpenWithList]
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.library-ms\OpenWithProgids]
+"LibraryFolder"=hex(0):
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel]
+"{031E4825-7B94-4dc3-B131-E946B44C8DD5}"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{031E4825-7B94-4dc3-B131-E946B44C8DD5}]
+@="UsersLibraries"
+"Removal Message"="@shell32.dll,-9047"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{2112AB0A-C86A-4ffe-A368-0DE96E47012E}]
+"Name"="MusicLibrary"
+"Category"=dword:00000004
+"ParsingName"="::{031E4825-7B94-4dc3-B131-E946B44C8DD5}\\{2112AB0A-C86A-4ffe-A368-0DE96E47012E}"
+"Stream"=dword:00000001
+"StreamResource"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,32,00,00,00
+"StreamResourceType"="LIBRARY"
+"RelativePath"="Music.library-ms"
+"ParentFolder"="{1B3EA5DC-B587-4786-B4EF-BD1DC332AEAE}"
+"Icon"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,\
+  00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,00,\
+  6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,\
+  00,31,00,30,00,30,00,34,00,00,00
+"InfoTip"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,32,00,36,00,38,00,39,00,00,00
+"LocalizedName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,\
+  6f,00,6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,\
+  00,5c,00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,\
+  2c,00,2d,00,33,00,34,00,35,00,38,00,34,00,00,00
+"PreCreate"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{2112AB0A-C86A-4ffe-A368-0DE96E47012E}\PropertyBag]
+"FoldersDependentOn"="{4BD8D571-6D19-48D3-BE97-422220080E43};{3214FAB5-9757-4298-BB61-92A9DEAA44FF}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{491E922F-5643-4af4-A7EB-4E7A138D8174}]
+"Name"="VideosLibrary"
+"Category"=dword:00000004
+"ParsingName"="::{031E4825-7B94-4dc3-B131-E946B44C8DD5}\\{491E922F-5643-4af4-A7EB-4E7A138D8174}"
+"Stream"=dword:00000001
+"StreamResource"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,34,00,00,00
+"StreamResourceType"="LIBRARY"
+"RelativePath"="Videos.library-ms"
+"ParentFolder"="{1B3EA5DC-B587-4786-B4EF-BD1DC332AEAE}"
+"Icon"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,\
+  00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,00,\
+  6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,\
+  00,31,00,30,00,30,00,35,00,00,00
+"InfoTip"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,32,00,36,00,39,00,30,00,00,00
+"LocalizedName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,\
+  6f,00,6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,\
+  00,5c,00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,\
+  2c,00,2d,00,33,00,34,00,36,00,32,00,30,00,00,00
+"PreCreate"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{491E922F-5643-4af4-A7EB-4E7A138D8174}\PropertyBag]
+"FoldersDependentOn"="{18989B1D-99B5-455B-841C-AB7C74E4DDFC};{2400183A-6185-49FB-A2D8-4A392A602BA3}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{7b0db17d-9cd2-4a93-9733-46cc89022e7c}]
+"Name"="DocumentsLibrary"
+"Category"=dword:00000004
+"ParsingName"="::{031E4825-7B94-4dc3-B131-E946B44C8DD5}\\{7b0db17d-9cd2-4a93-9733-46cc89022e7c}"
+"Stream"=dword:00000001
+"StreamResource"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,00,00
+"StreamResourceType"="LIBRARY"
+"RelativePath"="Documents.library-ms"
+"ParentFolder"="{1B3EA5DC-B587-4786-B4EF-BD1DC332AEAE}"
+"Icon"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,\
+  00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,00,\
+  6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,\
+  00,31,00,30,00,30,00,32,00,00,00
+"LocalizedName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,\
+  6f,00,6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,\
+  00,5c,00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,\
+  2c,00,2d,00,33,00,34,00,35,00,37,00,35,00,00,00
+"PreCreate"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{7b0db17d-9cd2-4a93-9733-46cc89022e7c}\PropertyBag]
+"FoldersDependentOn"="{FDD39AD0-238F-46AF-ADB4-6C85480369C7};{ED4824AF-DCE4-45A8-81E2-FC7965083634}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{A302545D-DEFF-464b-ABE8-61C8648D939B}]
+"Name"="UsersLibrariesFolder"
+"Category"=dword:00000001
+"ParsingName"="::{031E4825-7B94-4dc3-B131-E946B44C8DD5}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{A302545D-DEFF-464b-ABE8-61C8648D939B}\PropertyBag]
+"NoCustomize"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{A990AE9F-A03B-4e80-94BC-9912D7504104}]
+"Name"="PicturesLibrary"
+"Category"=dword:00000004
+"ParsingName"="::{031E4825-7B94-4dc3-B131-E946B44C8DD5}\\{A990AE9F-A03B-4e80-94BC-9912D7504104}"
+"Stream"=dword:00000001
+"StreamResource"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,33,00,00,00
+"StreamResourceType"="LIBRARY"
+"RelativePath"="Pictures.library-ms"
+"ParentFolder"="{1B3EA5DC-B587-4786-B4EF-BD1DC332AEAE}"
+"Icon"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,\
+  00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,00,\
+  6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,\
+  00,31,00,30,00,30,00,33,00,00,00
+"InfoTip"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,32,00,36,00,38,00,38,00,00,00
+"LocalizedName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,\
+  6f,00,6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,\
+  00,5c,00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,\
+  2c,00,2d,00,33,00,34,00,35,00,39,00,35,00,00,00
+"PreCreate"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{A990AE9F-A03B-4e80-94BC-9912D7504104}\PropertyBag]
+"FoldersDependentOn"="{33E28130-4E1E-4676-835A-98395C3BC3BB};{B6EBFB86-6907-413C-9AF7-4FC2ABF07CC5}"
+

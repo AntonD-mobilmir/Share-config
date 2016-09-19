@@ -1,0 +1,5 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\atapi\Parameters]
+"EnableBigLBA"=dword:00000001
+

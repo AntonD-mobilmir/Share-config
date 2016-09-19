@@ -1,0 +1,43 @@
+// <!-- <mdb:mork:z v="1.4"/> -->
+< <(a=c)> // (f=iso-8859-1)
+  (B8=useServerRetention)(80=ns:msg:db:row:scope:msgs:all)(81=subject)
+  (82=sender)(83=message-id)(84=references)(85=recipients)(86=date)
+  (87=size)(88=flags)(89=priority)(8A=label)(8B=statusOfset)(8C=numLines)
+  (8D=ccList)(8E=bccList)(8F=msgThreadId)(90=threadId)(91=threadFlags)
+  (92=threadNewestMsgDate)(93=children)(94=unreadChildren)
+  (95=threadSubject)(96=msgCharSet)(97=ns:msg:db:table:kind:msgs)
+  (98=ns:msg:db:table:kind:thread)(99=ns:msg:db:table:kind:allthreads)
+  (9A=ns:msg:db:row:scope:threads:all)(9B=threadParent)(9C=threadRoot)
+  (9D=msgOffset)(9E=offlineMsgSize)
+  (9F=ns:msg:db:row:scope:dbfolderinfo:all)
+  (A0=ns:msg:db:table:kind:dbfolderinfo)(A1=numMsgs)(A2=numNewMsgs)
+  (A3=folderSize)(A4=expungedBytes)(A5=folderDate)(A6=highWaterKey)
+  (A7=mailboxName)(A8=UIDValidity)(A9=totPendingMsgs)
+  (AA=unreadPendingMsgs)(AB=expiredMark)(AC=version)
+  (AD=fixedBadRefThreading)(AE=charSetOverride)(AF=charSet)
+  (B0=folderName)(B1=MRUTime)(B2=sortType)(B3=sortOrder)(B4=viewFlags)
+  (B5=viewType)(B6=sortColumns)(B7=columnStates)>
+
+<(80=1)(81=0)(82=4fb4fafc)(85=404)(86=Drafts)(87=$D0$A7$D0$B5$D1$80$D0$BD$D0$BE\
+$D0$B2$D0$B8$D0$BA$D0$B8)(88=1337260791)(89=12)(8A=)(8B
+    ={"threadCol":{"visible":true,"ordinal":"3"},"flaggedCol":{"visible":true,\
+"ordinal":"5"},"attachmentCol":{"visible":true,"ordinal":"7"},"subjectCol":{"v\
+isible":true,"ordinal":"9"},"unreadButtonColHeader":{"visible":true,"ordinal":\
+"11"},"senderCol":{"visible":false,"ordinal":"13"},"recipientCol":{"visible":t\
+rue,"ordinal":"15"},"junkStatusCol":{"visible":false,"ordinal":"17"},"received\
+Col":{"visible":false,"ordinal":"19"},"dateCol":{"visible":true,"ordinal":"21"\
+},"statusCol":{"visible":false,"ordinal":"23"},"sizeCol":{"visible":true,"ordi\
+nal":"25"},"tagsCol":{"visible":false,"ordinal":"27"},"accountCol":{"visible":\
+false,"ordinal":"29"},"priorityCol":{"visible":false,"ordinal":"31"},"unreadCo\
+l":{"visible":false,"ordinal":"33"},"totalCol":{"visible":false,"ordinal":"35"\
+},"locationCol":{"visible":false,"ordinal":"37"},"idCol":{"visible":false,"ord\
+inal":"39"},"enigmailStatusCol":{"visible":false,"ordinal":"1"}})(8C
+    =5c9475e)>
+{1:^9F {(k^A0:c)(s=9u)} 
+  [1(^AC=1)(^AD=1)(^A3=0)(^A5^82)(^88^85)(^A7^86)(^B0^87)(^A1=0)(^A2=0)
+    (^A4=0)(^B1^88)(^B2=12)(^B3=1)(^B4=0)(^B5=0)(^B6=)(^B7^8B)(^A6^8C)
+    (^B8=1)]}
+
+@$${3{@
+<(8D=1337260796)>[1:^9F(^B1^8D)]
+@$$}3}@

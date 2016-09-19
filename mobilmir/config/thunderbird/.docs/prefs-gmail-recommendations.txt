@@ -1,0 +1,6 @@
+user_pref("browser.cache.memory.capacity", 30720);
+user_pref("mail.server.default.fetch_by_chunks", false);
+user_pref("mail.imap.fetch_by_chunks", false);
+user_pref("mail.server.default.mdn_not_in_to_cc", 0);
+user_pref("mail.server.default.mdn_other", 1);
+user_pref("mail.server.default.mdn_outside_domain", 1);

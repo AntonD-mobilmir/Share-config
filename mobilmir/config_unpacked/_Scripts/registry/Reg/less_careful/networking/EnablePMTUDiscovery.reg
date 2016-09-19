@@ -1,0 +1,24 @@
+REGEDIT4
+
+;EnablePMTUDiscovery 
+;HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters Data type	Range	Default value
+;REG_DWORD 	
+;0 | 1 	
+;1 
+;Description
+;Determines whether TCP uses a fixed, default maximum transmission unit (MTU) or attempts to detect the actual MTU.
+;By discovering the Path MTU and limiting TCP segments to this size, TCP can eliminate fragmentation at routers connecting networks with different MTUs. Fragmentation reduces TCP throughput and increases network congestion.
+;By default, this entry applies to all interfaces. However, the MTU can be reduced for any particular interface by changing the default value of the MTU entry in the subkey for that interface.Value	Meaning
+;
+;0	
+;TCP uses an MTU of 576 bytes for all connections to computers outside the local subnet.
+;
+;1	
+;TCP attempts to discover the MTU of the path to a remote host.
+;
+; Note
+;Windows 2000 does not add this entry to the registry. You can add it by editing the registry or by using a program that edits the registry.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"EnablePMTUDiscovery"=dword:00000001
+

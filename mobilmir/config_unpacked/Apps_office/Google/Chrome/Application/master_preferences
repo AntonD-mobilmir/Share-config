@@ -1,0 +1,75 @@
+﻿{
+ "distribution" : {
+    "msi":true,"system_level":true,"verbose_logging":true,
+    "skip_first_run_ui" : true,
+    "show_welcome_page" : true,
+    "import_search_engine" : false,
+    "import_history" : false,
+    "create_all_shortcuts" : true,
+    "do_not_launch_chrome" : true,
+    "make_chrome_default" : true,
+    "import_bookmarks": false,
+    "import_bookmarks_from_file": "{ProgramFiles}\\Google\\Chrome\\Application\\bookmarks_office.html"
+ },
+ "first_run_tabs" : [
+   "https://sites.google.com/a/mobilmir.ru/help/rules/info-for-newbies",
+   "new_tab_page",
+   "welcome_page"
+ ],
+
+ "extensions": {
+    "settings": {
+       "pgphcomnlaojlmmcjmiddhdapjpbgeoc": {
+          "location": 1,
+          "manifest": {
+	       "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEbpC6xVrnpwMX7JcommrPGp06qF9/Avm++6lhyDBqMZCItyP00PKdfkGzEU/9RQYlFwbkD/7nD3BvK+hpUDNn+Gv53cexm3ZmvD67GgWSD+bUu/iUcYxTaQ5q6spUpPHUVWA2cjhZLJRYR7QCnVWGVqjEg43PcPfaj1rSS9hliQIDAQAB",
+	       "name": "Send from Gmail (by Google)",
+	       "permissions": [ "tabs", "http://*/*", "https://*/*", "http://*.google.com/" ],
+	       "update_url": "https://clients2.google.com/service/update2/crx",
+	       "version": "0.0"
+          },
+	  "granted_permissions": {
+	    "api": [ "tabs" ],
+	    "explicit_host": [ "http://*/*", "https://*/*", "http://*.google.com/" ],
+	    "scriptable_host": [ "http://www.google.com/" ]
+	  },
+          "path": "pgphcomnlaojlmmcjmiddhdapjpbgeoc\\0.0",
+          "state": 1
+       },
+       "apdfllckaahabafndbhieahigkjlhalf": {
+          "location": 1,
+          "manifest": {
+	       "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDIl5KlKwL2TSkntkpY3naLLz5jsN0YwjhZyObcTOK6Nda4Ie21KRqZau9lx5SHcLh7pE2/S9OiArb+na2dn7YK5EvH+aRXS1ec3uxVlBhqLdnleVgwgwlg5fH95I52IeHcoeK6pR4hW/Nv39GNlI/Uqk6O6GBCCsAxYrdxww9BiQIDAQAB",
+	       "name": "Диск Google",
+	       "permissions": [ "background", "clipboardRead", "clipboardWrite", "notifications", "unlimitedStorage" ],
+	       "update_url": "http://clients2.google.com/service/update2/crx",
+               "version": "0.0"
+          },
+	  "granted_permissions": {
+	    "api": [ "background", "clipboardRead", "clipboardWrite", "notifications", "unlimitedStorage" ],
+	    "explicit_host": [ ],
+	    "scriptable_host": [ ]
+	  },
+          "path": "apdfllckaahabafndbhieahigkjlhalf\\0.0",
+          "state": 1
+       },
+       "ejjicmeblgpmajnghnpcppodonldlgfn": {
+          "location": 1,
+          "manifest": {
+	       "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6fnR49fckPUD1k8H1VbgVo+wcGNtCxOwDhJBkY/LRNX82aoY4Kr49pbGAkY/4yeHEiiSmUDH+kJWQUFAm+JAcgCUjQQgA10lEhNSAhTf6Y6AJa6RxF3u8+tmTTuNdBGG+EIU/jEhrztd5WZ012uet7OizJFPB9rHWnCJI49p6CQIDAQAB",
+	       "name": "Календарь Google",
+	       "permissions": [ "unlimitedStorage", "notifications" ],
+	       "update_url": "http://clients2.google.com/service/update2/crx",
+	       "version": "0.0"
+          },
+	  "granted_permissions": {
+	    "api": [ "unlimitedStorage", "notifications" ],
+	    "explicit_host": [ ],
+	    "scriptable_host": [ ]
+	  },
+          "path": "ejjicmeblgpmajnghnpcppodonldlgfn\\0.0",
+          "state": 1
+       }
+    }
+ }
+}

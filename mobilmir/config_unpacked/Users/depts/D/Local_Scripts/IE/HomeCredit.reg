@@ -1,0 +1,11 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\PageSetup]
+"header"=""
+"footer"=""
+"margin_bottom"="0.1665"
+"margin_left"="0.1665"
+"margin_right"="0.1665"
+"margin_top"="0.1665"
+"orientation"="1"
+"paper_size"="9"

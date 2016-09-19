@@ -1,0 +1,6 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoDriveTypeAutoRun"=dword:000000ff
+"NoLowDiskSpaceChecks"=dword:00000001
+"NoDrives"=dword:00000000

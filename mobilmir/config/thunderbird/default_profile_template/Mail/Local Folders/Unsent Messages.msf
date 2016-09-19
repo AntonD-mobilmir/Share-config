@@ -1,0 +1,42 @@
+// <!-- <mdb:mork:z v="1.4"/> -->
+< <(a=c)> // (f=iso-8859-1)
+  (B8=customSortCol)(80=ns:msg:db:row:scope:msgs:all)(81=subject)
+  (82=sender)(83=message-id)(84=references)(85=recipients)(86=date)
+  (87=size)(88=flags)(89=priority)(8A=label)(8B=statusOfset)(8C=numLines)
+  (8D=ccList)(8E=bccList)(8F=msgThreadId)(90=threadId)(91=threadFlags)
+  (92=threadNewestMsgDate)(93=children)(94=unreadChildren)
+  (95=threadSubject)(96=msgCharSet)(97=ns:msg:db:table:kind:msgs)
+  (98=ns:msg:db:table:kind:thread)(99=ns:msg:db:table:kind:allthreads)
+  (9A=ns:msg:db:row:scope:threads:all)(9B=threadParent)(9C=threadRoot)
+  (9D=msgOffset)(9E=offlineMsgSize)
+  (9F=ns:msg:db:row:scope:dbfolderinfo:all)
+  (A0=ns:msg:db:table:kind:dbfolderinfo)(A1=numMsgs)(A2=numNewMsgs)
+  (A3=folderSize)(A4=expungedBytes)(A5=folderDate)(A6=highWaterKey)
+  (A7=mailboxName)(A8=UIDValidity)(A9=totPendingMsgs)
+  (AA=unreadPendingMsgs)(AB=expiredMark)(AC=version)(AD=forceReparse)
+  (AE=fixedBadRefThreading)(AF=maildirValid)(B0=folderName)(B1=sortType)
+  (B2=sortOrder)(B3=viewFlags)(B4=viewType)(B5=columnStates)(B6=MRUTime)
+  (B7=sortColumns)>
+
+<(80=1)(81=0)(87=1464946925)(83=12)(84=)(89
+    ={"threadCol":{"visible":true,"ordinal":"1"},"flaggedCol":{"visible":true,\
+"ordinal":"3"},"attachmentCol":{"visible":true,"ordinal":"5"},"subjectCol":{"v\
+isible":true,"ordinal":"7"},"unreadButtonColHeader":{"visible":true,"ordinal":\
+"9"},"senderCol":{"visible":false,"ordinal":"11"},"recipientCol":{"visible":tr\
+ue,"ordinal":"13"},"correspondentCol":{"visible":false,"ordinal":"15"},"junkSt\
+atusCol":{"visible":false,"ordinal":"17"},"receivedCol":{"visible":false,"ordi\
+nal":"19"},"dateCol":{"visible":true,"ordinal":"21"},"statusCol":{"visible":fa\
+lse,"ordinal":"23"},"sizeCol":{"visible":true,"ordinal":"25"},"tagsCol":{"visi\
+ble":false,"ordinal":"27"},"accountCol":{"visible":false,"ordinal":"29"},"prio\
+rityCol":{"visible":false,"ordinal":"31"},"unreadCol":{"visible":false,"ordina\
+l":"33"},"totalCol":{"visible":false,"ordinal":"35"},"locationCol":{"visible":\
+false,"ordinal":"37"},"idCol":{"visible":false,"ordinal":"39"}})>
+{1:^9F {(k^A0:c)(s=9)} 
+  [1(^AC=1)(^AD=0)(^AE=1)(^AF=1)(^B6^87)(^B1=12)(^B2=1)(^B3=0)(^B4=0)
+    (^B7=)(^B5^89)]}
+
+@$${6{@
+@$$}6}@
+
+@$${7{@
+@$$}7}@

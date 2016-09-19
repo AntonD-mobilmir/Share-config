@@ -1,0 +1,1 @@
+rundll32 shell32.dll,Control_RunDLLAsUser cscui.dll, Автономные файлы

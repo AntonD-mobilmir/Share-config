@@ -1,0 +1,13 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}]
+"UpperFilters"=-
+"LowerFilters"=-
+
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Cdr4_2K]
+
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Cdralw2k]
+
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Cdudf]
+
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UdfReadr]

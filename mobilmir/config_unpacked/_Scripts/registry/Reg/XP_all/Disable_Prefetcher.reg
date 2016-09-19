@@ -1,0 +1,7 @@
+REGEDIT4
+
+;0 = Disabled / 1 = Application Launch Prefetch / 2 = Boot Prefetch / 3 = Prefetch All
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters]
+"EnablePrefetcher"=dword:00000000
+

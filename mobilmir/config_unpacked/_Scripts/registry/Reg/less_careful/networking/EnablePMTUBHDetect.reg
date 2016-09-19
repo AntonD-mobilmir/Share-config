@@ -1,0 +1,22 @@
+REGEDIT4
+
+;EnablePMTUBHDetect
+;HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters Data type Range Default value
+;REG_DWORD
+;0 | 1
+;0
+;Description
+;Determines whether TCP tries to detect black hole routers during the Path MTU (maximum transmission unit) discovery process. Enabling black hole detection increases the maximum number of times TCP retransmits a given segment.
+;If the value of this entry is 1, TCP recognizes when it has transmitted the same segment several times without receiving an acknowledgement. It reduces the maximum segment size (MSS) to 536 bytes, and it sets the Don't-Fragment bit. If, as a result, receipt of the segment is acknowledged, TCP continues this practice in all subsequent transmissions on the connection.Value Meaning
+;0
+;Disables black hole detection.
+;1
+;Enables black hole detection.
+; Note
+;This entry is used only when the Path MTU discovery process is performed, that is, when the value of the EnablePMTUDiscovery entry is 1.
+;Windows 2000 does not add this entry to the registry. You can add it by editing the registry or by using a program that edits the registry.
+
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"EnablePMTUBHDetect"=dword:00000001
+

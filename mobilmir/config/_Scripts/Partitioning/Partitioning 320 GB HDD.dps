@@ -1,0 +1,15 @@
+REM coding:OEM
+LIST DISK
+SELECT DISK 0
+DETAIL DISK
+
+REM For 320 GB HDD, free space after this partition created is 262241
+REM -32765 = 229476 for WideStorage (W:). But better specify 229446 or size will be rounded up, and no 32765 will left
+REM However after creating 229446 size partition, 32765+24 will left. Hitherto no fix.
+
+CREATE PARTITION LOGICAL SIZE=229446
+ASSIGN LETTER=W
+
+REM 32789 left (checked), but no way to create partition of that size :(
+CREATE PARTITION LOGICAL
+ASSIGN LETTER=R

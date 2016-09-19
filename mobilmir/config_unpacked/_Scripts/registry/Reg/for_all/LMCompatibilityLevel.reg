@@ -1,0 +1,30 @@
+REGEDIT4
+
+;LmCompatibilityLevel 
+;HKLM\SYSTEM\CurrentControlSet\Control\Lsa 
+; Data type	Range	Default value
+;REG_DWORD 	0–5 	0 
+;Description 
+;Specifies the mode of authentication and session security to be used for network logons.
+; Value	Meaning
+;0	Clients use LM and NTLM authentication, but they never use NTLMv2 session security. Domain controllers accept LM, NTLM, and NTLMv2 authentication.
+;1	Clients use LM and NTLM authentication, and they use NTLMv2 session security if the server supports it. Domain controllers accept LM, NTLM, and NTLMv2 authentication.
+;2	Clients use only NTLM authentication, and they use NTLMv2 session security if the server supports it. Domain controller accepts LM, NTLM, and NTLMv2 authentication.
+;3	Clients use only NTLMv2 authentication, and they use NTLMv2 session security if the server supports it. Domain controllers accept LM, NTLM, and NTLMv2 authentication.
+;4	Clients use only NTLMv2 authentication, and they use NTLMv2 session security if the server supports it. Domain controller refuses LM authentication responses, but it accepts NTLM and NTLMv2.
+;5	Clients use only NTLMv2 authentication, and they use NTLMv2 session security if the server supports it. Domain controller refuses LM and NTLM authentication responses, but it accepts NTLMv2.
+
+;NoLMHash
+;HKLM\SYSTEM\CurrentControlSet\Control\Lsa 
+; Data type 	Range 	Default value 
+;REG_DWORD	0 | 1	0
+;Description
+;Specifies whether Security Accounts Manager (SAM) stores the LAN Manager (LM) hash of the user's password. The LM hash of the user's password is necessary to authenticate downlevel clients that cannot use NTLM or NTLMv2 authentication.
+; Value 	Meaning 
+;0	SAM stores the message digest of the user's password.
+;1	SAM does not store the message digest of the user's password.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa]
+"LMCompatibilityLevel"=dword:00000004
+"NoLMHash"=dword:00000001
+"SuppressExtendedProtection"=dword:0

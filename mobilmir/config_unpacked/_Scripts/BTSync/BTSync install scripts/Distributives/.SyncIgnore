@@ -1,0 +1,46 @@
+# .SyncIgnore is a UTF-8 encoded .txt file that helps you specify single files, paths and rules 
+# for ignoring during the synchronization job. It supports "?" and "*" wildcard symbols.
+#
+#
+# OS generated files #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+Thumbs.db
+
+# out-of-office Distributives files
+*_local
+
+# mobilmir distributives tempfiles and garbadge
+*.!ut
+temp
+*\temp
+
+# remote-depts traffic conservation
+Soft\AntiViruses AntiTrojans\Microsoft Security Essentials
+Soft\MultiMedia\Players\VLC
+Soft\Network\Chat Messengers
+Soft\Network\Configuration
+Soft\Network\HTTP\Google Chrome\*.msi
+Soft\Network\HTTP\Google Chrome\policy_templates.zip
+Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\*.exe
+Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\_html_and_doc.rar
+Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\TeamViewerPortable.zip
+
+# .Distributives_Update_Run.All.cmd or silent self-update
+Soft\Keyboard Tools\AutoHotkey\*.exe
+Soft\Keyboard Tools\AutoHotkey\old\*
+Soft\MultiMedia\Plugins Frameworks Components\Adobe Flash\*.exe
+Soft\Network\Chat Messengers\Skype\*.msi
+Soft\Network\HTTP\Google Chrome\*.msi
+Soft\Network\HTTP\Mozilla FireFox\*.exe
+Soft\Network\HTTP\Mozilla FireFox\latest-mozilla-central
+Soft\Network\HTTP\Mozilla FireFox\utilities
+Soft\Network\HTTP\Mozilla FireFox\W2K
+Soft\Network\Mail News\Mozilla Thunderbird\*.exe
+Soft\Network\Mail News\Mozilla Thunderbird\W2K
+Drivers\Canon\Laser MF\MF4010\CD.rar

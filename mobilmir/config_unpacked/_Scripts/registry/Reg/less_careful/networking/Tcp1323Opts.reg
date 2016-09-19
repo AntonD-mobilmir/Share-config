@@ -1,0 +1,26 @@
+REGEDIT4
+
+;Tcp1323Opts 
+;HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters Data type	Range	Default value
+;REG_DWORD 	
+;0 | 1 | 2 | 3 	
+;3 
+;Description
+;Determines whether TCP uses the timestamping and window scaling features described in RFC 1323, TCP Extensions for High Performance.
+;Window scaling permits TCP to negotiate a scaling factor for the TCP receive window size, allowing for a very large TCP receive window of up to 1 GB. The TCP receive window is the amount of data the sending host can send at one time on a connection.
+;Timestamps help TCP measure round trip time (RTT) accurately in order to adjust retransmission timeouts. The Timestamps option provides two timestamp fields of 4 bytes each in the TCP header, one to record the time the initial transmission is sent and one to record the time on the remote host.
+;This entry is a 2-bit bitmask. The lower bit determines whether scaling is enabled; the higher bit determines whether timestamps are enabled. To enable a feature, set the bit representing the feature to 1. To disable a feature, set its bit to 0.Value	Meaning
+;0 (00)	
+;Timestamps and window scaling are disabled.
+;1 (01)	
+;Window scaling is enabled.
+;2 (10)	
+;Timestamps are enabled.
+;3 (11)	
+;Timestamps and window scaling are enabled.
+; Note
+;Windows 2000 does not add this entry to the registry. You can add it by editing the registry or by using a program that edits the registry.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"Tcp1323Opts"=dword:00000001
+

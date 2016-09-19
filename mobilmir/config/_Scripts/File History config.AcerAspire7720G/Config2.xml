@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataProtectionUserConfig SchemaVersion="1">
+  <UserName>LogicDaemon</UserName>
+  <FriendlyName>LogicDaemon</FriendlyName>
+  <PCName>ACERASPIRE7720G</PCName>
+  <UserId>b8839fa1-9cc0-4a39-b33c-07842547a143</UserId>
+  <Library>
+    <LibraryName>*2112ab0a-c86a-4ffe-a368-0de96e47012e</LibraryName>
+    <Folder>D:\Users\LogicDaemon\Music</Folder>
+    <Folder>W:\Media\Music</Folder>
+  </Library>
+  <Library>
+    <LibraryName>Saved Pictures</LibraryName>
+    <Folder>D:\Users\LogicDaemon\Pictures\Saved Pictures</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*491e922f-5643-4af4-a7eb-4e7a138d8174</LibraryName>
+    <Folder>D:\Users\LogicDaemon\Videos</Folder>
+  </Library>
+  <Library>
+    <LibraryName>Camera Roll</LibraryName>
+    <Folder>D:\Users\LogicDaemon\Pictures\Camera Roll</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*7b0db17d-9cd2-4a93-9733-46cc89022e7c</LibraryName>
+    <Folder>D:\Users\LogicDaemon\Documents</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*a990ae9f-a03b-4e80-94bc-9912d7504104</LibraryName>
+    <Folder>D:\Users\LogicDaemon\Pictures</Folder>
+  </Library>
+  <UserFolder>D:\Users\LogicDaemon\.oracle_jre_usage</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Dropbox</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Git</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Google Drive</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Mail</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Tracing</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Searches</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Desktop</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\OneDrive</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Contacts</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Pictures</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Favorites</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Downloads</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Documents</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Links</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Saved Games</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Videos</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\Music</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\.ssh</UserFolder>
+  <UserFolder>D:\Users\LogicDaemon\.idlerc</UserFolder>
+  <LibraryExclude>*2112ab0a-c86a-4ffe-a368-0de96e47012e</LibraryExclude>
+  <LibraryExclude>*491e922f-5643-4af4-a7eb-4e7a138d8174</LibraryExclude>
+  <LocalCatalogPath1>D:\Users\LogicDaemon\AppData\Local\Microsoft\Windows\FileHistory\Configuration\Catalog1.edb</LocalCatalogPath1>
+  <LocalCatalogPath2>D:\Users\LogicDaemon\AppData\Local\Microsoft\Windows\FileHistory\Configuration\Catalog2.edb</LocalCatalogPath2>
+  <StagingArea>
+    <StagingAreaPath>D:\Users\LogicDaemon\AppData\Local\Microsoft\Windows\FileHistory\Data</StagingAreaPath>
+    <StagingAreaMaximumCapacity>169958420</StagingAreaMaximumCapacity>
+    <StagingAreaWarningThreshold>127468815</StagingAreaWarningThreshold>
+  </StagingArea>
+  <AvailabilityPolicies>
+    <TargetAbsenceTime>5</TargetAbsenceTime>
+    <TimeInUnprotectedState>3</TimeInUnprotectedState>
+  </AvailabilityPolicies>
+  <RetentionPolicies>
+    <RetentionPolicyType>NO LIMIT</RetentionPolicyType>
+    <MinimumRetentionAge>365</MinimumRetentionAge>
+  </RetentionPolicies>
+  <DPFrequency>3600</DPFrequency>
+  <DPStatus>ENABLED</DPStatus>
+  <Target>
+    <TargetName>\\localhost\FileHistory$\</TargetName>
+    <TargetUrl>\\localhost\FileHistory$\</TargetUrl>
+    <TargetDriveType>REMOTE</TargetDriveType>
+    <TargetConfigPath1>LogicDaemon\ACERASPIRE7720G\Configuration\Config1.xml</TargetConfigPath1>
+    <TargetConfigPath2>LogicDaemon\ACERASPIRE7720G\Configuration\Config2.xml</TargetConfigPath2>
+    <TargetCatalogPath1>LogicDaemon\ACERASPIRE7720G\Configuration\Catalog1.edb</TargetCatalogPath1>
+    <TargetCatalogPath2>LogicDaemon\ACERASPIRE7720G\Configuration\Catalog2.edb</TargetCatalogPath2>
+    <TargetBackupStorePath>LogicDaemon\ACERASPIRE7720G\Data</TargetBackupStorePath>
+    <TargetWarningThreshold>98</TargetWarningThreshold>
+  </Target>
+</DataProtectionUserConfig>

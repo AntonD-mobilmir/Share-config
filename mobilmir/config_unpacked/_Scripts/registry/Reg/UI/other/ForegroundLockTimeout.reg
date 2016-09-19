@@ -1,0 +1,12 @@
+REGEDIT4
+
+; ForegroundLockTimeout 
+; HKCU\Control Panel\Desktop
+; Data type	Range	Default value
+; REG_DWORD 	Milliseconds	200000 
+
+; Description
+; Specifies the time, following user input, during which the system keeps applications from moving into the foreground.
+
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"ForegroundLockTimeout"=dword:00030d40

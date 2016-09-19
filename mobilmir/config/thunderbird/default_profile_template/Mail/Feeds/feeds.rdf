@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns:NS1="http://purl.org/rss/1.0/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:fz="urn:forumzilla:"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Seq RDF:about="rdf:#$2k.YC3">
+    <RDF:li RDF:resource="http://trenerkt.blogspot.com/feeds/posts/default"/>
+    <RDF:li RDF:resource="http://i.mobilmir.ru/ideas/?PAGE_NAME=rss&amp;TYPE=atom&amp;MODE=forum&amp;IID=0"/>
+    <RDF:li RDF:resource="http://itcp-mobilmir-ru.tumblr.com/rss"/>
+    <RDF:li RDF:resource="http://blog.it.mobilmir.ru/rss"/>
+  </RDF:Seq>
+  <fz:feed RDF:about="http://itcp-mobilmir-ru.tumblr.com/rss"
+                   fz:quickMode="true"
+                   fz:options="{&quot;version&quot;:1,&quot;category&quot;:{&quot;enabled&quot;:false,&quot;prefixEnabled&quot;:false,&quot;prefix&quot;:&quot;&quot;}}"
+                   dc:identifier="http://itcp-mobilmir-ru.tumblr.com/rss"
+                   dc:title="Новости службы ИТ (Цифроград, Ставрополь и край)"
+                   NS1:link="http://itcp-mobilmir-ru.tumblr.com/">
+    <fz:destFolder RDF:resource="mailbox://nobody@Feeds/%D0%A6%D0%B8%D1%84%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%B4/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8%20%D1%81%D0%BB%D1%83%D0%B6%D0%B1%D1%8B%20%D0%98%D0%A2"/>
+  </fz:feed>
+  <fz:feed RDF:about="http://i.mobilmir.ru/ideas/?PAGE_NAME=rss&amp;TYPE=atom&amp;MODE=forum&amp;IID=0"
+                   fz:quickMode="true"
+                   fz:options="{&quot;version&quot;:1,&quot;category&quot;:{&quot;enabled&quot;:false,&quot;prefixEnabled&quot;:false,&quot;prefix&quot;:&quot;&quot;}}"
+                   dc:identifier="http://i.mobilmir.ru/ideas/?PAGE_NAME=rss&amp;TYPE=atom&amp;MODE=forum&amp;IID=0"
+                   dc:title="Фабрика идей [форум]"
+                   NS1:link="http://i.mobilmir.ru">
+    <fz:destFolder RDF:resource="mailbox://nobody@Feeds/%D0%A6%D0%B8%D1%84%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%B4/%D0%A4%D0%B0%D0%B1%D1%80%D0%B8%D0%BA%D0%B0%20%D0%B8%D0%B4%D0%B5%D0%B9%20%5B%D1%84%D0%BE%D1%80%D1%83%D0%BC%5D"/>
+  </fz:feed>
+  <RDF:Description RDF:about="urn:forumzilla:root">
+    <fz:feeds RDF:resource="rdf:#$2k.YC3"/>
+  </RDF:Description>
+  <fz:feed RDF:about="http://trenerkt.blogspot.com/feeds/posts/default"
+                   fz:quickMode="true"
+                   fz:options="{&quot;version&quot;:1,&quot;category&quot;:{&quot;enabled&quot;:false,&quot;prefixEnabled&quot;:false,&quot;prefix&quot;:&quot;&quot;}}"
+                   dc:identifier="http://trenerkt.blogspot.com/feeds/posts/default"
+                   dc:title="Блог тренера по компьютерным технологиям"
+                   NS1:link="http://trenerkt.blogspot.com/"
+                   dc:lastModified="Mon, 10 Nov 2014 08:05:08 GMT">
+    <fz:destFolder RDF:resource="mailbox://nobody@Feeds/%D0%A6%D0%B8%D1%84%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%B4/%D0%91%D0%BB%D0%BE%D0%B3%20%D1%82%D1%80%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%20%D0%BF%D0%BE%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%BD%D1%8B%D0%BC%20%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F%D0%BC"/>
+  </fz:feed>
+  <fz:feed RDF:about="http://blog.it.mobilmir.ru/rss"
+                   fz:quickMode="true"
+                   fz:options="{&quot;version&quot;:1,&quot;category&quot;:{&quot;enabled&quot;:false,&quot;prefixEnabled&quot;:false,&quot;prefix&quot;:&quot;&quot;}}"
+                   dc:identifier="http://blog.it.mobilmir.ru/rss"
+                   dc:title="it.mobilmir.ru"
+                   NS1:link="http://blog.it.mobilmir.ru/">
+    <fz:destFolder RDF:resource="mailbox://nobody@Feeds/%D0%A6%D0%B8%D1%84%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%B4/%D0%91%D0%BB%D0%BE%D0%B3%20%D0%B0%D0%B3%D0%B5%D0%BD%D1%82%D1%81%D1%82%D0%B2%D0%B0%20%D0%98%D0%A2-%D0%B0%D1%83%D1%82%D1%81%D0%BE%D1%80%D1%81%D0%B8%D0%BD%D0%B3%D0%B0"/>
+  </fz:feed>
+</RDF:RDF>

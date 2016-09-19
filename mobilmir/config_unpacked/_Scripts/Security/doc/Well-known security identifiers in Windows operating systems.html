@@ -1,0 +1,1573 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="en-US">
+<head><title>
+	Well-known security identifiers in Windows operating systems
+</title><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta id="ctl00_ctl00_WtCampaignId" name="DCSext.wt_linkid" /><meta id="ctl00_ctl00_WtTarget" name="DCSext.wt_target" /><meta id="ctl00_ctl00_WtSp" name="WT.sp" /><meta name="DCSdir.gTrackExceptions" content="no-track" />
+    <link rel="stylesheet" type="text/css" href="/Styles/oneMscomMaster.css" />
+    <script type="text/javascript" src="/scripts/oneMscomMaster.js"></script>
+    
+    <link title="Microsoft Support Search" type="application/opensearchdescription+xml" rel="search" href="/common/opensearchdescriptor.aspx?ln=en-gb" /><meta name="ms.gsfxversion" content="8.1.1.0" /><meta name="ms.sup_cid" content="243330" /><meta name="ms.sup_cln" content="en-us" /><meta name="ms.sup_ct" content="kb" /><meta name="ms.sup_ln" content="en-gb" /><meta name="ms.sup_sd" content="gn" /><meta name="DCSext.sup_cid" content="243330" /><meta name="DCSext.sup_cln" content="en-us" /><meta name="DCSext.sup_ct" content="kb" /><meta name="DCSext.sup_ln" content="en-gb" /><meta name="DCSext.sup_sd" content="gn" /><script type="text/javascript">var gCookieDomain='support.microsoft.com';</script><script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.js"></script><script type="text/javascript" src="/common/script/gsfx/default.js?76"></script><script type="text/javascript">setcookieval("gssSITE","gn",'',true);</script><script type="text/javascript">setcookieval("gssTHEME","gn",'',true);</script><script type="text/javascript">setcookieval("gssTOOLBAR","gn",'',true);</script><script type="text/javascript">var g_currentContent='kb\x3ben-us\x3b243330';</script><script type="text/javascript" src="/common/script/fx/survey.js?76"></script><meta name="robots" content="" /><meta name="Search.lcid" content="1033" /><meta name="Search.KeyWords" content="kbenv kbinfo KB243330" /><meta name="Search.DateModified" content="2012-03-01T19:15:00" /><meta name="Search.Description" content="A security identifier (SID) is a unique value of variable length that is used to identify a security principal or security group in Windows operating systems. Well-known SIDs are a group of SIDs that identify generic users or generic groups. Their..." /><meta name="Search.KBParents" content="5891 3198 1163 5887 5886 6728 3223 1173 7341 7274 1131 7940 7017 5732 3071 14135 14134 14131 14136 13228 12925 13230 13236" /><meta name="Search.Assets" content="1" /><meta name="Search.Retire" content="0" /><meta name="Search.Products" content="36987 36983 36982 185522 241524 275322 36828 582480 582476 582481 542607 542609 542615" /><meta name="Search.QueryWords" content="security objects well known sid" /><meta name="Search.ContentID" content="243330" /><meta name="Search.Audiences" content="kbAudITPRO" /><meta name="Search.Title" content="Well-known security identifiers in Windows operating systems" /><meta name="KBParents" content="5891 3198 1163 5887 5886 6728 3223 1173 7341 7274 1131 7940 7017 5732 3071 14135 14134 14131 14136 13228 12925 13230 13236" /><meta name="Search.ContentType" content="kb" /><meta name="Search.scid" content="kb;en-us;243330" /><meta name="Search.MT" content="0" /><meta name="Search.KB3" content="0" /><meta name="Keywords" content="kbenv kbinfo KB243330" /><meta name="Description" content="A security identifier (SID) is a unique value of variable length that is used to identify a security principal or security group in Windows operating systems. Well-known SIDs are a group of SIDs that identify generic users or generic groups. Their..." /><meta name="MS.LOCALE" content="en" /><meta http-equiv="content-type" content="text/html; charset=utf-8" /><meta http-equiv="content-language" content="en-US" /><script type="text/javascript">var url_exactMatch='/select/Default.aspx?target=assistance';</script><link rel="stylesheet" type="text/css" href="/common/css/default/default.css?76" /><link rel="stylesheet" type="text/css" href="/common/css/default/XmlContent.css?76" /><script type="text/javascript" src="/common/script/gsfx/kb.js?76"></script><script type="text/javascript" src="/common/script/gsfx/stickypanel.js?76"></script><link rel="stylesheet" type="text/css" href="/common/css/default/stickypanel.css?76" /><link rel="stylesheet" type="text/css" href="/common/css/default/branding.css?76" />
+<!-- RESG: 8/2/2012 3:15:00 AM - RESX: 1/1/0001 12:00:00 AM -->
+<!-- (c) 2012 Microsoft Corporation. All Rights Reserved -->
+<style type="text/css">html body, html select, html input, html form, html textarea{font-family : Segoe UI, Arial, Verdana, Tahoma, sans-serif;}</style><script type="text/javascript">var PersonalizationInfo='a2IyNDMzMzAIZW4tdXMIV2VsbC1rbm93biBzZWN1cml0eSBpZGVudGk_';</script><script type="text/javascript" src="/common/script/fx/surveycookieutil.js?76"></script><script type="text/javascript" src="/common/script/gsfx/search.js?76"></script><script type="text/javascript" src="/common/script/gsfx/ac.js?76"></script>    
+    <style type="text/css">
+        #gsfx_brnd_PageWrapper
+        {
+            float: left;
+        }        
+        div.stage, div.mstHdr
+        {
+            width: 1024px;
+        }
+        div.search-navigation
+        {
+            margin-bottom: 0px;    
+        }
+        #contentArea
+        {
+            border-bottom: 0px;       
+        }        
+    </style>
+<style type="text/css">
+
+   body 
+    {
+        color: #000;
+        background-color: #ececec;
+       
+    }
+
+    body, input 
+    {
+        font-size: 100%;
+    }
+
+    body, select 
+    {
+        font-family: Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;
+    }
+
+    .png-img span 
+    {
+        left: -9999px;
+    }
+
+    
+
+    div.form-bottom-inner 
+    {
+     background-color: #ececec;
+        left: 0;
+    }
+    
+    div.stage-bg-top 
+    {
+        background-color: #fff;
+        left: 0;
+    }
+
+    div.stage-bg-mid 
+    {
+        background-color: #fff;
+        left: 0;
+    }
+
+    div.stage-bg-bot 
+    {
+        background-color: #fff;
+        left: 0;
+    }
+    
+    div.main-brand div
+    {
+        float: left;
+    }
+    div.main-brand div.brandLogoText a
+    {
+        color: #4f4f4f;
+        font-size: 188%;
+    }
+
+    div.main-brand div.brandTagLineText a
+    {
+        color: #4f4f4f;
+        font-size: 80%;
+    }
+    
+     <!--[if !IE 7]>
+    .png-img div 
+    {
+        left: 0;
+    }
+      <![endif]-->
+    
+</style></head>
+<body bi:type="oneMscomMaster">
+    <!--dynamic style-->
+    <script type="text/javascript">        if (typeof WTOptimize != 'undefined') WTOptimize.setup();</script>
+    
+
+<div id="oneMscomJsCssLoader">
+
+    <link rel="stylesheet" type="text/css" href="/Styles/onemscomcomponents.css" />
+    <link rel="stylesheet" type="text/css" href="/Styles/oneMscomListLayout.css" />
+
+    
+    <link rel="stylesheet" type="text/css" href="/Styles/oneMscomBlade.css" />
+    <script type="text/javascript" src="/scripts/oneMscomBlade.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="/Styles/onemscomfooter.css" />
+    <script type="text/javascript" src="/scripts/onemscomfooter.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="/Styles/oneMscomNav.css" />
+    <script type="text/javascript" src="/scripts/oneMscomNav.js"></script>
+    <div id="ctl00_ctl00_JsCssLoaderCtl_oneMscomLoadedComponent" style="display: none;">oneMscomBlade,oneMsomNav,oneMscomFooter,</div>
+    <div id="ctl00_ctl00_JsCssLoaderCtl_oneMscomComponentDynamicStyle">
+        <style type="text/css">
+            
+        .mstHdr {font-family:Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;}.mstHdr .mstHdr_PriRowBg {background-color:#464646;opacity:1;filter:alpha(opacity=100);_opacity:1;_filter:alpha(opacity=100);}.mstHdr .mstHdr_PriRow {_background-color:#464646;}.mstHdr .mstHdr_PriRow, .mstHdr .mstHdr_PriRow a:link, .mstHdr .mstHdr_PriRow a:visited, .mstHdr .mstHdr_PriRow a:active, .mstHdr .mstHdr_PriRow a:hover {color:#ffffff;}.mstHdr .mstHdr_StaticSec11,.mstHdr .mstHdr_StaticSec12,.mstHdr .mstHdr_StaticSec13, .mstHdr .mstHdr_StaticSec22 {float:left;}.mstHdr .mstHdr_StaticSec14,.mstHdr .mstHdr_StaticSec21 {float:right;}.mstHdr .mstHdr_StaticSecLeftAlign {float:left;}.mstHdr .mstHdr_StaticSecRightAlign {float:right;}.mstHdr .mstHdr_FlyoutPos {left: 0;}.mstHdr .mstHdr_PriRow .mstHdr_Flyout {background-color:#464646;}.mstHdr .mstHdr_PriRow .mstHdr_Flyout, .mstHdr .mstHdr_PriRow .mstHdr_Flyout a:link, .mstHdr .mstHdr_PriRow .mstHdr_Flyout a:visited, .mstHdr .mstHdr_PriRow .mstHdr_Flyout a:active, .mstHdr .mstHdr_PriRow .mstHdr_Flyout a:hover {color:#ffffff;}.mstHdr .mstLcp .mstLcp_Head {margin-left: 5px;}.mstHdr .mstLcp_Heading h3 {font-family: Segoe UI Light,Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;color:#ffffff;}.mstHdr .mstLcp_LangLinks ul.mstLcp_Col {float:left;margin-left: 6px;}.mstHdr .mstLcp_LangLinks ul.mstLcp_Col.mstLcp_C0 {margin-left: 0;}.mstHdr .mstLcp_LangLinks ul.mstLcp_Col li {margin-left: 5px;}.mstHdr .mstLcp_LangLinks ul.mstLcp_Col.mstLcp_C0 li {margin-left: 0;}.mstHdr .mstLcp_LangLinks a:link,.mstHdr .mstLcp_LangLinks a:visited,.mstHdr .mstLcp_WorldwideLink a:link,.mstHdr .mstLcp_WorldwideLink a:visited {color:#ffffff;}.mstHdr .mstLcp_LangLinks li.mstLcp_Hide a {color:#e3e3e3 !important;}.mstHdr .mstLcp_WorldwideLink a {float:left;}.mstHdr .mstHdr_Flyout .mstHdr_PrdLayoutA {padding-top: 30px;min-height: 280px;_height: 280px;_width: 960px;}.mstHdr .mstHdr_Flyout .mstHdr_PrdLayoutA .mstHdr_PrdSection31 {float:left;padding-left: 40px;}.mstHdr .mstHdr_Flyout .mstHdr_PrdLayoutA .mstHdr_PrdSection31 .mstHdr_PrdSection31_Image {float:left;}.mstHdr .mstHdr_Flyout .mstHdr_PrdLayoutA .mstHdr_PrdSection31 .mstHdr_PrdSection31_Item .mstHdr_PrdSection31_Text {float:left;margin-left: 20px;}.mstHdr .mstHdr_Flyout .mstHdr_PrdSection32 {float:left;width:230px;}.mstHdr .mstHdr_Flyout .mstHdr_PrdSection33 {float:left;}.mstHdr .mstHdr_AnimateDesc div.mstHdr_MenuLinkDesc {padding-left: 3px;}.mstHdr .mstHdr_SecRow{background-color:;background-repeat:repeat-x;}.mstHdr .mstHdr_MenuLink,.mstHdr .mstHdr_SignInOut{font-size:62.5%;_font-size:57.5%;}.mstHdr .mstHdr_CpsAStaticSecLeftAlign {float:left;width:100%;}.mstHdr .divA {border-right: solid 1px black;}.oneMscomNav {color:#000;}.oneMscomNav,.oneMscomNav input {font-size:100%;}.oneMscomNav,.oneMscomNav select {font-family:Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;}div.oneMscomNav .Nav_shown {display: block;right:none;}.oneMscomNav div.navigation-4level-strip {float:left;}div.oneMscomNav .navigation-section {text-align:left;}div.oneMscomNav .navigation-item {float:left;}}div.oneMscomNav .navigation-item-flyout-content .navigation-item {float:left;}div.oneMscomNav div.navigation-item-flyout-content-shown {right: 0;}.oneMscomNav div.navigation-sub {float:left;}div.navigation-sub .navigation-sub-item {float:left;}div.navigation-sub .selected .first {border-left: 0;}div.navigation-sub .navigation-sub-item-flyout-content .navigation-sub-item {float:left;}div.navigation-sub div.navigation-sub-item-flyout-content-shown {right: 0;}div.navigation-sub .links {margin-left: 0.5em;}div.oneMscomNav .navigation-item-tab {position: relative;color:#4f4f4f;font-size:13px;border-color:transparent;border-width: 0px 1px 0px 1px;}div.navigation-sub .navigation-sub-item-tab {position: relative;color:#4f4f4f;font-size:13px;border-width: 0px 1px 0px 1px;}.oneMscomNav div.navMenu {font-family:Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;}div.oneMscomNav .navigation-bg {background-color:#f8f8f8;}div.oneMscomNav .selected .navigation-item-tab {background-color:#ffffff;color:#4f4f4f;border-color:#ffffff;z-index: 996;}div.oneMscomNav .selected .navigation-item-tab a:link,div.oneMscomNav .selected .navigation-item-tab a:visited,div.oneMscomNav .selected .navigation-item-tab a:active {color:#4f4f4f;}div.oneMscomNav .navigation-item-tab a {border-color:#f8f8f8;}div.oneMscomNav .selected .navigation-item-tab a:hover {background-color:#ffffff;color:#4f4f4f;border-color:#ffffff;}div.oneMscomNav .navigation-item-tab a:link,div.oneMscomNav .navigation-item-tab a:visited,div.oneMscomNav .navigation-item-tab a:active {color:#4f4f4f;}div.oneMscomNav .navigation-item-tab a:hover {color:#4f4f4f;background-color:#f8f8f8;border-color:#f8f8f8;}div.oneMscomNav .navigation-item-flyout .navigation-level2 {border:#e0e0e0 1px solid;background-color:#FFFFFF;font-size:13px;}div.oneMscomNav .navigation-item-flyout .navigation-level2 .links {width:178px;float:left;}div.oneMscomNav .navigation-item-flyout .vertical_split {border-right: solid 1px #E3E3E3;}div.oneMscomNav .navigation-item-flyout .navigation-level2 .links a,div.oneMscomNav .navigation-item-flyout .navigation-level2 .links a:link,div.oneMscomNav .navigation-item-flyout .navigation-level2 .links a:visited,div.oneMscomNav .navigation-item-flyout .navigation-level2 .links a:active {color:#4f4f4f;}div.oneMscomNav .navigation-item-flyout .navigation-level2 .links a:hover {color:#4f4f4f;background-color:#ececec;}div.oneMscomNav .navigation-item-flyout .navigation-level3 {border:#e0e0e0 1px solid;background-color:#FFFFFF;}div.oneMscomNav .navigation-item-flyout .navigation-level3 .links {width:178px;float:left;}div.oneMscomNav .navigation-item-flyout .navigation-level3 .links .link-group a,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links .link-group a:link,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links .link-group a:visited,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links .link-group a:hover,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links .link-group a:active {color:#4f4f4f;background-color:#FFFFFF;font-size:13px;}div.oneMscomNav .navigation-item-flyout .navigation-level3 .link-group a {font-size:13px;color:#4f4f4f;}div.oneMscomNav .link-group-bottom-border {border-bottom: solid 1px #e3e3e3;}div.oneMscomNav .navigation-item-flyout .navigation-level3 .links a,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links a:link,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links a:visited,div.oneMscomNav .navigation-item-flyout .navigation-level3 .links a:active {color:#4f4f4f;}div.oneMscomNav .navigation-item-flyout .navigation-level3 .links a:hover {color:#4f4f4f;background-color:#ececec;}div.oneMscomNav .navigation-item-flyout .navigation-level3 .links a {font-size:13px;color:#4f4f4f;}div.oneMscomNav .navigation-item-flyout .navigation-level4 {border:#e0e0e0 1px solid;}div.navigation-sub .navigation-sub-bg {background-color:#4f4f4f;}div.navigation-sub .selected .navigation-sub-item-tab {background-color:#4f4f4f;color:#4f4f4f;border-color:#ececec;}div.navigation-sub .selected .navigation-sub-item-tab a:link,div.navigation-sub .selected .navigation-sub-item-tab a:visited,div.navigation-sub .selected .navigation-sub-item-tab a:active {color:#4f4f4f;}div.navigation-sub .navigation-sub-item-tab a:link,div.navigation-sub .navigation-sub-item-tab a:visited,div.navigation-sub .navigation-sub-item-tab a:active {color:#4f4f4f;}div.navigation-sub .navigation-sub-item-tab a:hover {color:#4f4f4f;background-color:#4f4f4f;}div.oneMscomNav .navigation-sub-item-flyout .navigation-sub-level3 {border:#ececec 1px solid;}div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 {background-color:#4f4f4f;}div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .link-group a,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .link-group a:link,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .link-group a:visited,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .link-group a:hover,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .link-group a:active {color:#4f4f4f;}div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .link-group {font-size:13px;color:#4f4f4f;}div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .links a,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .links a:link,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .links a:visited,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .links a:hover,div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .links a:active {color:#0060a6;}div.navigation-sub .navigation-sub-item-flyout .navigation-sub-level3 .links {font-size:13px;color:#0060a6;}div.oneMscomNav .navMenu{border-color:#f8f8f8;}.oneMscomFooter { color:#000;}.oneMscomFooter, .oneMscomFooter input {font-size:100%;}.oneMscomFooter, .oneMscomFooter select {font-family:Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;}.oneMscomFooter .defaultLinks .seoCatergory li,.oneMscomFooter .seoLinks li a,.oneMscomFooter .defaultLinks li a {color:black;}.oneMscomFooter .customLinks li a {color:black;}.oneMscomFooter .copyright {color:black;}.oneMscomFooter .msLogo {float:right;padding-right: 15px;}.oneMscomFooter .copyright {font-family:Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;color:black;}.oneMscomFooter .links {float:right;margin-right: 6px;}.oneMscomFooter ul.customLinks, .oneMscomFooter ul.defaultLinks {float:right;}.oneMscomFooter ul li a,.oneMscomFooter ul.seoLinks li a {border-right-color:black;font-family:Segoe UI,Arial,Verdana,Tahoma,sans-serif
+        ;}.oneMscomFooter .seoLinks{float:left;}.oneMscomFooter ul.seoLinks li{float:left;}.oneMscomFooter li.selected,.oneMscomFooter .selected .seo-item-tab a,.oneMscomFooter .seo-item-flyout-content{border-color:#e0e0e0;_border-color:#e0e0e0;}.oneMscomFooter .seo-item .png-img{padding-left:4px;}.oneMscomFooter ul li.lastLink a,.oneMscomFooter ul li.singleLink a{border-right: 0;}.oneMscomFooter .selected .seo-item-tab a {background-color: #fff;}.oneMscomFooter .bg-img,.oneMscomFooter .seo-item .png-img .bg-img{background-image: url("http://www.microsoft.com/global/onemscomsettings/publishingimages/footerimages/seo_downarrow.png");}.oneMscomFooter .seo-item .png-img .filter-img{filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="http://www.microsoft.com/global/onemscomsettings/publishingimages/footerimages/seo_downarrow.png", sizingMethod="scale");}</style>
+    </div>
+    <div id="ctl00_ctl00_JsCssLoaderCtl_oneMscomGlobalSettings" style="display: none;"></div>
+     <div id="ctl00_ctl00_JsCssLoaderCtl_oneMscomThemeSettings" style="display: none;"></div>
+    <div id="ctl00_ctl00_JsCssLoaderCtl_oneMscomLocaleSettings" style="display: none;"></div>
+    <div id="ctl00_ctl00_JsCssLoaderCtl_oneMscomSiteSettings" style="display: none;"></div>
+</div>
+
+    <div class="stage">
+        <div class="utility-bar">
+            
+    
+
+<div class="oneMscomComp mstHdr_FlyoutRegion-ltr" dir="ltr"
+    bi:type="oneMscomBlade">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_Header" class="mstHdr">
+        <div class="mstHdr_PriRow">
+            <div class="mstHdr_PriRowBg">
+            </div>
+            <div class="cssClear">
+            </div>
+            <div class="mstHdr_StaticSec11">
+                <div class="mstHdr_StaticSecLeftAlign">
+                    
+                            
+<div class="mstHdr_MenuItem" 
+    id="mthdr01"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl00_ctl00_MenuLink" class="mstHdr_MenuLink">
+        <a href="http://www.microsoft.com/en-gb/default.aspx" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl00_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor">
+            
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl00_ctl00_MenuLinkImage" class="mstHdr_MenuLinkImg png-img" title="Microsoft UK Home Page" style="padding-top:5px;padding-bottom:6px;">
+                <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl00_ctl00_MenuLinkImageBg" class="bg-img" style="background-image:url(&#39;http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/microsoftlogo.gif&#39;);width:75px;height:15px;"></div>
+                <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl00_ctl00_MenuLinkImageFilter" class="filter-img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=&quot;http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/microsoftlogo.gif&quot;, sizingMethod=&quot;scale&quot;);width:75px;height:15px;"></div>
+            </div>
+            
+            <div class="cssClear">
+            </div>
+        </a>
+    </div>
+    
+</div>
+                        
+                            
+<div class="mstHdr_MenuItem" 
+    id="mthdr02"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_MenuLink" class="mstHdr_MenuLink mstHdr_FlyoutLink mstHdr_HideMenuLink mstHdr_AnimateDesc" style="width:;">
+        <a href="/default.aspx/kb/243330?hdrFo=mthdr02" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor mstHdr_MenuLinkBoth" bi:track="false">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_MenuLinkText" class="mstHdr_MenuLinkTxt">PRODUCTS</div>
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_MenuLinkImage" class="mstHdr_MenuLinkImg png-img" title="Menu" style="padding-top:5px;padding-bottom:6px;">
+                <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_MenuLinkImageBg" class="bg-img" style="background-image:url(&#39;http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/products_dropdown.png&#39;);width:15px;height:15px;"></div>
+                <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_MenuLinkImageFilter" class="filter-img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=&quot;http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/products_dropdown.png&quot;, sizingMethod=&quot;scale&quot;);width:15px;height:15px;"></div>
+            </div>
+            
+            <div class="cssClear">
+            </div>
+        </a>
+    </div>
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_HeaderFlyoutPos" class="mstHdr_FlyoutPos">
+        <div class="mstHdr_Flyout">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec11_Repeater_ctl01_ctl00_HeaderFlyoutContent" bi:type="oneMscomProduct" class="mstHdr_ShowFlyoutA"><div id="ProductLayoutA" class="mstHdr_PrdLayoutA"><div class="mstHdr_PrdSection31"><ul><li id="mthdr09"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://www.microsoft.com/uk/windows/default.aspx" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="Windows"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="Windows" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/windowslogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://www.microsoft.com/uk/windows/default.aspx"><span>Windows</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr10"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://office.microsoft.com/en-gb/" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="Office"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="Office" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/officelogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://office.microsoft.com/en-gb/"><span>Office</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr11"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://www.xbox.com/en-gb/" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="xbox"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="xbox" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/xboxlogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://www.xbox.com/en-gb/"><span>Xbox</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr12"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://www.microsoft.com/windowsphone/en-gb/default.aspx" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="WindowPhone"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="WindowPhone" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/phonelogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://www.microsoft.com/windowsphone/en-gb/default.aspx"><span>Windows Phone</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr13"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://windows.microsoft.com/en-GB/internet-explorer/products/ie/home" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="IE"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="IE" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/ielogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://windows.microsoft.com/en-GB/internet-explorer/products/ie/home"><span>Internet Explorer</span></a></div></div><div class="cssClear"></div></li></ul></div><div id="HeaderProductSection32" class="mstHdr_PrdSection32"><ul><li id="mthdr15"><div class="mstHdr_PrdSection32_GroupHeader"><a  Href="javascript:void(0);"><span>For Home</span></a></div></li><li id="mthdr16"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/en-gb/security_essentials/default.aspx"><span>Security Essentials</span></a></div></li><li id="mthdr17"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.update.microsoft.com/microsoftupdate/v6/vistadefault.aspx?ln=en-gb"><span>Microsoft Update</span></a></div></li><li id="mthdr18"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/uk/hardware/"><span>PC Hardware</span></a></div></li><li id="mthdr19"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.gamesforwindows.com/en-GB/"><span>PC Gaming</span></a></div></li></ul><ul><li id="mthdr20"><div class="mstHdr_PrdSection32_GroupHeader"><a  Href="javascript:void(0);"><span>For Work</span></a></div></li><li id="mthdr21"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/business/en-gb/Pages/default.aspx"><span>Small Businesses</span></a></div></li><li id="mthdr22"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://pinpoint.microsoft.com/en-GB/home?WT.mc_id=en-GB_Perm_Link_MSCOMSitemapSolutions_2HP"><span>IT Specialist Locator</span></a></div></li><li id="mthdr23"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/en-gb/enterprise/"><span>Enterprise</span></a></div></li><li id="mthdr24"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/en-gb/cloud/default.aspx"><span>Cloud</span></a></div></li></ul></div><div id="HeaderProductSection33" class="mstHdr_PrdSection33"><ul><li id="mthdr25"><div class="mstHdr_PrdSection33_GroupHeader"><a  Href="javascript:void(0);"><span>Top Destinations</span></a></div></li><li id="mthdr26"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://www.microsoft.com/download/en/default.aspx"><span>Download Center</span></a></div></li><li id="mthdr27"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://emea.microsoftstore.com/UK/en-GB"><span>Microsoft Store</span></a></div></li><li id="mthdr28"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://support.microsoft.com/?ln=en-gb"><span>Microsoft Support</span></a></div></li><li id="mthdr29"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://www.microsoft.com/en-gb/default.aspx"><span>Microsoft UK Home Page</span></a></div></li><li id="mthdr30"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://www.microsoft.com/en/gb/sitemap.aspx"><span>All Microsoft Sites</span></a></div></li></ul></div><div class="cssClear"></div></div></div>
+             <div class="mstHdr_PrdBottomStrip">
+            </div>
+        </div>
+    </div>
+</div>
+                        
+                </div>
+            </div>
+            <div class="mstHdr_StaticSec12">
+                <div class="mstHdr_StaticSecLeftAlign">
+                    
+                            
+<style type="text/css">
+    div.gsfx_bsrch_container
+    {
+        background-image: none;
+        margin: 0px
+        float: none;
+        height: 24px;
+        width: 330px;
+    }
+    #gsfx_bsrch_divQuery
+    {
+        margin: 0px;
+        background-color: #FFFFFF;
+        height: 22px;
+        border: 1px solid #999999;
+        display: block;
+    }
+    #gsfx_bsrch_divQuery #gsfx_bsrch_query
+    {
+        margin-top: 0px;
+        font-size: 75%;
+        padding: 2px 2px 0px 2px;
+        margin: 2px 2px 0px 2px;
+        vertical-align: top;
+        height: 16px;
+        background-color:transparent;
+    }
+    #gsfx_bsrch_divQuery #gsfx_bsrch_btnimg
+    {
+        margin-top: 1px;
+        margin-left: 0px;
+        vertical-align: top;
+    }
+    #gsfx_cat_sel
+    {
+        margin-top: 0px;
+        margin-right: 0px;
+        width: 13px;
+    }
+    #gsfx_bsrch_logo
+    {
+        cursor: auto;
+        vertical-align: top;
+        margin-top: 1px;
+    }
+    #gsfx_bsrch_logo_div
+    {
+        margin-top: 0px;
+        margin-right: 5px;
+    }
+    div.search-navigation .search
+    {
+        width: 328px;
+    }
+    .gsfx_srchsitename_cotnr
+    {
+        width: 293px;
+        float: right;
+    }
+    .gsfx_srchoptimg_cotnr
+    {
+        width: 15px;
+    }
+    #acListWrappergsfx_bsrch_query
+    {
+        top:0px;
+        *top:-3px;
+    }
+</style>
+<form id="frmsrch" action="/search/default.aspx" method="get" onsubmit="return SaveSimpleSearch();">
+<script type='text/javascript'>setACStartChars('4:');</script>
+<div id="gsfx_bsrch_bg" class="gsfx_bsrch_container">
+    <div id="gsfx_bsrch_divQuery" style="width: 324px">
+        <input type="text" id="gsfx_bsrch_query" style="width: 245px" name="query"
+            maxlength="200" value="" class="siteseltxt" autocomplete="off" /><span style="display: inline-block;*display:inline; height: 22px; width: 40px;margin-left:5px;margin-right:5px;"><img title="" alt="" class="gsfx_img_png" id="topSearchBingLogo" style="width: 40px;height: 21px;" src="/library/images/support/CN/bing_logo_blue.png" onclick="HandleBingClick()" /><!--[if lte IE 6]><div alt="" class="gsfx_div_png" id="topSearchBingLogo" style="width:40px;height:21px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/library/images/support/CN/bing_logo_blue.png', sizingMethod='scale');" onclick="HandleBingClick()"></div><![endif]--></span><input type="image" title="" alt="" class="gsfx_img_png" style="width: 20px;height: 20px;" src="/library/images/support/CN/ss_live_button.png" onclick="return SaveSimpleSearch();" id="gsfx_bsrch_btnimg" /><!--[if lte IE 6]><input type="image" src="/library/images/support/cn/onepix.gif" alt="" class="gsfx_div_png" style="width:20px;height:20px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/library/images/support/CN/ss_live_button.png', sizingMethod='scale');" onclick="return SaveSimpleSearch();" id="gsfx_bsrch_btnimg" /><![endif]--></div>
+        <div id="gsfx_cat_sel" style="display:none">
+            <a id="gsfx_cat_sel_btn" href="javascript:void(0)">
+                <img src="/library/images/support/cn/ss_dd_select1.png" hover-src="/library/images/support/cn/ss_dd_select2.png" alt="Select"/></a>
+        
+        <input type="hidden" id="catalog" name="catalog" value="LCID=2057" />
+        
+    </div>
+</div>
+<script type="text/javascript">try{MS.Support.AC.MakeAutoComplete({id:'gsfx_bsrch_query', lcid:'2057', acURL:'http://autocomplete.support.microsoft.com', statsObj:StatsDotNet, startChar:'4', bubbleside:'left'});}catch(e){}</script><script type='text/javascript'>supportedSites.push(new Site('Search Microsoft Support', '\x2fsearch\x2fdefault.aspx', true));supportedSites.push(new Site('all of Microsoft.com', 'http\x3a\x2f\x2fsearch.microsoft.com\x2fresults.aspx\x3fmkt\x3den-us\x26q\x3d', false));supportedSites.push(new Site('all of the Internet', 'http\x3a\x2f\x2fwww.bing.com\x2fsearch\x3fform\x3dMSSSUP\x26mkt\x3den-gb\x26q\x3d', false));</script>
+<div class="hiddenformels">
+    <input type="hidden" name="mode" value="r" />
+</div>
+<noscript>
+    <style type="text/css">
+        #gsfx_bsrch_catsel a
+        {
+            display: none;
+        }
+        #gsfx_bsrch_websrch
+        {
+            display: none;
+        }
+        #gsfx_bsrch_query
+        {
+            font-style: normal;
+            color: Black;
+        }
+    </style>
+</noscript>
+</form>
+
+                        
+                </div>
+            </div>
+            <div class="mstHdr_StaticSec14">
+                <div class="mstHdr_StaticSecRightAlign">
+                    
+                            
+<div class="mstHdr_MenuItem mstHdr_MenuItemLcp" 
+    id="mthdr07"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00_MenuLink" class="mstHdr_MenuLink mstHdr_FlyoutLink">
+        <span id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00_MenuLinkSpan"><a href="/default.aspx/kb/243330?hdrFo=mthdr07" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor mstLcp_MenuLinkAnchorNormal" bi:track="false">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00_MenuLinkText" class="mstHdr_MenuLinkTxt">United Kingdom </div>
+            
+            <div class="cssClear">
+            </div>
+        </a></span>
+    </div>
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00_HeaderFlyoutPos" class="mstHdr_FlyoutPos">
+        <div class="mstHdr_Flyout">
+            
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00" class="mstLcp">
+                
+                <div class="mstLcp_Head">
+                    <div class="mstLcp_Heading">
+                        <h3 id="ctl00_ctl00_Header_oneMscomBlade_StaticSec14_Repeater_ctl00_ctl00_SiteInOtherLanguages">This site in other countries/regions</h3>
+                    </div>
+                </div>
+                <div class="mstLcp_LangLinks mstLcp_Cols5">
+                    
+                    <ul class="mstLcp_Col mstLcp_C0">
+                        
+                        <li><a href="/?ln=fr-al" >
+                            <span dir="ltr">
+                                Algeria - Français</span></a></li>
+                        
+                        <li><a href="/?ln=es-ar" >
+                            <span dir="ltr">
+                                Argentina - Español</span></a></li>
+                        
+                        <li><a href="/?ln=en-au" >
+                            <span dir="ltr">
+                                Australia - English</span></a></li>
+                        
+                        <li><a href="/?ln=nl-be" >
+                            <span dir="ltr">
+                                België - Nederlands</span></a></li>
+                        
+                        <li><a href="/?ln=fr-be" >
+                            <span dir="ltr">
+                                Belgique - Français</span></a></li>
+                        
+                        <li><a href="/?ln=es-bo" >
+                            <span dir="ltr">
+                                Bolivia - Español</span></a></li>
+                        
+                        <li><a href="/?ln=hr-ba" >
+                            <span dir="ltr">
+                                Bosna i Hercegovina  - Hrvatski</span></a></li>
+                        
+                        <li><a href="/?ln=pt-br" >
+                            <span dir="ltr">
+                                Brasil - Português</span></a></li>
+                        
+                        <li><a href="/?ln=en-ca" >
+                            <span dir="ltr">
+                                Canada - English</span></a></li>
+                        
+                        <li><a href="/?ln=fr-ca" >
+                            <span dir="ltr">
+                                Canada - Français</span></a></li>
+                        
+                        <li><a href="/?ln=cs" >
+                            <span dir="ltr">
+                                Česká Republika - Čeština</span></a></li>
+                        
+                        <li><a href="/?ln=es-cl" >
+                            <span dir="ltr">
+                                Chile - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-co" >
+                            <span dir="ltr">
+                                Colombia - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-cr" >
+                            <span dir="ltr">
+                                Costa Rica - Español</span></a></li>
+                        
+                        <li><a href="/?ln=sr-me" >
+                            <span dir="ltr">
+                                Crna Gora - Srpski</span></a></li>
+                        
+                        <li><a href="/?ln=da" >
+                            <span dir="ltr">
+                                Danmark - Dansk</span></a></li>
+                        
+                        <li><a href="/?ln=de" >
+                            <span dir="ltr">
+                                Deutschland – Deutsch</span></a></li>
+                        
+                    </ul>
+                    
+                    <ul class="mstLcp_Col mstLcp_C1">
+                        
+                        <li><a href="/?ln=es-do" >
+                            <span dir="ltr">
+                                Dominican Republic - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-ec" >
+                            <span dir="ltr">
+                                Ecuador - Español</span></a></li>
+                        
+                        <li><a href="/?ln=et" >
+                            <span dir="ltr">
+                                Eesti - Eesti</span></a></li>
+                        
+                        <li><a href="/?ln=es-sv" >
+                            <span dir="ltr">
+                                El Salvador - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-es" >
+                            <span dir="ltr">
+                                España - Español</span></a></li>
+                        
+                        <li><a href="/?ln=fr" >
+                            <span dir="ltr">
+                                France - Français</span></a></li>
+                        
+                        <li><a href="/?ln=es-gt" >
+                            <span dir="ltr">
+                                Guatemala - Español</span></a></li>
+                        
+                        <li><a href="/?ln=en-hk" >
+                            <span dir="ltr">
+                                Hong Kong SAR - English</span></a></li>
+                        
+                        <li><a href="/?ln=hr" >
+                            <span dir="ltr">
+                                Hrvatska - Hrvatski</span></a></li>
+                        
+                        <li><a href="/?ln=en-in" >
+                            <span dir="ltr">
+                                India - English</span></a></li>
+                        
+                        <li><a href="/?ln=id-id" >
+                            <span dir="ltr">
+                                Indonesia (Bahasa) - Bahasa</span></a></li>
+                        
+                        <li><a href="/?ln=en-id" >
+                            <span dir="ltr">
+                                Indonesia (English) - English</span></a></li>
+                        
+                        <li><a href="/?ln=en-ie" >
+                            <span dir="ltr">
+                                Ireland - English</span></a></li>
+                        
+                        <li><a href="/?ln=is-is" >
+                            <span dir="ltr">
+                                Ísland - Íslenska</span></a></li>
+                        
+                        <li><a href="/?ln=it" >
+                            <span dir="ltr">
+                                Italia - Italiano</span></a></li>
+                        
+                        <li><a href="/?ln=es-la" >
+                            <span dir="ltr">
+                                Latinoamérica - Español</span></a></li>
+                        
+                        <li><a href="/?ln=lv" >
+                            <span dir="ltr">
+                                Latvija - Latviešu</span></a></li>
+                        
+                    </ul>
+                    
+                    <ul class="mstLcp_Col mstLcp_C2">
+                        
+                        <li><a href="/?ln=lt" >
+                            <span dir="ltr">
+                                Lietuva - Lietuvių</span></a></li>
+                        
+                        <li><a href="/?ln=fr-lu" >
+                            <span dir="ltr">
+                                Luxembourg - Français </span></a></li>
+                        
+                        <li><a href="/?ln=hu" >
+                            <span dir="ltr">
+                                Magyarország - Magyar</span></a></li>
+                        
+                        <li><a href="/?ln=en-my" >
+                            <span dir="ltr">
+                                Malaysia - English</span></a></li>
+                        
+                        <li><a href="/?ln=es-mx" >
+                            <span dir="ltr">
+                                México - Español</span></a></li>
+                        
+                        <li><a href="/?ln=en-me" >
+                            <span dir="ltr">
+                                Middle East - English</span></a></li>
+                        
+                        <li><a href="/?ln=fr-mo" >
+                            <span dir="ltr">
+                                Morrocco - Français</span></a></li>
+                        
+                        <li><a href="/?ln=nl" >
+                            <span dir="ltr">
+                                Nederland - Nederlands</span></a></li>
+                        
+                        <li><a href="/?ln=en-nz" >
+                            <span dir="ltr">
+                                New Zealand - English</span></a></li>
+                        
+                        <li><a href="/?ln=no" >
+                            <span dir="ltr">
+                                Norge - Bokmål</span></a></li>
+                        
+                        <li><a href="/?ln=de-at" >
+                            <span dir="ltr">
+                                Österreich - Deutsch</span></a></li>
+                        
+                        <li><a href="/?ln=es-pa" >
+                            <span dir="ltr">
+                                Panamá - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-py" >
+                            <span dir="ltr">
+                                Paraguay - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-pe" >
+                            <span dir="ltr">
+                                Perú - Español</span></a></li>
+                        
+                        <li><a href="/?ln=en-ph" >
+                            <span dir="ltr">
+                                Philippines - English</span></a></li>
+                        
+                        <li><a href="/?ln=pl" >
+                            <span dir="ltr">
+                                Polska - Polski</span></a></li>
+                        
+                        <li><a href="/?ln=pt" >
+                            <span dir="ltr">
+                                Portugal - Português</span></a></li>
+                        
+                    </ul>
+                    
+                    <ul class="mstLcp_Col mstLcp_C3">
+                        
+                        <li><a href="/?ln=es-pr" >
+                            <span dir="ltr">
+                                Puerto Rico - Español</span></a></li>
+                        
+                        <li><a href="/?ln=ro" >
+                            <span dir="ltr">
+                                România - Română</span></a></li>
+                        
+                        <li><a href="?ln=de-ch" >
+                            <span dir="ltr">
+                                Schweiz - Deutsch</span></a></li>
+                        
+                        <li><a href="/?ln=en-sg" >
+                            <span dir="ltr">
+                                Singapore - English</span></a></li>
+                        
+                        <li><a href="/?ln=sl" >
+                            <span dir="ltr">
+                                Slovenija - Slovenščina</span></a></li>
+                        
+                        <li><a href="/?ln=sk" >
+                            <span dir="ltr">
+                                Slovensko - Slovenčina</span></a></li>
+                        
+                        <li><a href="/?ln=en-za" >
+                            <span dir="ltr">
+                                South Africa - English</span></a></li>
+                        
+                        <li><a href="/?ln=sr" >
+                            <span dir="ltr">
+                                Srbija - Srpski</span></a></li>
+                        
+                        <li><a href="/?ln=fr-ch" >
+                            <span dir="ltr">
+                                Suisse - Français</span></a></li>
+                        
+                        <li><a href="/?ln=fi" >
+                            <span dir="ltr">
+                                Suomi - Suomi</span></a></li>
+                        
+                        <li><a href="/?ln=sv" >
+                            <span dir="ltr">
+                                Sverige - Svenska</span></a></li>
+                        
+                        <li><a href="/?ln=fr-tu" >
+                            <span dir="ltr">
+                                Tunisia - Français</span></a></li>
+                        
+                        <li><a href="/?ln=tr" >
+                            <span dir="ltr">
+                                Türkiye - Türkçe</span></a></li>
+                        
+                        <li><a href="/?ln=en-us" >
+                            <span dir="ltr">
+                                United States - English</span></a></li>
+                        
+                        <li><a href="/?ln=es-uy" >
+                            <span dir="ltr">
+                                Uruguay - Español</span></a></li>
+                        
+                        <li><a href="/?ln=es-ve" >
+                            <span dir="ltr">
+                                Venezuela - Español</span></a></li>
+                        
+                        <li><a href="/?ln=vi-vn" >
+                            <span dir="ltr">
+                                Việt Nam - Tiếng việt</span></a></li>
+                        
+                    </ul>
+                    
+                    <ul class="mstLcp_Col mstLcp_C4">
+                        
+                        <li><a href="/?ln=el" >
+                            <span dir="ltr">
+                                Ελλάδα - Ελληνικά</span></a></li>
+                        
+                        <li><a href="/?ln=bg" >
+                            <span dir="ltr">
+                                България - Български</span></a></li>
+                        
+                        <li><a href="/?ln=kk-kz" >
+                            <span dir="ltr">
+                                Казахстан - Русский</span></a></li>
+                        
+                        <li><a href="/?ln=ru" >
+                            <span dir="ltr">
+                                Россия - Русский</span></a></li>
+                        
+                        <li><a href="/?ln=uk-ua" >
+                            <span dir="ltr">
+                                Україна - Українська</span></a></li>
+                        
+                        <li><a href="/?ln=he" >
+                            <span dir="rtl">
+                                ישראל - עברית</span></a></li>
+                        
+                        <li><a href="/?ln=ar-ae" >
+                            <span dir="rtl">
+                                الإمارات العربية المتحدة - العربية </span></a></li>
+                        
+                        <li><a href="/?ln=ar" >
+                            <span dir="rtl">
+                                الشرق الاوسط  - العربية - العربية</span></a></li>
+                        
+                        <li><a href="/?ln=ar-sa" >
+                            <span dir="ltr">
+                                المملكة العربية السعودية - العربية</span></a></li>
+                        
+                        <li><a href="/?ln=ar-eg" >
+                            <span dir="rtl">
+                                مصر - العربية</span></a></li>
+                        
+                        <li><a href="/?ln=hi-in" >
+                            <span dir="ltr">
+                                भारत - हिंदी</span></a></li>
+                        
+                        <li><a href="/?ln=th" >
+                            <span dir="ltr">
+                                ไทย - ไทย</span></a></li>
+                        
+                        <li><a href="/?ln=ko" >
+                            <span dir="ltr">
+                                대한민국 - 한국어</span></a></li>
+                        
+                        <li><a href="/?ln=zh-cn" >
+                            <span dir="ltr">
+                                中国  - 简体中文</span></a></li>
+                        
+                        <li><a href="/?ln=zh-tw" >
+                            <span dir="ltr">
+                                台灣 - 繁體中文</span></a></li>
+                        
+                        <li><a href="/?ln=ja" >
+                            <span dir="ltr">
+                                日本 - 日本語</span></a></li>
+                        
+                        <li><a href="/?ln=zh-hk" >
+                            <span dir="ltr">
+                                香港特別行政區 - 繁體中文</span></a></li>
+                        
+                    </ul>
+                    
+                    <div class="cssClear">
+                    </div>
+                </div>
+                <div class="mstLcp_WorldwideLink mstLcp_Cols5">
+                    <a href="http://www.microsoft.com/worldwide/"  bi:GlobalWorldwideLinkKey="GlobalWorldwideLinkVal"><span>Microsoft.com worldwide</span></a>
+                    <div class="cssClear"></div>
+                </div>
+            </div>
+            <div class="mstHdr_FlyoutBotStrip"></div>
+        </div>
+    </div>
+</div>
+
+                        
+                </div>
+            </div>
+            <div class="mstHdr_StaticSec13">
+                <div class="mstHdr_StaticSecLeftAlign">
+                    
+                            
+<div class="mstHdr_MenuItem" 
+    id="mthdr02"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_MenuLink" class="mstHdr_MenuLink mstHdr_FlyoutLink">
+        <a href="/default.aspx/kb/243330?hdrFo=mthdr02" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor mstHdr_MenuLinkBoth" bi:track="false">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_MenuLinkText" class="mstHdr_MenuLinkTxt">PRODUCTS</div>
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_MenuLinkImage" class="mstHdr_MenuLinkImg png-img" title="Menu" style="padding-top:5px;padding-bottom:6px;">
+                <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_MenuLinkImageBg" class="bg-img" style="background-image:url(&#39;http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/products_dropdown.png&#39;);width:15px;height:15px;"></div>
+                <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_MenuLinkImageFilter" class="filter-img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=&quot;http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/products_dropdown.png&quot;, sizingMethod=&quot;scale&quot;);width:15px;height:15px;"></div>
+            </div>
+            
+            <div class="cssClear">
+            </div>
+        </a>
+    </div>
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_HeaderFlyoutPos" class="mstHdr_FlyoutPos">
+        <div class="mstHdr_Flyout">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl00_ctl00_HeaderFlyoutContent" bi:type="oneMscomProduct" class="mstHdr_ShowFlyoutA"><div id="ProductLayoutA" class="mstHdr_PrdLayoutA"><div class="mstHdr_PrdSection31"><ul><li id="mthdr09"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://www.microsoft.com/uk/windows/default.aspx" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="Windows"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="Windows" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/windowslogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://www.microsoft.com/uk/windows/default.aspx"><span>Windows</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr10"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://office.microsoft.com/en-gb/" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="Office"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="Office" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/officelogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://office.microsoft.com/en-gb/"><span>Office</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr11"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://www.xbox.com/en-gb/" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="xbox"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="xbox" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/xboxlogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://www.xbox.com/en-gb/"><span>Xbox</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr12"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://www.microsoft.com/windowsphone/en-gb/default.aspx" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="WindowPhone"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="WindowPhone" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/phonelogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://www.microsoft.com/windowsphone/en-gb/default.aspx"><span>Windows Phone</span></a></div></div><div class="cssClear"></div></li></ul><ul><li id="mthdr13"><div class="mstHdr_PrdSection31_Item"><a class="mstHdr_PrdSection31_Image" href="http://windows.microsoft.com/en-GB/internet-explorer/products/ie/home" ><div class="mstHdr_PrdSection31_Image_Inner" align="center"  title="IE"><div class="mstHdr_PrdSection31_ImageSize"><img width="100%" height="100%" alt="IE" src="http://www.microsoft.com/global/onemscomsettings/publishingimages/headerimages/ielogo.png"></img></div></div></a><div class="mstHdr_PrdSection31_Text"><a  Href="http://windows.microsoft.com/en-GB/internet-explorer/products/ie/home"><span>Internet Explorer</span></a></div></div><div class="cssClear"></div></li></ul></div><div id="HeaderProductSection32" class="mstHdr_PrdSection32"><ul><li id="mthdr15"><div class="mstHdr_PrdSection32_GroupHeader"><a  Href="javascript:void(0);"><span>For Home</span></a></div></li><li id="mthdr16"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/en-gb/security_essentials/default.aspx"><span>Security Essentials</span></a></div></li><li id="mthdr17"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.update.microsoft.com/microsoftupdate/v6/vistadefault.aspx?ln=en-gb"><span>Microsoft Update</span></a></div></li><li id="mthdr18"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/uk/hardware/"><span>PC Hardware</span></a></div></li><li id="mthdr19"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.gamesforwindows.com/en-GB/"><span>PC Gaming</span></a></div></li></ul><ul><li id="mthdr20"><div class="mstHdr_PrdSection32_GroupHeader"><a  Href="javascript:void(0);"><span>For Work</span></a></div></li><li id="mthdr21"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/business/en-gb/Pages/default.aspx"><span>Small Businesses</span></a></div></li><li id="mthdr22"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://pinpoint.microsoft.com/en-GB/home?WT.mc_id=en-GB_Perm_Link_MSCOMSitemapSolutions_2HP"><span>IT Specialist Locator</span></a></div></li><li id="mthdr23"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/en-gb/enterprise/"><span>Enterprise</span></a></div></li><li id="mthdr24"><div class="mstHdr_PrdSection32_GroupItem"><a  Href="http://www.microsoft.com/en-gb/cloud/default.aspx"><span>Cloud</span></a></div></li></ul></div><div id="HeaderProductSection33" class="mstHdr_PrdSection33"><ul><li id="mthdr25"><div class="mstHdr_PrdSection33_GroupHeader"><a  Href="javascript:void(0);"><span>Top Destinations</span></a></div></li><li id="mthdr26"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://www.microsoft.com/download/en/default.aspx"><span>Download Center</span></a></div></li><li id="mthdr27"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://emea.microsoftstore.com/UK/en-GB"><span>Microsoft Store</span></a></div></li><li id="mthdr28"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://support.microsoft.com/?ln=en-gb"><span>Microsoft Support</span></a></div></li><li id="mthdr29"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://www.microsoft.com/en-gb/default.aspx"><span>Microsoft UK Home Page</span></a></div></li><li id="mthdr30"><div class="mstHdr_PrdSection33_GroupItem"><a  Href="http://www.microsoft.com/en/gb/sitemap.aspx"><span>All Microsoft Sites</span></a></div></li></ul></div><div class="cssClear"></div></div></div>
+             <div class="mstHdr_PrdBottomStrip">
+            </div>
+        </div>
+    </div>
+</div>
+                        
+                            
+<div class="mstHdr_MenuItem" 
+    id="mthdr04"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl01_ctl00_MenuLink" class="mstHdr_MenuLink">
+        <a href="http://emea.microsoftstore.com/UK/en-GB" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl01_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl01_ctl00_MenuLinkText" class="mstHdr_MenuLinkTxt">STORE</div>
+            
+            
+            <div class="cssClear">
+            </div>
+        </a>
+    </div>
+    
+</div>
+                        
+                            
+<div class="mstHdr_MenuItem" 
+    id="mthdr05"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl02_ctl00_MenuLink" class="mstHdr_MenuLink">
+        <a href="http://www.microsoft.com/download/en/default.aspx" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl02_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl02_ctl00_MenuLinkText" class="mstHdr_MenuLinkTxt">DOWNLOADS</div>
+            
+            
+            <div class="cssClear">
+            </div>
+        </a>
+    </div>
+    
+</div>
+                        
+                            
+<div class="mstHdr_MenuItem" 
+    id="mthdr06"  bi:type="oneMscomHeaderLink">
+    <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl03_ctl00_MenuLink" class="mstHdr_MenuLink">
+        <a href="http://support.microsoft.com/?ln=en-gb" id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl03_ctl00_MenuLinkAnchor" class="mstHdr_MenuLinkAnchor">
+            <div id="ctl00_ctl00_Header_oneMscomBlade_StaticSec13_Repeater_ctl03_ctl00_MenuLinkText" class="mstHdr_MenuLinkTxt">SUPPORT</div>
+            
+            
+            <div class="cssClear">
+            </div>
+        </a>
+    </div>
+    
+</div>
+                        
+                </div>
+            </div>
+            <div class="cssClear">
+            </div>
+        </div>
+        <div class="mstHdr_SecRow">
+            <div class="mstHdr_SecRowBg">
+            </div>
+            
+            <div class="mstHdr_StaticSec21">
+                <div class="mstHdr_StaticSecRightAlign">
+                    
+                            
+                        
+                </div>
+            </div>
+            <div class="mstHdr_StaticSec22">
+                <div class="mstHdr_CpsAStaticSecLeftAlign">
+                    
+                </div>
+            </div>
+            <div class="cssClear">
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    if (typeof $ != "undefined") {
+        $(function () {
+            if (Mst && Mst.FlyoutMenu) {
+                var BladeClick;
+                var BladeClose;
+                if ($.bi && $.bi.dataRetrievers.structure) {
+                    BladeClick = function (e) {
+                        /* New Functionality*/
+                        /*
+                        1. Grab all the links in the popups
+                        2. For each link collate the bi parameters
+                        */
+                        var element = $(e.target);
+                        var elements = $(e.target).parents('.mstHdr_MenuItem').find('.mstHdr_Flyout a,.mstHdr_Flyout');
+
+                        /* Merge Params from the additionalParams*/
+                        var linkCutomParams = $.bi.getAttrData($(e.target).parents('.mstHdr_MenuItem').find('a.mstHdr_MenuLinkAnchor'));
+                        var mergedbiData = $.bi.getAttrData(elements);
+                        var customParams = $.extend({}, linkCutomParams, { title: $.trim($(element).text()) });
+                        try {
+                            $.extend(customParams, $.bi.baseData(), $.bi.dataRetrievers.structure.getData(element));
+                        } catch (e) { }
+
+                        /* Open Bi Event
+                        InteractionType=9;Initial=0;Title=BladeItem;ParentTypeStructure;ParentIndexStructure(same)*/
+                        var openBIParams = $.extend({}, customParams, {
+                            initial: ($(e.target).data('bibladeopen') !== undefined ? $(e.target).data('bibladeopen') : 0)
+                                    , interactiontype: 9
+                                    , index: customParams['parentindexstructure']
+                                    , parentindexstructure: ''
+                                    , '-bi-description-ignore-': 'blade-open'
+                        });
+
+                        $(e.target).data('bibladeopen', 1);
+                        /* Blade Index is Index*/
+                        $.bi.queue.push(openBIParams);
+
+                    };
+                    BladeClose = function ($flyoutLink) {
+                        /*  Blade Close Function InteractionType = 10;Initial = 0/1;Title;ParentTypeStructure;IndexStructure; Remove : ParentTitleStructure */
+                        var biId = $flyoutLink.attr('id');
+                        var customParams = {};
+                        $.extend(customParams, $.bi.baseData(), $.bi.dataRetrievers.structure.getIndexGridTypeStructure($flyoutLink));
+                        $.extend(customParams, {
+                            initial: $flyoutLink.data('bibladeclose') !== undefined ? $flyoutLink.data('bibladeclose') : 0
+                                    , interactiontype: 10
+                                    , title: $.trim($flyoutLink.text())
+                                    , index: customParams['parentindexstructure']
+                                    , parentindexstructure: ''
+                                     , '-bi-description-ignore-': 'blade-close'
+                        });
+
+                        $flyoutLink.data('bibladeclose', 1);
+
+                        $.bi.queue.push(customParams); /* Close Record*/
+
+                    };
+                }
+                var blade = new Mst.FlyoutMenu('ctl00_ctl00_Header_oneMscomBlade_Header', "mstHdr", "mstHdr_MenuItem", "mstHdr_FlyoutLink", "mstHdr_MenuLink", "mstHdr_Flyout", "mstHdr_FlyoutRegion-ltr", BladeClick, BladeClose);
+               
+            }
+        });
+    }
+</script>
+
+
+</div>
+
+
+        </div>
+        <div class="stage-content">
+            <div class="main-brand">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <a href="/?ln=en-gb" id="ctl00_ctl00_BrandLogo"><table><tbody><tr><td class="brandLogoTextCell"><div><img src="https://support.microsoft.com/library/images/support/en-gb/microsoft_support_logo.png" alt="Microsoft Support" /></div></td><td class="brandLogoTextCell"></td></tr></tbody></table></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="search-navigation">
+                <div class="search-navigation-bg">
+                </div>
+                <div class="navigation">
+                    
+    
+<div class="oneMscomComp oneMscomNav navigation-flyout-region" bi:type="oneMscomNav">
+    <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_NavigationMenuItems" class="navMenu">
+        <div class="navigation-bg">
+        </div>
+        <ul class="navigation-section" bi:type="oneMscomMenu">
+            
+                    <li id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl00_NavigationListItem" class="navigation-item">
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl00_Navigationtab" class="navigation-item-tab">
+                            <a href="/?ln=en-gb" id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl00_NavigationLink" class="navigation-item-tab-text navigation-link" bi:Home1="HomeVal1" bi:Home2="HomeVal2"><span class="navigation-item-text">Support home</span><div style="clear: both; " ></div></a>
+                        </div>
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl00_NavigationFlyout" class="navigation-item-flyout">
+                            <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl00_NavigationFlyoutContent" class="navigation-item-flyout-content">
+                            </div>
+                        </div>
+                    </li>
+                
+                    <li id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl01_NavigationListItem" class="navigation-item">
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl01_Navigationtab" class="navigation-item-tab">
+                            <a href="/gp/hublist/en-gb" id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl01_NavigationLink" class="navigation-item-tab-text navigation-link"><span class="navigation-item-text">Solution centres</span><div style="clear: both; " ></div></a>
+                        </div>
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl01_NavigationFlyout" class="navigation-item-flyout">
+                            <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl01_NavigationFlyoutContent" class="navigation-item-flyout-content">
+                            </div>
+                        </div>
+                    </li>
+                
+                    <li id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl02_NavigationListItem" class="navigation-item">
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl02_Navigationtab" class="navigation-item-tab">
+                            <a href="/search/?adv=1" id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl02_NavigationLink" class="navigation-item-tab-text navigation-link"><span class="navigation-item-text">Advanced search</span><div style="clear: both; " ></div></a>
+                        </div>
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl02_NavigationFlyout" class="navigation-item-flyout">
+                            <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl02_NavigationFlyoutContent" class="navigation-item-flyout-content">
+                            </div>
+                        </div>
+                    </li>
+                
+                    <li id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl03_NavigationListItem" class="navigation-item">
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl03_Navigationtab" class="navigation-item-tab">
+                            <a href="/downloads/en/default.aspx" id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl03_NavigationLink" class="navigation-item-tab-text navigation-link"><span class="navigation-item-text">Downloads</span><div style="clear: both; " ></div></a>
+                        </div>
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl03_NavigationFlyout" class="navigation-item-flyout">
+                            <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl03_NavigationFlyoutContent" class="navigation-item-flyout-content">
+                            </div>
+                        </div>
+                    </li>
+                
+                    <li id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl04_NavigationListItem" class="navigation-item">
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl04_Navigationtab" class="navigation-item-tab">
+                            <a href="http://emea.microsoftstore.com/uk/?WT.mc_id=SMCBAR_ENGB_TEXT_BUY" id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl04_NavigationLink" class="navigation-item-tab-text navigation-link"><span class="navigation-item-text">Buy products</span><div style="clear: both; " ></div></a>
+                        </div>
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl04_NavigationFlyout" class="navigation-item-flyout">
+                            <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl04_NavigationFlyoutContent" class="navigation-item-flyout-content">
+                            </div>
+                        </div>
+                    </li>
+                
+                    <li id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl05_NavigationListItem" class="navigation-item">
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl05_Navigationtab" class="navigation-item-tab">
+                            <a href="/contactus/?ws=support" id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl05_NavigationLink" class="navigation-item-tab-text navigation-link"><span class="navigation-item-text">Contact us</span><div style="clear: both; " ></div></a>
+                        </div>
+                        <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl05_NavigationFlyout" class="navigation-item-flyout">
+                            <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_ItemsRepeater_ctl05_NavigationFlyoutContent" class="navigation-item-flyout-content">
+                            </div>
+                        </div>
+                    </li>
+                
+        </ul>
+    </div>
+    <div id="ctl00_ctl00_Navigation_oneMscomNav_ctl00_subStrip" class="navigation-4level-strip"></div>
+    
+</div>
+<script type="text/javascript">
+    if (typeof $ != "undefined") {
+        $(function () {
+            if (Mst && Mst.FlyoutNavigationMenu) {
+                var NavClick;
+                var NavClose;
+                if ($.bi && $.bi.dataRetrievers.structure) {
+                    NavClick = function (e) {
+                        /* New Functionality*/
+                        /*
+                        1. Grab all the links in the popups
+                        2. For each link collate the bi parameters
+                        */
+                        var element = $(e.target);
+                        var elements = $(e.target).parents('.navigation-item').find('.navigation-item-flyout-content a,.navigation-item-flyout-content');
+                        /* Merge Params from the additionalParams*/
+                        var mergedbiData = $.bi.getAttrData(elements);
+                        var customParams = { title: $.trim($(element).text()) };
+                        try {
+                            $.extend(customParams, $.bi.baseData(), $.bi.dataRetrievers.structure.getData(element));
+                        } catch (e) { }
+
+                        /* Open Bi Event
+                        InteractionType=9;Initial=0;Title=BladeItem;ParentTypeStructure;ParentIndexStructure(same)*/
+                        var openBIParams = $.extend({}, customParams, {
+                            initial: ($(e.target).data('binavopen') !== undefined ? $(e.target).data('binavopen') : 0)
+                                    , interactiontype: 9
+                                    , index: customParams['parentindexstructure']
+                                    , parentindexstructure: ''
+                                    , '-bi-description-ignore-': 'nav-open'
+                        });
+
+                        $(e.target).data('binavopen', 1);
+                        /* Blade Index is Index*/
+                        $.bi.queue.push(openBIParams);
+
+
+                    };
+                    NavClose = function ($flyoutLink) {
+                        /*  Blade Close Function InteractionType = 10;Initial = 0/1;Title;ParentTypeStructure;IndexStructure; Remove : ParentTitleStructure */
+                        var biId = $flyoutLink.attr('id');
+                        var customParams = {};
+                        $.extend(customParams, $.bi.baseData(), $.bi.dataRetrievers.structure.getIndexGridTypeStructure($flyoutLink));
+                        $.extend(customParams, {
+                            initial: $flyoutLink.data('binavclose') !== undefined ? $flyoutLink.data('bibladeclose') : 0
+                                    , interactiontype: 10
+                                    , title: $.trim($flyoutLink.text())
+                                    , index: customParams['parentindexstructure']
+                                    , parentindexstructure: ''
+                                     , '-bi-description-ignore-': 'nav-close'
+                        });
+
+                        $flyoutLink.data('binavclose', 1);
+
+                        $.bi.queue.push(customParams); /* Close Record*/
+
+                    };
+                }
+                var NavigationMenu = new Mst.FlyoutNavigationMenu('ctl00_ctl00_Navigation_oneMscomNav_ctl00_NavigationMenuItems', "navMenu", "navigation-item", "navigation-flyout-link", "navigation-link", "navigation-item-flyout-content", "navigation-flyout-region", "navigation-section", NavClick, NavClose, false, "navigation-sub-item-flyout-content", "navigation-sub-item");
+            }
+        });
+    }
+</script>
+
+
+                </div>
+            </div>
+            <div class="main-content">
+                
+    <div id="gsfx_brnd_PageWrapper">
+        <div id="gsfx_brnd_PageContainer">
+            <div id="gsfx_brnd_ContentContainer" class="gsfx_brnd_TransBG">
+                <div id="contentArea">
+                    <div id="mainRow"><div class="primaryTable"><table cellpadding="0" cellspacing="0" class="primaryTable"><tr><td class="primaryMainColumn"><div id="mainColumn" lang="en-us"><div id="kb" class="kb"><div id="kb_default" class="kb_default ltr"><!-- - -KB 3 start- - --><a id="top"></a><h1 class="title" id="mt_title">Well-known security identifiers in Windows operating systems</h1><div class="articleProperty" id="mt_article_properties" translate="false">Article ID: 243330 - <a href="#appliesto" onclick="return ScrollToSection('.articleProperties');">View products that this article applies to.</a></div><script type="text/javascript">if (!loadTOCNode) {var loadTOCNode = function(){}}</script><div class="notice">This article was previously published under Q243330</div><div id="kb_section" class="section"><div id="kb_expandcollapseall" class="expandcollapseall" translate="false"><a href="javascript:void(0);" class="expandalltext" id="expandAll">Expand all</a> | <a href="javascript:void(0);" class="collapsealltext" id="collapseAll">Collapse all</a><script type="text/javascript">
+          if (kb_page_object)
+          {
+          kb_page_object.kb_imageExpandHoverText = 'Click to expand this image';
+          }
+        </script></div><h2 class="subTitle" id="tocHeadRef" translate="false"><span><a href="javascript:void(0);">SUMMARY</a></span></h2><script type="text/javascript">
+              loadTOCNode(1, 'summary');
+            </script><div class="sbody" id="mt">A security identifier (SID) is a unique value of variable length that is used to identify a security principal or security group in Windows operating systems. Well-known SIDs are a group of SIDs that identify generic users or generic groups. Their values remain constant across all operating systems.<br><br>
+ This information is useful for troubleshooting issues involving security. It is also useful for potential display problems that may be seen in the ACL editor. A SID may be displayed in the ACL editor instead of the user or group name. </div><h2 class="subTitle" id="tocHeadRef" translate="false"><span><a href="javascript:void(0);">MORE INFORMATION</a></span></h2><script type="text/javascript">
+              loadTOCNode(1, 'moreinformation');
+            </script><div class="sbody" id="mt"> Well-known SIDs:  <ul><li>SID: S-1-0<br>
+ Name: Null Authority<br>
+ Description: An identifier authority.</li><li>SID: S-1-0-0<br>
+ Name: Nobody<br>
+ Description: No security principal.</li><li>SID: S-1-1<br>
+ Name: World Authority<br>
+ Description: An identifier authority.</li><li>SID: S-1-1-0<br>
+ Name: Everyone<br>
+ Description: A group that includes all users, even anonymous users and guests. Membership is controlled by the operating system.<br><br><b>Note</b> By default, the Everyone group no longer includes anonymous users on a computer that is running Windows XP Service Pack 2 (SP2).</li><li>SID: S-1-2<br>
+ Name: Local Authority<br>
+ Description: An identifier authority.</li><li>SID: S-1-2-0 
+<br>Name: Local 
+<br>Description: A group that includes all users who have logged on locally.
+</li><li>SID: S-1-2-1 
+<br>Name: Console Logon 
+<br>Description: A group that includes users who are logged on to the physical console.
+<br><br><b>Note</b> Added in Windows 7 and Windows Server 2008 R2</li><li>SID: S-1-3<br>
+ Name: Creator Authority<br>
+ Description: An identifier authority.</li><li>SID: S-1-3-0<br>
+ Name: Creator Owner<br>
+ Description: A placeholder in an inheritable access control entry (ACE). When the ACE is inherited, the system replaces this SID with the SID for the object's creator.</li><li>SID: S-1-3-1<br>
+ Name: Creator Group<br>
+ Description: A placeholder in an inheritable ACE. When the ACE is inherited, the system replaces this SID with the SID for the primary group of the object's creator. The primary group is used only by the POSIX subsystem.</li><li>SID: S-1-3-2<br>
+ Name: Creator Owner Server<br>
+ Description: This SID is not used in Windows 2000.</li><li>SID: S-1-3-3<br>
+ Name: Creator Group Server<br>
+ Description: This SID is not used in Windows 2000.</li><li>SID: S-1-3-4 
+Name: Owner Rights 
+<br>Description: A group that represents the current owner of the object. When an ACE that carries this SID is applied to an object, the system ignores the implicit READ_CONTROL and WRITE_DAC permissions for the object owner.</li><li>SID: S-1-5-80-0 <br>Name: All Services <br>Description: A group that includes all service processes configured on the system. Membership is controlled by the operating system. <br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-4<br>
+ Name: Non-unique Authority<br>
+ Description: An identifier authority.</li><li>SID: S-1-5<br>
+ Name: NT Authority<br>
+ Description: An identifier authority.</li><li>SID: S-1-5-1<br>
+ Name: Dialup<br>
+ Description: A group that includes all users who have logged on through a dial-up connection. Membership is controlled by the operating system.</li><li>SID: S-1-5-2<br>
+ Name: Network<br>
+ Description: A group that includes all users that have logged on through a network connection. Membership is controlled by the operating system.</li><li>SID: S-1-5-3<br>
+ Name: Batch<br>
+ Description: A group that includes all users that have logged on through a batch queue facility. Membership is controlled by the operating system.</li><li>SID: S-1-5-4<br>
+ Name: Interactive<br>
+ Description: A group that includes all users that have logged on interactively. Membership is controlled by the operating system.</li><li>SID: S-1-5-5-X-Y<br>
+ Name: Logon Session<br>
+ Description: A logon session. The X and Y values for these SIDs are different for each session.</li><li>SID: S-1-5-6<br>
+ Name: Service<br>
+ Description: A group that includes all security principals that have logged on as a service. Membership is controlled by the operating system.</li><li>SID: S-1-5-7<br>
+ Name: Anonymous<br>
+ Description: A group that includes all users that have logged on anonymously. Membership is controlled by the operating system.</li><li>SID: S-1-5-8<br>
+ Name: Proxy<br>
+ Description: This SID is not used in Windows 2000.</li><li>SID: S-1-5-9<br>
+ Name: Enterprise Domain Controllers<br>
+ Description: A group that includes all domain controllers in a forest that uses an Active Directory directory service. Membership is controlled by the operating system.</li><li>SID: S-1-5-10<br>
+ Name: Principal Self<br>
+ Description: A placeholder in an inheritable ACE on an account object or group object in Active Directory. When the ACE is inherited, the system replaces this SID with the SID for the security principal who holds the account.</li><li>SID: S-1-5-11<br>
+ Name: Authenticated Users<br>
+ Description: A group that includes all users whose identities were authenticated when they logged on. Membership is controlled by the operating system.</li><li>SID: S-1-5-12<br>
+ Name: Restricted Code<br>
+ Description: This SID is reserved for future use.</li><li>SID: S-1-5-13<br>
+ Name: Terminal Server Users<br>
+ Description: A group that includes all users that have logged on to a Terminal Services server. Membership is controlled by the operating system.</li><li>SID: S-1-5-14 
+<br>Name: Remote Interactive Logon
+<br>Description: A group that includes all users who have logged on through a terminal services logon.
+</li><li>SID: S-1-5-15 
+<br>Name: This Organization
+<br>Description: A group that includes all users from the same organization. Only included with AD accounts and only added by a Windows Server 2003 or later domain controller.
+</li><li>SID: S-1-5-17<br> 
+Name: This Organization
+<br>Description: An account that is used by the default Internet Information Services (IIS) user.
+</li><li>SID: S-1-5-18<br>
+ Name: Local System<br>
+ Description: A service account that is used by the operating system.</li><li>SID: S-1-5-19<br>
+Name: NT Authority<br>
+Description: Local Service</li><li>SID: S-1-5-20<br>
+Name: NT Authority<br>
+Description: Network Service</li><li>SID: S-1-5-21<var>domain</var>-500<br>
+ Name: Administrator<br>
+ Description: A user account for the system administrator. By default, it is the only user account that is given full control over the system.</li><li>SID: S-1-5-21<var>domain</var>-501<br>
+ Name: Guest<br>
+ Description: A user account for people who do not have individual accounts. This user account does not require a password. By default, the Guest account is disabled.</li><li>SID: S-1-5-21<var>domain</var>-502<br>
+ Name: KRBTGT<br>
+ Description: A service account that is used by the Key Distribution Center (KDC) service.</li><li>SID: S-1-5-21<var>domain</var>-512<br>
+ Name: Domain Admins<br>
+ Description: A global group whose members are authorized to administer the domain. By default, the Domain Admins group is a member of the Administrators group on all computers that have joined a domain, including the domain controllers. Domain Admins is the default owner of any object that is created by any member of the group.</li><li>SID: S-1-5-21<var>domain</var>-513<br>
+ Name: Domain Users<br>
+ Description: A global group that, by default, includes all user accounts in a domain. When you create a user account in a domain, it is added to this group by default.</li><li>SID: S-1-5-21<var>domain</var>-514<br>
+ Name: Domain Guests<br>
+ Description: A global group that, by default, has only one member, the domain's built-in Guest account.</li><li>SID: S-1-5-21<var>domain</var>-515<br>
+ Name: Domain Computers<br>
+ Description: A global group that includes all clients and servers that have joined the domain.</li><li>SID: S-1-5-21<var>domain</var>-516<br>
+ Name: Domain Controllers<br>
+ Description: A global group that includes all domain controllers in the domain. New domain controllers are added to this group by default.</li><li>SID: S-1-5-21<var>domain</var>-517<br>
+ Name: Cert Publishers<br>
+ Description: A global group that includes all computers that are running an enterprise certification authority. Cert Publishers are authorized to publish certificates for User objects in Active Directory.</li><li>SID: S-1-5-21<var>root domain</var>-518<br>
+ Name: Schema Admins<br>
+ Description: A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make schema changes in Active Directory. By default, the only member of the group is the Administrator account for the forest root domain.</li><li>SID: S-1-5-21<var>root domain</var>-519<br>
+ Name: Enterprise Admins<br>
+ Description: A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make forest-wide changes in Active Directory, such as adding child domains. By default, the only member of the group is the Administrator account for the forest root domain.</li><li>SID: S-1-5-21<var>domain</var>-520<br>
+ Name: Group Policy Creator Owners<br>
+ Description: A global group that is authorized to create new Group Policy objects in Active Directory. By default, the only member of the group is Administrator.</li><li>SID: S-1-5-21<var>domain</var>-553<br>
+ Name: RAS and IAS Servers<br>
+ Description: A domain local group. By default, this group has no members. Servers in this group have Read Account Restrictions and Read Logon Information access to User objects in the Active Directory domain local group. </li><li>SID: S-1-5-32-544<br>
+ Name: Administrators<br>
+ Description: A built-in group. After the initial installation of the operating system, the only member of the group is the Administrator account. When a computer joins a domain, the Domain Admins group is added to the Administrators group. When a server becomes a domain controller, the Enterprise Admins group also is added to the Administrators group.</li><li>SID: S-1-5-32-545<br>
+ Name: Users<br>
+ Description: A built-in group. After the initial installation of the operating system, the only member is the Authenticated Users group. When a computer joins a domain, the Domain Users group is added to the Users group on the computer.</li><li>SID: S-1-5-32-546<br>
+ Name: Guests<br>
+ Description: A built-in group. By default, the only member is the Guest account. The Guests group allows occasional or one-time users to log on with limited privileges to a computer's built-in Guest account.</li><li>SID: S-1-5-32-547<br>
+ Name: Power Users<br>
+ Description: A built-in group. By default, the group has no members. Power users can create local users and groups; modify and delete accounts that they have created; and remove users from the Power Users, Users, and Guests groups. Power users also can install programs; create, manage, and delete local printers; and create and delete file shares.</li><li>SID: S-1-5-32-548<br>
+ Name: Account Operators<br>
+ Description: A built-in group that exists only on domain controllers. By default, the group has no members. By default, Account Operators have permission to create, modify, and delete accounts for users, groups, and computers in all containers and organizational units of Active Directory except the Builtin container and the Domain Controllers OU. Account Operators do not have permission to modify the Administrators and Domain Admins groups, nor do they have permission to modify the accounts for members of those groups.</li><li>SID: S-1-5-32-549<br>
+ Name: Server Operators<br>
+ Description: A built-in group that exists only on domain controllers. By default, the group has no members. Server Operators can log on to a server interactively; create and delete network shares; start and stop services; back up and restore files; format the hard disk of the computer; and shut down the computer.</li><li>SID: S-1-5-32-550<br>
+ Name: Print Operators<br>
+ Description: A built-in group that exists only on domain controllers. By default, the only member is the Domain Users group. Print Operators can manage printers and document queues.</li><li>SID: S-1-5-32-551<br>
+ Name: Backup Operators<br>
+ Description: A built-in group. By default, the group has no members. Backup Operators can back up and restore all files on a computer, regardless of the permissions that protect those files. Backup Operators also can log on to the computer and shut it down.</li><li>SID: S-1-5-32-552<br>
+ Name: Replicators<br>
+ Description: A built-in group that is used by the File Replication service on domain controllers. By default, the group has no members. Do not add users to this group.</li><li>SID: S-1-5-64-10 
+<br>Name: NTLM Authentication
+<br>Description: A SID that is used when the NTLM authentication package authenticated the client
+</li><li>SID: S-1-5-64-14 
+<br>Name: SChannel Authentication
+<br>Description: A SID that is used when the SChannel authentication package authenticated the client.
+</li><li>SID: S-1-5-64-21 
+<br>Name: Digest Authentication
+<br>Description: A SID that is used when the Digest authentication package authenticated the client.
+</li><li>SID: S-1-5-80 
+<br>Name: NT Service
+<br>Description: An NT Service account prefix
+</li><li>SID: S-1-16-0 
+<br>Name: Untrusted Mandatory Level
+<br>Description: An untrusted integrity level. 
+Note Added in Windows Vista and Windows Server 2008
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-4096
+<br>Name: Low Mandatory Level
+<br>Description: A low integrity level. 
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-8192
+<br>Name: Medium Mandatory Level
+<br>Description: A medium integrity level. 
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-8448
+<br>Name: Medium Plus Mandatory Level
+<br>Description: A medium plus integrity level. 
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-12288
+<br>Name: High Mandatory Level
+<br>Description: A high integrity level. 
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-16384
+<br>Name: System Mandatory Level
+<br>Description: A system integrity level.
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-20480
+<br>Name: Protected Process Mandatory Level
+<br>Description: A protected-process integrity level.
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-16-28672
+<br>Name: Secure Process Mandatory Level
+<br>Description: A secure process integrity level.
+<br><br><b>Note</b> Added in Windows Vista and Windows Server 2008</li><li>SID: S-1-5-80-0<br>SID S-1-5-80-0 = NT SERVICES\ALL SERVICES<br>Name: All Services 
+<br>Description: A group that includes all service processes that are configured on the system. Membership is controlled by the operating system.<br><br><b>Note</b> Added in Windows Server 2008 R2</li></ul>The following groups will show as SIDs until a Windows Server 2003 domain controller is made the primary domain controller (PDC) operations master role holder. The "operations master" is also known as flexible single master operations or FSMO. Additional new built-in groups that are created when a Windows Server 2003 domain controller is added to the domain are:  <ul><li>SID: S-1-5-32-554<br>
+Name: BUILTIN\Pre-Windows 2000 Compatible Access<br>
+Description: An alias added by Windows 2000. A backward compatibility group which allows read access on all users and groups in the domain. </li><li>SID: S-1-5-32-555<br>
+Name: BUILTIN\Remote Desktop Users<br>
+Description: An alias. Members in this group are granted the right to logon remotely. </li><li>SID: S-1-5-32-556<br>
+Name: BUILTIN\Network Configuration Operators<br>
+Description: An alias. Members in this group can have some administrative privileges to manage configuration of networking features.
+</li><li>SID: S-1-5-32-557<br>
+Name: BUILTIN\Incoming Forest Trust Builders<br>
+Description: An alias. Members of this group can create incoming, one-way trusts to this forest. </li><li>SID: S-1-5-32-558<br>
+Name: BUILTIN\Performance Monitor Users<br>
+Description: An alias. Members of this group have remote access to monitor this computer. </li><li>SID: S-1-5-32-559<br>
+Name: BUILTIN\Performance Log Users<br>
+Description: An alias. Members of this group have remote access to schedule logging of performance counters on this computer. </li><li>SID: S-1-5-32-560<br>
+Name: BUILTIN\Windows Authorization Access Group<br>
+Description: An alias. Members of this group have access to the computed tokenGroupsGlobalAndUniversal attribute on User objects.
+</li><li>SID: S-1-5-32-561<br>
+Name: BUILTIN\Terminal Server License Servers<br>
+Description: An alias. A group for Terminal Server License Servers.
+When Windows Server 2003 Service Pack 1 is installed, a new local group is created.</li><li>SID: S-1-5-32-562<br>Name: BUILTIN\Distributed COM Users<br>Description: An alias. A group for COM to provide computerwide access controls that govern access to all call, activation, or launch requests on the computer.</li></ul><br><br>The following groups will show as SIDs until a Windows Server 2008 or Windows Server 2008 R2 domain controller is made the primary domain controller (PDC) operations master role holder. The "operations master" is also known as flexible single master operations or FSMO. Additional new built-in groups that are created when a Windows Server 2008 or Windows Server 2008 R2 domain controller is added to the domain are: <ul><li>SID: S-1-5- 21<i>domain </i>-498
+<br>Name: Enterprise Read-only Domain Controllers
+<br>Description: A Universal group. Members of this group are Read-Only Domain Controllers in the enterprise
+
+</li><li>SID: S-1-5- 21<i>domain</i> -521
+<br>Name: Read-only Domain Controllers<br>
+Description: A Global group. Members of this group are Read-Only Domain Controllers in the domain</li><li>
+
+SID: S-1-5-32-569<br>
+Name: BUILTIN\Cryptographic Operators<br>
+Description: A Builtin Local group. Members are authorized to perform cryptographic operations.</li><li>
+
+SID: S-1-5-21 <i>domain</i> -571
+<br>Name: Allowed RODC Password Replication Group
+<br>Description: A Domain Local group. Members in this group can have their passwords replicated to all read-only domain controllers in the domain.
+
+</li><li>SID: S-1-5- 21 <i>domain</i> -572
+<br>Name: Denied RODC Password Replication Group
+<br>Description: A Domain Local group. Members in this group cannot have their passwords replicated to any read-only domain controllers in the domain
+
+</li><li>SID: S-1-5-32-573
+<br>Name: BUILTIN\Event Log Readers
+<br>Description: A Builtin Local group. Members of this group can read event logs from local machine.
+
+</li><li>SID: S-1-5-32-574<br>
+Name: BUILTIN\Certificate Service DCOM Access
+<br>Description: A Builtin Local group. Members of this group are allowed to connect to Certification Authorities in the enterprise. </li></ul><br>The following groups will show as SIDs until a Windows Server "8" Beta domain controller is made the primary domain controller (PDC) operations master role holder. The "operations master" is also known as flexible single master operations or FSMO. Additional new built-in groups that are created when a Windows Server "8" Beta domain controller is added to the domain are:<ul><li>SID: S-1-5-21-<i>domain</i>-522<br>Name: Cloneable Domain Controllers<br>Description: A Global group. Members of this group that are domain controllers may be cloned.</li><li>SID: S-1-5-32-575 <br>Name: BUILTIN\RDS Remote Access Servers<br>Description: A Builtin Local group. Servers in this group enable users of RemoteApp programs and personal virtual desktops access to these resources. In Internet-facing deployments, these servers are typically deployed in an edge network. This group needs to be populated on servers running RD Connection Broker. RD Gateway servers and RD Web Access servers used in the deployment need to be in this group.</li><li>SID: S-1-5-32-576 <br>Name: BUILTIN\RDS Endpoint Servers<br>Description: A Builtin Local group. Servers in this group run virtual machines and host sessions where users RemoteApp programs and personal virtual desktops run. This group needs to be populated on servers running RD Connection Broker. RD Session Host servers and RD Virtualization Host servers used in the deployment need to be in this group.</li><li>SID: S-1-5-32-577 <br>Name: BUILTIN\RDS Management Servers<br>Description: A Builtin Local group. Servers in this group can perform routine administrative actions on servers running Remote Desktop Services. This group needs to be populated on all servers in a Remote Desktop Services deployment. The servers running the RDS Central Management service must be included in this group.</li><li>SID: S-1-5-32-578 <br>Name: BUILTIN\Hyper-V Administrators<br>Description: A Builtin Local group. Members of this group have complete and unrestricted access to all features of Hyper-V.</li><li>SID: S-1-5-32-579 <br>Name: BUILTIN\Access Control Assistance Operators<br>Description: A Builtin Local group. Members of this group can remotely query authorization attributes and permissions for resources on this computer.</li><li>SID: S-1-5-32-580<br>Name: BUILTIN\Remote Management Users<br>Description: A Builtin Local group. Members of this group can access WMI resources over management protocols (such as WS-Management via the Windows Remote Management service). This applies only to WMI namespaces that grant access to the user.</li></ul><br><br><br></div><h2 class="subTitle articleProperties" id="tocHeadRef" translate="false"><span><a href="javascript:void(0);" id="mt_propertyHead">Properties</a></span></h2><script type="text/javascript">
+      loadTOCNode(1, 'Properties');
+    </script><div class="sbody" translate="false"><div class="articlePropertyBottom">Article ID: 243330 - Last Review: March 1, 2012 - Revision: 13.2</div><div class="appliesTo"><a id="appliesto"></a><h5>APPLIES TO</h5><ul><li>Microsoft Windows Server 2003, Standard Edition (32-bit x86)</li><li>Microsoft Windows Server 2003, Enterprise Edition (32-bit x86)</li><li>Microsoft Windows Server 2003, Datacenter Edition (32-bit x86)</li><li>Microsoft Windows XP Professional</li><li>Microsoft Windows 2000 Server</li><li>Microsoft Windows 2000 Advanced Server</li><li>Microsoft Windows 2000 Professional Edition</li><li>Windows Server 2008 R2 Datacenter</li><li>Windows Server 2008 R2 Enterprise</li><li>Windows Server 2008 R2 Standard</li><li>Windows Server 2008 Datacenter</li><li>Windows Server 2008 Enterprise</li><li>Windows Server 2008 Standard</li></ul></div><div class="keywords"><table><tr><td class="header"><h5>Keywords: 
+              </h5></td><td class="text">kbenv kbinfo KB243330</td></tr></table></div><div class="topOfPage" translate="false"><a href="#top"><img src="/library/images/support/en-us/uparrow.gif" alt=""><span>Back to the top</span></a><font class="noShow"> | </font><a href="#survey" class="noShow" onclick="return ScrollToSection('.kbfeedback');">Give Feedback</a></div></div></div><script type="text/javascript">addMtSpan();</script><!-- - -KB 3 end- - --></div></div><div class="kbSurvey noShow"><h2 class="subTitle kbfeedback" id="tocHeadRef"><span><a href="javascript:void(0);">Give Feedback</a></span></h2><script type="text/javascript">
+        loadTOCNode(1, 'Give Feedback');
+      </script><div class="sbody"><span class="bookmark"><a id="survey" name="survey">&nbsp;</a></span><div class="wp" id="fmsSurvey" style="display:none;"><div class="fms"><noscript><div class="SURVEYNOSCRIPT"></div></noscript><input type="hidden" id="surveyname" name="surveyname" value=""><input type="hidden" id="showpage" name="showpage" value="1"><div id="SURVEYSECTIONCONTAINER"><div id="SURVEYSECTION_132" class="SURVEYSECTION" style="display:none;" xmlns:sw="urn:schemas-microsoft-com/PSS/PSS_Survey01"><input type="hidden" name="id" value="132"><div name="CompoundingBranchRules" style="display:none;"></div><input type="hidden" name="NextSectionByTopicRef" value="0"><div id="SURVEYQUESTION_12616" class="QUESTIONCONTAINER"><input type="hidden" name="id" value="12616"><input type="hidden" name="type" value="CHOICE"><input type="hidden" name="required" value="0"><div class="QUESTIONTEXT">Was this information helpful?</div><div class="QUESTIONINSTRUCTION"></div><div class="QUESTIONREQUIRED"></div><input type="hidden" name="randomization" value=""><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1261612616" id="125" value="0"></td><td class="ANSWERTEXT">Yes</td></tr></table></td></tr><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1261612616" id="126" value="1"></td><td class="ANSWERTEXT">No</td></tr></table></td></tr><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1261612616" id="18874" value="2"></td><td class="ANSWERTEXT">Somewhat</td></tr></table></td></tr></table></div><div id="SURVEYQUESTION_10576" class="QUESTIONCONTAINER"><input type="hidden" name="id" value="10576"><input type="hidden" name="type" value="CHOICE"><input type="hidden" name="required" value="0"><div class="QUESTIONTEXT">How much effort did you personally put forth to use this article?</div><div class="QUESTIONINSTRUCTION"></div><div class="QUESTIONREQUIRED"></div><input type="hidden" name="randomization" value=""><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1057610576" id="16305" value="1"></td><td class="ANSWERTEXT">Very low</td></tr></table></td></tr><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1057610576" id="16306" value="2"></td><td class="ANSWERTEXT">Low</td></tr></table></td></tr><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1057610576" id="16307" value="3"></td><td class="ANSWERTEXT">Moderate</td></tr></table></td></tr><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1057610576" id="16308" value="4"></td><td class="ANSWERTEXT">High</td></tr></table></td></tr><tr><td valign="top"><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="top" class="CHOICEROW"><input type="radio" name="QUESTION_132_1057610576" id="16309" value="5"></td><td class="ANSWERTEXT">Very high</td></tr></table></td></tr></table></div><div id="SURVEYQUESTION_12617" class="QUESTIONCONTAINER"><input type="hidden" name="id" value="12617"><input type="hidden" name="type" value="TEXT-BLOCK"><input type="hidden" name="required" value="0"><div class="QUESTIONTEXT">Tell us why and what can we do to improve this information</div><div class="QUESTIONINSTRUCTION"></div><div class="QUESTIONREQUIRED"></div><textarea class="ANSWERBOX" name="TEXTBLOCK_12617" rows="12" cols="80" onpaste="enforceMaxLength(this,1024,event)" onkeyup="enforceMaxLength(this,1024,event)"></textarea></div><div class="NAVIGATION"><table class="NAVBUTTONCONTAINER"><tr><td class="PADDINGCELL"></td><td class="NAVBUTTONCELL" id="PreviousButton"></td><td class="NAVBUTTONCELL"><input class="NAVBUTTON" type="button" name="next" data-nav="true" data-name="btnNext" value="Submit" id="&#xA;                      SURVEYSECTION_132_next&#xA;                    " onclick="kbSurvey.next();this.blur();"></td><td class="ENDPADDINGCELL"></td></tr></table></div></div><div ID="DIV_CLOSE" style="display:none" xmlns:sw="urn:schemas-microsoft-com/PSS/PSS_Survey01"><div class="SURVEYTHANKYOUCONTAINER"><div class="SURVEYINTROTEXT">Thank you! Your feedback is used to help us improve our support content. For more assistance options, please visit the <a href="http://support.microsoft.com">Help and Support Home Page</a>.</div></div><div class="NAVIGATION"><table class="NAVBUTTONCONTAINER" nowrap="yes"><tr><td class="PADDINGCELL"></td><td class="NAVBUTTONCELL"></td><td class="ENDPADDINGCELL"></td></tr></table></div></div></div></div></div><script type="text/javascript">
+      var kbSurvey = new MS.Support.Fms.Survey("fmsSurvey");
+      kbSurvey.isKBEmbedded = true;
+      kbSurvey.addSubmitField('REGIONID', 'en-gb');
+      kbSurvey.addSubmitField('SITE', 'gn');
+      kbSurvey.addSubmitField('SURVEYSCID', 'sw;en;1809');
+      kbSurvey.addSubmitField('SURVEYID', '1809');
+      kbSurvey.addSubmitField('SURVEYNAME', '');
+      kbSurvey.addSubmitField('BROWSERLANGCODE', 'ru-RU,ru\x3bq\x3d0.9,en\x3bq\x3d0.8');
+      kbSurvey.addSubmitField('SURVEYLANGCODE', 'en');
+      kbSurvey.addSubmitField('FMSURL', '%252fdefault.aspx%252fkb%252f243330');
+      kbSurvey.parameters = ['kb','en-us','243330','','','','','','',''];
+      kbSurvey.maxKBsInCookie = '10';
+      kbSurvey.kbvisited = '';
+    </script><div class="topOfPage">
+      <a href="#top">
+        <img src="/library/images/support/en-us/upArrow.gif" alt="Back to the top"></img>Back to the top
+      </a>
+    </div></div></div></div></td><td class="primaryThinColumn"><div id="thinColumn" style="float: none;"><div class="SocialMedia"><a class="ShareButton" href="#">Share</a><div class="MediaContent"><ul class="MediaLinks"><li><a title="Share on Twitter" rel="nofollow" href="Javascript:AddtoSocialMedia('twitter','smcsocialbookmark','http://twitter.com/share/?url=','&text=');"><img src="/library/images/support/en-AU/twitter_16.png" alt="Share on Twitter"/>Twitter</a></li><li><a title="Share on Facebook" rel="nofollow" href="Javascript:AddtoSocialMedia('Facebook','smcsocialbookmark','http://www.facebook.com/share.php?u=','');"><img src="/library/images/support/en-AU/facebook_16.png" alt="Share on Facebook"/>Facebook</a></li><li><a title="Share on Bebo" rel="nofollow" href="Javascript:AddtoSocialMedia('bebo','smcsocialbookmark','http://www.bebo.com/c/share?Url=','&Title=');"><img src="/library/images/support/en-AU/bebo_16.png" alt="Share on Bebo"/>Bebo</a></li><li><a title="Share with Messenger" rel="nofollow" href="Javascript:AddtoSocialMedia('live','smcsocialbookmark','http://profile.live.com/badge/?url=','&title=');"><img src="/library/images/support/CN/SharingBadge16x16White.png" alt="Share with Messenger"/>Windows Live</a></li><li><a title="Share on LinkedIn" rel="nofollow" href="Javascript:AddtoSocialMedia('linkedin','smcsocialbookmark','http://www.linkedin.com/shareArticle?url=','&title=');"><img src="/library/images/support/en-AU/linkedin_16.png" alt="Share on LinkedIn"/>LinkedIn</a></li><li><a title="Share on Tumblr" rel="nofollow" href="Javascript:AddtoSocialMedia('Tumblr','smcsocialbookmark','http://www.tumblr.com/share?v=3&u=','&t=');"><img src="/library/images/support/en-AU/tumblr.png" alt="Share on Tumblr"/>Tumblr</a></li><li><a title="Share on Email" rel="nofollow" href="Javascript:AddtoSocialMedia('Email','smcsocialbookmark','mailto:?subject=Well-known%20security%20identifiers%20in%20Windows%20operating%20systems&amp;body=','');"><img src="/library/images/support/CN/email_20x.png" alt="Share on Email"/>Email</a></li></ul></div></div><div class="clearBoth"></div><div class="wp" id="RelatedSupportCenters"><table cellspacing="0" class="LCT" style="width:100%"><tr><td class="textColumn"><table cellSpacing="0"><tr><td><h3><span class="linkCon">Related Support Centers</span><span class="linkConTop"></span></h3></td></tr></table><table cellSpacing="0"><tr><td><ul><li id="_tr"><span><a href="/ph/3198/en-gb">Windows Server 2003</a></span></li><li id="_tr"><span><a href="/ph/1163/en-gb">Windows Server</a></span></li><li id="_tr"><span><a href="/ph/3223/en-gb">Windows XP Professional</a></span></li><li id="_tr"><span><a href="/ph/1173/en-gb">Windows XP</a></span></li><li id="_tr"><span><a href="/ph/1131/en-gb">Windows 2000</a></span></li></ul></td></tr></table></td></tr></table></div><div id="MiniRouter"><h3><span>Other Support Sites</span></h3><ul id="OSS_MR"><li><a href="/gp/hublist/en-gb" id="L_206987">Solution Centres</a></li><li><a href="/gp/cp_fixit_main/en-gb" id="L_206988">Microsoft Fix It Solutions</a></li><li><a href="http://windows.microsoft.com/en-gb/windows/help" id="L_206989">Windows Help and How-to</a></li><li><a href="http://office.microsoft.com/en-gb/default.aspx" id="L_206990">Office Online</a></li><li><a href="https://partner.microsoft.com/uk/" id="L_206991">Microsoft Partner Network</a></li></ul><h3><span>Community</span></h3><ul id="Community_MR"><li><a href="http://answers.microsoft.com/en-us" id="L_206992">Answers Forums</a></li><li><a href="http://social.msdn.microsoft.com/Forums" id="L_206994">Microsoft Developer Network (MSDN)</a></li><li><a href="http://social.technet.microsoft.com/Forums" id="L_206993">Technet Forums</a></li></ul><h3><span>Get Help Now</span></h3><div class="gethelp" id="GetHelp_MR"><a href="/gethelp/default.aspx?content=kb;en-us;243330" id="L_206995" class="imglink"><img title="" alt="" class="gsfx_img_png" src="/library/images/support/CN/GetHelpNow.png" /></a><a href="/gethelp/default.aspx?content=kb;en-us;243330" id="L_206995" class="txtlink">Submit your support incident and get in contact with a support professional</a><div class='clearBoth'></div></div><div class="space"></div></div><script type="text/javascript">GSS.Utility.DisplaySsbAd();</script><div id="divSsbAdContent"><a href="http://smallbusiness.support.microsoft.com/en-gb"><center><img src="/library/images/support/en-US/180x150-SMB-ENUS1-Alicia.jpg"/></center></a></div><div class="adWrapper"><center><a id="XPCountdownWdget" href="http://technet.microsoft.com/windows/dd361745.aspx?ITPID=eosgdgt" style="text-decoration:none" title="Get guidance and free tools to help you migrate to Windows 7">		
+			<div style="background-image:url('/library/images/support/CN/windows-xp-eos-small_notext.gif'); height:150px; width:150px; margin-top: 10px; margin-bottom: 10px;">
+				<div id="XPCountdownTitle" style="position: relative; top:57px; width:150px; text-align:center; font-family: Segoe UI; font-size:16px; color:#FFFFFF; left: 0px;"></div>
+				<div id="XPCountdown"      style="position: relative; top:73px; width:150px; text-align:center; font-family: Segoe UI; font-weight:bolder; font-size:20px; color:#FFFFFF; left: 0px;"></div>
+			</div>    
+		</a>	
+</center>
+<script language="javascript" type="text/javascript">
+
+    $(document).ready(function () {
+        var siteCulture = $('meta[name="DCSext.sup_ln"]').attr('CONTENT');
+
+        if (siteCulture == undefined) siteCulture = "en-us";
+
+        var ConfigUrl = "/common/fetchxml.aspx?scid=cf;[LN];XPCountdown";
+
+        ConfigUrl = ConfigUrl.replace("[LN]", siteCulture);
+
+        $.ajax({
+            type: "GET",
+            url: ConfigUrl,
+            dataType: "xml",
+            success: function (xml) {
+                var Title = $(xml).find("configuration > section[name='config'] > key[name='Title']").attr("value");
+                var EndOfSupport = $(xml).find("configuration > section[name='config'] > key[name='EndOfSupport']").attr("value");
+                var CounterFormat = $(xml).find("configuration > section[name='config'] > key[name='CounterFormat']").attr("value");
+                var LinkAddress = $(xml).find("configuration > section[name='config'] > link[name='ExtLink']").attr("href");
+                var LinkTitle = $(xml).find("configuration > section[name='config'] > link[name='ExtLink'] > linkText ").text();
+
+                $("#XPCountdownWdget").attr("title", LinkTitle);
+                $("#XPCountdownWdget").attr("href", LinkAddress);
+                $("#XPCountdownTitle").html(Title);
+
+                DisplayCalc("#XPCountdown", escape(CounterFormat), escape(EndOfSupport));
+                setInterval("DisplayCalc('#XPCountdown','" + escape(CounterFormat) + "','" + escape(EndOfSupport) + "');", 60000);  /* refresh every minute */
+            }
+        });
+    });
+
+
+    function DisplayCalc(DivId, format, eos) {
+        var todate = new Date("04/08/2014 08:00 AM UTC");
+        var currentdate = new Date();
+        var ddiff = new Date(todate - currentdate);
+        var NbSecs = Math.floor(ddiff.valueOf() / 1000);
+        var result = "";
+
+        if (NbSecs > 0) {
+            result = unescape(format).replace(/%%D%%/g, Math.floor(NbSecs / 86400).toString());
+        }
+        else {
+            result = unescape(eos);
+        }
+
+        $(DivId).html(result);
+    }
+
+</script></div><div class="adWrapper"><noscript>
+<a href="http://emea.microsoftstore.com/UK/en-GB/Microsoft/Office/Suites-2010?wt.mc_id=smchome_engb_adr_noscript">
+<img src="http://support.microsoft.com/library/images/support/en-GB/Office_2010_165x240_EN-GB_orig.png"  />
+</a>
+</noscript>
+
+
+<div style="display:none">
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/left_button_hover_RN.png" /></a>
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/right_button_hover_RN.png" /></a>
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/left_button_RN.png" /></a>
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/right_button_RN.png" /></a>
+</div>
+
+<link rel="stylesheet" href="http://support.microsoft.com/library/StyleSheet/support/en-GB/Dynamic_banner_RN_css_style.css" type="text/css" />
+<script type="text/javascript" src="http://support.microsoft.com/library/JavaScript/support/en-GB/BrowserInfoBanner_Slider_Script.js"></script>
+<script type="text/javascript" src="http://support.microsoft.com/library/JavaScript/support/en-GB/BrowserInfoBanner_Detect_Script.js"></script>
+<script type="text/javascript" src="http://support.microsoft.com/library/JavaScript/Support/EN-GB/dynamic_banner_rn_init_script.js"></script>
+
+
+<script language="JavaScript" type="text/javascript">
+
+    /* banner display settings */
+
+    /* office */
+    var office = '<li><a href="http://emea.microsoftstore.com/uk/en-gb/microsoft/office/suites-2010/?wt.mc_id=smcpsc_engb_adr_buyoff"><img src="http://support.microsoft.com/library/images/support/en-GB/Office_2010_165x240_EN-GB_orig.png" alt="Office 2010" /></a></li>';
+    /*http://support.microsoft.com/library/images/support/en-GB/MSSTORE_Office_HB_Pub_165x240.png';*/
+
+    /* windows 7 */
+    var windows7 = '<li><a href="http://emea.microsoftstore.com/uk/en-gb/microsoft/windows/windows-7/?wt.mc_id=smcpsc_engb_adr_buywin7"><img src="http://support.microsoft.com/library/images/support/en-GB/windows_165_240_EN-GB.png" alt="Windows 7" /></a></li>';
+
+    /* msstore */
+    var msstore = '<li><a href="http://emea.microsoftstore.com/uk/en-GB?WT.mc_id=smcpsc_engb_adr_generalstore"><img src="http://support.microsoft.com/library/images/support/en-GB/MSSTORE_General_Banner_165x240.png" alt="Microsoft Store" /></a></li>';
+
+    /* mac */
+    var mac = '<li><a href="http://emea.microsoftstore.com/uk/en-gb/microsoft/office/office-for-mac-2011?wt.mc_id=smcpsc_engb_adr_buyoffmac"><img src="http://support.microsoft.com/library/images/support/en-GB/Office_Mac_165x240_EN-GB.png" alt="Microsoft® Office for Mac 2011" /></a></li>';
+
+    /* ie9 */
+    var ie9 = '<li><a href="http://www.beautyoftheweb.co.uk/experience/"><img src="http://support.microsoft.com/library/images/support/en-GB/Fullon_165x240_EN-GB.png" alt="IE9" /><img src="http://view.atdmt.com/UKM/view/358712121/direct/01/" alt="" /></a></li>';
+
+    /* ie8 */
+    var ie8 = '<li><a href="http://www.beautyoftheweb.co.uk/experience/"><img src="http://support.microsoft.com/library/images/support/en-GB/Fullon_165x240_EN-GB.png alt="IE8" /><img src="http://view.atdmt.com/UKM/view/358712121/direct/01/" alt="" /></a></li>';
+
+    /* dc */
+    var dc = '<li><a href="http://www.microsoft.com/download/en/default.aspx?wt.mc_id=smcpsc_engb_adr_downdc"><img src="http://support.microsoft.com/library/images/support/en-GB/Download_center_165x240_EN-GB.png" alt="Download Center" /></a></li>';
+
+    /* mse */
+    var mse = '<li><a href="http://windows.microsoft.com/en-GB/windows/products/security-essentials/?Wt.mc_id=smcpsc_engb_text_dnldmse"><img src="http://support.microsoft.com/library/images/support/en-GB/MSE_165x240_EN-GB.png" alt="Microsoft Security Essentials" /></a></li>';
+
+    /* customer experience */
+    var experience = '<li><a href="http://support.microsoft.com/common/survey.aspx?scid=sw;en;2040&showpage=1"><img src="http://support.microsoft.com/library/images/support/en-GB/SMC_CustomerExperience_Banner_165x240_EN.png" alt="Customer Experience" /></a></li>';
+
+    /* pinpoint */
+    var pinpoint = '<li><a href="http://pinpoint.microsoft.com/en-gb/companies/search?q=&wt.mc_id=en-gb_perm_link_ms_support_2sr_right-nav-rotator-ad"><img src="http://support.microsoft.com/library/images/support/en-gb/Pinpoint_165x240_EN-GB.png" alt="Pinpoint" /></a></li>';
+
+
+    /* banner set settings */
+    var Browseinfobanner_ie10_win8 = mse + office + windows7 + msstore;
+    var Browseinfobanner_ie9_rest_win8 = mse + office + windows7 + msstore;
+    var Browseinfobanner_ie9_win7_vista = mse + office + windows7 + msstore;
+    var Browseinfobanner_ie8_rest_win7_vista = ie9 + office + windows7 + msstore;
+    var Browseinfobanner_ie8_winxp = mse + office + windows7 + msstore;
+    var Browseinfobanner_ie7_rest_winxp = ie8 + office + windows7 + msstore;
+    var Browseinfobanner_ie8_other_win = mse + office + windows7 + msstore;
+    var Browseinfobanner_ie7_rest_other_win = ie8 + office + windows7 + msstore;
+    var Browseinfobanner_non_win = office + windows7 + msstore;
+    var Browseinfobanner_mac = mac; /* dynamic banner has been disabled for mac, only static banner - see below */
+
+    /* dyn. banner body */
+    var banner_header = '<div id="BrowserInfoBanner" class="display_block"><div><div style="text-align: center;"><div id="slider"><ul>';
+    var banner_footer = '</ul></div></div></div></div>';
+
+    /* end of dynamic banner content variables */
+
+    banner_init();
+    banner_init_mac();
+
+</script></div><div class="adWrapper"><noscript>
+<a href="http://emea.microsoftstore.com/UK/en-GB/Microsoft/Office/Suites-2010?wt.mc_id=smchome_engb_adr_noscript">
+<img src="http://support.microsoft.com/library/images/support/en-GB/Office_2010_165x240_EN-GB_orig.png"  />
+</a>
+</noscript>
+
+
+<div style="display:none">
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/left_button_hover_RN.png" /></a>
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/right_button_hover_RN.png" /></a>
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/left_button_RN.png" /></a>
+<a href=""><img src="http://support.microsoft.com/library/images/support/cs/right_button_RN.png" /></a>
+</div>
+
+<link rel="stylesheet" href="http://support.microsoft.com/library/StyleSheet/support/en-GB/Dynamic_banner_RN_css_style.css" type="text/css" />
+<script type="text/javascript" src="http://support.microsoft.com/library/JavaScript/support/en-GB/BrowserInfoBanner_Slider_Script.js"></script>
+<script type="text/javascript" src="http://support.microsoft.com/library/JavaScript/support/en-GB/BrowserInfoBanner_Detect_Script.js"></script>
+<script type="text/javascript" src="http://support.microsoft.com/library/JavaScript/Support/EN-GB/dynamic_banner_rn_init_script.js"></script>
+
+
+<script language="JavaScript" type="text/javascript">
+
+    /* banner display settings */
+
+    /* office */
+    var office = '<li><a href="http://emea.microsoftstore.com/uk/en-gb/microsoft/office/suites-2010/?wt.mc_id=smcpsc_engb_adr_buyoff"><img src="http://support.microsoft.com/library/images/support/en-GB/Office_2010_165x240_EN-GB_orig.png" alt="Office 2010" /></a></li>';
+    /*http://support.microsoft.com/library/images/support/en-GB/MSSTORE_Office_HB_Pub_165x240.png';*/
+
+    /* windows 7 */
+    var windows7 = '<li><a href="http://emea.microsoftstore.com/uk/en-gb/microsoft/windows/windows-7/?wt.mc_id=smcpsc_engb_adr_buywin7"><img src="http://support.microsoft.com/library/images/support/en-GB/windows_165_240_EN-GB.png" alt="Windows 7" /></a></li>';
+
+    /* msstore */
+    var msstore = '<li><a href="http://emea.microsoftstore.com/uk/en-GB?WT.mc_id=smcpsc_engb_adr_generalstore"><img src="http://support.microsoft.com/library/images/support/en-GB/MSSTORE_General_Banner_165x240.png" alt="Microsoft Store" /></a></li>';
+
+    /* mac */
+    var mac = '<li><a href="http://emea.microsoftstore.com/uk/en-gb/microsoft/office/office-for-mac-2011?wt.mc_id=smcpsc_engb_adr_buyoffmac"><img src="http://support.microsoft.com/library/images/support/en-GB/Office_Mac_165x240_EN-GB.png" alt="Microsoft® Office for Mac 2011" /></a></li>';
+
+    /* ie9 */
+    var ie9 = '<li><a href="http://www.beautyoftheweb.co.uk/experience/"><img src="http://support.microsoft.com/library/images/support/en-GB/Fullon_165x240_EN-GB.png" alt="IE9" /><img src="http://view.atdmt.com/UKM/view/358712121/direct/01/" alt="" /></a></li>';
+
+    /* ie8 */
+    var ie8 = '<li><a href="http://www.beautyoftheweb.co.uk/experience/"><img src="http://support.microsoft.com/library/images/support/en-GB/Fullon_165x240_EN-GB.png alt="IE8" /><img src="http://view.atdmt.com/UKM/view/358712121/direct/01/" alt="" /></a></li>';
+
+    /* dc */
+    var dc = '<li><a href="http://www.microsoft.com/download/en/default.aspx?wt.mc_id=smcpsc_engb_adr_downdc"><img src="http://support.microsoft.com/library/images/support/en-GB/Download_center_165x240_EN-GB.png" alt="Download Center" /></a></li>';
+
+    /* mse */
+    var mse = '<li><a href="http://windows.microsoft.com/en-GB/windows/products/security-essentials/?Wt.mc_id=smcpsc_engb_text_dnldmse"><img src="http://support.microsoft.com/library/images/support/en-GB/MSE_165x240_EN-GB.png" alt="Microsoft Security Essentials" /></a></li>';
+
+    /* customer experience */
+    var experience = '<li><a href="http://support.microsoft.com/common/survey.aspx?scid=sw;en;2040&showpage=1"><img src="http://support.microsoft.com/library/images/support/en-GB/SMC_CustomerExperience_Banner_165x240_EN.png" alt="Customer Experience" /></a></li>';
+
+    /* pinpoint */
+    var pinpoint = '<li><a href="http://pinpoint.microsoft.com/en-GB/home?WT.mc_id=en-GB_Perm_BannerDeeplink_MS_Support_KB_2HP"><img src="http://support.microsoft.com/library/images/support/en-gb/165x240_en_GB_IT_Experts.png" alt="Pinpoint" /></a></li>';
+/* <li><a href="http://pinpoint.microsoft.com/en-gb/companies/search?q=&wt.mc_id=en-gb_perm_link_ms_support_2sr_right-nav-rotator-ad"><img src="http://support.microsoft.com/library/images/support/en-gb/Pinpoint_165x240_EN-GB.png" alt="Pinpoint" /></a></li>*/
+
+
+    /* banner set settings */
+    var Browseinfobanner_ie10_win8 = pinpoint + office + windows7 + msstore;
+    var Browseinfobanner_ie9_rest_win8 = pinpoint + office + windows7 + msstore;
+    var Browseinfobanner_ie9_win7_vista = pinpoint + office + windows7 + msstore;
+    var Browseinfobanner_ie8_rest_win7_vista = ie9 + office + windows7 + msstore;
+    var Browseinfobanner_ie8_winxp = pinpoint + office + windows7 + msstore;
+    var Browseinfobanner_ie7_rest_winxp = ie8 + office + windows7 + msstore;
+    var Browseinfobanner_ie8_other_win = pinpoint + office + windows7 + msstore;
+    var Browseinfobanner_ie7_rest_other_win = ie8 + office + windows7 + msstore;
+    var Browseinfobanner_non_win = office + windows7 + msstore;
+    var Browseinfobanner_mac = mac; /* dynamic banner has been disabled for mac, only static banner - see below */
+
+/* dyn. banner body */
+var commercial_banner_header = '<div id="BrowserInfoBanner" class="display_block"><div><div style="text-align: center;"><div id="slider1"><ul>';
+var commercial_banner_footer = '</ul></div></div></div></div>';
+
+/* end of dynamic banner content variables */
+   
+$(document).ready(function() {
+$('body').find('#BrowserInfoBanner').eq(1).attr("style", "display:none !important;");
+});
+
+commercial_banner_init();
+    banner_init_mac();
+
+</script></div><div class="wp articleTrans"><h3><span class="linkCon">Article Translations</span><span class="linkConTop"></span></h3></div><div id="ArticleTranslations"><div onclick="DisplayATList()" class="ATtext"><span><a href="/kb/243330/ar" onclick="ATClick('29803',this)" title="(الشرق الاوسط (العربية">(الشرق الاوسط (العربية</a></span><a style="background-image:url(/library/images/support/CN/kb_dropdown_icon.png);" href="javascript:void(0)"></a></div><div id="ATList" name="scid"><ul><li><a href="/kb/243330/pt-br" onclick="ATClick('29803',this)" title="Brasil (Português)">Brasil (Português)</a></li><li><a href="/kb/243330/cs" onclick="ATClick('29803',this)" title="Česká republika (Čeština)">Česká republika (Čeština)</a></li><li><a href="/kb/243330/de" onclick="ATClick('29803',this)" title="Deutschland (Deutsch)">Deutschland (Deutsch)</a></li><li><a href="/kb/243330/es" onclick="ATClick('29803',this)" title="España, Latinoamérica (Español)">España, Latinoamérica (Español)</a></li><li><a href="/kb/243330/fr" onclick="ATClick('29803',this)" title="France (Français)">France (Français)</a></li><li><a href="/kb/243330/id-id" onclick="ATClick('29803',this)" title="Indonesia (Bahasa Indonesia)">Indonesia (Bahasa Indonesia)</a></li><li><a href="/kb/243330/it" onclick="ATClick('29803',this)" title="Italia (Italiano)">Italia (Italiano)</a></li><li><a href="/kb/243330/pt" onclick="ATClick('29803',this)" title="Portugal (Português)">Portugal (Português)</a></li><li><a href="/kb/243330/ro" onclick="ATClick('29803',this)" title="România (Română)">România (Română)</a></li><li><a href="/kb/243330/sk" onclick="ATClick('29803',this)" title="Slovenská Republika (Slovenčina)">Slovenská Republika (Slovenčina)</a></li><li><a href="/kb/243330/tr" onclick="ATClick('29803',this)" title="Türkiye (Türkçe)">Türkiye (Türkçe)</a></li><li><a href="/kb/243330/vi-vn" onclick="ATClick('29803',this)" title="Việt Nam (Tiếng Việt)">Việt Nam (Tiếng Việt)</a></li><li><a href="/kb/243330/el" onclick="ATClick('29803',this)" title="Ελλάδα (Ελληνικά)">Ελλάδα (Ελληνικά)</a></li><li><a href="/kb/243330/ru" onclick="ATClick('29803',this)" title="Россия (Русский)">Россия (Русский)</a></li><li><a href="/kb/243330/uk-ua" onclick="ATClick('29803',this)" title="Україна (Україньска)">Україна (Україньска)</a></li><li><a href="/kb/243330/hi" onclick="ATClick('29803',this)" title="भारत (हिंदी)">भारत (हिंदी)</a></li><li><a href="/kb/243330/th" onclick="ATClick('29803',this)" title="ไทย (ไทย)">ไทย (ไทย)</a></li><li><a href="/kb/243330/ko" onclick="ATClick('29803',this)" title="대한민국 (한국어)">대한민국 (한국어)</a></li><li><a href="/kb/243330/zh-cn" onclick="ATClick('29803',this)" title="中国 (简体中文)">中国 (简体中文)</a></li><li><a href="/kb/243330/zh-tw" onclick="ATClick('29803',this)" title="台灣 (繁體中文)">台灣 (繁體中文)</a></li><li><a href="/kb/243330/ja" onclick="ATClick('29803',this)" title="日本 (日本語)">日本 (日本語)</a></li></ul></div></div><div id="divRelContent" style="display:none"></div><div id="divRelTags" style="display:none"></div></div></td></tr></table></div></div><div id="bottomRow"><div class="wp getHelp"><table cellpadding="0" cellspacing="0"><tr><td class="image"><a href="/gethelp/default.aspx?content=kb;en-us;243330" id="L_179483"><img title="" alt="" class="gsfx_img_png" src="/library/images/support/CN/GetHelpNow.png" /></a></td><td class="text"><h3>Get Help Now</h3><a href="/gethelp/default.aspx?content=kb;en-us;243330" id="L_179483">Submit your support incident and get in contact with a support professional</a></td></tr></table></div></div><noscript><img id="StatsDotNetImgNoScript" alt="" src="http://support.microsoft.com/LTS/default.aspx?SSID=1&amp;SiteLCID=2057&amp;SsVersion=GSS7.6&amp;SiteCulture=en-gb&amp;ContentCulture=en-us&amp;In404Url=&amp;EventCollectionID=1&amp;URL=%2fdefault.aspx&amp;ContentType=kb&amp;ContentLCID=1033&amp;ContentID=243330&amp;Platform=windows%20nt%205.1&amp;BrandID=1&amp;flexValue2=32&amp;flexValue8=0&amp;ContentProperties=6%3d9%7c7%3d13.2%7c9%3dkbAudITPRO%20%7c" /></noscript><img id="StatsDotNetImg" name="StatsDotNetImg" alt="" src="/library/images/support/cn/onepix.gif" /><script type="text/javascript">StatsDotNet.disabled=false;StatsDotNet.enableCollTierParams=true;StatsDotNet.host='http\x3a\x2f\x2fsupport.microsoft.com\x2fLTS\x2fdefault.aspx';StatsDotNet.ssId='1';StatsDotNet.siteLcId='2057';StatsDotNet.SiteCulture='en-gb';StatsDotNet.SsVersion='GSS7.6';StatsDotNet.url='\x2fdefault.aspx';StatsDotNet.ContentCulture ='en-us';StatsDotNet.contentType='kb';StatsDotNet.contentLn='1033';StatsDotNet.contentId='243330';StatsDotNet.platform='windows nt 5.1';StatsDotNet.eventCollectionId=1;StatsDotNet.siteBrandId='1';StatsDotNet.onUnloadTimeout=300;StatsDotNet.ltsIdleTimeout=5000;StatsDotNet.userAgentString='opera\x2f9.80 \x28windows nt 5.1\x3b u\x3b en-gb\x29 presto\x2f2.10.289 version\x2f12.01';StatsDotNet.ContentProperties='6\x3d9\x7c7\x3d13.2\x7c9\x3dkbAudITPRO \x7c';StatsDotNet.flexValue2='32';StatsDotNet.flexValue8='0';</script><script type="text/javascript"> var varWedcsEnable = true; this.generateWedcsData(); </script><script type="text/javascript">var enableSiteSurvey = true;function isDomainTracking(){var entry = MS.Support.Fms.CookieUtil.getCookie('fmshb');if (entry){try{return entry.split(',')[0] == '1' ? true : false;}catch (e){return false;}}return false;};window.setInterval(function(){MS.Support.Fms.CookieUtil.setSessionCookie('fmshb', (isDomainTracking() ? '1' : '0') + ',' + (new Date()).getTime());}, 1000);function fmsLastExp(){var visits = MS.Support.Fms.CookieUtil.getCookie('ST_GN_EN-GB');var parts =  visits ? visits.split('_') : [];if (null == visits || parts.length != 3 || isNaN(parts[0])){return 0;}return parseInt(parts[2]);};function fmsSurveyExpired(days){var MiliDay = 86400000;var visits = MS.Support.Fms.CookieUtil.getCookie('ST_GN_EN-GB');var parts = visits ? visits.split('_') : [];if (null == visits || parts.length != 3 || isNaN(parts[0])){return true;};var origDate = parseInt(parts[1]);var curDate = new Date();return (curDate.getTime()/MiliDay - days) >= origDate;};function activateSiteSurvey (){if(window.top == window && !isDomainTracking() && typeof(enableSiteSurvey) != "undefined" && enableSiteSurvey && fmsSurveyExpired(fmsLastExp())){document.write('<script language="javascript" src="/library/svy/broker.js"></scr'+'ipt>');}};activateSiteSurvey();</script><script type="text/javascript">function thisLoad(){makeAjaxCall('LoadRelatedContent','243330\x3ben-us');makeAjaxCall('LoadRelatedTags','243330\x3ben-us');KBFeedBackDisplay();StatsDotNet.LogPageOnLoad();CreateSearchOptions('acListWrappergsfx_bsrch_query', 326);InitCatLangSel();InitSrch();InitAC('gsfx_bsrch_query');$(document).ready(function() {gsfx_bsrch_InitCatSelection('gsfx_bsrch_query', '4:');});}function thisUnload(){}</script><script type="text/javascript">$(window).load(thisLoad);$(window).unload(thisUnload);</script><script type="text/javascript" src="/library/javascript/support/en-gb/store_link_modifier.js?1"></script><script type="text/javascript" src="/library/javascript/support/en-gb/pinpoint_link_modifier.js?2"></script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            </div>
+            <div class="footer">
+                
+    <div class="oneMscomComp oneMscomFooter" bi:type="oneMscomFooter" dir="ltr"><div class="msLogo" bi:type="oneMscomMSLogo"><a href="http://www.microsoft.com/en/gb/default.aspx"><span><img src="http://www.microsoft.com/global/onemscomsettings/publishingimages/microsoft_logo_footer.gif" alt="Microsoft"/></span></a><div class="copyright" bi:type="oneMscomCopyRight">&copy;2012 Microsoft</div></div><div class="links"><div class="links-inner" bi:type="oneMscomCustomLinks"><ul class="customLinks"><li class="lastLink"><a href="http://support.microsoft.com/gp/csa/en-gb"  bi:Key="Val" ><span>Services Agreement</span></a></li></ul></div><div id="FooterDefaultLink" class="links-inner" bi:type="oneMscomDefaultLink"><ul class="defaultLinks"><li><a href="https://profile.microsoft.com/RegSysProfileCenter/default.aspx?lcid=2057"  ><span>Manage Your Profile</span></a></li><li><a href="http://support.microsoft.com/contactus/?ws=support"  bi:ContactFromFooterXml="22" ><span>Contact Us</span></a></li><li><a href="http://go.microsoft.com/?linkid=4412892"  bi:Key="Val" ><span>Terms of Use</span></a></li><li><a href="http://www.microsoft.com/library/toolbar/3.0/trademarks/en-gb.mspx"  bi:Trademarks1="TrademarksVal1" bi:Trademarks2="Trademarks2" ><span>Trademarks</span></a></li><li class="lastLink"><a href="http://go.microsoft.com/fwlink/p/?LinkId=248685"  bi:Key="Val" ><span>Privacy & Cookies</span></a></li></ul></div></div></div><script type="text/javascript">if (typeof $ != "undefined") {$(function () {if (Mst && Mst.SeoMenu) {var SeoClick;var SeoClose;if ($.bi && $.bi.dataRetrievers.structure) {SeoClick = function (e) {var element = $(e.target);var elements = $(e.target).parents('.seo-item').find('.seo-item-flyout-content a,.seo-item-flyout-content');var mergedbiData = $.bi.getAttrData(elements);var customParams = { title: $.trim($(element).text()) };try {$.extend(customParams, $.bi.baseData(), $.bi.dataRetrievers.structure.getData(element));} catch (e) { }var openBIParams = $.extend({}, customParams, {initial: ($(e.target).data('biseoopen') !== undefined ? $(e.target).data('biseoopen') : 0), interactiontype: 9, index: customParams['parentindexstructure'], parentindexstructure: '', '-bi-description-ignore-': 'seo-open'});$(e.target).data('biseoopen', 1);$.bi.queue.push(openBIParams); };SeoClose = function ($flyoutLink) {var biId = $flyoutLink.attr('id');var customParams = {};$.extend(customParams, $.bi.baseData(), $.bi.dataRetrievers.structure.getIndexGridTypeStructure($flyoutLink));$.extend(customParams, {initial: $flyoutLink.data('biseoclose') !== undefined ? $flyoutLink.data('biseoclose') : 0, interactiontype: 10, title: $.trim($flyoutLink.text()), index: customParams['parentindexstructure'], parentindexstructure: '', '-bi-description-ignore-': 'seo-close'});$flyoutLink.data('biseoclose', 1);$.bi.queue.push(customParams); };}var Seo = new Mst.SeoMenu('FooterDefaultLink', 'links-inner', 'seo-item', 'seo-flyout-link','seo-item-flyout-content', 'oneMscomFooter', SeoClick, SeoClose);}});}</script>
+
+            </div>
+            <div class="cssClear">
+            </div>
+        </div>
+        <div class="stage-bg-top">
+        </div>
+        <div class="stage-bg-mid">
+        </div>
+        <div class="stage-bg-bot">
+        </div>
+    </div>
+    <div class="form-bottom">
+        <div class="form-bottom-inner">
+        </div>
+    </div>
+    
+
+ 
+    <!--ADD BIPROXY and BISupporting SCRIPT-->
+    
+    <script type="text/javascript" src="/Scripts/jquery.bi.js"></script>
+    
+    <script type="text/javascript" src="/Scripts/jquery.bi.dataretrievers.attr.js"></script>
+    
+    <script type="text/javascript" src="/Scripts/jquery.bi.dataretrievers.exp.js"></script>
+    
+    <script type="text/javascript" src="/Scripts/jquery.bi.dataretrievers.structure.js"></script>
+    
+    <script type="text/javascript" src="/Scripts/jquery.bi.queue.js"></script>
+
+    
+
+    <!--ADD WEDCS SCRIPT-->
+    <script type="text/javascript">
+        var varSegmentation = 1;
+        var varClickTracking = 1;
+        var varCustomerTracking = 1;
+        var varLoadTracking = 0;
+    </script>
+
+    <!--ADD WEDCS SCRIPT-->
+    
+    <script type="text/javascript" src="/Scripts/jquery.bi.dataconsumers.wedcs.js"></script>
+
+    
+    <script type="text/javascript" src="/Scripts/wedcs.js"></script>
+
+    <noscript>
+        <img alt="" width="1" height="1" src="http://c.microsoft.com/trans_pixel.aspx" />
+    </noscript>
+    
+   
+<script type="text/javascript"> var $biSettings={"webtrends":{"interactionTypeMap":{ },"parameterMap":{"DCS.dcssip":[{"bi":"uridomain"}],"DCS.dcsuri":[{"bi":"uripath"}],"DCS.dcsqry":[{"bi":"uriquery"}],"WT.dl":[{"bi":"interactiontype"}],"WT.TriggerType":[{"bi":"triggertype"}],"WT.z_Initial":[{"bi":"initial"}],"WT.ti":[{"bi":"title"}],"WT.ParentTitleStructure":[{"bi":"parenttitlestructure"}],"WT.Type":[{"bi":"type"}],"WT.ParentTypeStructure":[{"bi":"parenttypestructure"}],"WT.Index":[{"bi":"index"}],"WT.ParentIndexStructure":[{"bi":"parentindexstructure"}],"WT.GridStructure":[{"bi":"gridstructure"}],"WT.SearchType":[{"bi":"searchtype"}],"WT.SearchQuery":[{"bi":"searchquery"}],"DCSext.wt_linkId":[{"bi":"linkid"}],"WT.z_locale":[{"bi":"locale"}],"WT.pa":[{"bi":"primaryaudience"}],"WT.z_ea_name":[{"bi":"endactionname"}],"WT.z_ea_actionoffer":[{"bi":"endactionoffer"}],"WT.z_ea_targetcampaign":[{"bi":"campaignguid"}],"DCSext.vp_evt":[{"bi":"vpevent"}],"DCSext.vp_uuid":[{"bi":"vpuuid"}],"WT.SurveyId":[{"bi":"surveyid"}],"WT.SurveyVersion":[{"bi":"surveyversion"}],"WT.SurveyQuestions":[{"bi":"surveyquestions"}],"WT.SurveyComments":[{"bi":"surveycomments"}]}},"wedcs":{"interactionTypeMap":{ },"parameterMap":{"ms.UriDomain":[{"bi":"uridomain"}],"ms.UriPath":[{"bi":"uripath"}],"ms.UriQuery":[{"bi":"uriquery"}],"ms.InteractionType":[{"bi":"interactiontype"}],"ms.TriggerType":[{"bi":"triggertype"}],"ms.Initial":[{"bi":"initial"}],"ms.Title":[{"bi":"title"}],"ms.ParentTitleStructure":[{"bi":"parenttitlestructure"}],"ms.Type":[{"bi":"type"}],"ms.ParentTypeStructure":[{"bi":"parenttypestructure"}],"ms.Index":[{"bi":"index"}],"ms.ParentIndexStructure":[{"bi":"parentindexstructure"}],"ms.GridStructure":[{"bi":"gridstructure"}],"ms.SearchType":[{"bi":"searchtype"}],"ms.SearchQuery":[{"bi":"searchquery"}],"cot":[{"bi":"cot"}],"ms.linkid":[{"bi":"linkid"}],"ms.cpgnguid":[{"bi":"campaignguid"}],"ms.rioctc":[{"bi":"rioctc"}],"ms.z_locale":[{"bi":"locale"}],"ms.pa":[{"bi":"primaryaudience"}],"ms.serp.link_type":[{"bi":"serplinktype"}],"ms.serp.link_position":[{"bi":"serplinkposition"}],"ms.ea_offer":[{"bi":"endactionoffer"}],"ms.ea_action":[{"bi":"endaction"}],"ms.ea_name":[{"bi":"endactionname"}],"ms.vp_site":[{"bi":"vpsite"}],"ms.vp_evt":[{"bi":"vpevent"}],"ms.vp_duration":[{"bi":"vpduration"}],"ms.vp_channel":[{"bi":"vpchannel"}],"ms.vp_uuid":[{"bi":"vpuuid"}],"ms.vp_origin":[{"bi":"vporigin"}],"ms.vp_pos":[{"bi":"vpposition"}],"ms.Order_ID":[{"bi":"orderid"}],"ms.Order_Revenue":[{"bi":"orderrevenue"}],"ms.Currency":[{"bi":"currency"}],"ms.MS_Sales_Part_Number":[{"bi":"msssalespartnumber"}],"ms.MS_Sales_Part_Quantity":[{"bi":"mssalespartquantity"}],"ms.dwntype":[{"bi":"downloadtype"}],"ms.ActiveDwellTime":[{"bi":"activedwelltime"}],"ms.SurveyId":[{"bi":"surveyid"}],"ms.SurveyVersion":[{"bi":"surveyversion"}],"ms.SurveyQuestions":[{"bi":"surveyquestions"}],"ms.SurveyComments":[{"bi":"surveycomments"}]}}};</script>
+<script type="text/javascript">
+if ($ && $.bi)
+{
+$('html').attr('xmlns:bi', 'urn:schemas-microsoft-com:mscom:bi');
+$.bi.init(window.$biSettings);
+}
+</script>
+
+</body>
+</html>

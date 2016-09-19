@@ -1,0 +1,5 @@
+user_pref("mail.serverDefaultStoreContractID", "@mozilla.org/msgstore/maildirstore;1");
+user_pref("mail.serverDefaultStoreContractID", "@mozilla.org/msgstore/berkeleystore;1");
+
+user_pref("mail.server.server1.storeContractID", "@mozilla.org/msgstore/maildirstore;1");
+user_pref("mail.server.server1.storeContractID", "@mozilla.org/msgstore/berkeleystore;1");
