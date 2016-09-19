@@ -6,8 +6,8 @@ IF NOT DEFINED exe7z CALL "..\..\..\..\profiles$\Share\config\_Scripts\find7zexe
 )
 (
 PUSHD "%~dp0"
-    FOR %%I IN (*.cmd *.ahk) DO %xlnexe% %%I "%USERPROFILE%\Git\PersonalUseScripts\mobilmir\Rarus_ShopBTS_InitialBase\%%~I"
+    FOR %%I IN (*.cmd *.ahk) DO %xlnexe% %%I "%USERPROFILE%\Git\Share-config\Rarus_ShopBTS_InitialBase\%%~I"
 POPD
-%exe7z% x -aoa -o"%USERPROFILE%\Git\PersonalUseScripts\mobilmir\Rarus_ShopBTS_InitialBase\Rarus_Scripts" -- Rarus_Scripts.7z
-%exe7z% x -aoa -o"%USERPROFILE%\Git\PersonalUseScripts\mobilmir\Rarus_ShopBTS_InitialBase\D_1S_Rarus_ShopBTS_ShopBTS_Add" -- D_1S_Rarus_ShopBTS\ShopBTS_Add.7z
+%exe7z% x -aoa -o"%USERPROFILE%\Git\Share-config\Rarus_ShopBTS_InitialBase\Rarus_Scripts" -- Rarus_Scripts.7z
+%exe7z% x -aoa -o"%USERPROFILE%\Git\Share-config\Rarus_ShopBTS_InitialBase\D_1S_Rarus_ShopBTS_ShopBTS_Add" -- D_1S_Rarus_ShopBTS\ShopBTS_Add.7z
 )
