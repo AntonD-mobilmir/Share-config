@@ -3,7 +3,7 @@
 Menu Tray, Icon, shell32.dll,25,0
 Menu Tray, Tip, Запуск 1С-Рарус
 
-run1sexe=1cv7s.exe
+run1sexe:="1cv7s.exe"s
 ExcessArcTimeLim:=5*60
 WaitArchivingAfterBoot:=5*60*1000 ; ms
 
@@ -258,11 +258,9 @@ MailWarning(mailtitle, mailtext:="") {
     outgoingEmailAttDir=d:\1S\Rarus\ShopBTS\ExtForms\post\OutgoingText\nobackupwarning
     outgoingEmailFile=%outgoingEmailAttDir%.txt
 
-    Loop Read, d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg
-    {
-	deptRarusEmail := A_LoopReadLine
-	break
-    }
+    Try deptID := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_SharedMailUserId.cmd", "MailUserId")
+    If (!deptID)
+	FileReadLine deptID, d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg, 1
     
     FileCreateDir %outgoingEmailAttDir%
     RunWait %comspec% /C "DIR /A /O /S "%backupsDir%" >>"%outgoingEmailAttDir%\dir.txt" 2>&1",%backupsDir%,UseErrorLevel
@@ -276,7 +274,7 @@ MailWarning(mailtitle, mailtext:="") {
 	FileCopy r:\Rarus_backup.log,%outgoingEmailAttDir%
 	FileCopy r:\rarus-backup-start.log,%outgoingEmailAttDir%
     }
-    FileAppend rarus-nobackups-warning@status.mobilmir.ru`n%deptRarusEmail%: %mailtitle%`n%mailtext%,%outgoingEmailFile%,CP1251
+    FileAppend rarus-nobackups-warning@status.mobilmir.ru`n%deptID% (%A_ComputerName%): %mailtitle%`n%mailtext%,%outgoingEmailFile%,CP1251
     
     Run "%A_AhkPath%" "d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk",d:\1S\Rarus\ShopBTS\ExtForms\post
 }
