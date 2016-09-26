@@ -29,7 +29,7 @@ CALL "%ConfigDir%_Scripts\find7zexe.cmd"
 	RD /S /Q "%RegTmpDir%"
 	DEL "%DefaultUserRegistrySettings%"
     )
-    CALL "%ConfigDir%_Scripts\Remove All AppX Apps for current user.cmd" /firstlogon || CALL "%ConfigDir%_Scripts\Remove AppX Apps except allowed.cmd" /firstlogon
+    CALL "%ConfigDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon || CALL "%ConfigDir%_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /firstlogon
     DEL "%~f0"
     EXIT /B
 )
