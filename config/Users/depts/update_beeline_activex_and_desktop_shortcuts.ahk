@@ -304,6 +304,10 @@ If (mtimeCommonScriptsSrv0 > latestCommonScript) {
     SetLastRowStatus()
 }
 
+AddLog("Удаление лишних приложений AppX")
+RunWait %comspec% /C "TITLE Удаление лишних приложений AppX & "%localConfigDir%\_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /Quiet",, Min UseErrorLevel
+SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+
 AddLog("Запуск в фоновом режиме настройки ACL ФС")
 Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%localConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,ErrorLevel=0)
