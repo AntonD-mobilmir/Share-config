@@ -1,0 +1,1 @@
+https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B5B213709-B940-985F-A267-BDA51976D2C8%7D%26lang%3Dru%26browser%3D0%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3D2.0-dev%26installdataindex%3Ddefaultbrowser/edgedl/chrome/install/GoogleChromeStandaloneEnterprise.msi

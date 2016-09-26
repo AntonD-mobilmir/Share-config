@@ -1,0 +1,15 @@
+MSI:
+    http://www.google.com/chrome/intl/ru/business/
+
+Chrome System-Wide Offline:
+    http://www.google.com/chrome/eula.html?system=true&standalone=1
+
+Chrome Frame:
+    http://dl.google.com/chrome/install/<ver>/chromeframe_installer.exe
+    commandline switches: chromeframe_installer.exe --do-not-launch-chrome  --do-not-create-shortcuts --do-not-register-for-update-launch  --system-level  --chrome-frame
+
+Chrome:
+    http://www.google.com/chrome/eula.html?standalone=1
+    http://www.google.com/chrome/thankyou.html?standalone=1
+    http://dl.google.com/chrome/install/<ver>/chrome_installer.exe
+    http://www.softpedia.com/get/Internet/Browsers/Google-Chrome.shtml

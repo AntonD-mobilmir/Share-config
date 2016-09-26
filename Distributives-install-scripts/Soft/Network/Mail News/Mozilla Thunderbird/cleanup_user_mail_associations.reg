@@ -1,0 +1,17 @@
+REGEDIT4
+
+;coding:cp1251
+;Если интегрировать Thunderbird в систему, когда он запущен от имени пользователя (а не администратора), он прописывает в реестр вместо своего пути:
+;kernel32::GetLongPathNameW(w R8, w .R7, i 1024)i .R6,0
+;После этого даже системная интеграция не помогает для пользователя, у которого ошибочные настройки.
+;Этот скрипт удаляет неправильные записи из реестра (запускать от имени пользователя!)
+
+[-HKEY_CURRENT_USER\Software\Classes\mailto]
+[-HKEY_CURRENT_USER\Software\Classes\news]
+[-HKEY_CURRENT_USER\Software\Classes\nntp]
+[-HKEY_CURRENT_USER\Software\Classes\snews]
+[-HKEY_CURRENT_USER\Software\Classes\Thunderbird.Url.mailto]
+[-HKEY_CURRENT_USER\Software\Classes\Thunderbird.Url.news]
+[-HKEY_CURRENT_USER\Software\Classes\ThunderbirdEML]
+
+

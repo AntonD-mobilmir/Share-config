@@ -3,8 +3,8 @@
 Menu Tray, Icon, shell32.dll,25,0
 Menu Tray, Tip, Запуск 1С-Рарус
 
-run1sexe:="1cv7s.exe"s
-ExcessArcTimeLim:=5*60
+run1sexe:="1cv7s.exe"
+ExcessArcTimeLim:=5*60 ; s
 WaitArchivingAfterBoot:=5*60*1000 ; ms
 
 DailyArchiveFName = ShopBTS_%A_Year%-%A_MM%-??.7z
