@@ -86,7 +86,7 @@ If (FileExist(scriptInventoryReport)) {
     }
     
     If (!IsObject(prevSavedInvReport) || ageSavedInvReport > maxAgeSavedInvReport) {
-	AddLog("Сбор информации о компьютере")
+	SetLastRowStatus("Не найден, сбор информации")
 	Run %comspec% /C "TITLE Сбор информации о компьютере&"%scriptInventoryReport%"",,Min UseErrorLevel
 	SetLastRowStatus(ErrorLevel,ErrorLevel=0)
     }

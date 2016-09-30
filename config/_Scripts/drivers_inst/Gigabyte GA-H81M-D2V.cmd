@@ -1,5 +1,9 @@
 @REM coding:OEM
 SETLOCAL ENABLEEXTENSIONS
 
-CALL "%~dp0Intel Ivy Bridge or Haswell + Realtek HD Audio.cmd"
-CALL "\\192.168.1.80\Distributives\Drivers\VIA\USB 3.0\install.cmd"||PAUSE
+START "" /B /WAIT %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Drivers\Intel\Chipset\Chipset Software Installation Utility\install.cmd"
+START "" /B /WAIT %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Drivers\Intel\Chipset\Intel Management Engine Interface\WU\Install.cmd"
+START "" /B /WAIT %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Drivers\Intel\Graphics\4th gen - Haswell\install.cmd"
+START "" /B /WAIT %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Drivers\Intel\Chipset\USB 3.0 XHCI\install_8series.cmd"
+START "" /B /WAIT %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Drivers\Realtek\Audio\High_Definition_Audio_Codecs\Install.cmd"
+START "" /B /WAIT %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Drivers\VIA\USB 3.0\repacked\install.cmd"||PAUSE
