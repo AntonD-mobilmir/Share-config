@@ -5,8 +5,12 @@
 #NoEnv
 #SingleInstance Force
 SetTitleMatchMode RegEx
+FileEncoding UTF-8
 
+SplitPath A_ScriptFullPath,,,, casesFullPath
+casesFullPath = %A_ScriptDir%\%casesFullPath%.csv
 FileGetTime scriptInitDate, %A_ScriptFullPath%
+FileGetTime casesInitDate, %casesFullPath%
 
 Global Log
 Log=%A_Desktop%\%A_ScriptName% ClickLog.log
@@ -20,158 +24,72 @@ if not A_IsAdmin
     ExitApp
 }
 
+cases := Object()
+;Title	WinText	Buttons to press
+Loop Read, %casesFullPath%
+{
+    Loop Parse, A_LoopReadLine, CSV
+    {
+	If (A_Index = 1) {
+	    winTitle := A_LoopField
+	    continue
+	} Else If (A_Index = 2) {
+	    winText := A_LoopField
+	    continue
+	} Else If (A_Index = 3) {
+	    clickList:=Object()
+	}
+	If (Trim(A_LoopField))
+	    clickList.Push(A_LoopField)
+    }
+    cases[A_Index] := {winTitle: winTitle, winText: winText, clickList: clickList}
+    clickList=
+}
+
 Loop {
     FileGetTime scriptCurDate, %A_ScriptFullPath%
-    If (scriptCurDate != scriptInitDate)
+    FileGetTime casesCurDate, %casesFullPath%
+    If ((scriptCurDate && scriptCurDate != scriptInitDate) || (casesCurDate && casesInitDate != casesCurDate)) {
+	ToolTip Перезапуск скрипта
+	Sleep 500
 	Reload
-    Sleep 500
-    Tooltip
+	Pause
+    }
     
-    IfWinExist ahk_class #32770, Click Yes to restart
-	cclick("No")
-    Else IfWinExist ahk_class #32770, You must restart system
-	cclick("No")
-    Else IfWinExist Удаление ahk_class #32770, Приложение .+ удалено\.
-	cclick("ОК")
-    Else IfWinExist Удаление ahk_class #32770, Удалить приложение
-	cclick("&Да")
-    Else IfWinExist Question ahk_class #32770, Would you like to keep
-    {
-	cclick("&Нет")
-	cclick("&No")
-    } Else IfWinExist ASUS ahk_class #32770, Do you want keep settings
-	cclick("&No")
-    Else IfWinExist ahk_class #32770, ^Do &not close applications. \(A Reboot may be required.\)
-    {
-	cclick("Do &not close applications. \(A Reboot may be required.\)")
-	cclick("OK")
-    } Else IfWinExist Удаление, Завершение работы мастера удаления
-	cclick("&Готово")
-    Else IfWinExist,, Программа InstallShield Wizard завершила удаление
-    {
-	cclick("Нет")
-	cclick("Готово")
-    } Else IfWinExist ^Acer Backup Manager$ ahk_class #32770, Вы хотите удалить файлы задания?
-	cclick("&Да")
-;    Else IfWinExist ^Беспроводной адапте\?Atheros 802.11a/b/g$, Файл\?драйвера\, которы\?нужн\?удалит\? не буду\?удален\? та\?ка\? соответствующая плат\?не вставлен\?
-    Else IfWinExist ^Беспроводной адапте, ^Файл
-	cclick("ОК")
-    Else IfWinExist ^Atheros Client Installation Program$, ^Программ
-	cclick("Готово")
-    Else IfWinExist ^Мастер удаления драйвера устройства$, &ОК
-	cclick("&ОК")
-    Else IfWinExist ^Основные компоненты Windows Live 2011$ ahk_class LiveDialog, П&ерезапустить позже
-	cclick("П&ерезапустить позже")
-    Else IfWinExist ^Основные компоненты Windows Live 2011$ ahk_class LiveDialog, Удалить одну или несколько программ Windows Live
-	cclick("Удалить одну или несколько программ Windows Live")
-    Else IfWinExist ^Основные компоненты Windows Live 2011$ ahk_class LiveDialog, Выбор программ для удаления
-    {
-	ControlClick X38 Y215, ,,,, Pos
-	ControlClick X38 Y256, ,,,, Pos
-	ControlClick X38 Y295, ,,,, Pos
-	ControlClick X326 Y215,,,,, Pos
-	ControlClick X326 Y256,,,,, Pos
-	ControlClick X326 Y295,,,,, Pos
-	cclick("&Удалить")
+    For i, case in cases {
+	ToolTip % "Проверка:`n" case.winTitle "`n" case.winText
+	If (WinExist(case.winTitle, case.winText)) {
+	    TrayTip % "Найдено окно " case.winTitle, % "`n" case.winText
+	    cclick(case.clickList*)
+	    continue
+	}
     }
-    Else IfWinExist ^Удаление Adobe Shockwave Player ahk_class #32770, Закрыть
-	cclick("Закрыть")
-    Else IfWinExist ^Удаление Adobe Flash Player ahk_class AdobeFlashPlayerInstaller, УСТАНОВКА
-	cclick("УСТАНОВКА")
-    Else IfWinExist ^Установка Adobe AIR$ ahk_class ApolloRuntimeContentWindow
-	cclick("X159 Y177")
-    Else IfWinExist InstallShield Wizard$ ahk_class #32770, YES: All data and settings will be removed with application.
-    {
-	cclick("YES: All data and settings will be removed with application.")
-	cclick("Next >")
-    }
-    Else IfWinExist InstallShield Wizard$ ahk_class #32770, No`, I will restart my computer later.
-    {
-	cclick("No, I will restart my computer later.")
-	cclick("Finish")
-    }
-    Else IfWinExist InstallShield Wizard$ ahk_class #32770, Finish
-	cclick("Finish")
-    Else IfWinExist Windows Live ahk_class LiveDialog, Выбор программ для удаления
-    {
-	ControlClick X58 Y173, ,,,, Pos
-	ControlClick X58 Y197, ,,,, Pos
-	ControlClick X58 Y224, ,,,, Pos
-	ControlClick X58 Y249, ,,,, Pos
-	ControlClick X58 Y272, ,,,, Pos
-	cclick("&Продолжить")
-    }
-    Else IfWinExist Windows Live ahk_class LiveDialog, &Продолжить
-    {
-	cclick("&Удалить")
-	cclick("&Продолжить")
-    }
-    Else IfWinExist Windows Live ahk_class LiveDialog, Готово
-	cclick("&Закрыть")
-    Else IfWinExist ,, Do you want to completely remove
-    {
-	cclick("Remove")
-	cclick("&Да")
-    }
-    Else IfWinExist ,, Removal completed successfully.
-	cclick("Finish")
-    Else IfWinExist Question ahk_class #32770, This will remove 
-	cclick("&Да")
-    Else IfWinExist Вопрос ahk_class #32770, Эта процедура удалит
-	cclick("&Да")
-    Else IfWinExist Uninstall Program for ahk_class #32770, Next
-	cclick("Button2")
-    Else IfWinExist Установщик Windows ahk_class #32770, Д&а
-	cclick("Д&а")
-    Else IfWinExist Удаление программ на вашем компьютере ahk_class #32770,, OK
-	cclick("OK")
-    Else IfWinExist Подтвердите удаление файла ahk_class #32770,, &Да
-	cclick("&Да")
-    Else IfWinExist Подтверждение удаления файла, Удалить выбранное приложение и все его компоненты?
-	cclick("ОК")
-    Else IfWinExist ,, Удалить выбранное приложение и все его компоненты?
-	cclick("&Да")
-    Else IfWinExist Удаление ahk_class #32770, &Далее >
-	cclick("&Далее >")
-    Else IfWinExist Удаление ahk_class obj_Form, Удалить
-	cclick("obj_BUTTON2")
-    Else IfWinExist Удаление ahk_class #32770, Уд&алить
-	cclick("Уд&алить")
-    Else IfWinExist Деинсталляция ahk_class #32770, ОК
-	cclick("ОК")
-    Else IfWinExist Деинсталляция ahk_class #32770, &Да
-	cclick("&Да")
-    Else IfWinExist Uninstall ahk_class #32770, &Uninstall
-	cclick("&Uninstall")
-    Else IfWinExist Uninstall ahk_class #32770, Да
-	cclick("Да")
-    Else IfWinExist Uninstall ahk_class #32770, Finish
-	cclick("Finish")
-    Else IfWinExist Uninstall ahk_class #32770, ОК
-	cclick("ОК") ; Russian letters
-    Else IfWinExist Uninstall ahk_class #32770, OK
-	cclick("OK") ; English letters
-    Else IfWinExist Uninstall ahk_class #32770, Close
-	cclick("Close")
-    Else IfWinExist Удаление ahk_class #32770, Закрыть
-	cclick("Закрыть")
     
+    Sleep 1000
 }
 
 ExitApp
 
-cclick(label) {
-    static prevLabel
-
-    WinGetTitle Title
-    FileAppend %A_Now% in "%Title%" clicked %label%`n,%Log%
-    ControlClick %label%
-    ToolTip Clicked %label%
+cclick(labels*) {
+    static prevLabel, lastClick
     
-    If (prevLabel=label)
-	Sleep 10000
-    Else
-	prevLabel=label
+    clickDelay := A_TickCount - lastClick
+
+    For i,label in labels {
+	WinGetTitle Title
+	FileAppend %A_Now% in "%Title%" clicked %label%`n,%Log%
+	ControlClick %label%
+	tooltipText .= A_Space . label
+    }
+    ToolTip Clicked%tooltipText%
+    If (clickDelay < 1000) {
+	If (prevLabels=tooltipText)
+	    Sleep 10000
+	Else
+	    Sleep 1000 - clickDelay
+    }
+    prevLabels:=tooltipText
+    lastClick:=A_TickCount
     return
 }
 
