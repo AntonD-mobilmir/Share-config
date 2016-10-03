@@ -103,8 +103,8 @@ EXIT /B
     IF NOT EXIST %1 EXIT /B 0
     IF EXIST "%~2.flag" CALL :AskRestoreACL %* || EXIT /B
     ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
-    (ECHO Not restored)>"%~2.flag"
     %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%~2.%now%.sddl" -silent
+    (ECHO Not restored)>"%~2.flag"
     COMPACT /C /F /EXE:LZX "%~2.%now%.sddl" >NUL 2>&1
 EXIT /B
 )
