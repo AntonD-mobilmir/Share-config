@@ -65,8 +65,15 @@ Loop Reg, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\U
 	userFoldersChk=
     }
 }
-If (userFoldersChk)
+If (userFoldersChk) {
     SetLastRowStatus()
+} Else {
+    MsgBox 4, %A_ScriptName%, Некоторые папки пользователя недоступны. Из-за этого могут также не работать библиотеки.`n`nСбросить пути к папкам пользователя на стандартные?
+    IfMsgBox Yes
+    {
+	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\..\_Scripts\MoveUserProfile\reset HKCU folders.ahk"
+    }
+}
 
 If (!A_IsAdmin) {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
@@ -203,7 +210,7 @@ If (!IsObject(sharePublic)) {
 }
 
 If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
-    AddLog("Найден Рарус, обновление скриптов в Local_Scripts")
+    AddLog("Найден Рарус, замена Rarus_Scripts")
     Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts_unpack.ahk",,UseErrorLevel
     SetLastRowStatus(ErrorLevel,ErrorLevel=0)
     EnvSet Inst1S,1
