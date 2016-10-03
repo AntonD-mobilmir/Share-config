@@ -139,11 +139,15 @@ EXIT /B
     SET "SU_Aversion=%~n1"
     REM split filename by "-_ " and use last part as version
     SET "VerSplitter=-_ "
+    SET /A RunCount=0
 )
 :GetVFFNAgain
 (
     REM %%U - filename
     REM %%V - version
+    IF NOT DEFINED SU_Aversion EXIT /B 1
+    IF %RunCount% GTR 100 EXIT /B 1
+    SET /A RunCount+=1
     FOR /F "tokens=1* delims=%VerSplitter%" %%U IN ("%SU_Aversion%") DO (
 	IF "%%~V"=="" (
 	    IF NOT DEFINED CurSU_Aversion IF NOT "%VerSplitter%"=="." (
