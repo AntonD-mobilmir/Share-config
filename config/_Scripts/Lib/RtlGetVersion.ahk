@@ -24,8 +24,9 @@ RtlGetVersion() {
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 
     RtlGetVersion := RtlGetVersion()
-
-    MsgBox % "RtlGetVersion function`n"
+    
+    
+    FileAppend % "RtlGetVersion function`n"
 	   . "RTL_OSVERSIONINFOEXW structure`n`n"
 	   . "ProductType:`t`t"           RtlGetVersion[1]   "`n"
 	   . "MajorVersion:`t`t"          RtlGetVersion[2]   "`n"
@@ -35,5 +36,5 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 	   . "CSDVersion:`t`t"            RtlGetVersion[6]   "`n"
 	   . "ServicePackMajor:`t`t"      RtlGetVersion[7]   "`n"
 	   . "ServicePackMinor:`t`t"      RtlGetVersion[8]   "`n"
-	   . "SuiteMask:`t`t"             RtlGetVersion[9]   "`n"
+	   . "SuiteMask:`t`t"             RtlGetVersion[9]   "`n", *
 }
