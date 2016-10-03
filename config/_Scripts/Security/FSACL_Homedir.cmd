@@ -51,7 +51,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     
     REM take ownership just in case; will be handled back after permissions setup
     ECHO %DATE% %TIME% Сброс владельца для "%tgt%"
-    CALL "%~dp0TAKEOWN_SKIPSL.cmd" /F "%tgt%" /A /R /D Y >NUL
+    CALL "%~dp0TAKEOWN_SKIPSL.cmd" /F "%tgt%" /A >NUL
     rem CALL "%~dp0..\CheckWinVer.cmd" 6.2 && %SystemRoot%\System32\TAKEOWN.exe /F "%tgt%" /A /R /D Y /SKIPSL >NUL
     rem IF ERRORLEVEL 1 %SystemRoot%\System32\TAKEOWN.exe /F "%tgt%" /A /R /D Y >NUL
     REM -rec cont_obj -actn setowner -ownr "n:%UIDAdministrators%"
