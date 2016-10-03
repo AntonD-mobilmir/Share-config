@@ -13,7 +13,9 @@ maskInventoryReport = \\Srv0.office0.mobilmir\profiles$\Share\Inventory\collecto
 Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R30 w600 vLogListView, Операция|Статус
 Gui Show
 
-AddLog("Запуск",A_Now,1)
+OSVersionObj := RtlGetVersion()
+AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
+
 xlnexe := findexe("xln.exe", "C:\SysUtils")
 If (xlnexe)
     AddLog("xln.exe: " . xlnexe, , 1)
@@ -311,9 +313,11 @@ If (mtimeCommonScriptsSrv0 > latestCommonScript) {
     SetLastRowStatus()
 }
 
-AddLog("Удаление лишних приложений AppX")
-RunWait %comspec% /C "TITLE Удаление лишних приложений AppX & "%localConfigDir%\_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /Quiet",, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+If (OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2)) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
+    AddLog("Удаление лишних приложений AppX")
+    RunWait %comspec% /C "TITLE Удаление лишних приложений AppX & "%localConfigDir%\_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /Quiet",, Min UseErrorLevel
+    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+}
 
 AddLog("Запуск в фоновом режиме настройки ACL ФС")
 Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%localConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
@@ -445,6 +449,7 @@ Expand(string) {
     return % output
 }
 
+#include %A_LineFile%\..\..\..\_Scripts\Lib\RtlGetVersion.ahk
 #Include %A_LineFile%\..\..\..\_Scripts\Lib\getDefaultConfig.ahk
 #include %A_LineFile%\..\..\..\_Scripts\Lib\find7zexe.ahk
 #include %A_LineFile%\..\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
