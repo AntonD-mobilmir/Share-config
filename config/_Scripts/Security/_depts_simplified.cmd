@@ -24,7 +24,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "UIDCreatorOwner=S-1-3-0;s:y"
     SET "UIDAdministrators=S-1-5-32-544;s:y"
 
-FOR /F "usebackq skip=2 tokens=1,2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v "ProfilesDirectory"`) DO IF "%%I"=="ProfilesDirectory" SET "ProfilesDirectory=%%~K"
+    FOR /F "usebackq skip=2 tokens=1,2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v "ProfilesDirectory"`) DO IF "%%I"=="ProfilesDirectory" SET "ProfilesDirectory=%%~K"
 )
 FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SET "ProfilesDirectory=%%~I"
 (
@@ -38,12 +38,11 @@ PUSHD "d:\1S\Rarus\ShopBTS" && (
 )
 CALL :MakeDirsReadOnlyForUsers "%UIDAuthenticatedUsers%" "%UIDUsers%"
 %SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set;Fdacl"
-rem %SetACLexe% -on "R:\File History" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:sc;m:set;w:dacl" -actn ace -ace "n:%UIDCreatorOwner%;p:write,read,FILE_DELETE_CHILD,DELETE;i:so;m:set;w:dacl"
 CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
 CALL "%srcpath%FSACL_PublicDirsRoot.cmd" D:\Users\Public "D:\Users\All Users" "D:\Users\Default User"
 CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
-rem "R:\File History"
 CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files" "D:\dealer.beeline.ru\bin"
+CALL "%srcpath%FSACL_FileHistory.cmd"
 
 EXIT /B
 )
