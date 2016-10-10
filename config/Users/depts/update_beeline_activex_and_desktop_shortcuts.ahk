@@ -77,6 +77,15 @@ If (userFoldersChk) {
     }
 }
 
+RegRead OneDriveSetup, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
+If (!ErrorLevel) {
+    AddLog("OneDriveSetup в автозагрузке", "Удаление")
+    RegDelete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
+    FileRemoveDir D:\Users\Пользователь\AppData\Local\Microsoft\OneDrive, 1
+    SetLastRowStatus(ErrorLevel)
+}
+
+
 If (!A_IsAdmin) {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
