@@ -55,7 +55,7 @@ sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg")
 If (IsObject(sendemailcfg)) {
     AddLog("Запуск ShopBTS_Add.install.ahk /skipSchedule")
     Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule,,UseErrorLevel
-    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
 userFoldersChk := AddLog("Проверка папок пользователя")
@@ -95,28 +95,6 @@ If (!A_IsAdmin) {
 }
 AddLog("Скрипт запущен с правами администратора",A_UserName,1)
 
-If (FileExist(scriptInventoryReport)) {
-    prevSavedInvReport := FindLatest(maskInventoryReport)
-    If (IsObject(prevSavedInvReport)) {
-	ageSavedInvReport=
-	EnvSub ageSavedInvReport,prevSavedInvReport,Days
-	AddLog("Возраст отчёта об инвентаре", ageSavedInvReport . " дн.", ageSavedInvReport <= maxAgeSavedInvReport)
-    }
-    
-    If (!IsObject(prevSavedInvReport) || ageSavedInvReport > maxAgeSavedInvReport) {
-	SetLastRowStatus("Не найден, сбор информации")
-	Run %comspec% /C "TITLE Сбор информации о компьютере&"%scriptInventoryReport%"",,Min UseErrorLevel
-	SetLastRowStatus(ErrorLevel,ErrorLevel=0)
-    }
-}
-
-; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
-Distributives := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_SoftUpdateScripts_source.cmd", "Distributives")
-If (!Distributives) {
-    EnvGet SystemDrive, SystemDrive
-    Distributives := ReadSetVarFromBatchFile(SystemDrive . "\Local_Scripts\_get_SoftUpdateScripts_source.cmd", "Distributives")
-}
-
 AddLog(A_AhkPath, A_AhkVersion)
 If (A_AhkVersion < "1.1.21") {
     AddLog("Запуск обновления с Srv0.office0.mobilmir.")
@@ -134,6 +112,33 @@ If (A_AhkVersion < "1.1.21") {
 }
 SetLastRowStatus()
 
+If (FileExist(scriptInventoryReport)) {
+    prevSavedInvReport := FindLatest(maskInventoryReport)
+    If (IsObject(prevSavedInvReport)) {
+	ageSavedInvReport=
+	EnvSub ageSavedInvReport,prevSavedInvReport,Days
+	AddLog("Возраст отчёта об инвентаре", ageSavedInvReport . " дн.", ageSavedInvReport <= maxAgeSavedInvReport)
+    }
+    
+    If (!IsObject(prevSavedInvReport) || ageSavedInvReport > maxAgeSavedInvReport) {
+	SetLastRowStatus("Не найден, сбор информации")
+	Run %comspec% /C "TITLE Сбор информации о компьютере&"%scriptInventoryReport%"",,Min UseErrorLevel
+	SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    }
+}
+
+; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
+EnvGet SystemDrive, SystemDrive
+AddLog("Distributives", "Searching _get_SoftUpdateScripts_source.cmd")
+gsussScript := FirstExisting(A_AppDataCommon . "\mobilmir.ru\_get_SoftUpdateScripts_source.cmd", SystemDrive . "\Local_Scripts\_get_SoftUpdateScripts_source.cmd")
+SetLastRowStatus("Running " . gsussScript, 0)
+Distributives := EnvGetAfterScript(gsussScript, "Distributives")
+SetLastRowStatus(Distributives)
+If (!FileExist(Distributives . "\Soft\PreInstalled\utils\7za.exe")) {
+    AddLog("В папке дистрибутивов нет Preinstalled\*\7za.exe")
+    Distributives=\\Srv0.office0.mobilmir\Distributives
+}
+
 exe7z:=find7zexe()
 AddLog("7-Zip: " . exe7z)
 FileGetVersion ver7z, %exe7z%
@@ -146,7 +151,7 @@ If (ver7z_[1] < 15) {
 	MsgBox Ошибка "%ErrorLevel%" при обновлении 7-Zip. Автоматическое продолжение невозможно.
 	ExitApp
     } Else {
-	SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     }
     Reload
 }
@@ -192,7 +197,7 @@ SetRowStatus(runConfUpdScript.line, ErrorLevel)
 If (FileExist("D:\Credit")) {
     AddLog("Перемещение ""D:\Credit"" в ""D:\Program Files\Credit""")
     FileMoveDir D:\Credit, D:\Program Files\Credit, 2
-    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
 sharePublic := CheckPath("D:\Users\Public", 0)
@@ -200,7 +205,7 @@ If (!IsObject(sharePublic)) {
     If (FileExist("W:\Media")) {
 	AddLog("Обнаружена папка W:\Media")
 	RunWait "%xlnexe%" -n W:\Media D:\Users\Public,,Min UseErrorLevel
-	AddLog("Создание ссылки D:\Users\Public",ErrorLevel,ErrorLevel=0)
+	AddLog("Создание ссылки D:\Users\Public",ErrorLevel,!ErrorLevel)
     }
     If (FileExist("W:\Обмен")) {
 	AddLog("Обнаружена папка W:\Обмен", "Перемещение")
@@ -213,7 +218,7 @@ If (!IsObject(sharePublic)) {
 	    LV_Modify(LV_GetCount(),,,"Не перемещено")
 	    AddLog("Создание ссылки W:\Обмен → ""W:\Media\Documents\старый обмен""")
 	    RunWait "%xlnexe%" -n W:\Обмен "W:\Media\Documents\старый обмен",,Min UseErrorLevel
-	    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
 	} Else {
 	    SetLastRowStatus()
 	}
@@ -223,19 +228,19 @@ If (!IsObject(sharePublic)) {
 If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     AddLog("Найден Рарус, замена Rarus_Scripts")
     Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts_unpack.ahk",,UseErrorLevel
-    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
     EnvSet Inst1S,1
 }
 
 AddLog("Ярлыки на рабочем столе и стандартные файлы","Замена")
 RunWait %comspec% /C ""%localConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %localConfigDir%\_Scripts, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"))
 If (IsObject(instCriacxocx)) {
     AddLog("d:\dealer.beeline.ru\update_dealer_beeline_activex.cmd")
     RunWait %comspec% /C "d:\dealer.beeline.ru\update_dealer_beeline_activex.cmd", d:\dealer.beeline.ru, Min UseErrorLevel
-    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
     
     ;FileGetTime criacxocxTimeDiff, instCriacxocx.path
     ;EnvSub criacxocxTimeDiff, instCriacxocx.mtime, Days
@@ -245,9 +250,9 @@ If (IsObject(instCriacxocx)) {
 }
 
 tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, "\\Srv0.office0.mobilmir\Distributives" . tv5settingsSubPath)
-AddLog("Обновление настроек TeamViewer 5")
+AddLog("Обновление настроек TeamViewer 5", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, StrLen(Distributives)))
 RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
 softUpdScripts := CheckPath("d:\Scripts\_DistDownload.cmd", 1, 0)
 If (IsObject(softUpdScripts)) {
@@ -296,9 +301,9 @@ If (hostSUScripts) {
 	ageLastStatus=
 	ageLastStatus-=timeLastStatus, Days
 	If (ageLastStatus) {
-	    SetLastRowStatus(hostSUScripts . " [" . fnameLastStatus . " дн.]", 0)
+	    SetLastRowStatus(hostSUScripts . " [" . ageLastStatus . " дн.]", 0)
 	} Else {
-	    SetLastRowStatus(fnameLastStatus)
+	    SetLastRowStatus(fnameLastStatus . " (сегодня)")
 	}
     }
 }
@@ -317,7 +322,7 @@ If (mtimeCommonScriptsSrv0 > latestCommonScript) {
 	RunWait %comspec% /C "%Distributives%\Soft\PreInstalled\auto\Common_Scripts.cmd",,Min UseErrorLevel
     Else
 	RunWait %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\auto\Common_Scripts.cmd",,Min UseErrorLevel
-    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
 } Else {
     SetLastRowStatus()
 }
@@ -325,12 +330,12 @@ If (mtimeCommonScriptsSrv0 > latestCommonScript) {
 If (OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2)) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     AddLog("Удаление лишних приложений AppX")
     RunWait %comspec% /C "TITLE Удаление лишних приложений AppX & "%localConfigDir%\_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /Quiet",, Min UseErrorLevel
-    SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
 AddLog("Запуск в фоновом режиме настройки ACL ФС")
 Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%localConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,ErrorLevel=0)
+SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 finished := 1
 AddLog("Готово",A_Now,1)
@@ -357,6 +362,26 @@ ButtonCancel:
 	    return
     }
     ExitApp
+
+EnvGetAfterScript(batch, varName) {
+    tempFile = %A_Temp%\%A_ScriptName%-envGetAfterScript.%A_Now%.cmd
+    outFile = %A_Temp%\%A_ScriptName%-envGetAfterScript.%A_Now%.txt
+    FileAppend 
+    (LTrim
+	@(REM coding:OEM
+	CALL "%batch%">"`%~dpn0.log" && DEL "`%~dpn0.log"
+	`)
+	(ECHO %varName%
+	`)>"%outFile%"
+    ),%tempFile%, CP1
+    RunWait %comspec% /C "%tempFile%", %A_Temp%, Min UseErrorLevel
+    FileRead out, *P1 *m65536 %outFile%
+    return out
+}
+
+StartsWith(longstr, shortstr) {
+    return SubStr(longstr, 1, StrLen(shortstr)) = shortstr
+}
 
 ShortenSrv0(path) {
     return RegExReplace(path, "i)^\\\\Srv0(\.office0\.mobilmir)?\\(profiles\$(\\Share)?|Distributives|)?\\","{Srv0}")
