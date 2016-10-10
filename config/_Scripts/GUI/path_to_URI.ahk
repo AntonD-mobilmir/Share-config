@@ -31,17 +31,12 @@ URIfy(path) {
 ; wrapped to leave Russian letters intact
 ; а-я А-Я
 UriEncodeR(Uri, Enc = "UTF-8") {
-    global leaveCyrillicIntact
-    If (leaveCyrillicIntact) {
-	Loop Parse, Uri
-	    If (A_LoopField >= "а" && A_LoopField <= "я" || A_LoopField >= "А" && A_LoopField <= "Я" || A_LoopField == "ё" || A_LoopField == "Ё")
-		rVal .= A_LoopField
-	    Else
-		rVal .= UriEncode(A_LoopField)
-	return rVal
-    } Else {
-	return UriEncode(Uri, Enc)
-    }
+    Loop Parse, Uri
+	If (A_LoopField >= "а" && A_LoopField <= "я" || A_LoopField >= "А" && A_LoopField <= "Я" || A_LoopField == "ё" || A_LoopField == "Ё")
+	    rVal .= A_LoopField
+	Else
+	    rVal .= UriEncode(A_LoopField)
+    return rVal
 }
 
 ;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/

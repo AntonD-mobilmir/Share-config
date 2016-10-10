@@ -27,5 +27,5 @@ SET "DefaultsSource="
 
 %AutohotkeyExe% "%SoftSourceDir%\AntiViruses AntiTrojans\Microsoft Security Essentials\install.ahk"
 
-%AutohotkeyExe% "%configDir%_Scripts\GUI\Run_UserBenchMark.ahk"
+%AutohotkeyExe% "%~dp0_Scripts\GUI\Run_UserBenchMark.ahk"
 )
