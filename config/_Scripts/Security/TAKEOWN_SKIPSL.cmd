@@ -12,13 +12,17 @@ CALL :ParseTAKEOWNArgs %*
 (
 rem TODO: Recurse folders avoiding reparse points and symlinks
 %SystemRoot%\System32\TAKEOWN.exe %*
-FOR /F "usebackq delims=" %%A IN (`DIR /S /B /AD-L "%tgt%"`) DO (
-    %SystemRoot%\System32\TAKEOWN.exe /F "%%~A" %TAKEOWNArgs%
-    %SystemRoot%\System32\TAKEOWN.exe /F "%%~A\*.*" %TAKEOWNArgs%
-)
+FOR /F "usebackq delims=" %%A IN (`DIR "%tgt" /S /B /AD-L`) DO %SystemRoot%\System32\TAKEOWN.exe /F "%%~A\*.*" %TAKEOWNArgs%
+rem CALL :procDir "%tgt%"
 EXIT /B
 )
 
+rem :procDir <path>
+rem (
+rem     %SystemRoot%\System32\TAKEOWN.exe /F "%~1\*.*" %TAKEOWNArgs%
+rem     FOR /F "usebackq delims=" %%A IN (`DIR %1 /B /AD-L`) DO CALL :procDir "%~1\%%~A"
+rem EXIT /B
+rem )
 :ParseTAKEOWNArgs <takeown-args>
 IF "%~1"=="/F" (
     SET "tgt=%~2"
