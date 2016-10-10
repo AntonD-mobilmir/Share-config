@@ -103,9 +103,10 @@ EXIT /B
     IF NOT EXIST %1 EXIT /B 0
     IF EXIST "%~2.flag" CALL :AskRestoreACL %* || EXIT /B
     ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
-    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%~2.%now%.sddl" -silent
+    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%~2.%now%.sddl.tmp" -silent
+    REN "%~2.%now%.sddl.tmp" "*."
     (ECHO Not restored)>"%~2.flag"
-    COMPACT /C /F /EXE:LZX "%~2.%now%.sddl" >NUL 2>&1
+    START "Compacting %~nx2.%now%.sddl" /MIN %SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX "%~2.%now%.sddl" >NUL 2>&1
 EXIT /B
 )
 :AskRestoreACL <path> <backup-name>
