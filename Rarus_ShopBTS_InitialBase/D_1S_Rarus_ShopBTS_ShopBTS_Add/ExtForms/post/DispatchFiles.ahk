@@ -124,7 +124,9 @@ DeliverOneEmail(EmailFileName) {
     Loop Read, %EmailFileName%
     {
 	If (!HeaderTo) {
-	    StringReplace HeaderTo,A_LoopReadLine,`",,All
+	    StringReplace HeaderTo,A_LoopReadLine,`",'',All
+	} Else If (StartsWith(A_LoopReadLine, "Reply-To: ")) {
+	    ReplyToHeader := "-o reply-to=""" . StrReplace(SubStr(A_LoopReadLine, StrLen("Reply-To: ") + 1), """", "''") . """"
 	} Else {
 	    Subject:=A_LoopReadLine
 	    HeaderSubject:=EncodeWrapBase64UTF8(Subject)
@@ -143,7 +145,7 @@ DeliverOneEmail(EmailFileName) {
     
     TrayTip Отправка письма, Тема: %Subject%`nКому: %HeaderTo%, 3
     SetupTemp()
-    RunWait %comspec% /c "%tailexe% -n+3 "%EmailFileName%" | %sendemailexe% -f "=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>" -t "%HeaderTo%" -u "%HeaderSubject%" -s "smtp.googlemail.com:587" -xu "rarus-emails@status.mobilmir.ru" -xp "TTCJ8Z--" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -bcc "rarus-emails-replies_status-mobilmir-ru@googlegroups.com" -o "reply-to=rarus-emails-replies@status.mobilmir.ru" -o "message-header=Organization: =?utf-8?B?0KbQuNGE0YDQvtCz0YDQsNC0LdCh0YLQsNCy0YDQvtC/0L7Qu9GM?=" %Attachments%",,Hide UseErrorLevel
+    RunWait %comspec% /c "%tailexe% -n+3 "%EmailFileName%" | %sendemailexe% -f "=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>" -t "%HeaderTo%" %ReplyToHeader% -u "%HeaderSubject%" -s "smtp.googlemail.com:587" -xu "rarus-emails@status.mobilmir.ru" -xp "TTCJ8Z--" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -bcc "rarus-emails-replies_status-mobilmir-ru@googlegroups.com" -o "reply-to=rarus-emails-replies@status.mobilmir.ru" -o "message-header=Organization: =?utf-8?B?0KbQuNGE0YDQvtCz0YDQsNC0LdCh0YLQsNCy0YDQvtC/0L7Qu9GM?=" %Attachments%",,Hide UseErrorLevel
     
     If Not ErrorLevel
     {
@@ -153,6 +155,10 @@ DeliverOneEmail(EmailFileName) {
     } Else {
 	TrayTip Ошибка при отправке, Тема: %Subject%`nКому: %HeaderTo%`n`nОшибка: %ErrorLevel%, 30, 3
     }
+}
+
+StartsWith(longstr, shortstr) {
+    return SubStr(longstr, StrLen(shortstr)) = shortstr
 }
 
 EncodeWrapBase64UTF8(textline) {
@@ -221,6 +227,7 @@ Base64Decode(ByRef bin, code) {
      ,Append(bin, pos, 3*!m, b>>16, 255 & b>>8, 255 & b)
    Append(bin, pos, !!m+(m&1), b>>16, 255 & b>>8, 0)
 }
+
 Append(ByRef bin, ByRef pos, k, c1,c2,c3) {
    Loop %k%
       DllCall("RtlFillMemory",UInt,&bin+pos++, UInt,1, UChar,c%A_Index%)

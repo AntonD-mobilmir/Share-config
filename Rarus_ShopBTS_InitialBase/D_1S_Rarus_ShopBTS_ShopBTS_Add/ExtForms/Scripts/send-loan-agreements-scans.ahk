@@ -9,6 +9,7 @@ OnExit("ExitFunc")
 global mainTitle := "Отправка сканов договоров в КРО"
      , settingsRegPath := "HKEY_CURRENT_USER\Software\mobilmir.ru\Rarus-Scripts\%A_ScriptName%"
      , outMailDir := A_ScriptDir . "\..\post\OutgoingText"
+     , MailUserId, replyTo
 
 ; Create an ImageList so that the ListView can display some icons:
 laNum = %1%
@@ -48,22 +49,19 @@ Gui Show,, %mainTitle%
 
 ;SelectAddFiles()
 
+Try MailUserId := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_SharedMailUserId.cmd", "MailUserId")
+If (MailUserId) {
+    replyTo := MailUserId . "@mobilmir.ru"
+} Else {
+    replyTo := "it-task-office@status.mobilmir.ru"
+    FileReadLine MailUserId, %A_ScriptDir%\..\post\sendemail.cfg, 1
+}
+
 Exit
 
 GuiEscape:
 GuiClose:
 ButtonCancel:
-    ;DoubleClick: The user has double-clicked within the control. The variable A_EventInfo contains the focused row number. LV_GetNext() can be used to instead get the first selected row number, which is 0 if the user double-clicked on empty space.
-
-    ;R: The user has double-right-clicked within the control. The variable A_EventInfo contains the focused row number.
-
-    ;ColClick: The user has clicked a column header. The variable A_EventInfo contains the column number, which is the original number assigned when the column was created; that is, it does not reflect any dragging and dropping of columns done by the user. One possible response to a column click is to sort by a hidden column (zero width) that contains data in a sort-friendly format (such as a YYYYMMDD integer date). Such a hidden column can mirror some other column that displays the same data in a more friendly format (such as MM/DD/YY). For example, a script could hide column 3 via LV_ModifyCol(3, 0), then disable automatic sorting in the visible column 2 via LV_ModifyCol(2, "NoSort"). Then in response to the ColClick notification for column 2, the script would sort the ListView by the hidden column via LV_ModifyCol(3, "Sort").
-
-    ;D: The user has attempted to start dragging a row or icon (there is currently no built-in support for dragging rows or icons). The variable A_EventInfo contains the focused row number. In v1.0.44+, this notification occurs even without AltSubmit.
-
-    ;d (lowercase D): Same as above except a right-click-drag rather than a left-drag.
-
-    ;e (lowercase E): The user has finished editing the first field of a row (the user may edit it only when the ListView has -ReadOnly in its options). The variable A_EventInfo contains the row number.
     If (!sent) {
 	MsgBox 0x24, %mainTitle%, Договор ещё не отравлен. Отменить отправку?
 	IfMsgBox No
@@ -86,6 +84,17 @@ ButtonOK:
 	}
     }
 FilesList:	  ; Arbitrary event in list
+    ;DoubleClick: The user has double-clicked within the control. The variable A_EventInfo contains the focused row number. LV_GetNext() can be used to instead get the first selected row number, which is 0 if the user double-clicked on empty space.
+
+    ;R: The user has double-right-clicked within the control. The variable A_EventInfo contains the focused row number.
+
+    ;ColClick: The user has clicked a column header. The variable A_EventInfo contains the column number, which is the original number assigned when the column was created; that is, it does not reflect any dragging and dropping of columns done by the user. One possible response to a column click is to sort by a hidden column (zero width) that contains data in a sort-friendly format (such as a YYYYMMDD integer date). Such a hidden column can mirror some other column that displays the same data in a more friendly format (such as MM/DD/YY). For example, a script could hide column 3 via LV_ModifyCol(3, 0), then disable automatic sorting in the visible column 2 via LV_ModifyCol(2, "NoSort"). Then in response to the ColClick notification for column 2, the script would sort the ListView by the hidden column via LV_ModifyCol(3, "Sort").
+
+    ;D: The user has attempted to start dragging a row or icon (there is currently no built-in support for dragging rows or icons). The variable A_EventInfo contains the focused row number. In v1.0.44+, this notification occurs even without AltSubmit.
+
+    ;d (lowercase D): Same as above except a right-click-drag rather than a left-drag.
+
+    ;e (lowercase E): The user has finished editing the first field of a row (the user may edit it only when the ListView has -ReadOnly in its options). The variable A_EventInfo contains the row number.
     If (A_GuiEvent = "DoubleClick") {
 	If (A_EventInfo) {
 	    OpenFile(A_EventInfo)
@@ -219,20 +228,59 @@ SendEmail() {
 	msgName = loan_scans_%A_Now%
 	outMsgPath = %outMailDir%\%msgName%
 	filesList := ""
-	FileCreateDir %outMsgPath%
+	messageSize := 5 ; 5 kb reserve for mail & headers
 	
 	Loop %itmc%
 	{
-	    LV_GetText(itmv, A_Index, 2)
-	    filesList .= itmv . "`n"
-	    FileCopy %itmv%, %outMsgPath%
-	    If (ErrorLevel)
-		MsgBox 0x30, %mainTitle%, Ошибка %A_LastError% при копировании файла %itmv% в папку для отправки!
+	    LV_GetText(path, A_Index, 2)
+	    filesList .= path . "`n"
+	    LV_GetText(size, A_Index, 3)
+	    messageSize += 4 * (size//3+1) + 1 ; Base64+headers. ~ToDo: account line breaks
+	}
+	
+	If (messageSize > 8192) {
+	    MsgBox 0x40, %mainTitle%, Слишком большой размер письма!`n`nCервер не принимает письма размером больше 8 МБ. Файлы в почте занимают на 1/4 больше`, чем сохранённые на диске`, поэтому рассчитывайте на 5-6 МБ максимум. Обычно этого с большим запасом достаточно`, чтобы отправить сканы кредитных договоров.`nУдалите лишние вложения`, либо сожмите файлы или отсканируйте в меньшем разрешении/с большим сжатием. Если не получится`, обращайтесь в службу ИТ.
+	    return 1
+	}
+	
+	FileCreateDir %outMsgPath%
+	Loop {
+	    errorsMsg:=""
+	    atLeastOneCopied:=0
+	    TrayTip %mainTitle%, Копирование файлов в папку отправки
+	    Loop Parse, filesList, `n
+	    {
+		If (!A_LoopField)
+		    continue
+		If (!FileExist(A_LoopField)) {
+		    errorsMsg .= "`n""" . A_LoopField . """ (файл не найден)"
+		    continue
+		}
+		FileCopy %A_LoopField%, %outMsgPath%
+		If (A_LastError || ErrorLevel)
+		    errorsMsg .= "`n""" . A_LoopField . """ (код " . A_LastError . ")"
+		Else
+		    atLeastOneCopied := 1
+	    }
+	    If (!atLeastOneCopied) {
+		MsgBox 0x40, %mainTitle%, Ни один файл не скопирован.`n`nПри копировании произошли следующие ошибки:%errorsMsg%
+		return 1
+	    }
+	    If (errorsMsg) {
+		MsgBox 0x36, %mainTitle%, Следующие файлы не скопированы:%errorsMsg%`n`nЕсли продолжить без них`, они не будут отправлены.
+		IfMsgBox Cancel
+		    return 1
+		IfMsgBox TryAgain
+		    continue
+	    }
+	    TrayTip
+	    break
 	}
 	FileAppend,
 	(LTrim
 	    loan-agreements@status.mobilmir.ru
-	    Договор №%laNum% {отправлено скриптом}
+	    Reply-To: %replyTo%
+	    %laNum% {сканы договоров отправлены скриптом с компьютера %A_ComputerName% отдела %MailUserId%}
 	    Список файлов:
 	    %filesList%
 	),%outMsgPath%.tmp, CP1251
@@ -245,6 +293,17 @@ SendEmail() {
     } Else {
 	MsgBox 0x40, %mainTitle%, Добавьте сканы договора!
 	return 1
+    }
+}
+
+ReadSetVarFromBatchFile(filename, varname) {
+    Loop Read, %filename%
+    {
+	If (mpos := RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", match)) {
+	    If (Trim(Trim(matchName), """") = varname) {
+		return Trim(Trim(matchValue), """")
+	    }
+	}
     }
 }
 
