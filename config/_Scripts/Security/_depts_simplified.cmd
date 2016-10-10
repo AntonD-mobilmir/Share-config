@@ -37,7 +37,7 @@ PUSHD "d:\1S\Rarus\ShopBTS" && (
     POPD
 )
 CALL :MakeDirsReadOnlyForUsers "%UIDAuthenticatedUsers%" "%UIDUsers%"
-%SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set;Fdacl"
+%SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set"
 CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
 CALL "%srcpath%FSACL_PublicDirsRoot.cmd" D:\Users\Public "D:\Users\All Users" "D:\Users\Default User"
 CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
