@@ -59,11 +59,15 @@ GOTO :MakeDirsReadOnlyForUsers
 (
 REM 0 = no error = yes, process
 REM 1 = error = no, skip
+    IF /I "%~1"=="Public" EXIT /B 1
     IF /I "%~1"=="All Users" EXIT /B 1
+    IF /I "%~1"=="Default" EXIT /B 1
     IF /I "%~1"=="Default User" EXIT /B 1
     IF /I "%~1"=="Default User.org" EXIT /B 1
     IF /I "%~1"=="LocalService" EXIT /B 1
     IF /I "%~1"=="NetworkService" EXIT /B 1
+
+    IF /I "%~1"=="admin-task-scheduler" EXIT /B 1
     IF /I "%~1"=="Admin" EXIT /B 1
     IF /I "%~1"=="Administrator" EXIT /B 1
     IF /I "%~1"=="Администратор" EXIT /B 1
