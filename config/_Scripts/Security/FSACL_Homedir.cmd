@@ -1,4 +1,4 @@
-@(REM coding:CP866
+    @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
     SETLOCAL ENABLEEXTENSIONS
@@ -23,7 +23,13 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "tgt=%~f1"
 )
     IF "%tgt:~-1%"=="\" SET "tgt=%tgt:~0,-1%"
+    SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
 (
+    IF NOT EXIST "%ACLBackupDir%" (
+	MKDIR "%ACLBackupDir%"
+	%SystemRoot%\System32\COMPACT.exe /C "%ACLBackupDir%"
+    )
+
     ECHO Настройка параметров безопасности для "%tgt%"
     PUSHD "%tgt%"||EXIT /B 1
     SET "DirUserName="
@@ -33,21 +39,13 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	NET USER "%~nx1" >NUL 2>&1 || EXIT /B 1
 	SET "DirUserName=%~nx1;s:n"
     )
-    IF NOT EXIST "%tgt%\AppData\Local\ACL-backup" (
-	MKDIR "%tgt%\AppData\Local\ACL-backup"
-	COMPACT /C "%tgt%\AppData\Local\ACL-backup"
-    )
-    SET "bkpPackages=%tgt%\AppData\Local\ACL-backup\AppDataLocalPackages"
-    SET "bkpPublishers=%tgt%\AppData\Local\ACL-backup\AppDataLocalPublishers"
-    SET "bkpCertificates=%tgt%\AppData\Local\ACL-backup\AppDataRoamingMSSystemCertificates"
 )
 (
-    ECHO %DATE% %TIME% Сохранение резервных копий ACL для "%tgt%"
-    %SetACLexe% -on "%tgt%" -ot file -actn list -lst "f:sddl;w:d,o,g" -bckp "%tgt%\AppData\Local\ACL-backup\fullprofile.%now%.sddl" -silent
+    CALL :backupACL "%tgt%" fullprofile || EXIT /B
     
-    CALL :backupACLFlagSubdir "%tgt%\AppData\Local\Packages" "%bkpPackages%" || EXIT /B
-    CALL :backupACLFlagSubdir "%tgt%\AppData\Local\Publishers" "%bkpPublishers%" || EXIT /B
-    CALL :backupACLFlagSubdir "%tgt%\AppData\Roaming\Microsoft\SystemCertificates" "%bkpCertificates%" || EXIT /B
+    CALL :backupACLFlagSubdir "%tgt%\AppData\Local\Packages" "AppDataLocalPackages" || EXIT /B
+    CALL :backupACLFlagSubdir "%tgt%\AppData\Local\Publishers" "AppDataLocalPublishers" || EXIT /B
+    CALL :backupACLFlagSubdir "%tgt%\AppData\Roaming\Microsoft\SystemCertificates" "AppDataRoamingMSSystemCertificates" || EXIT /B
     
     REM take ownership just in case; will be handled back after permissions setup
     ECHO %DATE% %TIME% Сброс владельца для "%tgt%"
@@ -88,36 +86,40 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
     CALL :DenyListDirectory "%UIDEveryone%" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History" "%tgt%\AppData\Local\Microsoft\Windows\INetCache\Content.IE5" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Roaming\Microsoft\Windows\Start Menu\Программы" "%tgt%\Application Data" "%tgt%\Cookies" "%tgt%\Documents\Мои видеозаписи" "%tgt%\Documents\мои рисунки" "%tgt%\Documents\Моя музыка" "%tgt%\Local Settings" "%tgt%\NetHood" "%tgt%\PrintHood" "%tgt%\Recent" "%tgt%\SendTo" "%tgt%\главное меню" "%tgt%\Мои документы" "%tgt%\Шаблоны"
     
-    CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Packages" "%bkpPackages%"
-    CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Publishers" "%bkpPublishers%"
-    CALL :restoreACLUnflagSubdir "%tgt%\AppData\Roaming\Microsoft\SystemCertificates" "%bkpCertificates%"
+    CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Packages" "AppDataLocalPackages"
+    CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Publishers" "AppDataLocalPublishers"
+    CALL :restoreACLUnflagSubdir "%tgt%\AppData\Roaming\Microsoft\SystemCertificates" "AppDataRoamingMSSystemCertificates"
     
     rem without FULL access to TEMP, HP MF driver hangs when printing non-PDFs :(
     FOR /F "usebackq delims=" %%Z IN ("%~dp0Allow TEMP full access.txt") DO IF /I "%COMPUTERNAME%"=="%%Z" %SetACLexe% -on "%tgt%\AppData\Local\Temp" -ot file -rec cont_obj -actn setowner -ownr "n:%DirUserName%" -actn rstchldrn -rst dacl -actn ace -ace "n:%DirUserName%;p:full"
     POPD
 EXIT /B
 )
-
 :backupACLFlagSubdir <path> <backup-name>
 (
     IF NOT EXIST %1 EXIT /B 0
     IF EXIST "%~2.flag" CALL :AskRestoreACL %* || EXIT /B
-    ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
-    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%~2.%now%.sddl.tmp" -silent
-    REN "%~2.%now%.sddl.tmp" "*."
-    (ECHO Not restored)>"%~2.flag"
-    START "Compacting %~nx2.%now%.sddl" /MIN %SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX "%~2.%now%.sddl" >NUL 2>&1
+    CALL :backupACL %1 %2
+    (ECHO Not restored)>"%ACLBackupDir%\%~2.flag"
 EXIT /B
+)
+:backupACL <path> <backup-name>
+(
+    ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
+    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%ACLBackupDir%\%~2.%now%.sddl.tmp" -silent||EXIT /B
+    REN "%ACLBackupDir%\%~2.%now%.sddl.tmp" "*."||EXIT /B
+    START "Compacting %~nx2.%now%.sddl" /MIN %SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX "%ACLBackupDir%\%~2.%now%.sddl" >NUL 2>&1
+    EXIT /B 0
 )
 :AskRestoreACL <path> <backup-name>
 (
     IF "%RunInteractiveInstalls%"=="0" EXIT /B 1
     SETLOCAL ENABLEEXTENSIONS
     rem ENABLEDELAYEDEXPANSION
-    FOR %%A IN ("%~2.flag") DO ECHO Обнаружен старый ^(%%~tA^) флаг, обозначающий наличие сохранённых но не восстановленных ACL.
+    FOR %%A IN ("%ACLBackupDir%\%~2.flag") DO ECHO Обнаружен старый ^(%%~tA^) флаг, обозначающий наличие сохранённых но не восстановленных ACL.
     ECHO.
     ECHO Имеющиеся резервные копии:
-    DIR /B "%~2.*.sddl"
+    DIR /B "%ACLBackupDir%\%~2.*.sddl"
     ECHO Введите имя файла резервной копии для восстановления или укажите:
     ECHO ^(пусто^)	- выход
     ECHO 0	- не восстанавливать
@@ -128,12 +130,12 @@ EXIT /B
 (
     IF "%usrInp%"=="0" EXIT /B 0
     IF "%usrInp%"=="*" (
-	SET "restoreMask=%~2.*.sddl"
-    ) ELSE IF EXIST "%~dp2%usrInp%" (
-	SET "restoreMask=%~dp2%usrInp%"
-    ) ELSE IF EXIST "%~dp2%usrInp%.sddl" (
-	SET "restoreMask=%~dp2%usrInp%.sddl"
-    )
+	SET "restoreMask=%ACLBackupDir%\%~2.*.sddl"
+    ) ELSE IF EXIST "%ACLBackupDir%\%usrInp%" (
+	SET "restoreMask=%ACLBackupDir%\%usrInp%"
+    ) ELSE IF EXIST "%ACLBackupDir%\%usrInp%.sddl" (
+	SET "restoreMask=%ACLBackupDir%\%usrInp%.sddl"
+    ) ELSE (SET "restoreMask=%usrInp%")
     CALL :InitRemembering
 )
 (
@@ -141,19 +143,19 @@ EXIT /B
     IF NOT DEFINED restoreFile EXIT /B 1
 )
     ECHO %DATE% %TIME% Восстановление сохранённых ACL для %1
-    %SetACLexe% -on %1 -ot file -actn restore -bckp "%restoreFile%" -silent && DEL "%~2.flag"
+    %SetACLexe% -on %1 -ot file -actn restore -bckp "%restoreFile%" -silent && DEL "%ACLBackupDir%\%~2.flag"
     EXIT /B
 :restoreACLUnflagSubdir <path> <backup-name>
 (
     ECHO %DATE% %TIME% Восстановление сохранённых ACL для %1
-    %SetACLexe% -on %1 -ot file -actn restore -bckp "%~2.%now%.sddl" -silent && DEL "%~2.flag"
+    %SetACLexe% -on %1 -ot file -actn restore -bckp "%ACLBackupDir%\%~2.%now%.sddl" -silent && DEL "%ACLBackupDir%\%~2.flag"
 EXIT /B
 )
 :DenyListDirectory <user> <path> <path> <...>
 (
     IF "%~2"=="" EXIT /B
     REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
-    %SetACLexe% -on "%2" -ot file -actn setprot -op "dacl:np" -actn ace -ace "n:%UIDEveryone%;p:FILE_LIST_DIRECTORY;i:np;m:deny" -actn setowner -ownr "n:%DirUserName%" -silent
+    %SetACLexe% -on %2 -ot file -actn setprot -op "dacl:np" -actn ace -ace "n:%UIDEveryone%;p:FILE_LIST_DIRECTORY;i:np;m:deny" -actn setowner -ownr "n:%DirUserName%" -silent
     SHIFT /2
     GOTO :DenyListDirectory
 EXIT /B
