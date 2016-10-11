@@ -18,7 +18,7 @@ getDefaultConfigFileName() {
 
 getDefaultConfigDir() {
     defaultConfig := getDefaultConfig()
-    SplitPath defaultsSource,,OutDir
+    SplitPath defaultConfig,,OutDir
     return OutDir
 }
 
