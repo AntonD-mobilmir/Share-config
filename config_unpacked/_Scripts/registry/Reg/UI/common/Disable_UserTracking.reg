@@ -1,0 +1,5 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoInstrumentation"=dword:00000001
+"NoSaveSettings"=dword:00000001
