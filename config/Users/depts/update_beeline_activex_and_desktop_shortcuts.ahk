@@ -8,13 +8,17 @@ pathSrvConfigUpdater=\\Srv0.office0.mobilmir\profiles$\Share\config\update local
 maxAgeSavedInvReport=1
 tv5settingsSubPath = \Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd
 scriptInventoryReport = \\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd
-maskInventoryReport = \\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\%A_ComputerName%*.7z
+maskInventoryReport = \\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\%A_ComputerName% *.7z
+
+chkDefConfigDir := CheckPath(getDefaultConfigDir())
+global DefaultConfigDir := chkDefConfigDir.path
 
 Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R30 w600 vLogListView, Операция|Статус
 Gui Show
 
 OSVersionObj := RtlGetVersion()
 AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
+AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
 
 xlnexe := findexe("xln.exe", "C:\SysUtils")
 If (xlnexe)
@@ -37,18 +41,26 @@ FileGetTime timestampRunningScript, %A_ScriptFullPath%
 
 If (timestampServerScript =! timestampRunningScript) {
     SetLastRowStatus("Не совпадает", 0)
-    MsgBox 0x4, %A_ScriptName%, Скрипт на сервере новее`, чем работающий. Запустить с сервера?`n`nНа сервере: "%serverScriptPath%":%timestampServerScript%`nРаботает:"%A_ScriptFullPath%":%timestampRunningScript%`n`n(автоматический перезапуск через 60 секунд), 60
-    IfMsgBox Yes
-	restartFromServer := 1
-    IfMsgBox Timeout
-	restartFromServer := 1
+    Loop
+    {
+	MsgBox 0x4, %A_ScriptName%, Скрипт на сервере новее`, чем работающий. Запустить с сервера?`n`nНа сервере: "%serverScriptPath%":%timestampServerScript%`nРаботает:"%A_ScriptFullPath%":%timestampRunningScript%`n`n(автоматический перезапуск через 60 секунд), 60
+	IfMsgBox No
+	    break
+	Run "%A_AhkPath%" "%serverScriptPath%"
+	ExitApp
+    }
 } Else {
     SetLastRowStatus(timestampRunningScript)
 }
 
-If (restartFromServer) {
-    Run "%A_AhkPath%" "%serverScriptPath%"
-    ExitApp
+EnvGet UserProfile,UserProfile
+CheckRemove(UserProfile . "\pdk-" . A_UserName)
+CheckRemove(UserProfile . "\perl")
+If (FileExist(UserProfile . "\fullprofile.*.sddl")) {
+    AddLog("Перемещение fullprofile.*.sddl из корня папки пользователя", "→AppData\Local\ACL-backup")
+    FileMove %UserProfile%\fullprofile.*.sddl, %UserProfile%\AppData\Local\ACL-backup\*.*
+    If (!ErrorLevel)
+	SetLastRowStatus()
 }
 
 sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg")
@@ -56,6 +68,8 @@ If (IsObject(sendemailcfg)) {
     AddLog("Запуск ShopBTS_Add.install.ahk /skipSchedule")
     Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule,,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    If (ErrorLevel)
+	keepOpen := 1
 }
 
 userFoldersChk := AddLog("Проверка папок пользователя")
@@ -65,6 +79,7 @@ Loop Reg, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\U
     If (!FileExist(Expand(path))) {
 	AddLog(path, A_LoopRegName)
 	userFoldersChk=
+	keepOpen := 1
     }
 }
 If (userFoldersChk) {
@@ -74,6 +89,8 @@ If (userFoldersChk) {
     IfMsgBox Yes
     {
 	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\..\_Scripts\MoveUserProfile\reset HKCU folders.ahk"
+	If (!ErrorLevel)
+	    keepOpen := 0
     }
 }
 
@@ -82,15 +99,28 @@ If (!ErrorLevel) {
     AddLog("OneDriveSetup в автозагрузке", "Удаление")
     RegDelete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
     FileRemoveDir D:\Users\Пользователь\AppData\Local\Microsoft\OneDrive, 1
+    If (ErrorLevel)
+	keepOpen := 1
     SetLastRowStatus(ErrorLevel)
 }
 
+If (AppXSupported && (A_UserName="Продавец" || A_UserName="Пользователь")) {
+    AddLog("Запуск удаления всех приложений AppX")
+    Run %comspec% /C "TITLE Удаление всех приложений AppX & "%DefaultConfigDir%\_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /Quiet",, Min UseErrorLevel, removeAppXPID
+    If (ErrorLevel)
+	keepOpen := 1
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+}
 
 If (!A_IsAdmin) {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+    If (removeAppXPID)
+	WaitProcessEnd(removeAppXPID, "Ожидание завершения скрипта удаления AppX")
     AddLog("Перезапуск от имени администратора…")
     Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
+    If (keepOpen)
+	Exit
     ExitApp
 }
 AddLog("Скрипт запущен с правами администратора",A_UserName,1)
@@ -131,12 +161,12 @@ If (FileExist(scriptInventoryReport)) {
 EnvGet SystemDrive, SystemDrive
 AddLog("Distributives", "Searching _get_SoftUpdateScripts_source.cmd")
 gsussScript := FirstExisting(A_AppDataCommon . "\mobilmir.ru\_get_SoftUpdateScripts_source.cmd", SystemDrive . "\Local_Scripts\_get_SoftUpdateScripts_source.cmd")
-SetLastRowStatus("Running " . gsussScript, 0)
+LV_Modify(LV_GetCount(),,gsussScript)
 Distributives := EnvGetAfterScript(gsussScript, "Distributives")
-SetLastRowStatus(Distributives)
+SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
 If (!FileExist(Distributives . "\Soft\PreInstalled\utils\7za.exe")) {
-    AddLog("В папке дистрибутивов нет Preinstalled\*\7za.exe")
     Distributives=\\Srv0.office0.mobilmir\Distributives
+    AddLog("В локальной папке дистрибутивов нет Preinstalled\*\7za.exe", "→ использовать Srv0")
 }
 
 exe7z:=find7zexe()
@@ -144,7 +174,7 @@ AddLog("7-Zip: " . exe7z)
 FileGetVersion ver7z, %exe7z%
 ver7z_ := StrSplit(ver7z, ".")
 If (ver7z_[1] < 15) {
-    LV_Modify(LV_GetCount(),,,ver7z)
+    SetLastRowStatus(ver7z, 0)
     AddLog("Требуется 7-Zip версии ≥15. Запуск обновления с Srv0.office0.mobilmir.")
     RunWait %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Soft\Archivers Packers\7Zip\install.cmd",,Min UseErrorLevel
     If (ErrorLevel) {
@@ -157,28 +187,9 @@ If (ver7z_[1] < 15) {
 }
 SetLastRowStatus(ver7z)
 
-Loop {
-    localConfigRead:=1
-    localConfig:=getDefaultConfig()
-    SplitPath localConfig,configName,localConfigDir
-    AddLog("Путь к файлу конфигурации: " . localConfig, configName, configName=reqdConfigName)
-    If (configName!=reqdConfigName) {
-	MsgBox 4, %A_ScriptName%, В розничных отделах название локального файла конфигурации должно быть %reqdConfigName%`, но на этом компьютере файл конфигурации (полный путь): %localConfig%`n`nИзменить на "%localConfigDir%\%reqdConfigName%"?
-	IfMsgBox Yes
-	{
-	    FileDelete %A_AppDataCommon%\mobilmir.ru\_get_defaultconfig_source.cmd
-	    FileAppend SET "DefaultsSource=%localConfigDir%\%reqdConfigName%"`n,%A_AppDataCommon%\mobilmir.ru\_get_defaultconfig_source.cmd, CP866
-	    localConfigRead:=0
-	}
-    }
-} Until localConfigRead
-
-
 srvConfigUpdater := CheckPath(pathSrvConfigUpdater)
-
 SplitPath pathSrvConfigUpdater, fnameConfigUpdater
-
-pathLocConfigUpdater=%localConfigDir%\%fnameConfigUpdater%
+pathLocConfigUpdater=%DefaultConfigDir%\%fnameConfigUpdater%
 locConfigUpdater := CheckPath(pathLocConfigUpdater,1,0)
 
 If (locConfigUpdater.mtime == srvConfigUpdater.mtime) {
@@ -190,9 +201,10 @@ If (locConfigUpdater.mtime == srvConfigUpdater.mtime) {
 }
 
 LV_Modify(runConfUpdScript.line,,,"Выполняется")
-cmdupdateLocalConfig := runConfUpdScript.path
-RunWait %comspec% /C "%cmdupdateLocalConfig%",,Min
+cmdupdateDefaultConfig := runConfUpdScript.path
+RunWait %comspec% /C "%cmdupdateDefaultConfig%",,Min
 SetRowStatus(runConfUpdScript.line, ErrorLevel)
+CheckUpdateDefaultConfigName(reqdConfigName)
 
 If (FileExist("D:\Credit")) {
     AddLog("Перемещение ""D:\Credit"" в ""D:\Program Files\Credit""")
@@ -233,7 +245,7 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
 }
 
 AddLog("Ярлыки на рабочем столе и стандартные файлы","Замена")
-RunWait %comspec% /C ""%localConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %localConfigDir%\_Scripts, Min UseErrorLevel
+RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"))
@@ -262,7 +274,7 @@ If (IsObject(softUpdScripts)) {
 	SetLastRowStatus(verFlagSoftUpdScripts,0)
     }
     
-    distSoftUpdScripts := CheckPath(localConfigDir . "\_Scripts\software_update_autodist\Scripts.7z")
+    distSoftUpdScripts := CheckPath(DefaultConfigDir . "\_Scripts\software_update_autodist\Scripts.7z")
     If (!IsObject(distSoftUpdScripts))
 	softUpdScripts=
     FormatTime timeDistSoftUpdScripts, % distSoftUpdScripts.mtime, dd.MM.yyyy HH:mm
@@ -280,14 +292,14 @@ If (IsObject(softUpdScripts)) {
     If (!IsObject(distSoftUpdScripts))
 	distSoftUpdScripts := CheckPath("\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\software_update_autodist\Scripts.7z", 0, 0)
     If (IsObject(distSoftUpdScripts)) {
-	distSoftUpdScripts.path := localConfigDir . "\_Scripts\software_update_autodist\Scripts.7z"
+	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\Scripts.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
-	RunWait %comspec% /C "%localConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",,Min UseErrorLevel
+	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",,Min UseErrorLevel
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
 
-AddLog("Журналы скриптов обновления", SUSHost)
+AddLog("Журналы скриптов обновления")
 EnvGet ProgramData,ProgramData
 suSettingsScript=%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
 hostSUScripts:=ReadSetVarFromBatchFile(suSettingsScript, "SUSHost")
@@ -295,6 +307,7 @@ If (hostSUScripts) {
     SetLastRowStatus(hostSUScripts, 0)
     RunWait %comspec% /C "%A_ScriptDir%\..\..\_Scripts\software_update_autodist\CheckLocalUpdater.cmd",,Min UseErrorLevel
     FileRead pathLastStatus, *P866 *m65536 %A_Temp%\CheckLocalUpdater.flag
+    pathLastStatus := Trim(pathLastStatus, "`r`n`t ")
     If (!ErrorLevel && FileExist(pathLastStatus)) {
 	FileGetTime timeLastStatus, pathLastStatus
 	SplitPath pathLastStatus, fnameLastStatus
@@ -327,14 +340,16 @@ If (mtimeCommonScriptsSrv0 > latestCommonScript) {
     SetLastRowStatus()
 }
 
-If (OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2)) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
+If (removeAppXPID)
+    WaitProcessEnd(removeAppXPID, "Ожидание завершения скрипта удаления AppX")
+If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     AddLog("Удаление лишних приложений AppX")
-    RunWait %comspec% /C "TITLE Удаление лишних приложений AppX & "%localConfigDir%\_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /Quiet",, Min UseErrorLevel
+    RunWait %comspec% /C "TITLE Удаление лишних приложений AppX & "%DefaultConfigDir%\_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /Quiet",, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
 AddLog("Запуск в фоновом режиме настройки ACL ФС")
-Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%localConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
+Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 finished := 1
@@ -363,20 +378,73 @@ ButtonCancel:
     }
     ExitApp
 
+CheckRemove(path) {
+    trashDir := A_Temp . "\trash-" . A_ScriptName
+    FileCreateDir %trashDir%
+    If (attr:=FileExist(path)) {
+	AddLog(path, "Удаление мусора")
+	If(InStr(attr, "D"))
+	    FileMoveDir %path%,%trashDir%,R
+	Else
+	    FileMove %path%,%trashDir%
+	If (!ErrorLevel)
+	    SetLastRowStatus()
+    }
+}
+
+CheckUpdateDefaultConfigName(reqdConfigName) {
+    Loop {
+	DefaultConfig:=GetDefaultConfig()
+	SplitPath DefaultConfig,configName,configDir
+	configCheck := configName=reqdConfigName
+	AddLog("Путь к файлу конфигурации: " . DefaultConfig, configName, configCheck)
+	If (!configCheck) {
+	    MsgBox 4, %A_ScriptName%, В розничных отделах название локального файла конфигурации должно быть %reqdConfigName%`, но на этом компьютере файл конфигурации (полный путь): %DefaultConfig%`n`nИзменить на "%configDir%\%reqdConfigName%"?
+	    IfMsgBox Yes
+	    {
+		FileDelete %A_AppDataCommon%\mobilmir.ru\_get_defaultconfig_source.cmd
+		FileAppend SET "DefaultsSource=%configDir%\%reqdConfigName%"`n,%A_AppDataCommon%\mobilmir.ru\_get_defaultconfig_source.cmd, CP866
+		continue
+	    }
+	}
+	break
+    }
+    DefaultConfigDir := configDir
+}
+
+WaitProcessEnd(pid, message:="Ожидание завершения процесса", timeout:=0) {
+    Process Exist, %pid%
+    If (ErrorLevel) {
+	AddLog(message)
+	waited := 1
+	If (timeout)
+	    Process WaitClose, %pid%, %timeout%
+	Else
+	    Process WaitClose, %pid%
+    }
+    
+    If (waited) {
+	SetLastRowStatus(ErrorLevel)
+    }
+    return ErrorLevel
+}
+
 EnvGetAfterScript(batch, varName) {
     tempFile = %A_Temp%\%A_ScriptName%-envGetAfterScript.%A_Now%.cmd
     outFile = %A_Temp%\%A_ScriptName%-envGetAfterScript.%A_Now%.txt
-    FileAppend 
+    FileAppend,
     (LTrim
-	@(REM coding:OEM
+	@(REM coding`:OEM
 	CALL "%batch%">"`%~dpn0.log" && DEL "`%~dpn0.log"
 	`)
-	(ECHO %varName%
+	(ECHO `%%varName%`%
 	`)>"%outFile%"
-    ),%tempFile%, CP1
+    ),%tempFile%,CP1
     RunWait %comspec% /C "%tempFile%", %A_Temp%, Min UseErrorLevel
     FileRead out, *P1 *m65536 %outFile%
-    return out
+    FileDelete %outFile%
+    FileDelete %tempFile%
+    return Trim(out, "`r`n`t ")
 }
 
 StartsWith(longstr, shortstr) {
