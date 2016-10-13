@@ -24,6 +24,8 @@ CALL "%~dp0dontIncludeRecommendedUpdates.cmd"
 
 REM Set up security policy and add admin users
 %comspec% /C "%~dp0Security\import_policy.cmd"
+REM Deny promoted Win10 apps
+%comspec% /C "%~dp0Security\Security\AppLocker - Deny promoted apps (Win10).cmd"
 
 ECHO "Compacting %SystemRoot%\Logs"
 %SystemRoot%\System32\COMPACT.exe /Q /C /I /S:"%SystemRoot%\Logs"
