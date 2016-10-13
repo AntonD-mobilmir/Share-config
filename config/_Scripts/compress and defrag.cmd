@@ -9,23 +9,27 @@ IF DEFINED PROCESSOR_ARCHITEW6432 (
 CALL "%~dp0find_exe.cmd" exe7z 7z.exe "%ProgramFiles%\7-Zip\7z.exe" "%ProgramFiles(x86)%\7-Zip\7z.exe" "%SystemDrive%\Program Files\7-Zip\7z.exe" "c:\Arc\7-Zip\7z.exe"
 CALL :InitRemembering
 
-SET "Target=%~d0WindowsImageBackup"
-IF EXIST "%~1" SET "Target=%~1"
+IF EXIST "%~1" (
+    SET "Target=%~1"
+) ELSE (
+    SET "Target=%~d0WindowsImageBackup"
+)
 )
 (
+CALL :getdrive "%Target%"
+
 FOR %%I IN ("\\Srv0\Distributives\Soft private use only\Disk- File- Tools\Defragmentation\Piriform Defraggler\dfsetup*.exe") DO CALL :RememberIfLatest dfinst "%%~I"
 
 IF EXIST "%Target%\WindowsImageBackup" SET "Target=%Target%\WindowsImageBackup"
-CALL :getdrive "%Target%"
+
+REM Windows 8+
+CALL "%~dp0CheckWinVer.cmd" 6.2 && SET "DefragOpt=/O"
+REM Windows 10+
+CALL "%~dp0CheckWinVer.cmd" 6.4 && SET "CompactOpt=/EXE:LZX"
 )
 (
-%SystemRoot%\System32\COMPACT.exe /C /I /S:"%Target%" *.*
-CALL "%~dp0CheckWinVer.cmd" 6.2
-IF ERRORLEVEL 1 ( REM Windows 7 or below
-    "%SystemRoot%\System32\Defrag.exe" %DefragDrive%
-) ELSE ( REM Windows 8+
-    "%SystemRoot%\System32\Defrag.exe" /O %DefragDrive%
-)
+%SystemRoot%\System32\COMPACT.exe /C %CompactOpt% /I /S:"%Target%" *.*
+"%SystemRoot%\System32\Defrag.exe" %DefragOpt% %DefragDrive%
 
 EXIT /B
 )
