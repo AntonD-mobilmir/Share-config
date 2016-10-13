@@ -31,6 +31,7 @@ bootmgr
 BOOTNXT
 config.sys
 swapfile.sys
+hiberfil.sys
 
 )
 
