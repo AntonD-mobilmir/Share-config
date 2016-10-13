@@ -4,6 +4,8 @@
 
 #NoEnv
 #SingleInstance Force
+#InstallKeybdHook
+#InstallMouseHook
 SetTitleMatchMode RegEx
 FileEncoding UTF-8
 
@@ -47,6 +49,7 @@ Loop Read, %casesFullPath%
 }
 
 Loop {
+    WaitCPUIdle()
     FileGetTime scriptCurDate, %A_ScriptFullPath%
     FileGetTime casesCurDate, %casesFullPath%
     If ((scriptCurDate && scriptCurDate != scriptInitDate) || (casesCurDate && casesInitDate != casesCurDate)) {
@@ -57,6 +60,11 @@ Loop {
     }
     
     For i, case in cases {
+	While (A_TimeIdlePhysical < 3000) {
+	    sleepTime := 2+A_Index
+	    ToolTip Ожидание простоя [%sleepTime% c]
+	    Sleep 300+sleepTime*1000-A_TimeIdlePhysical
+	}
 	ToolTip % "Проверка:`n" case.winTitle "`n" case.winText
 	If (WinExist(case.winTitle, case.winText)) {
 	    TrayTip % "Найдено окно " case.winTitle, % "`n" case.winText
@@ -64,11 +72,20 @@ Loop {
 	    continue
 	}
     }
+    ToolTip
     
     Sleep 1000
 }
 
 ExitApp
+
+#Esc::	ExitApp
+#!SC52:: ;R = SC52 #!R
+    TrayTip Reloading, Reloading due to Win+Alt+R
+    Sleep 1000
+    Reload
+    return
+Pause::	Pause
 
 cclick(labels*) {
     static prevLabel, lastClick
@@ -93,10 +110,46 @@ cclick(labels*) {
     return
 }
 
-#Esc::	ExitApp
-#!SC52:: ;R = SC52 #!R
-    TrayTip Reloading, Reloading due to Win+Alt+R
-    Sleep 1000
-    Reload
-    return
-Pause::	Pause
+WaitCPUIdle() {
+    SetFormat FloatFast, 3.2
+    
+    cycle:=0
+    cyclesLimit:=10
+    measurementTime:=1000
+    measurementTime_s:=measurementTime // 1000
+    idleLimit:=0.75
+    idleLimitPct:=Round(idleLimit * 100,2)
+    
+    FileAppend %A_Now% Проверка нагрузки на процессор / ожидание освобождения ресурсов`n, *
+    GetIdleTime()
+    Progress Off
+    Progress A R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " секунд"
+    Loop {
+	Loop
+	{
+	    Sleep %measurementTime%
+	    idle := GetIdleTime()
+	    If (idle > idleLimit)
+		break
+	    Else
+		cycle := 0
+	    Progress %cycle%, % "Текущий процент простоя: " . idle*100
+	}
+	cycle++
+    } Until cycle > cyclesLimit
+    Progress Off
+}
+
+;http://www.autohotkey.com/board/topic/11910-cpu-usage/
+GetIdleTime()    ;idle time fraction
+{
+    Static oldIdleTime, oldKrnlTime, oldUserTime
+    Static newIdleTime, newKrnlTime, newUserTime
+
+    oldIdleTime := newIdleTime
+    oldKrnlTime := newKrnlTime
+    oldUserTime := newUserTime
+
+    DllCall("GetSystemTimes", "int64P", newIdleTime, "int64P", newKrnlTime, "int64P", newUserTime)
+    Return (newIdleTime-oldIdleTime)/(newKrnlTime-oldKrnlTime + newUserTime-oldUserTime)
+}

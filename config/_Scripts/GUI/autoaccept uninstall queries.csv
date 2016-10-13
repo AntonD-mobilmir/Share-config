@@ -1,3 +1,4 @@
+;Заголовок окна,Текст в окне,Кнопка1,Кнопка2,…,,,,
 ahk_class #32770,Click Yes to restart,No,,,,,,
 ahk_class #32770,You must restart system,No,,,,,,
 InstallShield Wizard$ ahk_class #32770,"No, I will restart my computer later.","No, I will restart my computer later.",Finish,,,,,
@@ -50,3 +51,5 @@ Uninstall ahk_class #32770,Close,Close,,,,,,
 ^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Выбор программ для удаления,X38 Y215,X38 Y256,X38 Y295,X326 Y215,X326 Y256,X326 Y295,&Удалить
 Windows Live ahk_class LiveDialog,Выбор программ для удаления,X58 Y173,X58 Y197,X58 Y224,X58 Y249,X58 Y272,&Продолжить,
 HP ePrint - HP ePrint SW ahk_class WixStdBA,&Удалить,&Удалить,,,,,,
+ahk_exe McUICnt.exe,,X492 Y258,,,,,,
+McAfee SecurityCenter ahk_class uninstall,,X130 Y475,X43 Y207,X64 Y234,X466 Y479,X466 Y479,,
