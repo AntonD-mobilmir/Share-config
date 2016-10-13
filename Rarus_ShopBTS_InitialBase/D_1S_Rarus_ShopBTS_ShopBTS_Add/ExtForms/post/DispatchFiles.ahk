@@ -115,50 +115,80 @@ DispatchSingleFile(pathFileToSend) {
 
 DeliverOneEmail(EmailFileName) {
     ;файлы в текстовом (CP1251) виде следующего формата:
-    ;первая строчка - кому, можно несколько через запятую; кавычки, если есть, должны быть парными
-    ;вторая строчка - тема; кавычки, если есть, должны быть парными
-    ;третья и далее - текст письма
+    ;Любая строка до заголовка, начинающаяся с "Reply-To: " – обратный адрес
+    ;первая строчка без названия заголовка - кому, можно несколько через запятую; кавычки, если есть, должны быть парными
+    ;вторая строчка без названия заголовка - тема
+    ;всё, что далее - текст письма
 
     CheckTrayIcon()
-
-    Loop Read, %EmailFileName%
+    
+    static encodedFrom:="=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>"
+	 , bcc:="rarus-emails-replies_status-mobilmir-ru@googlegroups.com"
+         , smtpServer, smtpLogin, smtpPassword
+    If (!smtpServer) {
+	Loop Read, %A_ScriptDir%\DispatchFiles-NotificationsAccount.pwd
+	{
+	    If (A_Index == 1) {
+		smtpServer := A_LoopReadLine
+	    } Else If (A_Index == 2) {
+		smtpLogin := A_LoopReadLine
+	    } Else If (A_Index == 3) {
+		smtpPassword := A_LoopReadLine
+		break
+	    }
+	}
+    }
+    If (!smtpServer || !smtpLogin || !smtpPassword)
+	Throw Exception("Отправка уведомлений из 1С-Рарус не работает, немедленно свяжитесь со службой ИТ!", "Из файла DispatchFiles-NotificationsAccount.pwd не прочитались сервер или реквизиты учётной записи")
+    
+    replyToHeader = -o "reply-to=rarus-emails-replies@status.mobilmir.ru"
+    
+    FileRead emailFileText, %EmailFileName%
+    textStart:=1
+    Loop Parse, emailFileText, `n
     {
-	If (!HeaderTo) {
-	    StringReplace HeaderTo,A_LoopReadLine,`",'',All
-	} Else If (StartsWith(A_LoopReadLine, "Reply-To: ")) {
-	    ReplyToHeader := "-o reply-to=""" . StrReplace(SubStr(A_LoopReadLine, StrLen("Reply-To: ") + 1), """", "''") . """"
-	} Else {
-	    Subject:=A_LoopReadLine
-	    HeaderSubject:=EncodeWrapBase64UTF8(Subject)
+	textStart += StrLen(A_LoopField) + 1
+	curLine := Trim(A_LoopField,"`r")
+	If (StartsWith(curLine, "Reply-To: ")) {
+	    replyToHeader := "-o reply-to=""" . StrReplace(SubStr(curLine, StrLen("Reply-To: ") + 1), """", "''") . """"
+	} Else If (!HeaderTo) { ; first non-recognized line
+	    StringReplace HeaderTo,curLine,`",'',All
+	} Else { ; second non-recognized line
+	    Subject := curLine
+	    HeaderSubject := EncodeWrapBase64UTF8(Subject)
 	    Break
 	}
     }
     
     SplitPath EmailFileName,,EmailFileDir,,EmailFileNameNoExt
-    If EmailFileDir
-	EmailFileDir=%EmailFileDir%\
-    dirAttachments=%EmailFileDir%%EmailFileNameNoExt%
+    If(!EmailFileDir)
+	Throw Exception("Отправка уведомлений из 1С-Рарус не работает, немедленно свяжитесь со службой ИТ!", "Не удалось определить путь к файлу письма из полного пути", EmailFileName)
+    dirAttachments=%EmailFileDir%\%EmailFileNameNoExt%
     Loop %dirAttachments%\*.*
 	Attachments = %Attachments% "%A_LoopFileFullPath%"
     If Attachments
 	Attachments=-a %Attachments%
     
     TrayTip Отправка письма, Тема: %Subject%`nКому: %HeaderTo%, 3
-    SetupTemp()
-    RunWait %comspec% /c "%tailexe% -n+3 "%EmailFileName%" | %sendemailexe% -f "=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>" -t "%HeaderTo%" %ReplyToHeader% -u "%HeaderSubject%" -s "smtp.googlemail.com:587" -xu "rarus-emails@status.mobilmir.ru" -xp "TTCJ8Z--" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -bcc "rarus-emails-replies_status-mobilmir-ru@googlegroups.com" -o "reply-to=rarus-emails-replies@status.mobilmir.ru" -o "message-header=Organization: =?utf-8?B?0KbQuNGE0YDQvtCz0YDQsNC0LdCh0YLQsNCy0YDQvtC/0L7Qu9GM?=" %Attachments%",,Hide UseErrorLevel
+    tempDir := SetupTemp()
+    mailBodyFileName = %tempDir%\%A_Now%.txt
+    FileDelete %mailBodyFileName%
+    FileAppend % SubStr(emailFileText, textStart), %mailBodyFileName%, UTF-8
+    RunWait %sendemailexe% -o message-file="%mailBodyFileName%" -f "%encodedFrom%" -t "%HeaderTo%" %replyToHeader% -u "%HeaderSubject%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 -bcc "%bcc%" -l "%logfile%" %Attachments%",,Hide UseErrorLevel
+    FileDelete %mailBodyFileName%
     
-    If Not ErrorLevel
-    {
-	TrayTip Письмо отправлено, Тема: %Subject%`nКому: %HeaderTo%, 5, 1
-	FileDelete %EmailFileName%
-	FileRemoveDir %dirAttachments%, 1
-    } Else {
+    If (ErrorLevel) {
 	TrayTip Ошибка при отправке, Тема: %Subject%`nКому: %HeaderTo%`n`nОшибка: %ErrorLevel%, 30, 3
+	return ErrorLevel
     }
+    
+    TrayTip Письмо отправлено, Тема: %Subject%`nКому: %HeaderTo%, 5, 1
+    FileDelete %EmailFileName%
+    FileRemoveDir %dirAttachments%, 1
 }
 
 StartsWith(longstr, shortstr) {
-    return SubStr(longstr, StrLen(shortstr)) = shortstr
+    return SubStr(longstr, 1, StrLen(shortstr)) = shortstr
 }
 
 EncodeWrapBase64UTF8(textline) {
@@ -179,10 +209,12 @@ killSendEmail:
 return
 
 SetupTemp() {
-    FileCreateDir %A_Temp%\perl
-    RunWait "c:\SysUtils\SetACL.exe" -on . -ot file -actn ace -ace "n:S-1-1-0;s:y;p:change;i:so`,sc;m:set;w:dacl",%A_Temp%\perl, Hide UseErrorLevel
-    EnvSet Temp, %A_Temp%\perl
-    EnvSet Tmp, %A_Temp%\perl
+    tempDir = %A_Temp%\perl
+    FileCreateDir %tempDir%
+    RunWait "c:\SysUtils\SetACL.exe" -on . -ot file -actn ace -ace "n:S-1-1-0;s:y;p:change;i:so`,sc;m:set;w:dacl",%tempDir%, Hide UseErrorLevel
+    EnvSet Temp, %tempDir%
+    EnvSet Tmp, %tempDir%
+    return tempDir
 }
 
 CheckTrayIcon() {
