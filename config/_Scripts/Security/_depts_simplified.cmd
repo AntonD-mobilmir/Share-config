@@ -31,13 +31,13 @@ FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SET "P
 FOR /D %%I IN ("%ProfilesDirectory%\*.*") DO CALL :AskIfToProcessHomeDir "%%~nxI" && CALL "%~dp0FSACL_Homedir.cmd" "%%~I"
 
 PUSHD "d:\1S\Rarus\ShopBTS" && (
-    %SetACLexe% -on . -ot file -actn ace -ace "n:%UIDUsers%;p:change"
+    %SetACLexe% -on . -ot file -actn ace -ace "n:%UIDUsers%;p:change" -ignoreerr -silent
     rem TODO: MOdifyNoExecute *.*; ReadExecute *.DLL *.EXE
     rem     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" Users Flags Jobs SYSLOG Users
     POPD
 )
 CALL :MakeDirsReadOnlyForUsers "%UIDAuthenticatedUsers%" "%UIDUsers%"
-rem %SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set"
+rem %SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set" -ignoreerr -silent
 CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
 CALL "%srcpath%FSACL_PublicDirsRoot.cmd" D:\Users\Public "D:\Users\All Users" "D:\Users\Default User"
 CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
@@ -67,6 +67,7 @@ REM 1 = error = no, skip
     IF /I "%~1"=="LocalService" EXIT /B 1
     IF /I "%~1"=="NetworkService" EXIT /B 1
 
+    IF /I "%~1"=="Install" EXIT /B 1
     IF /I "%~1"=="admin-task-scheduler" EXIT /B 1
     IF /I "%~1"=="Admin" EXIT /B 1
     IF /I "%~1"=="Administrator" EXIT /B 1

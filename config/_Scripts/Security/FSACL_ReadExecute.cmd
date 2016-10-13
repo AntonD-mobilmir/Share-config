@@ -5,7 +5,7 @@ IF NOT DEFINED SetACLexe CALL "%~dp0..\find_exe.cmd" SetACLexe SetACL.exe
 IF NOT EXIST "%~2" GOTO :SkipThis
 
 rem SetACL -on %2 -ot file -actn ace -ace "n:%~1;p:read_ex;i:so,sc;m:set;w:dacl"
-%SetACLexe% -on %2 -ot file -actn ace -ace "n:%~1;p:full;m:revoke" -actn ace -ace "n:%~1;p:read_ex"
+%SetACLexe% -on %2 -ot file -actn ace -ace "n:%~1;p:full;m:revoke" -actn ace -ace "n:%~1;p:read_ex" -ignoreerr -silent
 
 :SkipThis
 SHIFT /2

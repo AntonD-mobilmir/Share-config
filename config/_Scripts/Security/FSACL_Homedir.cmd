@@ -1,4 +1,4 @@
-    @(REM coding:CP866
+@(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
     SETLOCAL ENABLEEXTENSIONS
@@ -54,47 +54,70 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     rem IF ERRORLEVEL 1 %SystemRoot%\System32\TAKEOWN.exe /F "%tgt%" /A /R /D Y >NUL
     REM -rec cont_obj -actn setowner -ownr "n:%UIDAdministrators%"
     ECHO %DATE% %TIME% Сброс ACL для "%tgt%"
-    %SetACLexe% -on "%tgt%" -ot file -rec cont_obj -actn rstchldrn -rst dacl -silent
+    %SetACLexe% -on "%tgt%" -ot file -rec cont_obj -actn rstchldrn -rst dacl -ignoreerr -silent
     REM Allow users modify, do not allow execute
     ECHO %DATE% %TIME% Разрешение пользователю менять "%tgt%", запретить запускать программы
-    %SetACLexe% -on "%tgt%" -ot file -actn setprot -op "dacl:p_nc;sacl:np" -actn clear -clr dacl -actn ace -ace "n:%UIDAdministrators%;p:full;i:sc,so" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:sc,so" -actn ace -ace "n:%DirUserName%;p:change,FILE_DELETE_CHILD;i:sc" -actn ace -ace "n:%DirUserName%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so" -silent
+    %SetACLexe% -on "%tgt%" -ot file -actn setprot -op "dacl:p_nc;sacl:np" -actn clear -clr dacl -actn ace -ace "n:%UIDAdministrators%;p:full;i:sc,so" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:sc,so" -actn ace -ace "n:%DirUserName%;p:change,FILE_DELETE_CHILD;i:sc" -actn ace -ace "n:%DirUserName%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so" -ignoreerr -silent
     ECHO %DATE% %TIME% Смена владельца "%tgt%" на %DirUserName%
-    %SetACLexe% -on "%tgt%" -ot file -rec cont_obj -actn setowner -ownr "n:%DirUserName%" -silent
+    %SetACLexe% -on "%tgt%" -ot file -rec cont_obj -actn setowner -ownr "n:%DirUserName%" -ignoreerr -silent
     rem %SetACLexe% -on "%tgt%\AppData\Local\Temp" -ot file -actn clear -clr dacl -actn rstchldrn -rst dacl -actn ace -ace "n:%UIDAdministrators%;p:full;i:sc,so" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:sc,so" -actn ace -ace "n:%DirUserName%;p:change,FILE_DELETE_CHILD;i:sc" -actn ace -ace "n:%DirUserName%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so"
     
     rem defaults: %user%	1	DACL(protected):СИСТЕМА,full,allow,container_inherit+object_inherit:Администраторы,full,allow,container_inherit+object_inherit:%user%,full,allow,container_inherit+object_inherit;Owner:СИСТЕМА;Group:СИСТЕМА
     
     ECHO %DATE% %TIME% Установка владельца и специальных ACL для некоторых папок, как в профиле по умолчанию
-    %SetACLexe% -on "%tgt%" -ot file -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
-    %SetACLexe% -on "%tgt%\AppData\Local\Microsoft\Windows\UPPS" -ot file -rec cont_obj -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
-    rem %SetACLexe% -on "%tgt%\AppData\Local\Microsoft\Windows\UPPS\UPPS.bin" -ot file -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
-    %SetACLexe% -on "%tgt%\AppData\Local\TileDataLayer\Database\EDBtmp.log" -ot file -rec cont_obj -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
-    %SetACLexe% -on "%tgt%\AppData\LocalLow" -ot file -rec cont_obj -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
-    
-    FOR %%A IN ("%tgt%\AppData\Local\Microsoft\Windows\UsrClass.dat*" "%tgt%\ntuser.dat*" "%tgt%\ntuser.ini") DO %SetACLexe% -on %%A -ot file -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
+    CALL :SetSystemOwnerAndGroup "%tgt%" "%tgt%\AppData\Local\Microsoft\Windows\UPPS\UPPS.bin" "%tgt%\AppData\Local\TileDataLayer\Database\EDBtmp.log" "%tgt%\Application Data" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History"
+    CALL :SetSystemOwnerAndGroupRec "%tgt%\AppData\Local\Microsoft\Windows\UPPS" "%tgt%\AppData\LocalLow"
+
+    CALL :SetSystemOwnerAndGroupForFiles "%tgt%\AppData\Local\Microsoft\Windows\UsrClass.dat*" "%tgt%\ntuser.dat*" "%tgt%\ntuser.ini" "%tgt%\AppData\Local\Microsoft\Windows\UPPS\UPPS.bin" "%tgt%\AppData\Local\TileDataLayer\Database\EDBtmp.log"
+
+    ECHO %DATE% %TIME% Запрет просмотра списка файлов для некоторых папок
+    REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
+    CALL :DenyListDirectory "%UIDEveryone%" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History" "%tgt%\AppData\Local\Microsoft\Windows\INetCache\Content.IE5" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Roaming\Microsoft\Windows\Start Menu\Программы" "%tgt%\Application Data" "%tgt%\Cookies" "%tgt%\Documents\Мои видеозаписи" "%tgt%\Documents\мои рисунки" "%tgt%\Documents\Моя музыка" "%tgt%\Local Settings" "%tgt%\NetHood" "%tgt%\PrintHood" "%tgt%\Recent" "%tgt%\SendTo" "%tgt%\главное меню" "%tgt%\Мои документы" "%tgt%\Шаблоны"
     
     rem left non-restored:
     rem AppData\Local\Microsoft\Windows\Caches\cversions.3.db	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read,allow,no_inheritance;
     rem AppData\Local\Microsoft\Windows\Caches\{38117EE8-B905-4D30-88C9-B63C603DA134}.3.ver0x0000000000000001.db	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read,allow,no_inheritance;
     rem AppData\Local\Microsoft\Windows\Caches\{3DA71D5A-20CC-432F-A115-DFE92379E91F}.3.ver0x0000000000000006.db	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read,allow,no_inheritance;
     rem AppData\Local\Microsoft\Windows\INetCache\counters.dat	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read_execute,allow,no_inheritance;
-    
+    rem AppData\Local\Microsoft\Windows\INetCache\counters2.dat	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету, включая входящие подключения из Интернета,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Домашние или рабочие сети,read_execute,allow,no_inheritance
+
     ECHO %DATE% %TIME% Разрешение изменения и выполнения файлов из некоторых папок
-    CALL "%srcpath%FSACL_Change.cmd" "%DirUserName%" "%tgt%\Mail\Thunderbird\profile\extensions" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs"
-    
-    ECHO %DATE% %TIME% Запрет просмотра списка файлов для некоторых папок
-    REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
-    CALL :DenyListDirectory "%UIDEveryone%" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History" "%tgt%\AppData\Local\Microsoft\Windows\INetCache\Content.IE5" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Roaming\Microsoft\Windows\Start Menu\Программы" "%tgt%\Application Data" "%tgt%\Cookies" "%tgt%\Documents\Мои видеозаписи" "%tgt%\Documents\мои рисунки" "%tgt%\Documents\Моя музыка" "%tgt%\Local Settings" "%tgt%\NetHood" "%tgt%\PrintHood" "%tgt%\Recent" "%tgt%\SendTo" "%tgt%\главное меню" "%tgt%\Мои документы" "%tgt%\Шаблоны"
+    CALL "%srcpath%FSACL_Change.cmd" "%DirUserName%" "%tgt%\Mail\Thunderbird\profile\extensions" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs" \
     
     CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Packages" "AppDataLocalPackages"
     CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Publishers" "AppDataLocalPublishers"
     CALL :restoreACLUnflagSubdir "%tgt%\AppData\Roaming\Microsoft\SystemCertificates" "AppDataRoamingMSSystemCertificates"
     
     rem without FULL access to TEMP, HP MF driver hangs when printing non-PDFs :(
-    FOR /F "usebackq delims=" %%Z IN ("%~dp0Allow TEMP full access.txt") DO IF /I "%COMPUTERNAME%"=="%%Z" %SetACLexe% -on "%tgt%\AppData\Local\Temp" -ot file -rec cont_obj -actn setowner -ownr "n:%DirUserName%" -actn rstchldrn -rst dacl -actn ace -ace "n:%DirUserName%;p:full"
+    FOR /F "usebackq delims=" %%Z IN ("%~dp0Allow TEMP full access.txt") DO IF /I "%COMPUTERNAME%"=="%%Z" %SetACLexe% -on "%tgt%\AppData\Local\Temp" -ot file -rec cont_obj -actn setowner -ownr "n:%DirUserName%" -actn rstchldrn -rst dacl -actn ace -ace "n:%DirUserName%;p:full" -ignoreerr -silent
     POPD
 EXIT /B
 )
+:SetSystemOwnerAndGroup
+(
+    %SetACLexe% -on %1 -ot file -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -silent
+    SET "nextArgLabel=SetSystemOwnerAndGroup"
+GOTO :CheckArgShift
+)
+:SetSystemOwnerAndGroupRec
+(
+    %SetACLexe% -on %1 -ot file -rec cont_obj -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -ignoreerr -silent
+    SET "nextArgLabel=SetSystemOwnerAndGroupRec"
+GOTO :CheckArgShift
+)
+:SetSystemOwnerAndGroupForFiles <paths>
+(
+    FOR /F "usebackq delims=" %%A IN (`DIR /B /A %1`) DO %SetACLexe% -on "%~dp1%%A" -ot file -actn setowner -ownr "n:%UIDSYSTEM%" -actn setgroup -grp "n:%UIDSYSTEM%" -ignoreerr -silent
+    SET "nextArgLabel=SetSystemOwnerAndGroupForFiles"
+GOTO :CheckArgShift
+)
+:CheckArgShift
+(
+    IF NOT "%~2"=="" ( SHIFT & GOTO :%nextArgLabel% )
+    SET nextArgLabel=
+    EXIT /B
+)
+    
 :backupACLFlagSubdir <path> <backup-name>
 (
     IF NOT EXIST %1 EXIT /B 0
@@ -106,7 +129,7 @@ EXIT /B
 :backupACL <path> <backup-name>
 (
     ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
-    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%ACLBackupDir%\%~2.%now%.sddl.tmp" -silent||EXIT /B
+    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%ACLBackupDir%\%~2.%now%.sddl.tmp" -ignoreerr -silent||EXIT /B
     REN "%ACLBackupDir%\%~2.%now%.sddl.tmp" "*."||EXIT /B
     START "Compacting %~nx2.%now%.sddl" /MIN %SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX "%ACLBackupDir%\%~2.%now%.sddl" >NUL 2>&1
     EXIT /B 0
@@ -143,12 +166,12 @@ EXIT /B
     IF NOT DEFINED restoreFile EXIT /B 1
 )
     ECHO %DATE% %TIME% Восстановление сохранённых ACL для %1
-    %SetACLexe% -on %1 -ot file -actn restore -bckp "%restoreFile%" -silent && DEL "%ACLBackupDir%\%~2.flag"
+    %SetACLexe% -on %1 -ot file -actn restore -bckp "%restoreFile%" -ignoreerr -silent && DEL "%ACLBackupDir%\%~2.flag"
     EXIT /B
 :restoreACLUnflagSubdir <path> <backup-name>
 (
     ECHO %DATE% %TIME% Восстановление сохранённых ACL для %1
-    %SetACLexe% -on %1 -ot file -actn restore -bckp "%ACLBackupDir%\%~2.%now%.sddl" -silent && DEL "%ACLBackupDir%\%~2.flag"
+    %SetACLexe% -on %1 -ot file -actn restore -bckp "%ACLBackupDir%\%~2.%now%.sddl" -ignoreerr -silent && DEL "%ACLBackupDir%\%~2.flag"
 EXIT /B
 )
 :DenyListDirectory <user> <path> <path> <...>

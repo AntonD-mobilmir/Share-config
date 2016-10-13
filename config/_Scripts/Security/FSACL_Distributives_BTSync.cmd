@@ -29,6 +29,6 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 )
 
 FOR %%A IN (%procList%) DO IF EXIST %%A (
-    %SetACLexe% -on %%A -ot file -rec cont_obj -actn setowner -ownr "n:%UIDAdministrators%" -actn rstchldrn -rst dacl
-    %SetACLexe% -on %%A -ot file -actn ace -ace "n:%UIDEveryone%;p:full;m:revoke" -actn ace -ace "n:%UIDEveryone%;p:read_ex"
+    %SetACLexe% -on %%A -ot file -rec cont_obj -actn setowner -ownr "n:%UIDAdministrators%" -actn rstchldrn -rst dacl -ignoreerr -silent
+    %SetACLexe% -on %%A -ot file -actn ace -ace "n:%UIDEveryone%;p:full;m:revoke" -actn ace -ace "n:%UIDEveryone%;p:read_ex" -ignoreerr -silent
 )

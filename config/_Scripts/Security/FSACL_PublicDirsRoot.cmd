@@ -22,7 +22,7 @@ SET UIDCreatorOwner=S-1-3-0;s:y
 )
 
 :Next
-%SetACLexe% -on %1 -ot file -actn clear -clr dacl -actn rstchldrn -rst dacl -actn ace -ace "n:%UIDEveryone%;p:read;i:so,sc" -actn ace -ace "n:%UIDEveryone%;p:traverse,list_dir,read_attr,read_ea,add_file,add_subdir,del_child,read_dacl;i:io,sc" -actn ace -ace "n:%UIDEveryone%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so"
+%SetACLexe% -on %1 -ot file -actn clear -clr dacl -actn rstchldrn -rst dacl -actn ace -ace "n:%UIDEveryone%;p:read;i:so,sc" -actn ace -ace "n:%UIDEveryone%;p:traverse,list_dir,read_attr,read_ea,add_file,add_subdir,del_child,read_dacl;i:io,sc" -actn ace -ace "n:%UIDEveryone%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so" -ignoreerr -silent
 
 SHIFT
 IF NOT "%~1"=="" GOTO :Next

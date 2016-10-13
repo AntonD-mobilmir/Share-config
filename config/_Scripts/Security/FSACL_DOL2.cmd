@@ -6,5 +6,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application Data" SET "LOCALAPPDATA=%USERPROFILE%\Local Settings\Application Data"
 SET "UIDCreatorOwner=S-1-3-0;s:y"
 )
+(
 CALL "%~dp0FSACL_Change.cmd" "%UIDCreatorOwner%" "%LOCALAPPDATA%\Apps\2.0"
 CALL "%~dp0FSACL_Change.cmd" "%UIDCreatorOwner%" "%USERPROFILE%\Local Settings\Apps\2.0"
+)

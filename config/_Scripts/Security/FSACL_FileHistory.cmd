@@ -20,4 +20,4 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     SET "UIDAdministrators=S-1-5-32-544;s:y"
 )
 
-%SetACLexe% -on %1 -ot file -actn clear -clr dacl -actn setprot -op "dacl:p_nc;sacl:p_nc" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:so,sc" -actn ace -ace "n:%UIDAdministrators%;p:full;i:so,sc" -actn ace -ace "n:%UIDAuthenticatedUsers%;p:read,FILE_ADD_SUBDIRECTORY;i:np;m:set;w:dacl" -ace "n:%UIDCreatorOwner%;p:full;i:io,so,sc;m:set;w:dacl"
+%SetACLexe% -on %1 -ot file -actn clear -clr dacl -actn setprot -op "dacl:p_nc;sacl:p_nc" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:so,sc" -actn ace -ace "n:%UIDAdministrators%;p:full;i:so,sc" -actn ace -ace "n:%UIDAuthenticatedUsers%;p:read,FILE_ADD_SUBDIRECTORY;i:np;m:set;w:dacl" -ace "n:%UIDCreatorOwner%;p:full;i:io,so,sc;m:set;w:dacl" -ignoreerr -silent

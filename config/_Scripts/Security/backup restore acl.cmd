@@ -10,8 +10,23 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	ECHO SetACL.exe не найден, продолжение невозможно.
 	EXIT /B 2
     )
-    SET "now=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%_%TIME::=%"
+    
+    IF "%~2"=="" CALL :restoreACL "" %2 & EXIT /B
+    IF "%~1"=="/R" GOTO :restoreACL
+    IF "%~1"=="-" GOTO :restoreACL
+    IF "%~1"=="" GOTO :restoreACL
 )
-SET out="%Temp%\acl-list-%now%-%RANDOM%.csv"
-%SetACLexe% -ot file -on %1 -rec cont_obj -actn list -lst "f:csv;w:d,o,g;s:n" -bckp %out%
-START "" %out%
+:backupACL <path> <backup>
+(
+    ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
+    %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%~2.tmp" -ignoreerr||EXIT /B
+    REN "%~2.tmp" "*."||EXIT /B
+    START "Compacting %~nx2" /MIN /LOW %SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX %2 >NUL 2>&1
+    EXIT /B 0
+)
+:restoreACL <backup>
+(
+    ECHO %DATE% %TIME% Восстановление сохранённых ACL из %2
+    %SetACLexe% -on "%TEMP%\NUL" -ot file -actn restore -bckp %2 -ignoreerr
+    EXIT /B
+)

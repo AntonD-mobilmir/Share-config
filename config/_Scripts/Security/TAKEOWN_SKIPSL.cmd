@@ -3,6 +3,7 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
 
+CALL "%~dp0..\CheckWinVer.cmd" 6 || EXIT /B & REM Not working on XP
 CALL "%~dp0..\CheckWinVer.cmd" 6.2 && (
     %SystemRoot%\System32\TAKEOWN.exe %* /D Y /R /SKIPSL
     EXIT /B
