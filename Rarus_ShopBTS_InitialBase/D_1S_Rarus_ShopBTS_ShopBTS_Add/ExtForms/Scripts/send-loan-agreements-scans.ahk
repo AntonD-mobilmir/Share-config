@@ -283,7 +283,7 @@ SendEmail() {
 	    %laNum% {сканы договоров отправлены скриптом с компьютера %A_ComputerName% отдела %MailUserId%}
 	    Список файлов:
 	    %filesList%
-	),%outMsgPath%.tmp, CP1251
+	),%outMsgPath%.tmp, UTF-8
 	FileMove %outMsgPath%.tmp, %outMsgPath%.txt, 1
 	exitOK := 1
 	TrayTip %mainTitle%, Сформировано письмо с %itmc% файлами. Будет отправлено через стандатный механизм отправки уведомлений 1С-Рарус.
