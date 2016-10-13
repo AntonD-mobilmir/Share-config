@@ -48,7 +48,7 @@
     rem REN "%DstDirWIB%\%Hostname%\checksums.md5" "checksums.md5.%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%.%RANDOM%.bak"
 
     rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла)
-    START "Запись MD5" %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
+    START "Запись MD5" /MIN %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
 
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
@@ -60,13 +60,13 @@
 )
 :CompressAndDefrag <target>
 (
-    IF "%DontCompressLocal%"=="1" CALL :IfUNC %1 || EXIT /B
-    ECHO Сжатие и дефрагментация %1
-    IF EXIST "%~dp0compress and defrag.cmd" (
-	START "Compressing and Defragging %~1" %comspec% /C "%~dp0compress and defrag.cmd" %*
-    ) ELSE (
-	START "Compressing and defragging %~1" %comspec% /C compact.exe /C /S:"%DstDirWIB%" ^& %SystemRoot%\System32\defrag.exe %~d1
+    CALL :IfUNC %1 && (
+	START "Сжатие %~1" %SystemRoot%\System32\compact.exe /C /EXE:LZX /S:%1
+	EXIT /B
     )
+    IF "%DontCompressLocal%"=="1" EXIT /B
+    ECHO Запуск сжатия и дефрагментации %1
+    IF EXIST "%~dp0compress and defrag.cmd" START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C "%~dp0compress and defrag.cmd" %*
 EXIT /B
 )
 :IfUNC <path>
