@@ -348,9 +348,11 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-;AddLog("Запуск в фоновом режиме настройки ACL ФС")
-;Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
-;SetLastRowStatus(ErrorLevel,!ErrorLevel)
+If (OSVersionObj[2] != 10 || OSVersionObj[2] != 0 || OSVersionObj[3] != 14393) { ; On Win 10 [1607] Start menu stops working after this
+    AddLog("Запуск в фоновом режиме настройки ACL ФС")
+    Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+}
 
 finished := 1
 AddLog("Готово",A_Now,1)
