@@ -7,6 +7,8 @@
     rem ECHO OFF
     SETLOCAL ENABLEEXTENSIONS
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
     IF NOT DEFINED ErrorCmd SET "ErrorCmd=@(ECHO  & PING 127.0.0.1 -n 30 & EXIT /B 32767)"
 
     REM following path is hardcoded inside Update_Distributives.job and in a lot of cmd scripts.
@@ -24,7 +26,7 @@
     CALL :ensureRsyncReady
     IF NOT DEFINED SetACLexe CALL "%~dp0..\find_exe.cmd" SetACLexe "%SystemDrive%\SysUtils\SetACL.exe" || GOTO :SysutilsFail
     IF NOT DEFINED sedexe CALL "%~dp0..\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || GOTO :SysutilsFail
-    
+    IF NOT DEFINED AutohotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 )
 (
     IF NOT EXIST "%InstDest%" MKDIR "%InstDest%" || (
@@ -36,7 +38,10 @@
     DEL /S /Q "%InstDest%\software_update\scripts\_*.*"
 
     %exe7z% x -aoa -o"%InstDest%" -- "%~dp0Scripts.7z" || %ErrorCmd%
-    FOR %%I IN ("%~dp0Scripts.7z") DO (ECHO %%~tI)>"%InstDest%\ver.flag"
+    FOR %%I IN ("%~dp0Scripts.7z") DO (
+	(ECHO %%~tI)>"%InstDest%\ver.flag"
+	SET "instVersion=%%~tI"
+    )
     IF EXIST "%InstDest%\logs.bak" RD /S /Q "%InstDest%\logs.bak"
     IF EXIST "%InstDest%\logs" MOVE "%InstDest%\logs" "%InstDest%\logs.bak"
     MKDIR "%InstDest%\logs" || %ErrorCmd%
@@ -92,6 +97,14 @@ CALL :checkProxy
 START "Удаление старых SysUtils из Windows\Temp" /MIN %comspec% /C "%~dp0..\cleanup\special\RemoveSysutilsFromWinTemp.cmd"
 
 ECHO Готово.
+ECHO.
+ECHO Отправка информации в форму...
+CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
+IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
+)
+(
+%AutohotkeyExe% "%~dp0..\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfEDfrPvAJ4BuhfT4BNqAXiJOKjR767C4p0M3k6N2Ft0BI1LQ/formResponse" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
+
 EXIT /B
 )
 :CheckCreateDir
@@ -196,7 +209,7 @@ MOVE /Y "%SystemDrive%\SysUtils" "%SystemDrive%\Windows\Temp\SysUtils_%DATE%_%RA
 ECHO Running D:\Distributives\Soft\PreInstalled\prepare.cmd ...
 START "Installing PreInstalled" /MIN /WAIT %comspec% /C "D:\Distributives\Soft\PreInstalled\prepare.cmd"
 ECHO Cleaning non-existing paths from PATH
-START "Cleaning non-existing paths from PATH" "%configDir%_Scripts\cleanup\settings\cleanup Path var in reg.ahk"
+START "Cleaning non-existing paths from PATH" %AutohotkeyExe% "%configDir%_Scripts\cleanup\settings\cleanup Path var in reg.ahk"
 FOR /D %%A IN ("%SystemDrive%\Windows\Temp\SysUtils_*.*") DO RD /S /Q "%%~A"
 EXIT /B
 )
