@@ -24,7 +24,7 @@ RunCheckError(ComSpec . " /C """ . A_ScriptDir . "\_shedule_backup1Sbase.cmd""")
 Exit
 
 RunCheckError(cmdline) {
-    RunWait %cmdline%,,UseErrorLevel
+    RunWait %cmdline%,,Min UseErrorLevel
     If (ErrorLevel)
 	MsgBox "%cmdline%"`nerror: %ErrorLevel%
     return ErrorLevel
