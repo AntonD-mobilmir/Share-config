@@ -65,14 +65,18 @@ If (FileExist(UserProfile . "\fullprofile.*.sddl")) {
 
 sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg")
 If (IsObject(sendemailcfg)) {
-    AddLog("Запуск ShopBTS_Add.install.ahk /skipSchedule")
-    Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule,,UseErrorLevel
+    If (!A_IsAdmin) {
+	ShopBTS_AddInstArg:=" /install"
+	ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
+    }
+    AddLog("Запуск ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix)
+    RunWait "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     If (ErrorLevel)
 	keepOpen := 1
 }
 
-userFoldersChk := AddLog("Проверка папок пользователя")
+userFoldersChk := AddLog("Проверка доступности папок пользователя")
 Loop Reg, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
 {
     RegRead path
@@ -89,8 +93,8 @@ If (userFoldersChk) {
     IfMsgBox Yes
     {
 	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\..\_Scripts\MoveUserProfile\reset HKCU folders.ahk"
-	If (!ErrorLevel)
-	    keepOpen := 0
+	If (ErrorLevel)
+	    keepOpen := 1
     }
 }
 
@@ -399,7 +403,7 @@ CheckUpdateDefaultConfigName(reqdConfigName) {
 	DefaultConfig:=GetDefaultConfig()
 	SplitPath DefaultConfig,configName,configDir
 	configCheck := configName=reqdConfigName
-	AddLog("Путь к файлу конфигурации: " . DefaultConfig, configName, configCheck)
+	AddLog("Путь к файлу конфигурации: " . configDir, configName, configCheck)
 	If (!configCheck) {
 	    MsgBox 4, %A_ScriptName%, В розничных отделах название локального файла конфигурации должно быть %reqdConfigName%`, но на этом компьютере файл конфигурации (полный путь): %DefaultConfig%`n`nИзменить на "%configDir%\%reqdConfigName%"?
 	    IfMsgBox Yes
@@ -499,8 +503,8 @@ SetLastRowStatus(status:="", check:=1) {
 }
 
 SetRowStatus(row, status:="", check:=1) {
-    If (status=0) {
-	status=OK
+    If (status==0) {
+	status:="OK"
     } Else If (RegexMatch(status,"^[\d\-]{1-7}$")) {
 	status=! %status%
     }
