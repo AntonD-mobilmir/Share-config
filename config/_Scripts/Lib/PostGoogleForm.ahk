@@ -21,7 +21,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     Loop %0%
     {
 	arg:=%A_Index%
-	If (A_Index==1) {
+	If (!URL) {
 	    URL:=arg
 	} Else {
 	    foundPos := RegexMatch(arg, "([^=]+)=(.+)", argkv)
