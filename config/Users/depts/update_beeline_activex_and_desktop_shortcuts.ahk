@@ -65,10 +65,10 @@ If (FileExist(UserProfile . "\fullprofile.*.sddl")) {
 
 sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg")
 If (IsObject(sendemailcfg)) {
-    If (!A_IsAdmin) {
-	ShopBTS_AddInstArg:=" /install"
-	ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
-    }
+    ;If (!A_IsAdmin) {
+    ;    ShopBTS_AddInstArg:=" /install"
+    ;    ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
+    ;}
     AddLog("Запуск ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix)
     RunWait "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
@@ -352,7 +352,7 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-If (OSVersionObj[2] != 10 || OSVersionObj[2] != 0 || OSVersionObj[3] != 14393) { ; On Win 10 [1607] Start menu stops working after this
+If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
     AddLog("Запуск в фоновом режиме настройки ACL ФС")
     Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
