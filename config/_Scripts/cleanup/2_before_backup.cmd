@@ -15,7 +15,7 @@
 	ECHO Текущий профиль питания остался от WSUSOffline. Удалите его. Подробности: https://trello.com/c/V2yWUnul/23--
 	PAUSE
     )
-    "%~dp0..\GUI\Check SystemDrive for trash.ahk"
+    "%~dp0..\GUI\Find Trash on SystemDrive.ahk"
     
     SET /P "add_Admins=Добавить стандартных администраторов после создания резервной копии? [1=y=да]"
     

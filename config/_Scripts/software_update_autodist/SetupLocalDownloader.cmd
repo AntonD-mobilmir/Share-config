@@ -9,7 +9,7 @@
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-    IF NOT DEFINED ErrorCmd SET "ErrorCmd=@(ECHO  & PING 127.0.0.1 -n 30 & EXIT /B 32767)"
+    IF NOT DEFINED ErrorCmd SET "ErrorCmd=@(ECHO  & (PING 127.0.0.1 -n 30 >NUL) & EXIT /B 32767)"
 
     REM following path is hardcoded inside Update_Distributives.job and in a lot of cmd scripts.
     SET "InstDest=d:\Scripts"
@@ -34,6 +34,8 @@
 	%ErrorCmd%
 	EXIT /B
     )
+    "%SystemRoot%\System32\schtasks.exe" /End /TN "mobilmir\Update_Distributives" /F
+    "%SystemRoot%\System32\schtasks.exe" /End /TN "mobilmir.ru\Update_Distributives" /F
     DEL /S /Q "%InstDest%\software_update\scripts\!*.*"
     DEL /S /Q "%InstDest%\software_update\scripts\_*.*"
 

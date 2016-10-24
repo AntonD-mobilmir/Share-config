@@ -1,4 +1,0 @@
-REGEDIT4
-
-[HKEY_LOCAL_MACHINE/System/CurrentControlSet/Control/Session Manager/Memory Management]
-"ContigFileAllocSize"=dword:00001000
