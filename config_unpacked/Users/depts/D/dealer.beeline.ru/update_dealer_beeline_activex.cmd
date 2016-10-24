@@ -8,32 +8,29 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
 SET "sidAuthenticatedUsers=*S-1-5-11"
 
-SET "Download="
-IF /I "%~1"=="/Download" SET "Download=1"
-IF /I "%USERNAME%"=="Продавец" SET "Download=1"
-IF /I "%USERNAME%"=="Пользователь" SET "Download=1"
+IF NOT DEFINED Download IF /I "%~1"=="/Unpack" SET "Download=0"
+IF NOT DEFINED Download IF /I "%~1"=="/Download" SET "Download=1"
+IF NOT DEFINED Download IF /I "%USERNAME%"=="Продавец" SET "Download=1"
+IF NOT DEFINED Download IF /I "%USERNAME%"=="Пользователь" SET "Download=1"
 
-IF DEFINED Download (
+SET "dest=%srcpath%bin"
+)
+IF "%Download%"=="1" (
     ECHO Только скачиваение
     "%ProgramFiles%\Internet Explorer\IEXPLORE.EXE" https://dealer.beeline.ru/dealer/criacx.cab
     EXIT /B
 )
-
-IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-
+(
 IF NOT "%secondrun%"=="1" IF NOT "%PROCESSOR_ARCHITECTURE%"=="x86" (
     SET "secondrun=1"
     "%SystemRoot%\SysWOW64\cmd.exe" /C %0 %*
     EXIT /B
 )
 
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 )
-(
-SET "dest=%srcpath%bin"
 CALL :GetDir ConfigDir "%DefaultsSource%"
-)
 IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
-
 (
 %exe7z% x -aoa -o"%dest%" -- "%srcpath%criacx.cab"
 
