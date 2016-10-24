@@ -1,2 +1,1 @@
-update_beeline_activex_and_desktop_shortcuts.ahk D:\Distributives\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk
 Desktop_shortcuts_1S_64bit.7z ярлыки используют значок 1С из %ProgramFiles(x86)% вместо %ProgramFiles%
