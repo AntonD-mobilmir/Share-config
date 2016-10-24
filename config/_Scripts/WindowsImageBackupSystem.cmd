@@ -5,6 +5,7 @@
 	"%SystemRoot%\SysNative\cmd.exe" /C %0 %*
 	EXIT /B
     )
+    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe %SystemDrive%\SysUtils\kliu\md5sum.exe "\\Srv0.office0.mobilmir\profiles$\Share\Program Files\md5sum.exe"
     rem ECHO OFF
     SETLOCAL ENABLEEXTENSIONS
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
@@ -33,7 +34,7 @@
 	    SET "CopyToR=0"
 	) ELSE IF EXIST R:\ SET /P "CopyToR=Сделать копию образа на R: ? [1=да] "
 )
-    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe %SystemDrive%\SysUtils\kliu\md5sum.exe "%DstDirWIB%\md5sum.exe" "\\Srv0.office0.mobilmir\profiles$\Share\Program Files\md5sum.exe"
+    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe "%DstDirWIB%\md5sum.exe"
 (
     MKDIR "%DstDirWIB%" 2>NUL
     %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
@@ -48,7 +49,7 @@
     rem REN "%DstDirWIB%\%Hostname%\checksums.md5" "checksums.md5.%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%.%RANDOM%.bak"
 
     rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла)
-    START "Запись MD5" /MIN %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
+    IF DEFINED md5sumexe START "Запись MD5" /MIN %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
 
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
