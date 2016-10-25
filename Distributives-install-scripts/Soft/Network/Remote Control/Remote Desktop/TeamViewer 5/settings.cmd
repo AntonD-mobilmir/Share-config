@@ -37,13 +37,14 @@ IF "%argflag%"=="/" (
     REG IMPORT "%RegConfigName%"
     IF "%del%"=="1" DEL "%RegConfigName%"
     
+    IF DEFINED debug PAUSE
     EXIT /B
     )
 :arg_PostInstall
 (
     REM Posting data to TeamViewer Install Info form
     IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-    IF NOT EXIST %AutohotkeyExe% CALL :FindAutohotkeyExe
+    IF DEFINED AutohotkeyExe CALL :FindAutohotkeyExe
     SET "TVProgramFiles=%ProgramFiles(x86)%\TeamViewer\Version5"
 )
     IF NOT EXIST "%TVProgramFiles%\TV.dll" SET "TVProgramFiles=%ProgramFiles%\TeamViewer\Version5"
@@ -56,10 +57,14 @@ IF "%argflag%"=="/" (
     REM to avoid that, copy these files and schedule their move to normal location.
     REG ADD "HKEY_CURRENT_USER\Software\Sysinternals\Movefile" /v "EulaAccepted" /t REG_DWORD /d 1 /f
     IF NOT DEFINED movefileexe CALL :findexe movefileexe movefile.exe
+    IF NOT DEFINED xlnexe CALL :findexe xlnexe xln.exe
     IF NOT DEFINED movefileexe GOTO :skipNormalizingTV
+    IF NOT DEFINED xlnexe SET "xlnexe=xln.exe"
+)
+(
     PUSHD "%TVProgramFiles%" || GOTO :skipNormalizingTV
 	FOR %%I IN (*.dll *.exe) DO (
-	    xln "%%~I" "%%~I.copy" || COPY /B "%%~I" "%%~I.copy"
+	    %xlnexe% "%%~I" "%%~I.copy" || COPY /B "%%~I" "%%~I.copy"
 	    %movefileexe% "%%~I.copy" "%%~I"
 	)
     POPD
@@ -92,6 +97,7 @@ IF "%argflag%"=="/" (
     ATTRIB +H "%CommonDesktop%\TeamViewer*.lnk"
     
     START "Starting TeamViewer5 Service" /MIN %comspec% /C "%SystemRoot%\System32\ping.exe 127.0.0.1 -n 15 >NUL & %SystemRoot%\System32\net.exe start TeamViewer5"
+    IF DEFINED debug PAUSE
 EXIT /B
 )
 :arg_CleanupBeforeReinstall
@@ -103,23 +109,24 @@ EXIT /B
     %SystemRoot%\System32\taskkill.exe /F /IM TeamViewer.exe
     IF EXIST "%lProgramFiles%\Teamviewer\Version5" RD /S /Q "%lProgramFiles%\Teamviewer\Version5"
     IF EXIST "%lProgramFiles%\Teamviewer\Version5" MOVE /Y "%lProgramFiles%\Teamviewer\Version5" "%lProgramFiles%\Teamviewer\Version5_bak%RANDOM%"
+    IF DEFINED debug PAUSE
 EXIT /B
 )
 :FindSoftwareSource
     CALL :CheckSetSoftSource "%~d0\Distributives\Soft" || CALL :CheckSetSoftSource "%~dp0..\..\Soft" ( || CALL :CheckSetSoftSource "%~d0\Soft" || CALL :CheckSetSoftSource "\\Srv0\Distributives\Soft" || CALL :CheckSetSoftSource "\\Srv0.office0.mobilmir\Distributives\Soft" || EXIT /B 1
-
+(
     SET "utilsdir=%SoftSourceDir%PreInstalled\utils\"
-
 EXIT /B
-
+)
 :CheckSetSoftSource
+(
     IF EXIST "%~1" (
 	SET "SoftSourceDir=%~f1\"
 	ECHO SoftSourceDir: %SoftSourceDir%
 	EXIT /B 0
     )
 EXIT /B 
-
+)
 :FindAutohotkeyExe
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :GetFirstArg AutohotkeyExe %%I
 (
@@ -128,9 +135,10 @@ EXIT /B
 EXIT /B
 )
 :GetFirstArg
+(
     SET "%~1=%~2"
 EXIT /B
-
+)
 :find7zexe
 (
     FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command" /ve`) DO CALL :checkDirFrom1stArg %%B && EXIT /B
