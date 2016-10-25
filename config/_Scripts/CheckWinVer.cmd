@@ -1,27 +1,23 @@
-@REM coding:CP866
-@REM by LogicDaemon <www.logicdaemon.ru>
-@REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+@(REM coding:CP866
+REM by LogicDaemon <www.logicdaemon.ru>
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-
-(
-    SET "OSWordSize=32"
-    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OSWordSize=64"
-    IF /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" SET "OSWordSize=64"
-    FOR /F "usebackq delims=" %%W IN (`ver`) DO SET "VW=%%W"
+SET "OSWordSize=32"
+IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OSWordSize=64"
+IF /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" SET "OSWordSize=64"
+FOR /F "usebackq delims=" %%W IN (`ver`) DO SET "VW=%%W"
 )
-
 IF "%VW:~0,24%"=="Microsoft Windows 2000 [" (
     REM 2K: Microsoft Windows 2000 [Версия 5.00.2195]
-    SET WinVerNum=5.0
+    SET "WinVerNum=5.0"
 ) ELSE IF "%VW:~0,22%"=="Microsoft Windows XP [" (
     REM XP: Microsoft Windows XP [Version 5.1.2600]
-    SET WinVerNum=5.1
+    SET "WinVerNum=5.1"
 ) ELSE (
     IF "%VW:~0,27%"=="Microsoft Windows [Version " SET "WinVerNum=%VW:~27,-1%"
     IF "%VW:~0,26%"=="Microsoft Windows [Версия " SET "WinVerNum=%VW:~26,-1%"
 )
 
-:compare
 (
 IF "%~1"=="" EXIT /B
 SETLOCAL
