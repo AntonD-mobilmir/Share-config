@@ -35,7 +35,7 @@ IF NOT EXIST "%dir7z%\7z.dll" GOTO :Unpack7ZipLibs
 )
 :Skip7z
 (
-IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" %AutoHotkeyExe% _copy_config.ahk
+IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" %AutoHotkeyExe% "%TCDir%\_copy_config.ahk"
 EXIT /B
 )
 :getFirstArg
