@@ -187,7 +187,7 @@ Distributives := EnvGetAfterScript(gsussScript, "Distributives")
 SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
 If (!FileExist(Distributives . "\Soft\PreInstalled\utils\7za.exe")) {
     Distributives=\\Srv0.office0.mobilmir\Distributives
-    AddLog("В локальной папке дистрибутивов нет Preinstalled\*\7za.exe", "исп. дистр. из Srv0\Distributives")
+    AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
 }
 
 exe7z:=find7zexe()
