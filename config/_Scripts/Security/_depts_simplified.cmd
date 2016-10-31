@@ -24,7 +24,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "UIDCreatorOwner=S-1-3-0;s:y"
     SET "UIDAdministrators=S-1-5-32-544;s:y"
 
-    FOR /F "usebackq skip=2 tokens=1,2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v "ProfilesDirectory"`) DO IF "%%I"=="ProfilesDirectory" SET "ProfilesDirectory=%%~K"
+    IF /I "%~1" NEQ "/NoProfiles" FOR /F "usebackq skip=2 tokens=1,2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v "ProfilesDirectory"`) DO IF "%%I"=="ProfilesDirectory" SET "ProfilesDirectory=%%~K"
 )
 FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SET "ProfilesDirectory=%%~I"
 (
@@ -49,8 +49,8 @@ EXIT /B
 
 :MakeDirsReadOnlyForUsers
 (
-    IF "%~1"=="" EXIT /B
     CALL "%srcpath%FSACL_ReadExecute.cmd" %1 C:\ D:\ R:\ "%ALLUSERSPROFILE%\Documents" "%ALLUSERSPROFILE%\DRM" "%ALLUSERSPROFILE%\Application Data"
+    IF "%~2"=="" EXIT /B
     SHIFT
 GOTO :MakeDirsReadOnlyForUsers
 )
