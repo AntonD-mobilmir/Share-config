@@ -82,7 +82,9 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     rem AppData\Local\Microsoft\Windows\INetCache\counters2.dat	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету, включая входящие подключения из Интернета,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Домашние или рабочие сети,read_execute,allow,no_inheritance
 
     ECHO %DATE% %TIME% Разрешение изменения и выполнения файлов из некоторых папок
-    CALL "%srcpath%FSACL_Change.cmd" "%DirUserName%" "%tgt%\Mail\Thunderbird\profile\extensions" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs" \
+    CALL "%srcpath%FSACL_Change.cmd" "%DirUserName%" "%tgt%\Mail\Thunderbird\profile\extensions" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs"
+    REM исправление последствий опечатки --- \ в конце предыдущей строки
+    %SetACLexe% -on \ -ot file -actn ace -ace "n:%DirUserName%;p:change;i:so,sc;m:revoke;w:dacl" -ignoreerr -silent
     
     CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Packages" "AppDataLocalPackages"
     CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Publishers" "AppDataLocalPublishers"
