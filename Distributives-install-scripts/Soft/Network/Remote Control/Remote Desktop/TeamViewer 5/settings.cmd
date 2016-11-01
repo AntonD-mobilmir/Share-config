@@ -20,7 +20,7 @@ IF "%argflag%"=="/" (
 
 :arg_Import
     (
-    SET "RegConfigName=%~1"
+    IF NOT DEFINED RegConfigName SET "RegConfigName=%~1"
     IF NOT DEFINED RegConfigName SET "RegConfigName=TeamViewer_host.reg"
     )
     IF NOT EXIST "%RegConfigName%" (
@@ -42,6 +42,8 @@ IF "%argflag%"=="/" (
     )
 :arg_PostInstall
 (
+    IF NOT DEFINED RegConfigName SET "RegConfigName=%~1"
+    IF NOT DEFINED RegConfigName SET "RegConfigName=TeamViewer_host.reg"
     REM Posting data to TeamViewer Install Info form
     IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
     IF DEFINED AutohotkeyExe CALL :FindAutohotkeyExe

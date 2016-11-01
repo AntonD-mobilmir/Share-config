@@ -11,13 +11,17 @@ Loop 4
 	IPAddresses .= " " . A_IPAddress%A_Index%
 
 If (!configPost) { ; it may be defined when this script is included in "%USERPROFILE%\Dropbox\Developement\TeamViewer\Host\install_script\install.ahk"
+    EnvGet configPost, DefaultsSource
+    If (!configPost)
+	configPost := getDefaultConfig()
+    If (configPost)
+	configPost .= "\TeamViewer\"
     If %1%
-	configPost=%1%
-    Else
-    {
-	EnvGet configPost, DefaultsSource
-	If Not configPost
-	    configPost := getDefaultConfig()
+    {    
+	configPost=%configPost%%1%
+    } Else {
+	EnvGet RegConfigName, RegConfigName
+	configPost .= RegConfigName
     }
 }
 
@@ -29,6 +33,7 @@ Loop {
     If (A_Index > 1) {
 	TrayTip Сведения об установке TeamViewer, TeamViewer ID отсутствует в реестре`, ожидание…,,1
 	Sleep 3000
+	TrayTip
     }
 } Until ClientID
 

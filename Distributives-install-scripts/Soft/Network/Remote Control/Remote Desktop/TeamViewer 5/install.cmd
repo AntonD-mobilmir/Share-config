@@ -144,7 +144,7 @@ IF DEFINED RemoveMSI SET quotedRemoveMSI="%RemoveMSI%"
     %PreExeCcmd% msiexec.exe /i "%InstallMSI%" /quiet REBOOT=ReallySuppress /log+ "%MSILog%"
     IF ERRORLEVEL 1618 IF NOT ERRORLEVEL 1619 ( %SystemRoot%\System32\ping.exe 127.0.0.1 -n 30 >NUL & GOTO :retryMsiExecInstall ) & rem another install in progress, wait and retry
     IF ERRORLEVEL 1 SET "showlog=1"
-    %PreExeCcmd% cmd.exe /C ""%SettingsScript%" /PostInstall"
+    %PreExeCcmd% cmd.exe /C ""%SettingsScript%" /PostInstall "%RegConfigName%""
 )
 (
     IF DEFINED showlog (
