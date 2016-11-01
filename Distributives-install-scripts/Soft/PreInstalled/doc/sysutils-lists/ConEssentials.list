@@ -10,10 +10,12 @@ libs\libssh2.dll
 libs\regex2.dll
 libs\ssleay32.dll
 libs\zlib1.dll
+ln.exe
 SetACL errorcodes.txt
 SetACL.2.0.0.4.txt
 SetACL.exe
 SetACL.txt
+SysInternals\movefile.exe
 UnxUtils\agrep.exe
 UnxUtils\cat.exe
 UnxUtils\cp.exe
