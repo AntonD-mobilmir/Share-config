@@ -1,0 +1,6 @@
+jre-8u102-windows-i586.exe
+
+This file has been downloaded from:
+http://download.oracle.com/otn-pub/java/jdk/8u102-b14/jre-8u102-windows-i586.exe?AuthParam=1471271110_2e18893e4b89381ae68e03adae80895f
+
+Date: 15.08.2016, 17:24

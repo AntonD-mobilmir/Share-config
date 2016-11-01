@@ -1,0 +1,10 @@
+TeamViewer5HostUnattended_egs.exe тихо и без вопросов устанавливает TeamViewer Host на "голую" систему, где нет ни 7-zip, ни PreInstalled, ни доступа к config\Apps_*.7z (да и вообще нет _get_defaultconfig_source.cmd).
+
+Это самораспаковывающийся 7-zip архив с ahk_exe setup.exe.
+
+Просто запуск от имени администратора устанавливает TV Host с предустановленным паролем. Этот пароль надо сразу сменить.
+Если при запуске держать Shift, вместо этого будет использован стандартный админский пароль.
+
+ID, Hostname и IP записываются в https://docs.google.com/spreadsheets/d/179XOMsXbLEOoGIaN6_4gE43RVJ8fyQ57dw1DLe6XnF8/edit#gid=13434844
+
+exe доступен по ссылке: http://link.mobilmir.ru/tvhost

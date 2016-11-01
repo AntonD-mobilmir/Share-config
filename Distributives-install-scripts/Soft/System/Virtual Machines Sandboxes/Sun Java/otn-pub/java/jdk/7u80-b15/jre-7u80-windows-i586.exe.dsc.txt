@@ -1,0 +1,6 @@
+jre-7u80-windows-i586.exe
+
+This file has been downloaded from:
+http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jre-7u80-windows-i586.exe?AuthParam=1431506925_68da5a46d7497df7993cc61b2b3bd77f
+
+Date: 13.05.2015, 11:47
