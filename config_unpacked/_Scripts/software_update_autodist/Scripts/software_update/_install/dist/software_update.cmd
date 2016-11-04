@@ -60,7 +60,7 @@ REM compared files differ
 IF ERRORLEVEL 1 COPY /B /Y "%SUScripts%\..\_install\dist\software_update.cmd" "%0" & EXIT /B
 
 REM cleanup
-FOR %%I IN ("%SUScriptsStatus%\*.*") DO IF NOT EXIST "%SUScripts%\%%~nI" MOVE /Y "%%~I" "%SUScriptsOldLogs%"
+FOR %%I IN ("%SUScriptsStatus%\*.*") DO IF NOT EXIST "%SUScripts%\%%~nI" ECHO Y|MOVE /Y "%%~I" "%SUScriptsOldLogs%"
 %AutohotkeyExe% /ErrorStdOut "%SUScripts%\..\_install\dist\remove old logs.ahk" 1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%" 2>&1
 REM scripts running once if no error
 FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" SET "ScriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
