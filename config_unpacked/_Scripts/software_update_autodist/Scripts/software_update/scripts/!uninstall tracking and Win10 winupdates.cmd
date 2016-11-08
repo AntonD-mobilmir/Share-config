@@ -16,7 +16,7 @@ REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /
 REG ADD "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" /v "ReservationsAllowed" /d 0 /f
 )
 (
-rem Список с объяснениями: https://docs.google.com/spreadsheets/d/1OZfazpVPCoHJYGo4s7oFeuRXmzcZeYktbMdZTUB5SDU
+rem Список с объяснениями: <https://www.dropbox.com/s/qk18lkb6yb11q2j/%D0%BD%D0%B5%D0%BE%D0%B1%D1%8F%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%B8%20%D1%80%D0%B5%D0%BA%D0%BE%D0%BC%D0%B5%D0%BD%D0%B4%D1%83%D0%B5%D0%BC%D1%8B%D0%B5%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%20Windows%207.txt?dl=0>
 rem refs:
 rem http://www.wilderssecurity.com/threads/list-of-windows-7-telemetry-updates-to-avoid.379151/
 rem http://www.infoworld.com/article/3029642/microsoft-windows/kb-3135449-and-3135445-could-be-useful-but-ignore-the-rest-of-microsofts-batch.html

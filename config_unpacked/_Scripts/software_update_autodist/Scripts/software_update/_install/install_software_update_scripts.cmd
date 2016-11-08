@@ -33,7 +33,7 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
 )
 (
     REM use user named admin-task-scheduler with random password, write password to an encrypted local file, use this password for tasks creation
-    REM IF NOT DEFINED schedUserName CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
+    REM not in retail, because there server can have admin-task-scheduler user too -- IF NOT DEFINED schedUserName CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
     IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
 )
 :SchtasksRepeat

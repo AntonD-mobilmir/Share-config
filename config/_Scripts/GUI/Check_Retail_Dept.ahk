@@ -327,12 +327,12 @@ If (IsObject(softUpdScripts)) {
 }
 
 AddLog("Журналы скриптов обновления")
-EnvGet ProgramData,ProgramData
-suSettingsScript=%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
+suSettingsScript=%A_AppDataCommon%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
 hostSUScripts:=ReadSetVarFromBatchFile(suSettingsScript, "SUSHost")
 If (hostSUScripts) {
     SetLastRowStatus(hostSUScripts, 0)
-    RunWait %comspec% /C "%A_ScriptDir%\..\..\_Scripts\software_update_autodist\CheckLocalUpdater.cmd",,Min UseErrorLevel
+    cmdCheckLocalUpdater := FirstExisting(A_ScriptDir . "\..\..\_Scripts\software_update_autodist\CheckLocalUpdater.cmd")
+    RunWait %comspec% /C "%cmdCheckLocalUpdater%",,Min UseErrorLevel
     FileRead pathLastStatus, *P866 *m65536 %A_Temp%\CheckLocalUpdater.flag
     pathLastStatus := Trim(pathLastStatus, "`r`n`t ")
     If (!ErrorLevel && FileExist(pathLastStatus)) {
