@@ -49,7 +49,7 @@ IF NOT DEFINED srcpath GOTO :no_srcpath
     (
 	IF "%~2"=="" EXIT /B 9009
 	IF NOT EXIST "%~dp2" EXIT /B 9009
-	"%~2" <NUL >NUL 2>&1
+	"%~2" %findExeTestExecutionOptions% <NUL >NUL 2>&1
 	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
 	SET %~1="%~2"
 EXIT /B
