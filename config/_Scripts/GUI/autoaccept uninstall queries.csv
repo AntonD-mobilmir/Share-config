@@ -53,3 +53,4 @@ Windows Live ahk_class LiveDialog,Выбор программ для удале�
 HP ePrint - HP ePrint SW ahk_class WixStdBA,&Удалить,&Удалить,,,,,,
 ahk_exe McUICnt.exe,,X492 Y258,,,,,,
 McAfee SecurityCenter ahk_class uninstall,,X130 Y475,X43 Y207,X64 Y234,X466 Y479,X466 Y479,,
+ WPS Office Uninstallation Wizard ahk_exe Au_.exe,,X43 Y227,X43 Y330,X81 Y364,,,,
