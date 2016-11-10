@@ -39,15 +39,18 @@
     MKDIR "%DstDirWIB%" 2>NUL
     %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
     
-    IF DEFINED PassFilePath (
-	COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
-	DIR /AD /B /O-D "%DstDirWIB%\%Hostname%\Backup*">>"%PassFilePath%"
-    )
+    rem This inine (instead of CALL):
+    rem IF DEFINED PassFilePath (
+    rem     COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
+    rem     DIR /AD /B /O-D "%DstDirWIB%\%Hostname%\Backup*">>"%PassFilePath%"
+    rem )
+    rem causes this:
+    rem The syntax of the command is incorrect.
+    rem
+    rem C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
+    IF DEFINED PassFilePath CALL :CopyEchoPassFilePath
     
     ECHO Расчёт сумм MD5
-    rem IF EXIST "%DstDirWIB%\%Hostname%\checksums.md5" FOR %%I IN ("%DstDirWIB%\%Hostname%\checksums.md5") DO CALL :AddDateToName %%I "%%~tI"
-    rem REN "%DstDirWIB%\%Hostname%\checksums.md5" "checksums.md5.%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%.%RANDOM%.bak"
-
     rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла)
     IF DEFINED md5sumexe START "Запись MD5" /MIN %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
 
@@ -59,6 +62,13 @@
 
     EXIT /B
 )
+:CopyEchoPassFilePath
+(
+    COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
+    DIR /AD /B /O-D "%DstDirWIB%\%Hostname%\Backup*">>"%PassFilePath%"
+EXIT /B
+)
+
 :CompressAndDefrag <target>
 (
     CALL :IfUNC %1 && (
