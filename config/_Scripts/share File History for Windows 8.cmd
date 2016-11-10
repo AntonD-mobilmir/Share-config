@@ -10,10 +10,8 @@ SET shareName="File History$"
 :tryAgain
 (
 MKDIR %targetDir%
-IF NOT EXIST %targetDir% (
-    CALL :AskAnotherDir || EXIT /B
-    GOTO :tryAgain
-)
+IF NOT EXIST %targetDir% GOTO :AskAnotherDir
+
 %SystemRoot%\system32\compact.exe /C %targetDir%
 rem ATTRIB +H %targetDir%
 %SystemRoot%\system32\NET.exe SHARE %shareName%=%targetDir% /GRANT:Users,FULL /REMARK:"Ресурс для локальной истории файлов"
@@ -34,7 +32,7 @@ CALL :checktargetDir "%targetDir%" || CALL :checktargetDir %targetDir%
 (
 ENDLOCAL
 SET targetDir="%targetDir%"
-EXIT /B 0
+GOTO :tryAgain
 )
 :checktargetDir <path>
 (
