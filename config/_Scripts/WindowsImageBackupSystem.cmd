@@ -39,16 +39,10 @@
     MKDIR "%DstDirWIB%" 2>NUL
     %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
     
-    rem This inine (instead of CALL):
-    rem IF DEFINED PassFilePath (
-    rem     COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
-    rem     DIR /AD /B /O-D "%DstDirWIB%\%Hostname%\Backup*">>"%PassFilePath%"
-    rem )
-    rem causes this:
-    rem The syntax of the command is incorrect.
-    rem
-    rem C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
     IF DEFINED PassFilePath CALL :CopyEchoPassFilePath
+    rem previous thing inine instead of CALL causes this:
+    rem 	The syntax of the command is incorrect.
+    rem 	C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
     
     ECHO Расчёт сумм MD5
     rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла)
@@ -65,7 +59,7 @@
 :CopyEchoPassFilePath
 (
     COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
-    DIR /AD /B /O-D "%DstDirWIB%\%Hostname%\Backup*">>"%PassFilePath%"
+    CALL :DirToPassFile "%DstDirWIB%\%Hostname%\Backup*"
 EXIT /B
 )
 
@@ -73,11 +67,11 @@ EXIT /B
 (
     CALL :IfUNC %1 && (
 	START "Сжатие %~1" %SystemRoot%\System32\compact.exe /C /EXE:LZX /S:%1
-	EXIT /B
+    ) ELSE (
+	IF "%DontCompressLocal%"=="1" EXIT /B
+	ECHO Запуск сжатия и дефрагментации %1
+	IF EXIST "%~dp0compress and defrag.cmd" START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C "%~dp0compress and defrag.cmd" %*
     )
-    IF "%DontCompressLocal%"=="1" EXIT /B
-    ECHO Запуск сжатия и дефрагментации %1
-    IF EXIST "%~dp0compress and defrag.cmd" START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C "%~dp0compress and defrag.cmd" %*
 EXIT /B
 )
 :IfUNC <path>
@@ -100,7 +94,7 @@ EXIT /B
     ECHO Копирование образа в "%~1\WindowsImageBackup\%Hostname%"
     MKDIR "%~1\WindowsImageBackup\%Hostname%" 2>NUL
     XCOPY "%DstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
-    DIR /AD /B "%~1\WindowsImageBackup\%Hostname%\Backup*">>%PassFilePath%
+    IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
     
     rem when making local backup, WindowsImageBackup gets inherited permissions from root, and subfolder with actual backup: http://imgur.com/a/ttyqJ
     rem 	owned by SYSTEM
@@ -117,6 +111,11 @@ EXIT /B
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
 
     ECHO Ожидание окончания записи MD5
+)
+:DirToPassFile <path>
+(
+    DIR /AD /B /O-D %1 >>"%PassFilePath%"
+EXIT /B
 )
 :waitmore
 (
