@@ -34,5 +34,7 @@ REM копировать скрипт .inf в %TEMP%, иначе Win7 не может импортировать политику,
 COPY /B /Y "%SecurityCfgInfSrc%" "%SecurityCfgInf%"
 "%SystemRoot%\System32\secedit.exe" /configure /db "%seceddb%.new" /cfg "%SecurityCfgInf%"||%ErrorCmd%
 
+CALL "%~dp0GroupPolicy.DenyExecuteRemovables.cmd"
+
 rem MOVE /Y "%seceddb%.new" "%seceddb%"||%ErrorCmd%
 DEL "%SecurityCfgInf%"
