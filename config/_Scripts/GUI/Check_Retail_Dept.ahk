@@ -98,7 +98,7 @@ If (IsObject(sendemailcfg)) {
     ;    ShopBTS_AddInstArg:=" /install"
     ;    ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
     ;}
-    AddLog("Запуск ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix)
+    AddLog("ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix, "Запуск")
     RunWait "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     If (ErrorLevel)
@@ -271,6 +271,7 @@ SetLastRowStatus(ErrorLevel,!ErrorLevel)
 instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"))
 If (IsObject(instCriacxocx)) {
     criacxUpdater := CheckPath(LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk"))
+    LV_Modify(LV_GetCount(),,"update_beeline_activex_and_desktop_shortcuts.ahk")
     criacxUpdaterPath := criacxUpdater.Path
     RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
