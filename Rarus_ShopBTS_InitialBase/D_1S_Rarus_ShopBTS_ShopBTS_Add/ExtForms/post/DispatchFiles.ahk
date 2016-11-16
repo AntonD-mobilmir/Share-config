@@ -174,7 +174,7 @@ DeliverOneEmail(EmailFileName) {
     mailBodyFileName = %tempDir%\%A_Now%.txt
     FileDelete %mailBodyFileName%
     FileAppend % SubStr(emailFileText, textStart), %mailBodyFileName%, UTF-8
-    RunWait %sendemailexe% -o message-file="%mailBodyFileName%" -f "%encodedFrom%" -t "%HeaderTo%" %replyToHeader% -u "%HeaderSubject%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 -bcc "%bcc%" -l "%logfile%" %Attachments%",,Hide UseErrorLevel
+    RunWait %sendemailexe% -o message-file="%mailBodyFileName%" -f "%encodedFrom%" -t "%HeaderTo%" %replyToHeader% -u "%HeaderSubject%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 -bcc "%bcc%" -l "%logfile%" %Attachments%,,Hide UseErrorLevel
     FileDelete %mailBodyFileName%
     
     If (ErrorLevel) {
