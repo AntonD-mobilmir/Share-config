@@ -14,12 +14,11 @@ IF NOT DEFINED ErrorCmd (
     )
 )
 
-IF "%~1"=="/CMDrestarted" ( SHIFT ) ELSE (
-    IF /I %PROCESSOR_ARCHITECTURE% NEQ x86 (
-	ECHO Restarting with 32-bit cmd.exe
-	"%SystemRoot%\SysWOW64\cmd.exe" /C ""%~f0" /CMDrestarted %*"
-	EXIT /B
-    )
+IF NOT DEFINED RestartedWith32bitcmdexe IF /I %PROCESSOR_ARCHITECTURE% NEQ x86 (
+    ECHO Restarting with 32-bit cmd.exe
+    SET "RestartedWith32bitcmdexe=1"
+    "%SystemRoot%\SysWOW64\cmd.exe" /C ""%~f0" /CMDrestarted %*"
+    EXIT /B
 )
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 )
