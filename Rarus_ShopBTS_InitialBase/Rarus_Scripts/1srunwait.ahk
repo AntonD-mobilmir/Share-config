@@ -7,7 +7,7 @@ run1sexe:="1cv7s.exe"
 ExcessArcTimeLim:=5*60 ; s
 WaitArchivingAfterBoot:=5*60*1000 ; ms
 
-DailyArchiveFName = ShopBTS_%A_Year%-%A_MM%-??.7z
+DailyArchiveFName = ShopBTS_%A_Year%-%A_MM%-%A_DD%.7z
 MonthlyArchiveFName = ShopBTS_%A_Year%-%A_MM%.7z
 
 IfWinExist 1С:Предприятие ahk_exe %run1sexe%
@@ -45,7 +45,7 @@ backupsDir := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cm
 If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
 	&& !FileExist(rarusbackupflag)  		    			; and no flag exist
 	&& !FileExist(backupsDir . "\" . DailyArchiveFName) 			; and no daily backup exist
-	&& FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) {	; and monthly backup not exist or created before last boot
+	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) {	; and monthly backup not exist or created before last boot
     ResetProgress(WaitArchivingAfterBoot)
     Loop {
 	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, A_TickCount//1000 . " / " . WaitArchivingAfterBoot//1000)
