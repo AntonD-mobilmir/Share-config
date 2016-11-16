@@ -189,8 +189,7 @@ SelectAddFiles() {
 	If (A_Index = 1) {
 	    lastUsedDir := A_LoopField
 	} Else {
-	    FileGetSize fileSize, %lastUsedDir%\%A_LoopField%, K
-	    lastAddedRow := LV_Add("", A_LoopField, lastUsedDir . "\" . A_LoopField, fileSize)
+	    lastAddedRow := AddFileToList(lastUsedDir . "\" . A_LoopField)
 	}
     }
     LV_Modify(lastAddedRow, "Focus Vis")
@@ -204,10 +203,18 @@ SelectAddFiles() {
 
 GuiDropFiles(GuiHwnd, FileArray, CtrlHwnd, X, Y) {
     For i, path in FileArray {
-	FileGetSize fileSize, %path%, K
-	SplitPath path, OutFileName
-	lastAddedRow := LV_Add("", OutFileName, path, fileSize)
+	lastAddedRow := AddFileToList(path)
     }
+}
+
+AddFileToList(path) {
+    FileGetSize fileSize, %path%, K
+    If (!fileSize) {
+	MsgBox 0x30, %mainTitle%, Не удалось определить размер файла %path%`, он не будет добавлен.
+	return
+    }
+    SplitPath path, OutFileName,,OutExtension
+    return LV_Add("", OutFileName, path, fileSize)
 }
 
 ;Expand env vars in string, ignoring %% (double percent sequences)
@@ -233,9 +240,15 @@ SendEmail() {
 	Loop %itmc%
 	{
 	    LV_GetText(path, A_Index, 2)
-	    filesList .= path . "`n"
-	    LV_GetText(size, A_Index, 3)
-	    messageSize += 4 * (size//3+1) + 1 ; Base64+headers. ~ToDo: account line breaks
+	    FileGetSize size, %path%, K
+	    If (size && !ErrorLevel) {
+		filesList .= path . "`n"
+		;LV_GetText(size, A_Index, 3)
+		messageSize += 4 * (size//3+1) + 1 ; Base64+headers. ~ToDo: account line breaks
+	    } Else {
+		MsgBox 0x30, %mainTitle%, Не удалось определить размер файла %path%`, или размер равен нулю. Файл не может быть добавлен.
+		return 1
+	    }
 	}
 	
 	If (messageSize > 8192) {
@@ -256,7 +269,7 @@ SendEmail() {
 		    errorsMsg .= "`n""" . A_LoopField . """ (файл не найден)"
 		    continue
 		}
-		FileCopy %A_LoopField%, %outMsgPath%
+		FileCopy %A_LoopField%, %outMsgPath%\*.*, 1
 		If (A_LastError || ErrorLevel)
 		    errorsMsg .= "`n""" . A_LoopField . """ (код " . A_LastError . ")"
 		Else
