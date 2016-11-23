@@ -97,7 +97,7 @@ DispatchSingleFile(pathFileToSend) {
     SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -60000 * 10
-    RunWait %sendemailexe% -f "%emailUserName%" -t "gl@k.mobilmir.ru" -u "%subject%" -s "smtp.k.mobilmir.ru:587" -xu "%emailUserName%" -xp "%emailPassword%" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -m "%EmailBody%" -a "%pathFileToSend%",,Hide UseErrorLevel, pidSendEmail
+    RunWait %sendemailexe% -f "%emailUserName%" -t "gl@k.mobilmir.ru" -u "%subject%" -s "smtp.k.mobilmir.ru:587" -xu "%emailUserName%" -xp "%emailPassword%" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -m "%EmailBody%" -a "%pathFileToSend%",%A_Temp%,Hide UseErrorLevel, pidSendEmail
     SetTimer killSendEmail, Off
     If (ErrorLevel || killedSendEmail) {
 	TrayTip Ошибка при попытке отправки, %trayMsgText% %note% [%nameExtToSend%] неудачна, 30, 3
@@ -106,6 +106,9 @@ DispatchSingleFile(pathFileToSend) {
 	} Else {
 	    ReturnError:=ErrorLevel
 	}
+	FileRemoveDir %A_Temp%\perl, 1
+	Loop Files, %A_Temp%\pdk*, D
+	    FileRemoveDir %A_LoopFileFullPath%, 1
     } Else {
 	FileDelete %pathFileToSend%
 	FileDelete %pathNote%
