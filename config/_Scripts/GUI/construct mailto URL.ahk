@@ -59,14 +59,14 @@ Update:
     copied := 0
     
     If (mailto) {
-	URI := "mailto:" . To . "?"
+	URI := "mailto:" . EncodeTo(To) . "?"
     } Else { ; If (gmail)
-	URI := "https://mail.google.com/mail/?view=cm&to=" . To . "&"
+	URI := "https://mail.google.com/mail/?view=cm&to=" . EncodeTo(To) . "&"
     }
     If (CC)
-	URI .= "cc=" . CC . "&"
+	URI .= "cc=" . EncodeTo(CC) . "&"
     If (BCC)
-	URI .= "&bcc=" . BCC . "&"
+	URI .= "&bcc=" . EncodeTo(BCC) . "&"
 
     If (mailto) {
 	URI .= ConstructURL("subject","body")
@@ -75,6 +75,27 @@ Update:
     }
     GuiControl,,URI,%URI%
 return
+
+EncodeTo(csv) {
+    o:=""
+    Loop Parse, csv, CSV
+    {
+	o .= EncodeSingleAddress(A_LoopField) . ","
+    }
+    return SubStr(o, 1, -1)
+}
+
+EncodeSingleAddress(a) {
+    If (InStr(a, "@")) { 
+	If (RegexMatch(a, "^(.+)\<([^ >]+@[^ >]+\.[^ >]+)\>(.+)$", s)) { ; "Name <address> comment"
+	    return UriEncodeR(s1) . "<" . s2 . ">" . UriEncodeR(s3)
+	} Else If (!InStr(a, " ")) { ; just "address"
+	    return a
+	}
+    }
+    ; it's just name or comment, there's no @, there are spaces in address, or something else wrong. Encode everything!
+    return UriEncodeR(a)
+}
 
 ConstructURL(varNames*) {
 
