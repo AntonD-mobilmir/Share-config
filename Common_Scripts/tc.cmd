@@ -1,27 +1,43 @@
-REM coding:OEM
-SETLOCAL
-SET "TCRelPath=Total Commander\TOTALCMD.EXE"
-SET "TCDistRelPath=PreInstalled\manual\TotalCommander.cmd"
-CALL :FindTCPath || CALL :InstallTC || (
-    ECHO TC or distributive not found & PAUSE & EXIT /B 
+@(REM coding:CP866
+REM by LogicDaemon <www.logicdaemon.ru>
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+SETLOCAL ENABLEEXTENSIONS
+IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application Data" SET "APPDATA=%USERPROFILE%\Local Settings\Application Data"
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
+    IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
+    IF DEFINED OS64Bit (
+	SET "TCRelPath=Total Commander\TOTALCMD64.EXE"
+	CALL :FindTCPath || CALL :InstallTC || GOTO :fallback32bit
+	GOTO :starttc
+    )
 )
-IF "%~1"=="" (
-    SET param="%CD%"
-) ELSE SET "param=%*"
+:fallback32bit
+(
+  SET "TCRelPath=Total Commander\TOTALCMD.EXE"
+  CALL :FindTCPath || CALL :InstallTC || (ECHO TC not found, cannot install & PAUSE & EXIT /B)
+)
+:starttc
+SET param=%*
+IF NOT DEFINED param SET param="%CD%"
 (
 ENDLOCAL
 START "" /B "%exeTC%" %param%
 EXIT /B
 )
-
 :InstallTC
-    IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-    CALL :GetDir ConfigDir "%DefaultsSource%"
 (
-    CALL %ConfigDir%_Scripts\FindSoftwareSource.cmd || EXIT /B
-    CALL :InstallFirst "%SoftSourceDir%\%TCDistRelPath%" "D:\Distributives\Soft\%TCDistRelPath%" "W:\Distributives\Soft\%TCDistRelPath%" "\\Srv0.office0.mobilmir\Distributives\Soft\%TCDistRelPath%"
-    CALL :FindTCPath
-    PING 127.0.0.1 -n 3 >NUL
+    SET "TCDistRelPath=PreInstalled\manual\TotalCommander.cmd"
+    IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+)
+    CALL :GetDir ConfigDir "%DefaultsSource%"
+    CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
+(
+    IF DEFINED SoftSourceDir CALL :InstallFirst "%SoftSourceDir%\%TCDistRelPath%" && GOTO :FindTCPath
+    CALL :InstallFirst "D:\Distributives\Soft\%TCDistRelPath%" "\\Srv0.office0.mobilmir\Distributives\Soft\%TCDistRelPath%" && GOTO :FindTCPath
+    ECHO Install failed!
     EXIT /B
 )
 :GetDir
@@ -29,14 +45,17 @@ EXIT /B
 SET "%~1=%~dp2"
 EXIT /B
 )
-
+:InstallFirst
+    CALL :FindFirstExisting cmdTCInst %* || EXIT /B 1
+    IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" SET "SetUserSettings=1"
+    %comspec% /C "%cmdTCInst%"
+EXIT /B 0
 :FindTCPath
     IF NOT DEFINED LOCALAPPDATA SET "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
 (
     CALL :FindFirstExisting exeTC "%LOCALAPPDATA%\Programs\%TCRelPath%" "%ProgramFiles%\%TCRelPath%" "%ProgramFiles(x86)%\%TCRelPath%"
     EXIT /B
 )
-
 :FindFirstExisting <var> <path> <...>
 IF EXIST "%~2" (
     SET "%~1=%~2"
@@ -46,13 +65,6 @@ IF EXIST "%~2" (
     SHIFT /2
     GOTO :FindFirstExisting
 )
-
-:InstallFirst
-    CALL :FindFirstExisting cmdTCInst %* || EXIT /B 1
-    IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" SET "SetUserSettings=1"
-    START "" /B /WAIT %comspec% /C "%cmdTCInst%"
-EXIT /B 0
-
 :FindAutoHotkeyExe
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :GetFirstArg AutohotkeyExe %%I
     GOTO :SkipGetFirstArg
