@@ -22,7 +22,8 @@ SET "RunInteractiveInstalls=0"
 
 SET "ErrorCmd=EXIT 2"
 SET "today=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%"
-
+)
+( REM re-bracket due to ProgramData on XP
 CALL "%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd" || EXIT /B
 IF NOT DEFINED SUScripts EXIT /B 32002
 CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
