@@ -13,19 +13,23 @@ IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application D
 	CALL :FindTCPath || CALL :InstallTC || GOTO :fallback32bit
 	GOTO :starttc
     )
-)
 :fallback32bit
-(
-  SET "TCRelPath=Total Commander\TOTALCMD.EXE"
-  CALL :FindTCPath || CALL :InstallTC || (ECHO TC not found, cannot install & PAUSE & EXIT /B)
-)
+    SET "TCRelPath=Total Commander\TOTALCMD.EXE"
+    CALL :FindTCPath || CALL :InstallTC || (ECHO TC not found, cannot install & PAUSE & EXIT /B)
 :starttc
-SET param=%*
-IF NOT DEFINED param SET param="%CD%"
+    SET param=%*
+    IF NOT DEFINED param SET param="%CD%"
+)
 (
-ENDLOCAL
-START "" /B "%exeTC%" %param%
-EXIT /B
+    ENDLOCAL
+    CALL :AddTCPath "%exeTC%"
+    START "" /B "%exeTC%" %param%
+    EXIT /B
+)
+:AddTCPath
+(
+    SET "PATH=%PATH%;%~dp1"
+    EXIT /B
 )
 :InstallTC
 (
