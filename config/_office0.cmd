@@ -56,7 +56,6 @@ CALL "%~dp0_all.cmd" %arg%
 rem Without running ahk as an app (just starting .ahk), START /I misbehaves, ignoring the switch
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
 
-START "" %AutoHotkeyExe% "%~dp0_Scripts\SetDefaultAppsHideIEOE.ahk"
 CALL "%~dp0_Scripts\ChangeNXOptInToOptOut.cmd"
 
 CALL "%~dp0_Scripts\defrag in background.cmd"
