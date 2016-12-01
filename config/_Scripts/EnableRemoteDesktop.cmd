@@ -11,7 +11,11 @@ rem REG ADD "%TGT%HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal S
 REG ADD "%TGT%HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v "fDenyTSConnections" /t REG_DWORD /d 0 /f
 rem shutdown -m \\%1 -t 30 -f -r
 
-CALL "%~dp0CheckWinVer.cmd" 6 || (
+CALL "%~dp0CheckWinVer.cmd" 6 && (
+    REM Force NLA
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v "UserAuthentication" /t REG_DWORD /d 1 /f
+)
+IF ERRORLEVEL 1 (
     REM In Vista+, this only enables firewall for current network type (public / private / domain):
     "%SystemRoot%\system32\netsh.exe" firewall set service type = remotedesktop mode = enable
     EXIT /B
