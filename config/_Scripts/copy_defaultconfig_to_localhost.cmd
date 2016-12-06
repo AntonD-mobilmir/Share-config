@@ -22,7 +22,7 @@ FOR /D %%I IN ("D:\Distributives\config" "W:\Distributives\config" "%PROGRAMDATA
 	GOTO :ConfigCopied
     )
     ECHO Проверка "%%~I"...
-    IF NOT EXIST "%%~I" MKDIR "%%~I"
+    MKDIR "%%~I"
     IF EXIST "%%~I" (
 	XCOPY "%srcConfigDir%" "%%~I" /E /C /I /H /K /Y && (
 	    SET "configDir=%%~I\"
