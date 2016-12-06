@@ -69,10 +69,11 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     CALL :SetSystemOwnerAndGroupRec "%tgt%\AppData\Local\Microsoft\Windows\UPPS" "%tgt%\AppData\LocalLow"
 
     CALL :SetSystemOwnerAndGroupForFiles "%tgt%\AppData\Local\Microsoft\Windows\UsrClass.dat*" "%tgt%\ntuser.dat*" "%tgt%\ntuser.ini" "%tgt%\AppData\Local\Microsoft\Windows\UPPS\UPPS.bin" "%tgt%\AppData\Local\TileDataLayer\Database\EDBtmp.log"
-
-    ECHO %DATE% %TIME% Запрет просмотра списка файлов для некоторых папок
-    REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
-    CALL :DenyListDirectory "%UIDEveryone%" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History" "%tgt%\AppData\Local\Microsoft\Windows\INetCache\Content.IE5" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Roaming\Microsoft\Windows\Start Menu\Программы" "%tgt%\Application Data" "%tgt%\Cookies" "%tgt%\Documents\Мои видеозаписи" "%tgt%\Documents\мои рисунки" "%tgt%\Documents\Моя музыка" "%tgt%\Local Settings" "%tgt%\NetHood" "%tgt%\PrintHood" "%tgt%\Recent" "%tgt%\SendTo" "%tgt%\главное меню" "%tgt%\Мои документы" "%tgt%\Шаблоны"
+    CALL "%~dp0..\CheckWinVer.cmd" 6 && (
+	ECHO %DATE% %TIME% Запрет просмотра списка файлов для некоторых папок
+	REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
+	CALL :DenyListDirectory "%UIDEveryone%" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History" "%tgt%\AppData\Local\Microsoft\Windows\INetCache\Content.IE5" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Roaming\Microsoft\Windows\Start Menu\Программы" "%tgt%\Application Data" "%tgt%\Cookies" "%tgt%\Documents\Мои видеозаписи" "%tgt%\Documents\мои рисунки" "%tgt%\Documents\Моя музыка" "%tgt%\Local Settings" "%tgt%\NetHood" "%tgt%\PrintHood" "%tgt%\Recent" "%tgt%\SendTo" "%tgt%\главное меню" "%tgt%\Мои документы" "%tgt%\Шаблоны"
+    )
     
     rem left non-restored:
     rem AppData\Local\Microsoft\Windows\Caches\cversions.3.db	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read,allow,no_inheritance;
