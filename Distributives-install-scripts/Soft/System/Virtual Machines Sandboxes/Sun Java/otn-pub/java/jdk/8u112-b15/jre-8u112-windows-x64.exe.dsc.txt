@@ -1,0 +1,6 @@
+jre-8u112-windows-x64.exe
+
+This file has been downloaded from:
+http://download.oracle.com/otn-pub/java/jdk/8u112-b15/jre-8u112-windows-x64.exe?AuthParam=1481103188_19898d0dd0215a9b44834845760a6f68
+
+Date: 07.12.2016, 12:32

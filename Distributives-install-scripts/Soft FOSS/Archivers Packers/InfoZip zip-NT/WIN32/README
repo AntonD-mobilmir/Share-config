@@ -1,0 +1,56 @@
+This directory contains executables for Windows NT/2000 (Intel, Alpha, PowerPC
+and MIPS R4000) and Windows 95/98/ME.  Windows CE and Windows 3.x executables
+are in their own directories (../WINCE and ../WIN16, respectively).
+
+  3085 Jan 27 2001  README            what you're reading right now
+ 75825 Dec 23 1997  gzip124xN-axp.zip gzip 1.2.4, NT Alpha executable + docs
+ 62187 Nov 21 1995  gzip124xN.zip     gzip 1.2.4, NT/9x Intel executable + docs
+ 95553 Apr 25 1997  pun100xN.zip      Pocket UnZip 1.0 GUI app for NT/Intel
+
+341818 Jul  2 1996  unz520xN-ppc.exe  UnZip 5.2, NT PowerPC exes, self-extract
+526906 Aug 12 1997  unz531xN-mip.exe  UnZip 5.31, NT MIPS exes, self-extracting
+469744 Nov  2 1997  unz532xN-axp.exe  UnZip 5.32, NT Alpha exes, self-extracting
+185183 Jan 14 2001  unz542dN.zip      UnZip 5.42, NT/9x Intel DLL
+310353 Jan 14 2001  unz542xN.exe      UnZip 5.42, NT/9x Intel exes, self-extract
+
+814439 Jan  9 1998  wiz401xN-axp.exe  WiZ 4.01 GUI app, NT Alpha exe/DLLs/docs
+479573 Sep 25 2000  wiz502xN.exe      WiZ 5.02 GUI app, NT/9x Intel exe/DLL/docs
+
+226270 Aug 12 1997  zip21xN-mip.zip   Zip 2.1, NT MIPS exes (no encryption)
+174503 Jul  2 1996  zip21xN-ppc.zip   Zip 2.1, NT PowerPC exes (no encryption)
+104228 Dec 16 1997  zip22dN-bor.zip   Zip 2.2, NT/9x Intel DLL (Borland C)
+103399 Dec 16 1997  zip22dN-ms.zip    Zip 2.2, NT/9x Intel DLL (MS[V]C, VB?)
+267301 Nov  3 1997  zip22xN-axp.zip   Zip 2.2, NT Alpha exes (no encryption)
+107551 Dec  9 1999  zip23dN.zip       Zip 2.3, NT/9x Intel DLL (VB; MSVC?)
+149552 Dec 21 1999  zip23xN.zip       Zip 2.3, NT/9x Intel exes (no encryption)
+
+Encryption binaries are only available from our European site,
+ftp://ftp.icce.rug.nl/infozip/WIN32/ :
+
+123935 Dec 24 1999  zcr23dN.zip       Zip 2.3, NT/9x Intel DLL (w/encryption)
+184158 Dec 21 1999  zcr23xN.zip       Zip 2.3, NT/9x Intel exes (w/encryption)
+342527 Nov  4 1997  zcr22xN-axp.zip   Zip 2.2, NT Alpha exes (with encryption)
+287734 Aug 12 1997  zcr21xN-mip.zip   Zip 2.1, NT MIPS exes (with encryption)
+223691 Jul  3 1996  zcr21xN-ppc.zip   Zip 2.1, NT PowerPC exes (with encryption)
+
+Thanks to Gilles Vollant (info@winimage.com) for providing the latest Alpha
+binaries for Zip and UnZip.  Thanks to Mary Geddry for providing the MIPS
+binaries.  Thanks to Randall Ding (randyd@lse.fullfeed.com) for providing the
+Alpha binary for WiZ.
+
+The self-extracting files are in zipfile format.  You can use UnZip 5.x or
+PKUNZIP 2.04g to extract them directly without running them, as in:
+
+  unzip unz542xN.exe
+
+All Info-ZIP packages contain documentation.  Sources are in ../src .
+The DLL sources are included as a standard part of the Zip 2.3, UnZip
+5.42 and WiZ 5.02 source distributions; the WiZ 5.02 GUI sources are
+available only in ../src/wiz502+dlls.zip.  (Note that WiZ now performs
+both Zip and UnZip functions.)  Visual BASIC is supported only with the
+Microsoft version of the DLLs.
+
+Send problem reports on Zip, UnZip and WiZ to:  Zip-Bugs@lists.wku.edu
+Send problem reports on gzip to:                support@gzip.org
+
+Last updated:  27 January 2001

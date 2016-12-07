@@ -1,0 +1,250 @@
+
+  Tor <../index.html.en>
+
+  * Home <../index.html.en>
+  * About Tor <../about/overview.html.en>
+  * Documentation <../docs/documentation.html.en>
+  * Press <../press/press.html.en>
+  * Blog <https://blog.torproject.org/blog/>
+  * Contact <../about/contact.html.en>
+
+  * Download <../download/download-easy.html.en>
+  * Volunteer <../getinvolved/volunteer.html.en>
+  * Donate <../donate/donate.html.en>
+
+Home » <../index.html.en> Verifying Signatures
+<../docs/verifying-signatures.html.en>
+
+
+  Which PGP keys sign which packages
+
+------------------------------------------------------------------------
+
+The signing keys we use are:
+
+  * The Tor Browser Developers (0x93298290), Mike Perry (0x0E3A92E4),
+    Georg Koppen (0x4B7C3223), Nicolas Vigier (0xD0220E4B) and Linus
+    Nordberg (0x23291265) sign the Tor Browser releases.
+  * Roger Dingledine (0x28988BF5 and 0x19F78451) or Nick Mathewson
+    (0x165733EA, or its subkey 0x8D29319A) sign the Tor source code
+    tarballs.
+  * Erinn Clark (0x63FEE659) signed earlier Tor Browser Bundles and many
+    other packages, and used to sign RPMs with her other key
+    (0xF1F5C9B5). Andrew Lewman (0x31B0974B, 0x6B4D6475) used to sign
+    packages for RPMs, Windows, and OS X.
+  * Tor Project Archive (0x886DDD89) signs the deb.torproject.org
+    repositories and archives.
+  * Damian Johnson (0x9ABBEEC6) signs Arm releases.
+  * Sebastian Hahn (0xC5AA446D), and David Fifield (0xC11F6276) sign
+    Pluggable Transport Tor Browser Bundles. Sometimes Sebastian signs
+    the Tor Browser Bundles.
+  * The Tails team (0xBE2CD9C1) signs the Tails live system releases.
+  * Other developers include Peter Palfrader (0xC82E0039, or its subkey
+    0xE1DEC577) and Jacob Appelbaum (0xD255D3F5C868227F).
+
+The fingerprints for the keys should be:
+
+    pub   1024D/28988BF5 2000-02-27
+          Key fingerprint = B117 2656 DFF9 83C3 042B  C699 EB5A 896A 2898 8BF5
+    uid                  Roger Dingledine <arma@mit.edu>
+
+    pub   4096R/19F78451 2010-05-07
+          Key fingerprint = F65C E37F 04BA 5B36 0AE6  EE17 C218 5258 19F7 8451
+    uid                  Roger Dingledine <arma@mit.edu>
+    uid                  Roger Dingledine <arma@freehaven.net>
+    uid                  Roger Dingledine <arma@torproject.org>
+    sub   4096R/0DCC0FE1 2013-05-09 [expires: 2014-05-09]
+
+    pub   3072R/165733EA 2004-07-03
+          Key fingerprint = B35B F85B F194 89D0 4E28  C33C 2119 4EBB 1657 33EA
+    uid                  Nick Mathewson <nickm@alum.mit.edu>
+    uid                  Nick Mathewson <nickm@wangafu.net>
+    uid                  Nick Mathewson <nickm@freehaven.net>
+    uid                  [jpeg image of size 3369]
+    sub   3072R/8D29319A 2004-07-03
+    sub   3072R/F25B8E5E 2004-07-03
+
+    pub   2048R/63FEE659 2003-10-16
+          Key fingerprint = 8738 A680 B84B 3031 A630  F2DB 416F 0610 63FE E659
+    uid                  Erinn Clark <erinn@torproject.org>
+    uid                  Erinn Clark <erinn@debian.org>
+    uid                  Erinn Clark <erinn@double-helix.org>
+    sub   2048R/EB399FD7 2003-10-16
+
+    pub   1024D/F1F5C9B5 2010-02-03
+          Key fingerprint = C2E3 4CFC 13C6 2BD9 2C75  79B5 6B8A AEB1 F1F5 C9B5
+    uid                  Erinn Clark <erinn@torproject.org>
+    sub   1024g/7828F26A 2010-02-03
+
+    pub  1024D/31B0974B 2003-07-17
+         Key fingerprint = 0295 9AA7 190A B9E9 027E  0736 3B9D 093F 31B0 974B
+    uid                  Andrew Lewman <andrew@lewman.com>
+    uid                  Andrew Lewman <andrew@torproject.org>
+    sub   4096g/B77F95F7 2003-07-17
+
+    pub   4096R/6B4D6475 2012-02-29
+          Key fingerprint = 0291 ECCB E42B 2206 8E68  5545 627D EE28 6B4D 6475
+    uid                  Andrew Lewman <andrew@torproject.org>
+    uid                  Andrew Lewman <andrew@torproject.is>
+    sub   4096R/BE713AC6 2012-02-29
+
+    pub   2048R/886DDD89 2009-09-04 [expires: 2014-09-03]
+          Key fingerprint = A3C4 F0F9 79CA A22C DBA8  F512 EE8C BC9E 886D DD89
+    uid                  deb.torproject.org archive signing key
+    sub   2048R/219EC810 2009-09-04 [expires: 2014-08-29]
+
+    pub   1024D/9A753A6B 2009-09-11
+          Key fingerprint = 553D 7C2C 626E F16F 27F3  30BC 95E3 881D 9A75 3A6B
+    uid                  Tomás Touceda <chiiph@gmail.com>
+    sub   1024g/33BE0E5B 2009-09-11
+
+    pub   1024D/5FA14861 2005-08-17
+          Key fingerprint = 9467 294A 9985 3C9C 65CB  141D AF7E 0E43 5FA1 4861
+    uid                  Matt Edman <edmanm@rpi.edu>
+    uid                  Matt Edman <Matt_Edman@baylor.edu>
+    uid                  Matt Edman <edmanm2@cs.rpi.edu>
+    sub   4096g/EA654E59 2005-08-17
+
+    pub   1024D/9ABBEEC6 2009-06-17
+          Key fingerprint = 6827 8CC5 DD2D 1E85 C4E4  5AD9 0445 B7AB 9ABB EEC6
+    uid                  Damian Johnson (www.atagar.com) <atagar1@gmail.com>
+    uid                  Damian Johnson <atagar@torproject.org>
+    sub   2048g/146276B2 2009-06-17
+    sub   2048R/87F30690 2010-08-07
+
+    pub   8192R/683686CC 2013-09-11
+          Key fingerprint = C963 C21D 6356 4E2B 10BB  335B 2984 6B3C 6836 86CC
+    uid                  Mike Perry (Regular use key) <mikeperry@torproject.org>
+    sub   4096R/0E3A92E4 2013-09-11 [expires: 2014-09-11]
+    sub   4096R/BC40FFA0 2013-09-11 [expires: 2014-09-11]
+
+    pub   1024D/22F6856F 2006-08-19
+          Key fingerprint = DDB4 6B5B 7950 CD47 E59B  5189 4C09 25CF 22F6 856F
+    uid                  Robert Hogan <robert@roberthogan.net>
+    sub   1024g/FC4A9460 2006-08-19
+
+    pub   2048R/4279F297 2013-01-02
+          Key fingerprint = 97BB 9413 1873 FFD3 1331  64CC 7EB4 5C0A 4279 F297
+    uid                  Alexandre Allaire <alexandre.allaire@mail.mcgill.ca>
+    sub   2048R/76D943F1 2013-01-02
+
+    pub   4096R/C5AA446D 2010-07-14
+          Key fingerprint = 261C 5FBE 7728 5F88 FB0C  3432 66C8 C2D7 C5AA 446D
+    uid                  Sebastian Hahn <mail@sebastianhahn.net>
+    sub   2048R/A2499719 2010-07-14
+    sub   2048R/140C961B 2010-07-14
+
+    pub   4096R/C82E0039 2003-03-24
+          Key fingerprint = 25FC 1614 B8F8 7B52 FF2F  99B9 62AF 4031 C82E 0039
+    uid                  Peter Palfrader
+    uid                  Peter Palfrader <peter@palfrader.org>
+    uid                  Peter Palfrader <weasel@debian.org>
+
+    pub   4096R/BE2CD9C1 2010-10-07 [expires: 2015-02-05]
+          Key fingerprint = 0D24 B36A A9A2 A651 7878  7645 1202 821C BE2C D9C1
+    uid                  Tails developers (signing key) <tails@boum.org>
+    uid                  T(A)ILS developers (signing key) <amnesia@boum.org>
+
+    pub   8192R/C11F6276 2012-07-21
+          Key fingerprint = AD1A B35C 674D F572 FBCE  8B0A 6BC7 58CB C11F 6276
+    uid                  David Fifield <david@bamsoftware.com>
+    sub   4096R/D90A8E40 2012-07-21
+    sub   4096R/5CD388E5 2012-07-21
+
+    pub   4096R/23291265 2010-05-07
+          Key fingerprint = 8C4C D511 095E 982E B0EF  BFA2 1E8B F349 2329 1265
+    uid                  Linus Nordberg <linus@nordberg.se>
+    uid                  Linus Nordberg <linus@nordu.net>
+    uid                  Linus Nordberg <linus@torproject.org>
+    uid                  [jpeg image of size 2906]
+    sub   4096R/153E576C 2013-04-23 [expires: 2014-04-23]
+
+    pub   4096R/4B7C3223 2013-07-30
+          Key fingerprint = 35CD 74C2 4A9B 15A1 9E1A  81A1 9437 3AA9 4B7C 3223
+    uid                  Georg Koppen <gk@torproject.org>
+    uid                  Georg Koppen <groeg@vfemail.net>
+    uid                  Georg Koppen <georg@getfoxyproxy.org>
+    sub   4096R/97955E07 2013-07-30 [expires: 2014-07-30]
+    sub   4096R/AC3A821D 2013-07-30 [expires: 2014-07-30]
+    sub   4096R/A97A53DC 2014-07-08 [expires: 2015-07-08]
+    sub   4096R/E5AE3C98 2014-07-08 [expires: 2015-07-08]
+
+    pub   4096R/D0220E4B 2014-03-19
+          Key fingerprint = 4A90 646C 0BAE D9D4 56AB  3111 E5B8 1856 D022 0E4B
+uid                      Nicolas Vigier (TBB Builds Signing Key) <boklm@torproject.org>
+
+     pub   4096R/D255D3F5C868227F 2014-06-27 [expires: 2024-06-24]
+           Key fingerprint = D2C6 7D20 E9C3 6C2A C5FE  74A2 D255 D3F5 C868 227F
+     uid                          Jacob Appelbaum <jacob@appelbaum.net>
+     sub   3072R/02636620744301A2 2014-06-27 [expires: 2015-06-27]
+     sub   3072R/1A055A481801A819 2014-06-27 [expires: 2015-06-27]
+
+     pub   4096R/90BC9192B06291B2 2014-06-27 [expires: 2024-06-24]
+           Key fingerprint = 043E 0E69 DD56 BA59 5905  8756 90BC 9192 B062 91B2
+     uid                          Jacob Appelbaum <error@debian.org>
+     sub   3072R/F78ED60FFE4F141F 2014-06-27 [expires: 2015-06-27]
+     sub   3072R/986D6BCEF02A9C9C 2014-06-27 [expires: 2015-06-27]
+     sub   2048R/89AA6E5D2C6A7F40 2014-10-22 [expires: 2016-10-21]
+
+     pub   4096R/FA7F0E44D487F03F 2014-06-27 [expires: 2024-06-24]
+           Key fingerprint = D6A9 48CF 297F 7539 30B4  756A FA7F 0E44 D487 F03F
+     uid                          Jacob Appelbaum <jacob@torproject.org>
+     sub   3072R/611B45DE2517F1BA 2014-06-27 [expires: 2015-06-27]
+     sub   3072R/035D7A9A67D22BC0 2014-06-27 [expires: 2015-06-27]
+
+     pub   4096R/0x4E2C6E8793298290 2014-12-15
+           Key fingerprint = EF6E 286D DA85 EA2A 4BA7  DE68 4E2C 6E87 9329 8290
+     uid   Tor Browser Developers (signing key) <torbrowser@torproject.org>
+     sub   4096R/0x2E1AC68ED40814E0 2014-12-15
+     sub   4096R/0x7017ADCEF65C2036 2014-12-15
+     sub   4096R/0x2D000988589839A3 2014-12-15
+    
+
+  * Documentation Overview <../docs/documentation.html.en>
+  * Installation Guides <../docs/installguide.html.en>
+  * Manuals <../docs/manual.html.en>
+  * Tor Wiki <https://trac.torproject.org/projects/tor/wiki/>
+  * General FAQ <../docs/faq.html.en>
+  * Abuse FAQ <../docs/faq-abuse.html.en>
+  * Trademark FAQ <../docs/trademark-faq.html.en>
+  * Tor Legal FAQ <../eff/tor-legal-faq.html.en>
+  * Tor DMCA Response <../eff/tor-dmca-response.html.en>
+
+
+    Tor Tip
+
+Tor is written for and supported by people like you. Donate today
+<../donate/donate.html.en>!
+
+Tor
+
+Trademark, copyright notices, and rules for use by third parties can be
+found in our FAQ <../docs/trademark-faq.html.en>.
+
+
+        About Tor
+
+  * What Tor Does <../about/overview.html.en>
+  * Users of Tor <../about/torusers.html.en>
+  * Core Tor People <../about/corepeople.html.en>
+  * Sponsors <../about/sponsors.html.en>
+  * Contact Us <../about/contact.html.en>
+
+
+        Get Involved
+
+  * Donate <../donate/donate.html.en>
+  * Mailing Lists <../docs/documentation.html.en#MailingLists>
+  * Mirrors <../getinvolved/mirrors.html.en>
+  * Hidden Services <../docs/hidden-services.html.en>
+  * Translations <../getinvolved/translation.html.en>
+
+
+        Documentation
+
+  * Manuals <../docs/tor-manual.html.en>
+  * Installation Guides <../docs/documentation.html.en>
+  * Tor Wiki <https://trac.torproject.org/projects/tor/wiki/>
+  * General Tor FAQ <../docs/faq.html.en>
+
+Internet Defense League <https://internetdefenseleague.org/>

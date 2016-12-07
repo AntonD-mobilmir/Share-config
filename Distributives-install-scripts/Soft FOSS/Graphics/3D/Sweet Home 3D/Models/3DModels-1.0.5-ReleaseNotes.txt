@@ -1,0 +1,4 @@
+This release contain archives of SH3F files. 
+A SH3F file describes a library of additional 3D models for Sweet Home 3D and may be installed by choosing "Furniture > Import Furniture Library..." from the menu. 
+Please read http://www.sweethome3d.eu/importModels.html#ModelsLibraries for more information about 3D models libraries. 
+The 3D models of this release includes new localizations making furniture available in Bulgarian, Chinese (Simplified), English, French, Greek, Hungarian, Italian, Japanese, German, Polish, Russian, Spanish, Swedish and Vietnamese.

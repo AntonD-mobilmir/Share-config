@@ -1,0 +1,387 @@
+FREEVIMAGER HISTORY
+
+4.7.0 (May 30th 2013)
+
+- The crop tool permits now precise selections through the
+  arrow keys (use the tab key to switch crop handle)
+
+4.5.0 (May 14th 2013)
+
+- The generated pdfs are now smaller and compatible with all
+  current viewers (solved wrong color display issue of
+  Nitro Pdf Reader and some mobile pdf viewers)
+- Files sorting and viewing is now done like in Windows
+  Explorer (1.jpg, 2.jpg .. 10.jpg, 11.jpg, 12.jpg)
+
+4.3.0 (February 12th 2013)
+
+- New image Reload (from disk) command
+- Changed command accelerators to be more translation friendly
+- Removed Burning with Nero support (the Microsoft Windows
+  burning API works well since Windows XP)
+- Removed OCR txt batch output support because it needed
+  the Microsoft Office MODI component
+
+4.1.0 (December 4th 2012)
+
+- Fixed wrong parsing of dpi value for some type of jpeg files
+  (thanks to Nicolai Ehemann for reporting the problem)
+
+4.0.9 (November 11th 2012)
+
+- Save As Pdf stores now all high resolution bit depths with jpeg
+  compression (8bpp grayscale, 16bpp, 24bpp and higher -> jpeg)
+- Removed single pages save when tiff multi-page scanning because
+  since version 4.0.5 there is the lossless extract all pages
+  command if somebody wants the single tiff pages
+
+4.0.7 (November 1st 2012)
+
+- New Scan and Email toolbar button
+- New Screenshot toolbar button
+- Small fixes
+
+4.0.5 (August 27th 2012)
+
+- Possibility to extract all pages from a multi-page tiff file
+
+4.0.3 (August 9th 2012)
+
+- More productive working because less dialogs are popping-up
+  when saving files and scanning to PDF
+  (the save as dialogs have now a jpeg quality slider)
+- ESC key always exits the program if set so in Global Settings
+- Icons update
+- Email button pops-up the open file dialog if no documents open;
+  fixed emailing of two or more files with the same name
+- 2pass log file is not overwritten if encoding at the same
+  time two or more videos with the same destination file name
+  (obviously to different directories)
+- Fixed uniqueness of temporary subdirectories
+
+4.0.1 (July 10th 2012)
+
+- Fixed uniqueness of temporary files
+
+4.0.0 (June 15th 2012)
+
+- If file to open through command line (double-clicking on it)
+  is empty or not existing paste the clipboard into it;
+  if nothing in clipboard make it a 1x1 image
+- libpng updated to 1.2.49
+
+3.9.9 (May 1st 2012)
+
+- Beside the multi-page file the Scan to Tiff command
+  saves now also the single pages in separate files 
+- New toolbar button for Scan to Tiff and for Email
+- When Scan to Tiff or Scan to Pdf dialogs are closed
+  the program asks whether more pages are to be scanned
+  (removed the superfluous Lock Scan Dialog option)
+- Convert 32 bpp images to 24 bpp when sending them to the
+  printer; this because the alpha component is interpreted
+  by some printers even if it's not an image with alpha channel
+  
+3.9.7 (March 27th 2012)
+
+- The zoom selection box is now working as expected when
+  canceling the zoom level selection by pressing ESC or
+  clicking outside the selection box
+
+3.9.5 (February 27th 2012)
+
+- Better and faster printing for low-resolution images
+  (1bpp, 4bpp, 8bpp and 16bpp)
+- Updated toolbar min. width calculation
+
+3.9.0 (December 20th 2011)
+
+- Reduced dialogs and resources
+- Fixed randomness for slideshow in random mode
+
+3.7.0 (November 8th 2011)
+
+- Rename command (F2 key)
+- String and other fixes
+- Dropped memory mapped BMP support
+  (today's PC have enough RAM)
+
+3.5.5 (October 10th 2011)
+
+- No changes (be in sync with ContaCam version)
+
+3.5.0 (September 13th 2011)
+
+- Fixed Xmp metadata reading, sometimes this caused a
+  really slow loading of jpeg or tiff files
+- Animated gifs are now displaying in high quality when
+  that setting is chosen
+- libpng updated to 1.2.46
+
+3.3.0 (August 15th 2011)
+
+- Optimized installer size and removed installer CRC check
+  because it can fail on network shares
+- Fixed background color popup not displaying correctly bug
+  appeared with version 3.1.0 and affecting the unicode
+  executable running under Win 2003, XP and Win 2000 
+- Enhanced the Paste command
+- Fixed Preview Display not showing correctly bug
+  for small sizes on Windows 7
+- Added a Cut operation to the Crop/Copy/Cut command
+
+3.1.0 (July 5th 2011)
+
+- New compile with MFC security update (MS11-025 and KB2538241)
+
+3.0.0 (May 9th 2011)
+
+- Fixed W/H ratio info display for the crop tool with cm units
+- Optimized first picture soft load
+- Main window and File Info dialogs are restored to the
+  primary monitor if the last position is on a invalid monitor
+  (for example after the removal of a video projector)
+- Enhanced translations
+- Added some codecs
+
+2.3.9 (March 12th 2011)
+
+- Fixed playing problems for audio files with really long path
+- Fixed Loading... keeps occasionally showing in file open dialog
+- Fixed animated gif preview problems in file open dialog for
+  big files with many frames
+- German translation
+
+2.3.5 (February 18th 2011)
+
+- Standalone version is now clean: it will not create
+  a directory in the user's application data folder
+- View image location in Google Map
+
+2.3.0 (January 13th 2011)
+
+- Open in full-screen settings option
+- Possibility to play slideshow in random order
+
+2.1.0 (October 27th 2010)
+
+- More robust thread start/stop logic
+
+2.0.9 (September 24th 2010)
+
+- libpng updated to 1.2.44
+  
+2.0.7 (August 12th 2010)
+
+- Added touch screen gestures support for zoom in/out
+  and for next/previous picture
+- Fixed batch processing when input and output files
+  have overlapping names in same directory
+  -> reorder in same directory now works as expected!
+- Translation fixes
+- libpng updated to 1.2.43
+- Help command for paste into coordinates file
+- Fixed crash under Vista or higher when multiple avi
+  are open and full-screen mode is entered with DirectX
+
+2.0.5 (May 17th 2010)
+
+- Translation fixes
+- YUV Blt() support check
+ 
+2.0.1 (April 8th 2010)
+
+- Fixed brightness, contrast,... preview display size
+  for pictures with a larger size than the screen
+ 
+2.0.0 (March 18th 2010)
+
+- Some optimisations
+- View's toolbar repainting bug fixed
+- Integrated codecs (lossless, mjpeg, theora and vorbis)
+- Crop/Copy fix for images with transparency
+
+1.9.7 (September 3rd 2009)
+
+- Multi language support: Russian and Italian translations
+- Solved batch processing animated gifs and saving with
+  another extension bug
+- Save new picture remembers last used file type
+- Crop/Copy rectangle... supports rectangular selection
+- Tiff loading is more fault tolerant
+- Installer supports file association command line params:
+  for example /jpg=1 to associate and /jpg=0 to unassociate
+  jpeg files. Use the names found under File - Settings...
+  There is also /all=1 and /all=0 to associate/unassociate
+  all file types
+- Starting from Win2000 installer supports a force application
+  close parameter: /kill=1
+
+1.9.5 (May 12th 2009)
+
+- Paste Into with different corners and coordinates txt file
+- Bmp loading is more fault tolerant
+- New dialog bug fix
+- Fixed wrong loading of 2bpp pngs with transparency
+- Fixed ANSI chars conversion problems in Win95 and NT4
+- Added a Save As... toolbar button
+- Added Next / Previous Page / Frame toolbar buttons
+- Fixed the no printing to big formats (like A1 or A0) bug
+- When unchecking Fit in Print Preview then 100% is set now
+- In Batch Proc./Slideshow dialog enhanced the speed and the
+  stability of the output directory size calculation and
+  of the files count
+
+1.9.0 (November 12th 2008)
+
+- Jpeg loading is more fault tolerant
+- Since Windows Vista mplay32.exe has been removed.
+  FreeVimager can now be used to play a sound and close itself
+  when done like mplay32.exe used to do with the /play and
+  the /close command line options. Additionally there is a /hide
+  switch to hide the program window.
+- Preview Display dialog added different zoom factors and
+  corners for precise paste into
+- New command for empty paper creation
+- Print cancel button is responsive now
+- New Save As Pdf command 
+
+1.7.0 (June 10th 2008)
+
+- Current directory always set to the program's directory
+  to avoid locking the directory from which we double-clicked
+- Standalone application stores now settings in an INI file
+- Date Taken Shift under batch processing
+
+1.5.5 (March 9th 2008)
+
+- SSE optimized bicubic interpolation. Printing uses now
+  this method (before it used the bilinear method)
+- Lanczos resampling
+- Menu entry in full-screen to switch to next or previous
+  monitors
+- Rotate toolbar icon
+- Scan to PDF and scan to TIFF now remembers the last used
+  file path
+- Fixed the OSD not following when switching monitor
+- Fixed the no correct view update when switching to a
+  monitor with a different resolution
+- New preview display with alpha transparency and Paste Into
+- Paste Into right-click context menu entry
+- Fixed grayscale command for images with transparency
+- Palette edit dialog for 8 bpp or less images
+- Count Unique Colors menu entry
+- Soften dialog with different levels of softness
+- Double-click switchable coordinate units (px, cm and inch)
+- Print preview fits to the printer margin if Margin is
+  checked and to the printer page if Margin is not checked
+- Convert to red with alpha channel from the grayscale levels
+  (useful to convert black text on white background to text with
+  transparency; change to another color with the hue regulator)
+
+1.5.0 (February 1st 2008)
+
+- Solved a zip extraction problem when a file or a directory
+  do not have the right attributes
+- New settings dialog under the File menu: single instance,
+  tray icon and other parameters
+- Histogram under brightness, contrast, ... regulators
+- Redeye removal algorithm enhanced: supports big redeyes,
+  hue range regulation and manual mask pixels add / remove
+- Under the View menu added the No Borders command to
+  enable / disable borders around images
+- Moved the Close All menu entry from the File menu to the
+  Window menu
+- Audio CD player (cda file extension)
+- New FAQs menu entry under the Help menu
+- Under Vista the installer runs as admin,
+  but launches now FreeVimager as a normal user
+
+1.3.0 (September 5th 2007)
+
+- This is a stable release with many fixes
+  and optimizations
+- Improved Windows Vista compatibility
+  (runs well with UAC enabled)
+- Batch processing file list load / save uses
+  now a UTF8 (with BOM) text file
+- CD / DVD  slideshow remembers OSD settings
+- Fixed zip compression file names bug on UNICODE build
+- Fixed autorun.inf writing bug on UNICODE build
+- In full-screen use the TAB key to flip the image to the
+  next monitor, SHIFT + TAB to flip to the previous one
+
+1.1.0 (May 4th 2007)
+
+- Solved the empty Gif Extension crashes the program
+  (Bugzilla Bug#2)
+- Solved the chessboard transition Bug: FreeVimager
+  crashed with small images
+- Scan to Multi-Page Tiff, to Pdf and E-Mail it
+- Tiff Metadata write is now lossless
+- Store Zoom preferences
+- Batch processing can output to Animated Gif,
+  to Avi, to Multi-Page Tiff or to Pdf
+  OCR Txt output if Office 2003 or higher installed
+- Do not change Date Modified when doing a lossless
+  jpeg rotation
+- CD / DVD  slideshow remembers now slideshow delay,
+  transition type and zoom mode
+- Added Icc Profile View to File Info dialog
+
+1.0.0 (March 2nd 2007)
+
+- first public release
+- gps exif tags support
+- enhanced iptc and xmp batch support
+
+0.9.9 (November 9th 2006)
+
+- iptc and xmp read, write and batch support
+- solved metadata copy problem
+  between tiffs and from jpeg to tiff
+- on-screen display in full-screen mode
+
+0.9.7 (August 31st 2006)
+
+- Save Copy As... file menu entry
+- Negative edit menu entry
+- Add and Soft Borders edit menu entries
+- metadata copy with tiff (still some problems with exif)
+- show tiff exif data
+
+0.9.5 (July 20th 2006)
+
+- big bmp menu entry removed added check box in open dlg
+- new batch / slideshow dialog
+- alpha channel editing support (only png files)
+- picture sharpen and soften added
+- better quality picture shrinking and thumb preview creation
+- first tutorial explaning the slideshow creation
+- avi file player full-screen size outside monitor borders
+- avi player supports direct rendering of YUY2 and YV12 surfaces
+- avi player decodes many YUV formats
+
+0.9.3 (March 24th 2006)
+
+- stable and smooth running
+- big bmp files support through memory mapped Bmps
+  (new menu entry added)
+- batch shrink / email sending improved with dedicated thread
+- support to burn with Nero API and on Windows XP with native API
+  (Nero APIs are the preferred choice because XP APIs are not
+  that reliable and mature)
+
+0.9.1 (February 24th 2006)
+
+- fixed crashing when selecting other extension while saving
+  (only with new comctl32 version 6)
+- added run program when finished installing
+- first time the program runs the File Association dialog pops-up
+- unicode Support For File Loading/Saving
+- fixed mouse pointer blocking some seconds with big jpeg files
+- added HQ stretch
+
+0.9.0 (February 4th 2006)
+
+- first release to close friends

@@ -1,0 +1,1 @@
+ftp.mozilla.org\pub\mozilla.org\firefox\nightly\latest-mozilla-central

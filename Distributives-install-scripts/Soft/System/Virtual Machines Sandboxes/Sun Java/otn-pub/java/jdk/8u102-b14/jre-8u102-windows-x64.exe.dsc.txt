@@ -1,6 +1,0 @@
-jre-8u102-windows-x64.exe
-
-This file has been downloaded from:
-http://download.oracle.com/otn-pub/java/jdk/8u102-b14/jre-8u102-windows-x64.exe?AuthParam=1471271115_322ad4710dd94fb07f3c5aa2363aa6d3
-
-Date: 15.08.2016, 17:24

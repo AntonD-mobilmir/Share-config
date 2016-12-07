@@ -1,0 +1,76 @@
+Please use download.mozilla.org to retrieve the latest Thunderbird release. 
+
+For example, if you wish to download the US English installer for Windows (32bit)
+the url is
+   https://download.mozilla.org/?product=thunderbird-latest&os=win&lang=en-US
+
+This could be pasted into the location bar of a browser, or used with curl or wget,  e.g. 
+wget -O ThunderbirdSetup.exe "https://download.mozilla.org/?product=thunderbird-latest&os=win&lang=en-US"
+
+For other operating systems replace 'os=win' with:
+   OS X                       os=osx
+   Linux x86_64               os=linux64
+   Linux i686                 os=linux
+
+For other languages replace 'lang=en-US' with:
+   Albanian                   lang=sq
+   Arabic                     lang=ar
+   Armenian                   lang=hy-AM
+   Asturian                   lang=ast
+   Basque                     lang=eu
+   Belarusian                 lang=be
+   Bengali (Bangladesh)       lang=bn-BD
+   Breton                     lang=br
+   Bulgarian                  lang=bg
+   Catalan                    lang=ca
+   Chinese (Simplified)       lang=zh-CN
+   Chinese (Traditional)      lang=zh-TW
+   Croatian                   lang=hr
+   Czech                      lang=cs
+   Danish                     lang=da
+   Dutch                      lang=nl
+   English (British)          lang=en-GB
+   Estonian                   lang=et
+   Finnish                    lang=fi
+   French                     lang=fr
+   Frisian                    lang=fy-NL
+   Gaelic (Scotland)          lang=gd
+   Galician                   lang=gl
+   German                     lang=de
+   Greek                      lang=el
+   Hebrew                     lang=he
+   Hungarian                  lang=hu
+   Icelandic                  lang=is
+   Indonesian                 lang=id
+   Irish                      lang=ga-IE
+   Italian                    lang=it
+   Korean                     lang=ko
+   Lithuanian                 lang=lt
+   Lower Sorbian              lang=dsb
+   Norwegian (Bokmål)         lang=nb-NO
+   Norwegian (Nynorsk)        lang=nn-NO
+   Polish                     lang=pl
+   Portuguese (Brazilian)     lang=pt-BR
+   Portuguese (Portugal)      lang=pt-PT
+   Punjabi (India)            lang=pa-IN
+   Romanian                   lang=ro
+   Romansh                    lang=rm
+   Russian                    lang=ru
+   Serbian                    lang=sr
+   Sinhala                    lang=si
+   Slovak                     lang=sk
+   Slovenian                  lang=sl
+   Spanish (Argentina)        lang=es-AR
+   Spanish (Spain)            lang=es-ES
+   Swedish                    lang=sv-SE
+   Tamil (Sri Lanka)          lang=ta-LK
+   Turkish                    lang=tr
+   Ukrainian                  lang=uk
+   Upper Sorbian              lang=hsb
+   Vietnamese                 lang=vi
+   Welsh                      lang=cy
+
+
+Mozilla Release Engineering
+Email: release-engineering@lists.mozilla.org
+Web:   https://groups.google.com/forum/#!forum/mozilla.release.engineering

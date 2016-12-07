@@ -1,0 +1,53 @@
+
+==================================
+Release Notes for Ext2Fsd V0.51
+==================================
+
+Features implemented or bugfix since V0.50:
+
+    1, FIXME: Data corruption issue, especially for multiple-thread
+       writing on XP system
+    2, FIXME: Set ValidDataLength only for FileEndOfFileInformation
+       w/ AdvanceOnly    
+    3, Support writing to ext4 volumes w/ flex_bg
+    4, Code cleanup and enhancement for global/volume property settings
+
+Supported Ext3/4 features by 0.51:
+
+    1, flexible inode size: > 128 bytes, up to block size
+    2, dir_index:    htree directory index
+    3, filetype:     extra file mode in dentry
+    4, large_file:   > 4G files supported
+    5, sparse_super: super block backup in group descriptor
+    6, uninit_bg:    fast fsck and group checksum
+    7, extent:       reading, writing with no extending.
+    8, journal:      only support replay for internal journal
+    9, flex_bg:      first flexible metadata group
+
+Unsupported Ext3/4 features:
+    1, journal: log-based operations, external journal
+    2, extent: size truncating & expanding, file deletion
+    3, EA (extended attributes), ACL support
+
+Features to be implemented in future:
+
+    1, EXT3/4 features support (extents, journal)
+    2, Documents improvement: clear and elaborate
+    3, Performance improvement, code optimization
+    4, Automatic check & update of new versions
+    5, LVM support, e2fsprogs porting for Windows
+
+    Since 0.38, Ext2fsd is much stable even under heavy i/o loads,
+    both for reading and writing. Performance and stability are
+    highly, improved especially stability. A new and strong era of
+    Ext2Fsd in product shape is coming :)
+
+WARNINGS:
+ 
+    The driver may crash your system and ruin your data unexpectedly,
+    since there might be software conflicts and I could only test it
+    on some of the popular platforms. You should use it with care and
+    use it at your own risk!
+
+Matt <mattwu@163.com>
+http://www.ext2fsd.com

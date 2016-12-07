@@ -1,0 +1,2 @@
+http://www.confusedbycode.com/curl/#downloads
+Win32 2000/XP zip 	7.46.0 	binary 	SSL 	SSH 	Edward LoPinto

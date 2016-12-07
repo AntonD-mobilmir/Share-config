@@ -23,7 +23,7 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
 CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe"
 (
 IF DEFINED sedexe %sedexe% "s/;InstallDirectoryPath={InstallDirectoryPath}/InstallDirectoryPath=%cProgramFiles%\\Mozilla Firefox/" "%srcpath%install.ini">"%TempIni%"
-"%InstDistributive%" /INI="%TempIni%"
+"%InstDistributive%" /S /INI="%TempIni%"
 )
 (
 IF ERRORLEVEL 1 SET "ErrorMemory=%ERRORLEVEL%"

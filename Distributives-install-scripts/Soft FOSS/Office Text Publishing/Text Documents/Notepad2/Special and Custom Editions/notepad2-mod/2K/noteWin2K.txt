@@ -1,0 +1,3 @@
+http://xhmikosr.github.io/notepad2-mod/
+
+> If you use Windows 2000, the last build working on it is r856.

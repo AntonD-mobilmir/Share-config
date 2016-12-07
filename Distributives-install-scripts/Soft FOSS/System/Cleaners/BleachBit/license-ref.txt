@@ -1,0 +1,1 @@
+Copyright © 2008-2016 Andrew Ziem. User contributed content is copyrighted by the contributors. The BleachBit source code is copyrighted under the GNU General Public License version 3. Unless otherwise noted, the web page content is licensed under the Creative Commons Attribution-Noncommercial-Share Alike 3.0 license and screenshots of BleachBit as public domain.

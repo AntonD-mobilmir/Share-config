@@ -1,0 +1,12 @@
+git-revision=b0e97d9_dpolivaev_2015-02-07 18:03:31 +0100  1.2.x
+* 1.3.x
+  1.4.x
+  FreeplaneFX
+  UnicodeCharacterRepresentation
+  docear/trunk
+  maplayout.1.4.x
+  master
+  master_ribbons
+  menustructure
+  note-panels
+  workspace

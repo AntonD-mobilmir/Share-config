@@ -1,0 +1,125 @@
+--2016-11-29 14:49:57--  https://www.stunnel.org/downloads.html
+Connecting to 192.168.127.1:3128... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Last-modified header missing -- time-stamps turned off.
+--2016-11-29 14:49:58--  https://www.stunnel.org/downloads.html
+Reusing existing connection to www.stunnel.org:443.
+Proxy request sent, awaiting response... 200 OK
+Length: 7560 (7,4K) [text/html]
+Saving to: 'downloads.html'
+
+     0K                                    100% 14,9M=0s
+
+2016-11-29 14:49:58 (14,9 MB/s) - 'downloads.html' saved [7560/7560]
+
+Loading robots.txt; please ignore errors.
+--2016-11-29 14:49:58--  https://www.stunnel.org/robots.txt
+Reusing existing connection to www.stunnel.org:443.
+Proxy request sent, awaiting response... 200 OK
+Length: 82 [text/plain]
+Saving to: 'robots.txt.5'
+
+     0K                                    100%  265K=0s
+
+2016-11-29 14:49:58 (265 KB/s) - 'robots.txt.5' saved [82/82]
+
+Removing downloads.html since it should be rejected.
+
+--2016-11-29 14:49:58--  https://www.stunnel.org/downloads/stunnel-5.38-installer.exe.sha256
+Reusing existing connection to www.stunnel.org:443.
+Proxy request sent, awaiting response... 200 OK
+Length: 93 [text/plain]
+Server file no newer than local file 'stunnel-5.38-installer.exe.sha256' -- not retrieving.
+
+--2016-11-29 14:49:58--  http://www.usenix.org.uk/mirrors/stunnel/
+Connecting to 192.168.127.1:3128... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Last-modified header missing -- time-stamps turned off.
+--2016-11-29 14:49:59--  http://www.usenix.org.uk/mirrors/stunnel/
+Reusing existing connection to 192.168.127.1:3128.
+Proxy request sent, awaiting response... 200 OK
+Length: 4942 (4,8K) [text/html]
+Saving to: 'index.html'
+
+     0K                                    100%  582K=0,008s
+
+2016-11-29 14:49:59 (582 KB/s) - 'index.html' saved [4942/4942]
+
+Removing index.html since it should be rejected.
+
+--2016-11-29 14:49:59--  http://ftp.nluug.nl/pub/networking/stunnel/
+Reusing existing connection to 192.168.127.1:3128.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Last-modified header missing -- time-stamps turned off.
+--2016-11-29 14:49:59--  http://ftp.nluug.nl/pub/networking/stunnel/
+Reusing existing connection to 192.168.127.1:3128.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: 'index.html'
+
+     0K                                      689K=0,006s
+
+2016-11-29 14:49:59 (689 KB/s) - 'index.html' saved [4270]
+
+Removing index.html since it should be rejected.
+
+--2016-11-29 14:50:00--  http://stunnel.cybermirror.org/
+Connecting to 192.168.127.1:3128... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: 2021 (2,0K) [text/html]
+--2016-11-29 14:50:00--  http://stunnel.cybermirror.org/
+Reusing existing connection to 192.168.127.1:3128.
+Proxy request sent, awaiting response... 200 OK
+Length: 2021 (2,0K) [text/html]
+Saving to: 'index.html'
+
+     0K                                    100% 29,1M=0s
+
+2016-11-29 14:50:00 (29,1 MB/s) - 'index.html' saved [2021/2021]
+
+Removing index.html since it should be rejected.
+
+--2016-11-29 14:50:00--  http://rsync.samba.org/
+Reusing existing connection to 192.168.127.1:3128.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Last-modified header missing -- time-stamps turned off.
+--2016-11-29 14:50:00--  http://rsync.samba.org/
+Reusing existing connection to 192.168.127.1:3128.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: 'index.html'
+
+     0K                                      225K=0,07s
+
+2016-11-29 14:50:01 (225 KB/s) - 'index.html' saved [15681]
+
+Removing index.html since it should be rejected.
+
+--2016-11-29 14:50:01--  https://www.stunnel.org/
+Connecting to 192.168.127.1:3128... connected.
+Proxy request sent, awaiting response... 301 Moved Permanently
+Location: https://www.stunnel.org/index.html [following]
+--2016-11-29 14:50:01--  https://www.stunnel.org/index.html
+Connecting to 192.168.127.1:3128... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Last-modified header missing -- time-stamps turned off.
+--2016-11-29 14:50:02--  https://www.stunnel.org/index.html
+Reusing existing connection to www.stunnel.org:443.
+Proxy request sent, awaiting response... 200 OK
+Length: 6775 (6,6K) [text/html]
+Saving to: 'index.html'
+
+     0K                                    100% 8,83M=0,001s
+
+2016-11-29 14:50:03 (8,83 MB/s) - 'index.html' saved [6775/6775]
+
+Removing index.html since it should be rejected.
+
+FINISHED --2016-11-29 14:50:03--
+Total wall clock time: 6,0s
+Downloaded: 7 files, 40K in 0,08s (480 KB/s)

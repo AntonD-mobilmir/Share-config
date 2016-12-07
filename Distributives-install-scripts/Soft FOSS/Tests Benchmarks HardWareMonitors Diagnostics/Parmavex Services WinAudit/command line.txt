@@ -1,0 +1,108 @@
+10) Command Line Usage
+
+You can invoke WinAudit from the command line, in this mode the programme executes without showing its main window. In this manner, you can automate the auditing of computers using batch files or login scripts on a domain controller. If need be, you can post the results directly to a database or save them to a centralised networked drive.
+
+Some tips:
+- Try to use WinAudit in user interface mode before invoking it via the command line.
+- Ensure you have included the report switch '/r=' with some category letters.
+- The category letters are case sensitive
+- Use only backslashes slashes '\' for file path separators.
+- It is not necessary to quote output or log file paths even if there are spaces.
+- WinAudit returns a code of zero (0) on success and non-zero if an error occurred.
+- A logging facility is provided to help you diagnose problems.
+
+The command syntax (all on one line) is:
+
+WinAudit.exe /h /r=gsoPxuTUeERNtnzDaIbMpmidcSArCOHG /f=file /T=file_timestamp /l=log_file
+
+All switches are optional, if none are supplied the programme runs in user interface mode. See examples below.
+
+Switches	Comment
+/h	Show a help message then exit.
+/r	Report content, default is NO sections, i.e. nothing is done.
+g	Include System Overview
+s	Include Installed Software
+o	Include Operating System (Small letter o)
+P	Include Peripherals
+x	Include Security
+u	Include Groups and Users
+T	Include Scheduled Tasks
+U	Include Uptime Statistics
+e	Include Error Logs
+E	Include Environment Variables
+R	Include Regional Settings
+N	Include Windows Network
+t	Include Network TCP/IP
+z	Include Devices
+D	Include Display Capabilities
+a	Include Display Adapters
+I	Include Installed Printers (Capital I )
+b	Include BIOS Version
+M	Include System Management
+p	Include Processor
+m	Include Memory
+i	Include Physical Disks
+d	Include Drives
+c	Include Communication Ports
+S	Include Startup Programs
+A	Include Services
+r	Include Running Programs
+C	Include ODBC Information
+O	Include OLE DB Drivers (Capital O)
+H	Include Software Metering
+G	Include User Logon Statistics
+/f	Output file or database connection string. Valid file types are comma separated, rich text and web page:
+/f=computer_audit.csv
+/f=computer_audit.rtf
+/f=computer_audit.html
+Only one file type may be specified. If no /f switch is specified, the output is written to 'computer_name.html’ where computer_name is the NetBIOS name of the computer. 
+
+macaddress is a reserved word (case insensitive). If specified, the output will be written to a file named using a Media Access Control (MAC) address. If no MAC address can be resolved, then the computer's name will be used. On systems with multiple network adapters, the address of the first one discovered will be used. Usage: /f=macaddress.html .
+
+If a connection string is supplied, it must begin with DRIVER= or DBQ=. This string must not have any forward slashes.
+
+/T	Use an ISO style date, time or data-time in the output file name. The timestamp precedes the file extension e.g. Audit-20130320-123655.txt, options are:
+/T=date - YYYMMDD format
+/T=time - hhmmss format
+/T=datetime - YYYYMMDD-hhmmss format
+This switch is for use with regular file names, do not use when exporting data to a database.
+/l	The log file path to record diagnostic and activity messages. The log files are tab separated text that can be view in notepad hence the .txt extension is recommended. If only a file name is supplied, the log file will be written to the same directory in which the WinAudit executable resides. To avoid concurrency issues, be sure to use a different name for each concurrent job. For example /l=%COMPUTERNAME%.txt
+
+
+
+10.1) Command line examples
+
+To view the command line usage, at the command prompt type:
+WinAudit.exe /h
+
+To get a System Overview with the output saved in the same directory as the WinAudit executable in the default format of html and filename of 'computername.html':
+WinAudit.exe /r=g
+
+To get a System Overview and Operating System information saved in a specified directory in rich text format using the computer’name as defined in the environment:
+WinAudit.exe /r=go /f=C:\Temp\%COMPUTERNAME%.rtf
+
+To audit your computer showing the System Overview, Operating System and Installed Software sections then save the report in CSV format on remote computer called SERVER in the networked shared directory Audits using a filename based on the MAC address:
+WinAudit.exe /r=gos f=\\SERVER\Audits\macaddress.csv
+
+Get a System Overview and log the audit to a file called log.txt. The audit will be saved in 'computername.html' with the log file written to the directory containing WinAudi.exe.
+WinAudit.exe /r=g /l=log.txt
+
+Save data about displays and adapters using a file name that contains a timestamp. The output file name will be of the form Displays-20131020-130425.rtf:
+WinAudit.exe /f= Displays.rtf /r=gDa /T=datetime
+
+Send a system overview to an Access (.mdb) database using a DSN-Less connection string:
+WinAudit.exe /r=g /f=DBQ=C:\Temp\Test.mdb;Driver={Microsoft Access Driver (*.mdb)};UID=admin;
+
+Save many data categories to a password protected Access 2007 or newer database.
+WinAudit.exe /r=gsopxuTUeERNt /f=DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\Temp\WinAuditDB.accdb;UID=admin;PWD=123456
+
+Send a system overview to SQL Server on a computer named PXSSQLSVR using a DSN-Less connection string. Connect as user WinAuditUser to a database named WinAuditDB and write out a log file to log.txt. Note, there is a space between 'SQL' and 'Server':
+WinAudit.exe /r=g /f=DRIVER=SQL Server;SERVER=PXSSQLSVR;UID=WinAuditUser;PWD=Cvb5dP3g;DATABASE= WinAuditDB; /l=log.txt
+
+Save a system overview to a SQL Server database on a trusted connection.
+WinAudit.exe /r=g /f=DRIVER={SQL Server};SERVER=PXSSQLSVR;DATABASE=WinAuditDB;Trusted_Connection=Yes;
+
+Send a system overview to a MySQL database named winauditdb on the local computer using a DSN-Less connection string. Connect as root with a password.
+WinAudit.exe /r=g  /f=DRIVER=MySQL ODBC 3.51 Driver;SERVER=localhost;UID=root;PWD=123456;DATABASE=winauditdb;
+
+

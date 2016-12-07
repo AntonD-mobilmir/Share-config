@@ -133,7 +133,9 @@ EXIT /B
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :GetFirstArg AutohotkeyExe %%I
 (
     IF DEFINED AutohotkeyExe IF EXIST %AutohotkeyExe% EXIT /B 0
+    SET "findExeTestExecutionOptions=/ErrorStdOut"
     CALL :findexe AutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe"
+    SET "findExeTestExecutionOptions="
 EXIT /B
 )
 :GetFirstArg
@@ -200,7 +202,7 @@ EXIT /B
     (
 	IF "%~2"=="" EXIT /B 9009
 	IF NOT EXIST "%~dp2" EXIT /B 9009
-	"%~2" <NUL >NUL 2>&1
+	"%~2" %findExeTestExecutionOptions% <NUL >NUL 2>&1
 	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
 	SET %~1="%~2"
 EXIT /B

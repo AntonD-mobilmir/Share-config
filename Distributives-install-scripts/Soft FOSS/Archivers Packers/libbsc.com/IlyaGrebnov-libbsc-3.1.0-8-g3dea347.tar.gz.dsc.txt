@@ -1,0 +1,6 @@
+IlyaGrebnov-libbsc-3.1.0-8-g3dea347.tar.gz
+
+This file has been downloaded from:
+https://codeload.github.com/IlyaGrebnov/libbsc/legacy.tar.gz/master
+
+Date: 03.11.2016, 9:31
