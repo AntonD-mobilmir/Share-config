@@ -81,14 +81,11 @@
 	ECHO Через 5 секунд запустится %backupscriptpath%. Если это нежелательно, включите режим выделения в этом окне.
 	PING 127.0.0.1 -n 6 -w 1000 >NUL
 	ECHO %DATE% %TIME% Начало резервного копирования...
-	START "%backupscriptpath%" /I /WAIT %comspec% /C "%backupscriptpath%"
-	IF ERRORLEVEL 1 (
-	    ECHO %DATE% %TIME% Завершено с ошибкой %ERRORLEVEL%
-	    PAUSE
-	) ELSE (
+	START "%backupscriptpath%" /I /WAIT %comspec% /C "%backupscriptpath%" && (
 	    ECHO %DATE% %TIME% Завершено успешно. Ожидание 15 с.
 	    PING 127.0.0.1 -n 15 >NUL
 	)
+	CALL :CheckEchoError || PAUSE
     ) ELSE (
 	ECHO.
 	ECHO.
@@ -136,4 +133,12 @@ EXIT /B 1
     
     SET "backupscriptpath=%dobackup%"
 EXIT /B 1
+)
+
+:CheckEchoError
+(
+    IF ERRORLEVEL 1 (
+	ECHO %DATE% %TIME% Код ошибки: %ERRORLEVEL%
+    )
+EXIT /B
 )
