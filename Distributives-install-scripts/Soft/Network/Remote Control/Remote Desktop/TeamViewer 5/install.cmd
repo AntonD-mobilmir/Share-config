@@ -13,11 +13,12 @@ IF NOT DEFINED ErrorCmd (
 	SET "ErrorCmd=CALL :EchoErrorLevel"
     )
 )
-
-IF NOT DEFINED RestartedWith32bitcmdexe IF /I %PROCESSOR_ARCHITECTURE% NEQ x86 (
+SET "scriptName=%~n0"
+IF "%~1"=="/CmdRestarted" (
+    SHIFT
+) ELSE IF /I %PROCESSOR_ARCHITECTURE% NEQ x86 (
     ECHO Restarting with 32-bit cmd.exe
-    SET "RestartedWith32bitcmdexe=1"
-    "%SystemRoot%\SysWOW64\cmd.exe" /C ""%~f0" /CMDrestarted %*"
+    "%SystemRoot%\SysWOW64\cmd.exe" /C ""%~f0" /CmdRestarted %*"
     EXIT /B
 )
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
@@ -27,7 +28,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
     SET "TempDirName=TeamViewer_Setup"
     SET "DistributivesArchive=%srcpath%TeamViewerMSI.zip"
     SET "SettingsScript=settings.cmd"
-    SET "MSIlog=%TEMP%\%~n0.log"
+    SET "MSIlog=%TEMP%\%scriptName%.log"
 
     IF NOT DEFINED exe7z CALL :find7zexe
 )
@@ -67,24 +68,16 @@ IF /I "%~x1"==".MSI" (
 	GOTO :readCmdlArgs
     )
 )
-IF DEFINED desthost CALL :SetDesthostVars
+IF DEFINED desthost CALL :SetDesthostVars || EXIT /B 1
 (
-IF "%RegConfigFullPath%"=="%RegConfigName%" SET "RegConfigFullPath="
-SET "PreExeCcmd="
-IF NOT "%remotesystem%"=="" (
-    SET "TempExtractPath=%remotesystem%\Admin$\Temp\%TempDirName%"
-    START "" /B /WAIT /D"%TEMP%" c:\SysUtils\wget.exe -N --no-check-certificate http://live.sysinternals.com/psexec.exe
-    REG ADD "HKEY_CURRENT_USER\Software\Sysinternals\PsExec" /v "EulaAccepted" /t REG_DWORD /d 1 /f
-    SET PreExeCcmd="%TEMP%\psexec.exe" %remotesystem% -w "%SystemRoot%\Temp\%TempDirName%"
-)
-(
-IF DEFINED PreExeCcmd SET "MSILog=%~n0.log"
-IF NOT EXIST "%TempExtractPath%" MKDIR "%TempExtractPath%"
-ECHO Начало установки TeamViewer.
-ECHO Временная папка: %TempExtractPath%
-PUSHD "%TempExtractPath%" || (ECHO Не удалось перейти в папку "%TempExtractPath%"& GOTO :ExitWithError)
+    IF "%RegConfigFullPath%"=="%RegConfigName%" SET "RegConfigFullPath="
+    SET "PreExeCcmd="
+    IF NOT EXIST "%TempExtractPath%" MKDIR "%TempExtractPath%"
+    ECHO Начало установки TeamViewer.
+    ECHO Временная папка: %TempExtractPath%
+    PUSHD "%TempExtractPath%" || (ECHO Не удалось перейти в папку "%TempExtractPath%"& GOTO :ExitWithError)
 
-IF DEFINED RemoveMSI SET quotedRemoveMSI="%RemoveMSI%"
+    IF DEFINED RemoveMSI SET quotedRemoveMSI="%RemoveMSI%"
 )
 (
     ECHO Архив с дистрибутивами: %DistributivesArchive%
@@ -118,7 +111,7 @@ IF DEFINED RemoveMSI SET quotedRemoveMSI="%RemoveMSI%"
 )
 :retryMsiExecUninstall
 (
-    %PreExeCcmd% msiexec.exe /x {118F5245-1999-4227-A12D-A0BB69A5E80B} /qn REBOOT=ReallySuppress /log+ "%MSILog%" || %PreExeCcmd% msiexec.exe /x %RemoveMSI% /qn REBOOT=ReallySuppress /log+ "%MSILog%"
+    %PreExeCcmd% msiexec.exe /x "{118F5245-1999-4227-A12D-A0BB69A5E80B}" /qn REBOOT=ReallySuppress /log+ "%MSILog%" || %PreExeCcmd% msiexec.exe /x %RemoveMSI% /qn REBOOT=ReallySuppress /log+ "%MSILog%"
     IF ERRORLEVEL 1618 IF NOT ERRORLEVEL 1619 ( %SystemRoot%\System32\ping.exe 127.0.0.1 -n 30 >NUL & GOTO :retryMsiExecUninstall ) & rem another install in progress, wait and retry
     IF ERRORLEVEL 1 SET "showlog=1"
     %PreExeCcmd% "C:\Program Files\Teamviewer\Version5\uninstall.exe" -silent
@@ -175,20 +168,24 @@ EXIT /B
 EXIT /B
 )
 :SelectInstallMSI
-    SET "listtemp=%temp%\%~n0.%RANDOM%list.tmp"
+    SET "listtemp=%temp%\%scriptName%.%RANDOM%list.tmp"
     (
     IF EXIST "%listtemp%" DEL "%listtemp%"
     IF EXIST "%listtemp%" ECHO "%listtemp%" не должен существовать. & EXIT /B 2
     %exe7z% l -- "%DistributivesArchive%" *.MSI>"%listtemp%"
-    FOR /F "usebackq tokens=1 delims=[]" %%I IN (`%SystemRoot%\System32\find.exe /n "   Date      Time    Attr         Size   Compressed  Name" "%listtemp%"`) DO SET "skiplines=%%I"
+    FOR /F "usebackq tokens=1 EOL=- delims=[]" %%I IN (`%SystemRoot%\System32\find.exe /n "------------------- ----- ------------ ------------  ------------------------" "%listtemp%"`) DO (
+	SET "skiplines=%%I"
+	GOTO :ExitForFindSplitter
+    )
+:ExitForFindSplitter
     SET "Counter=0"
     ECHO Доступны следующие варианты установки:
     ECHO 0 : Удалить TeamViewer_Host.msi, установить TeamViewer.msi
     )
-    FOR /F "usebackq skip=%skiplines% tokens=6 delims= " %%I IN ("%listtemp%") DO (
-	IF "%%~I"=="folders" GOTO :SelectInstallMSIExitFor
+    FOR /F "usebackq skip=%skiplines% tokens=5* delims= " %%A IN ("%listtemp%") DO (
+	IF "%%~A"=="------------------------" GOTO :SelectInstallMSIExitFor
 	SET /A "Counter+=1"
-	CALL :AddMSIToList "%%~I"
+	CALL :AddMSIToList "%%~B"
     )
 :SelectInstallMSIExitFor
 (
@@ -201,6 +198,8 @@ EXIT /B
 	SET "RegConfigName=TeamViewer.reg"
 	EXIT /B
     )
+)
+(	REM MSINum defined above
     FOR /F "usebackq delims=" %%I IN (`ECHO %%MSI%MSINum%%%`) DO (
 	SET "InstallMSI=%%I"
 	SET "RegConfigName=%%~nI.reg"
@@ -226,10 +225,19 @@ IF "%InstallNum%"=="2" START "" "%srcpath%TeamViewer5HostUnattended_egs.exe"
 EXIT /B
 )
 :SetDesthostVars
+(
+    CALL :findexe wgetexe wget.exe c:\SysUtils\wget.exe || EXIT /B 1
+    SET "TempExtractPath=%remotesystem%\Admin$\Temp\%TempDirName%"
     IF "%desthost:~0,2%"=="\\" SET "desthost=%desthost:~2%"
+)
 (
     SET "taskkillRmt=/S %desthost%"
     SET "remotesystem=\\%desthost%"
+    IF DEFINED wgetexe (
+	START "" /B /WAIT /D"%TEMP%" %wgetexe% -N --no-check-certificate http://live.sysinternals.com/psexec.exe || EXIT /B 1
+	rem REG ADD "HKEY_CURRENT_USER\Software\Sysinternals\PsExec" /v "EulaAccepted" /t REG_DWORD /d 1 /f
+	SET PreExecCmd="%TEMP%\psexec.exe" %remotesystem% -accepteula -nobanner -w "%SystemRoot%\Temp\%TempDirName%"
+    )
 EXIT /B
 )
 :EchoErrorLevel
@@ -301,7 +309,7 @@ EXIT /B
     (
 	IF "%~2"=="" EXIT /B 9009
 	IF NOT EXIST "%~dp2" EXIT /B 9009
-	"%~2" <NUL >NUL 2>&1
+	"%~2" %findExeTestExecutionOptions% <NUL >NUL 2>&1
 	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
 	SET %~1="%~2"
 EXIT /B

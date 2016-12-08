@@ -16,6 +16,7 @@ SET "option=%argv:~1%"
 IF "%argflag%"=="/" (
     SHIFT
     GOTO :arg_%option%
+    EXIT /B 1
 )
 
 :arg_Import
@@ -46,15 +47,15 @@ IF "%argflag%"=="/" (
     IF NOT DEFINED RegConfigName SET "RegConfigName=TeamViewer_host.reg"
     REM Posting data to TeamViewer Install Info form
     IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-    IF DEFINED AutohotkeyExe CALL :FindAutohotkeyExe
+    IF NOT DEFINED AutohotkeyExe CALL :FindAutohotkeyExe
     SET "TVProgramFiles=%ProgramFiles(x86)%\TeamViewer\Version5"
 )
     IF NOT EXIST "%TVProgramFiles%\TV.dll" SET "TVProgramFiles=%ProgramFiles%\TeamViewer\Version5"
 (
-    START "" /B %AutohotkeyExe% /ErrorStdOut "%srcpath%PostFormData.ahk"
+    IF DEFINED AutohotkeyExe START "" /B %AutohotkeyExe% /ErrorStdOut "%srcpath%PostFormData.ahk"
     "%windir%\System32\netsh.exe" advfirewall firewall add rule name="Teamviewer Remote Control Application" dir=in action=allow program="%TVProgramFiles%\TeamViewer.exe" edge=yes
     "%windir%\System32\netsh.exe" advfirewall firewall add rule name="Teamviewer Remote Control Service" dir=in action=allow program="%TVProgramFiles%\TeamViewer_Service.exe" edge=yes
-
+    
     REM When uninstalling, TV schedules removal of leftover files from its dir. When resinstalling, it does not remove this pending move command, so it stops working after next reboot.
     REM to avoid that, copy these files and schedule their move to normal location.
     REG ADD "HKEY_CURRENT_USER\Software\Sysinternals\Movefile" /v "EulaAccepted" /t REG_DWORD /d 1 /f
@@ -67,7 +68,7 @@ IF "%argflag%"=="/" (
     PUSHD "%TVProgramFiles%" || GOTO :skipNormalizingTV
 	FOR %%I IN (*.dll *.exe) DO (
 	    %xlnexe% "%%~I" "%%~I.copy" || COPY /B "%%~I" "%%~I.copy"
-	    %movefileexe% "%%~I.copy" "%%~I"
+	    %movefileexe% /nobanner "%%~I.copy" "%%~I"
 	)
     POPD
 )
@@ -133,7 +134,7 @@ EXIT /B
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :GetFirstArg AutohotkeyExe %%I
 (
     IF DEFINED AutohotkeyExe IF EXIST %AutohotkeyExe% EXIT /B 0
-    SET "findExeTestExecutionOptions=/ErrorStdOut"
+    SET "findExeTestExecutionOptions=/ErrorStdOut ."
     CALL :findexe AutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe"
     SET "findExeTestExecutionOptions="
 EXIT /B
