@@ -8,12 +8,16 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
 IF EXIST "%SystemRoot%\SysNative\*.*" (SET "System32=%SystemRoot%\SysNative") ELSE SET "System32=%SystemRoot%\System32"
 SET "TaskRelPath=Tasks\mobilmir.ru\Force Time Sync"
+
+rem IF NOT DEFINED schedUserName CALL "%~dp0..\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
+rem IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
+
+rem IF NOT DEFINED schedUserName SET "schedUserName=SYSTEM"
 )
 (
-rem RUNAS /User:Пользователь
-CALL "%~dp0_Schedule WinVista+ Task.cmd" "%~dp0Tasks.XML.7z" "*" "Force Time Sync.xml"
-)
-(
+rem CALL "%~dp0_Schedule WinVista+ Task.cmd" "%~dp0Tasks.XML.7z" "*" "Force Time Sync.xml" /NP /RU "%schedUserName%"
+CALL "%~dp0_Schedule WinVista+ Task.cmd" "%~dp0Tasks.XML.7z" "*" "Force Time Sync.xml" /NP /RU "%USERNAME%"
+
 REM Everyone=*S-1-1-0
 "%WinDir%\System32\icacls.exe" "%System32%\%TaskRelPath%" /grant "*S-1-1-0:RX"
 rem     read&execute, just "read" isn't enough!
