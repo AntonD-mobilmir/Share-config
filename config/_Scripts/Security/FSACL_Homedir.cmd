@@ -125,8 +125,9 @@ GOTO :CheckArgShift
 (
     IF NOT EXIST %1 EXIT /B 0
     IF EXIST "%~2.flag" CALL :AskRestoreACL %* || EXIT /B
+    (ECHO %DATE% %TIME% Запущено создание резервной копии от имени %USERNAME%)>>"%ACLBackupDir%\%~2.flag"
     CALL :backupACL %1 %2
-    (ECHO Not restored)>"%ACLBackupDir%\%~2.flag"
+    (ECHO %DATE% %TIME% Резервная копия сохранена, не восстановлена)>>"%ACLBackupDir%\%~2.flag"
 EXIT /B
 )
 :backupACL <path> <backup-name>
@@ -142,7 +143,10 @@ EXIT /B
     IF "%RunInteractiveInstalls%"=="0" EXIT /B 1
     SETLOCAL ENABLEEXTENSIONS
     rem ENABLEDELAYEDEXPANSION
-    FOR %%A IN ("%ACLBackupDir%\%~2.flag") DO ECHO Обнаружен старый ^(%%~tA^) флаг, обозначающий наличие сохранённых но не восстановленных ACL.
+    FOR %%A IN ("%ACLBackupDir%\%~2.flag") DO (
+	ECHO Обнаружен флаг, записанный ^(%%~tA^) обозначающий наличие сохранённых но не восстановленных ACL, с текстом:
+	TYPE "%%~A"
+    )
     ECHO.
     ECHO Имеющиеся резервные копии:
     DIR /B "%ACLBackupDir%\%~2.*.sddl"
