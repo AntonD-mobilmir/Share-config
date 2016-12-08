@@ -1,6 +1,0 @@
-7z1604-extra.7z
-
-This file has been downloaded from:
-http://heanet.dl.sourceforge.net/project/sevenzip/7-Zip/16.04/7z1604-extra.7z
-
-Date: 25.10.2016, 18:30

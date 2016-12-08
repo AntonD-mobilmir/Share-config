@@ -1,6 +1,0 @@
-jre-7u80-windows-x64.exe
-
-This file has been downloaded from:
-http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jre-7u80-windows-x64.exe?AuthParam=1431506929_98dc8c44de516c061fed34d90b4a078b
-
-Date: 13.05.2015, 11:48

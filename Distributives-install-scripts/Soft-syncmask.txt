@@ -1,1 +1,1 @@
-|*.exe;*.msi;*.msp;*.7z;*.zip;*.rar;adlpackages*;*.tar;*.gz;*.tgz;*.pdf;*.u3p;*.xpi;*.plgx;*.bz2;*.png;*.php;*.xz;*.vbox-extpack;*.mhtml;*.mht;*.tc;*.sig;*.asc;*.html;*.dsc.txt;*.jar;Win@type=snapshots;*.gif;*.cab;*.oxt;*.patch;*.jpg;*.odt;*.orig;*.h;*.iso;*.md5
+|*.7z;*.asc;*.bz2;*.cab;*.dsc.txt;*.exe;*.gif;*.gz;*.h;*.html;*.iso;*.jar;*.jpg;*.log;*.md5;*.mht;*.mhtml;*.msi;*.msp;*.odt;*.orig;*.oxt;*.patch;*.pdf;*.php;*.plgx;*.png;*.rar;*.sig;*.tar;*.tc;*.tgz;*.u3p;*.vbox-extpack;*.xpi;*.xz;*.zip;adlpackages*;Win@type=snapshots

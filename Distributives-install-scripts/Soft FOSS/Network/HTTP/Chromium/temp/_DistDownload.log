@@ -1,5 +1,0 @@
---2016-12-07 10:18:42--  https://download-chromium.appspot.com/dl/Win?type=snapshots
-Connecting to 192.168.127.1:3128... connected.
-Proxy request sent, awaiting response... 405 Method Not Allowed
-2016-12-07 10:18:43 ERROR 405: Method Not Allowed.
-
