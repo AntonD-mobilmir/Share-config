@@ -49,7 +49,11 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
 (
     rem schedUserName	schedUserPwd
     SET "swSchtasksPass="
-    IF DEFINED schedUserPwd SET "swSchtasksPass=/RP ^"%schedUserPwd%^""
+    SET "STARTMode="
+    IF DEFINED schedUserPwd (
+	SET "swSchtasksPass=/RP ^"%schedUserPwd%^""
+	SET "STARTMode=/B"
+    )
     IF "%desthost%"=="" (
 	IF NOT EXIST "%ProgramData%\mobilmir.ru" MKDIR "%ProgramData%\mobilmir.ru"||%ErrorCmd%
 	COPY /B "%srcpath%dist\*.cmd" "%ProgramData%\mobilmir.ru\*.*"
@@ -64,13 +68,13 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
     CALL "%configDir%_Scripts\CheckWinVer.cmd" 6.1 && (
 	ECHO Adding software_update_Win7Task_1.2.xml
 	"%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Delete /TN "mobilmir\SoftwareUpdate" /F
-	START "schtasks.exe" /WAIT "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Create /TN "mobilmir.ru\SoftwareUpdate" /XML "%srcpath%dist\software_update_Win7Task_1.2.xml" /RU "%schedUserName%" %swSchtasksPass% /F
+	START "schtasks.exe" %STARTMode% /WAIT "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Create /TN "mobilmir.ru\SoftwareUpdate" /XML "%srcpath%dist\software_update_Win7Task_1.2.xml" /RU "%schedUserName%" %swSchtasksPass% /F
 	GOTO :CheckSchtasksError
     )
     CALL "%configDir%_Scripts\CheckWinVer.cmd" 6 && (
 	ECHO Adding software_update_Vista_1.2.xml
 	"%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Delete /TN "mobilmir\SoftwareUpdate" /F
-	START "schtasks.exe" /WAIT "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Create /TN "mobilmir.ru\SoftwareUpdate" /XML "%srcpath%dist\software_update_Vista_1.2.xml" /RU "%schedUserName%" %swSchtasksPass% /F
+	START "schtasks.exe" %STARTMode% /WAIT "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Create /TN "mobilmir.ru\SoftwareUpdate" /XML "%srcpath%dist\software_update_Vista_1.2.xml" /RU "%schedUserName%" %swSchtasksPass% /F
 	GOTO :CheckSchtasksError
     )
     CALL "%configDir%_Scripts\CheckWinVer.cmd" 5 && (
