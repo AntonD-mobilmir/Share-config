@@ -10,18 +10,24 @@ IF EXIST "%SystemRoot%\SysNative\*.*" (SET "System32=%SystemRoot%\SysNative") EL
 SET "ArchiveName=%~1"
 SET "TaskName=%~2"
 SET "XML=%~3"
-SET "AddArgs=%~4"
-
 SET /A "ErrorCount=0"
 SET "ErrorList="
 SET "TempXMLOut=%TEMP%\%~n0.%RANDOM%"
+)
+:CollectArgs
+(
+SET "AddArgs=%AddArgs% %4"
+IF NOT "%~5"=="" (
+    SHIFT
+    GOTO :CollectArgs
+)
 )
 (
 MKDIR "%TempXMLOut%"
 IF "%XML%"=="" SET "XML=%TaskName%.xml"
 IF NOT "%ArchiveName%"=="" (
-    IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || EXIT /B
-    IF NOT EXIST "%ArchiveName%" IF EXIST "%~dp0%ArchiveName%" SET "ArchiveName=%~dp0%ArchiveName%"
+    IF NOT DEFINED exe7z CALL "%srcpath%..\find7zexe.cmd" || EXIT /B
+    IF NOT EXIST "%ArchiveName%" IF EXIST "%srcpath%%ArchiveName%" SET "ArchiveName=%srcpath%%ArchiveName%"
 )
 )
 (
@@ -38,8 +44,8 @@ EXIT /B
 )
 :ScheduleSingleTask <TaskName> <XML>
 (
-    %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~1" /F
-    %System32%\SCHTASKS.exe /Create /TN "mobilmir.ru\%~1" /XML %2 %AddArgs% /F
+    rem %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~1" /F
+    ECHO.|%System32%\SCHTASKS.exe /Create /TN "mobilmir.ru\%~1" /XML %2 %AddArgs% /F
 )
 (
     IF ERRORLEVEL 1 (

@@ -58,7 +58,7 @@ SET "schtaskPassSw=" & IF DEFINED schedUserPwd SET schtaskPassSw=/RP "%schedUser
 SET "retaskq=0"
 CALL "%~dp0..\CheckWinVer.cmd" 6 || ( CALL :SchTasksXP & GOTO :checkSchtasksError )
 IF NOT ERRORLEVEL 1 (
-    "%SystemRoot%\System32\schtasks.exe" /Delete /TN "mobilmir\Update_Distributives" /F
+    rem "%SystemRoot%\System32\schtasks.exe" /Delete /TN "mobilmir\Update_Distributives" /F
     "%SystemRoot%\System32\schtasks.exe" /Create /TN "mobilmir.ru\Update_Distributives" /XML "%~dp0Update_Distributives.xml" /RU "%schedUserName%" %schtaskPassSw% /NP /F
 )
 )
