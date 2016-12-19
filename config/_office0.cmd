@@ -77,6 +77,11 @@ MKDIR d:\Users
 IF EXIST d:\Users %AutohotkeyExe% "%~dp0_Scripts\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
 POWERCFG -h off & POWERCFG /H OFF
 
+rem без следующей строки на чистых Windows появляется:
+rem # sed.exe - Системная ошибка
+rem Запуск программы невозможен, так как на компьютере отсутствует libintl3.dll. Попробуйте переустановить программу. 
+SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
+
 START "Software Update Scripts Installer" /I /D "\\Srv0.office0.mobilmir\profiles$\Share\software_update\_install" %comspec% /C ""\\Srv0\profiles$\Share\software_update\_install\install_software_update_scripts.cmd" /InstallAndMark"
 
 START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
