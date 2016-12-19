@@ -25,6 +25,12 @@
     IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || EXIT /B
     CALL :ensureRsyncReady
     IF NOT DEFINED SetACLexe CALL "%~dp0..\find_exe.cmd" SetACLexe "%SystemDrive%\SysUtils\SetACL.exe" || GOTO :SysutilsFail
+
+    rem без следующей строки на чистых Windows появляется:
+    rem # sed.exe - Системная ошибка
+    rem Запуск программы невозможен, так как на компьютере отсутствует libintl3.dll. Попробуйте переустановить программу. 
+    SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
+    
     IF NOT DEFINED sedexe CALL "%~dp0..\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || GOTO :SysutilsFail
     IF NOT DEFINED AutohotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 )
@@ -106,7 +112,7 @@ CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
 IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 )
 (
-%AutohotkeyExe% "%~dp0..\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfEDfrPvAJ4BuhfT4BNqAXiJOKjR767C4p0M3k6N2Ft0BI1LQ/formResponse" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
+START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfEDfrPvAJ4BuhfT4BNqAXiJOKjR767C4p0M3k6N2Ft0BI1LQ/formResponse" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
 
 EXIT /B
 )
