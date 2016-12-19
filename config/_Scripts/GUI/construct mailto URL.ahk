@@ -143,7 +143,7 @@ UriEncode(Uri, Enc = "UTF-8")
 		If (Code >= 0x30 && Code <= 0x39 ; 0-9
 			|| Code >= 0x41 && Code <= 0x5A ; A-Z
 			|| Code >= 0x61 && Code <= 0x7A ; a-z
-			|| Code == 0x24 || Code == 0x2D || Code == 0x5F || Code == 0x2E || Code == 0x2B || Code == 0x21 || Code == 0x2A || Code == 0x27 || Code == 0x2C ) ; safe special characters «$-_.+!*'(),» but «()» excluded for Markdown in Redbooth
+			|| Code == 0x24 || Code == 0x2D || Code == 0x5F || Code == 0x2E || Code == 0x21 || Code == 0x2A || Code == 0x27 || Code == 0x2C ) ; safe special characters «$-_.+!*'(),» but «()» excluded for Markdown in Redbooth, and «+» is exclude because treated as space otherwise
 			Res .= Chr(Code)
 		Else
 			Res .= "%" . SubStr(Code + 0x100, -1)
