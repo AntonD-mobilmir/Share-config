@@ -7,7 +7,7 @@ IF (A_LineFile==A_ScriptFullPath) {
     If(!passwd) {
 	InputBox passwd
 	If(ErrorLevel)
-	    Exit
+	    ExitApp
 	If(!passwd) {
 	    MsgBox Пароль для добавления не указан
 	    ExitApp
