@@ -17,7 +17,7 @@
     )
     "%~dp0..\GUI\Find Trash on SystemDrive.ahk"
     
-    SET /P "add_Admins=Добавить стандартных администраторов после создания резервной копии? [1=y=да]"
+    REM SET /P "add_Admins=Добавить стандартных администраторов после создания резервной копии? [1=y=да]"
     
     IF NOT DEFINED backupscriptpath (
 	CALL :AskToSkipBackup || GOTO :SkipBackupScriptSearch
