@@ -35,11 +35,7 @@ If A_OSVersion in WIN_2003,WIN_XP,WIN_2000
 }
 
 If ( ProfilesDirectory = ProfilesDest ) {
-    If (RunInteractiveInstalls != "0") {
-	MsgBox 4, %A_ScriptName%, Каталог профилей уже "%ProfilesDest%".`n`nВсё равно настроить общий доступ и параметры безопасности?, 300
-	IfMsgBox No
-	    Exit
-    }
+    TrayTip %A_ScriptName%, Каталог профилей уже "%ProfilesDest%".`nБудет настроен общий доступ и параметры безопасности.,,0x31
 } Else {
     RegWrite REG_EXPAND_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory.bak, %ProfilesDirectory%
     RegWrite REG_EXPAND_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory, %ProfilesDest%
