@@ -17,7 +17,12 @@ IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
 SET "TCDir=%LOCALAPPDATA%\Programs\Total Commander"
 (
 "%utilsdir%7za.exe" x -r -aoa -o"%TCDir%" -- "%~dpn0.7z"
-IF DEFINED OS64Bit "%utilsdir%7za.exe" x -r -aoa -o"%TCDir%" -- "%~dpn0.64bit.7z"
+"%utilsdir%7za.exe" x -r -aoa -o"%TCDir%" -- "%~dpn0.config.7z"
+"%utilsdir%7za.exe" x -r -aoa -o"%TCDir%" -- "%~dpn0.Plugins.7z"
+IF DEFINED OS64Bit (
+    "%utilsdir%7za.exe" x -r -aoa -o"%TCDir%" -- "%~dpn0.64bit.7z"
+    "%utilsdir%7za.exe" x -r -aoa -o"%TCDir%" -- "%~dpn0.Plugins64bit.7z"
+)
 "%SystemDrive%\SysUtils\SetACL.exe" -on "%TCDir%" -ot file -actn ace -ace "n:%UIDCreatorOwner%;p:change;i:so,sc;m:set;w:dacl"
 rem this causes weird permissions after profile permission reset --- "%utilsdir%xln.exe" %AutohotkeyExe% "%TCDir%\AutoHotkey.exe" || 
 XCOPY %AutohotkeyExe% "%TCDir%\*.*" /I /Y || (
@@ -25,6 +30,7 @@ XCOPY %AutohotkeyExe% "%TCDir%\*.*" /I /Y || (
     PING 127.0.0.1 -n 3 >NUL
 )
 SET "dist7zDir=%~dp0..\..\Archivers Packers\7Zip"
+SET "distzpaqDir=%~dp0..\..\..\Soft FOSS\Archivers Packers\zpaq"
 
 rem IF /I "%SystemDrive:~0,2%" NEQ "%TCDir:~0,2%" GOTO :Unpack7ZipLibs
 rem !BUG: dir7z not defined
@@ -37,13 +43,18 @@ rem     "%utilsdir%xln.exe" -n "%dir7z%\Lang" "%TCDir%\PlugIns\wcx\Total7zip\Lan
 rem     "%utilsdir%xln.exe" "%dir7z%\7z.dll" "%TCDir%\PlugIns\wcx\Total7zip\7z.dll" || XCOPY "%dir7z%\7z.dll" "%TCDir%\PlugIns\wcx\Total7zip\*.*" /I /Y || GOTO :Unpack7ZipLibs
 rem     "%utilsdir%xln.exe" "%dir7z%\7z.sfx" "%TCDir%\PlugIns\wcx\Total7zip\7z.sfx" || XCOPY "%dir7z%\7z.sfx" "%TCDir%\PlugIns\wcx\Total7zip\*.*" /I /Y || GOTO :Unpack7ZipLibs
 rem     "%utilsdir%xln.exe" "%dir7z%\7z.exe" "%TCDir%\PlugIns\wcx\Total7zip\7zG.exe" || XCOPY "%dir7z%\7z.exe" "%TCDir%\PlugIns\wcx\Total7zip\*.*" /I /Y || GOTO :Unpack7ZipLibs
-rem     GOTO :Skip7z
+rem     GOTO :UnpackConfig
 rem )
 :Unpack7ZipLibs
 (
     FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%dist7zDir%\7z*.exe"`) DO CALL :Unpack7ZipDist "%dist7zDir%\%%~N"
     rem "%utilsdir%7za.exe" x -r -aoa -o"%TCDir%\PlugIns\wcx\Total7zip" -- "%~dp0..\..\Archivers Packers\7Zip\7z*.exe" Lang\* 7z.dll 7z.sfx 7zg.exe
-    GOTO :Skip7z
+    FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%distzpaqDir%\zpaq*.zip"`) DO CALL :Unpackzpaq "%distzpaqDir%\%%~N" && GOTO :UnpackConfig
+)
+:UnpackConfig
+(
+IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" %AutoHotkeyExe% "%TCDir%\_copy_config.ahk"
+EXIT /B
 )
 :Unpack7ZipDist
 (
@@ -63,10 +74,16 @@ rem )
     IF NOT DEFINED %flagVar% "%utilsdir%7za.exe" x -r -aoa -o"%TCDir%\PlugIns\wcx\Total7zip%outSubdir%" -- %1 Lang\* 7z.dll 7z.sfx 7zg.exe && SET "%flagVar%=1"
     EXIT /B
 )
-:Skip7z
+:Unpackzpaq
 (
-IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" %AutoHotkeyExe% "%TCDir%\_copy_config.ahk"
-EXIT /B
+    IF DEFINED OS64Bit (
+	"%utilsdir%7za.exe" x -r -aoa -o"%TCDir%\zpaq" -- %1 zpaq64.exe readme.txt
+    ) ELSE (
+	"%utilsdir%7za.exe" x -r -aoa -o"%TCDir%\zpaq" -- %1 zpaq.exe readme.txt
+    )
+    MOVE /Y "%TCDir%\zpaq\*.exe" "%TCDir%\*.*"
+    MOVE /Y "%TCDir%\zpaq\readme.txt" "%TCDir%\zpaq-readme.txt"
+    RD "%TCDir%\zpaq"
 )
 
 :DefineLocalAppData

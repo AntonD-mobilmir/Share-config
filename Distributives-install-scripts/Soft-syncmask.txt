@@ -1,1 +1,0 @@
-|*.7z;*.asc;*.bz2;*.cab;*.dsc.txt;*.exe;*.gif;*.gz;*.h;*.html;*.iso;*.jar;*.jpg;*.log;*.md5;*.mht;*.mhtml;*.msi;*.msp;*.odt;*.orig;*.oxt;*.patch;*.pdf;*.php;*.plgx;*.png;*.rar;*.sig;*.tar;*.tc;*.tgz;*.u3p;*.vbox-extpack;*.xpi;*.xz;*.zip;adlpackages*;Win@type=snapshots
