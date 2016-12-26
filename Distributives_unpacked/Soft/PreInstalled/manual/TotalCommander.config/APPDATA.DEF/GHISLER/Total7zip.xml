@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<settings>
+	<lister_plugin fontColor="0" bgColor="16777215" fontSize="10" fontFx="0" font="Courier New" />
+	<gui lang="" />
+	<debug logLevel="0" />
+	<path path_7z_dll="7z.dll" path_7zG_exe="7zG.exe" />
+	<path64bit path_7zG_exe="" path_7z_dll="" />
+	<compression save="1" sfx="7z.sfx" updateSfx="0" askByContent="0" askByContentTimeout="1" alwaysWait7zip="0" extractToTempCount="20" deleteToRecycleBin="1" keySimpleMode="-1">
+		<settings_7zip Level="0" Archiver="7z" ShowPassword="0" EncryptHeaders="0">
+			<Options>
+				<formatOptions FormatID="7z" Level="9" Dictionary="67108864" Order="64" BlockSize="32" NumThreads="2" Method="LZMA" Options="" EncryptionMethod="" />
+			</Options>
+		</settings_7zip>
+	</compression>
+	<passwords save="0" />
+	<formats save="1">
+		<format description="zip" guid="{23170F69-40C1-278A-1000-000110010000}">
+			<ext val="docx" />
+			<ext val="epub" />
+			<ext val="jar" />
+			<ext val="ods" />
+			<ext val="odt" />
+			<ext val="xlsx" />
+			<ext val="xpi" />
+			<ext val="zip" />
+			<ext val="zipx" />
+		</format>
+		<format description="bzip2" guid="{23170F69-40C1-278A-1000-000110020000}">
+			<ext val="bz2" />
+			<ext val="bzip2" />
+			<ext val="tar" />
+			<ext val="tbz" />
+			<ext val="tbz2" />
+		</format>
+		<format description="Rar" guid="{23170F69-40C1-278A-1000-000110030000}">
+			<ext val="r00" />
+			<ext val="rar" />
+		</format>
+		<format description="Arj" guid="{23170F69-40C1-278A-1000-000110040000}">
+			<ext val="arj" />
+		</format>
+		<format description="Z" guid="{23170F69-40C1-278A-1000-000110050000}">
+			<ext val="taz" />
+			<ext val="z" />
+		</format>
+		<format description="Lzh" guid="{23170F69-40C1-278A-1000-000110060000}">
+			<ext val="lha" />
+			<ext val="lzh" />
+		</format>
+		<format description="7z" guid="{23170F69-40C1-278A-1000-000110070000}">
+			<ext val="7z" />
+			<ext val="bak" />
+			<ext val="exe" />
+			<ext val="lzma2" />
+			<ext val="ok" />
+			<ext val="tmp" />
+		</format>
+		<format description="Cab" guid="{23170F69-40C1-278A-1000-000110080000}">
+			<ext val="cab" />
+			<ext val="exe" />
+			<ext val="nrg" />
+		</format>
+		<format description="Nsis" guid="{23170F69-40C1-278A-1000-000110090000}">
+			<ext val="exe" />
+			<ext val="nsis" />
+		</format>
+		<format description="lzma" guid="{23170F69-40C1-278A-1000-0001100A0000}">
+			<ext val="lzma" />
+			<ext val="pak" />
+			<ext val="tar" />
+		</format>
+		<format description="lzma86" guid="{23170F69-40C1-278A-1000-0001100B0000}">
+			<ext val="lzma86" />
+		</format>
+		<format description="xz" guid="{23170F69-40C1-278A-1000-0001100C0000}">
+			<ext val="txz" />
+			<ext val="xz" />
+		</format>
+		<format description="Ppmd" guid="{23170F69-40C1-278A-1000-0001100D0000}">
+			<ext val="pmd" />
+			<ext val="ppmd" />
+		</format>
+		<format description="Ext" guid="{23170F69-40C1-278A-1000-000110C70000}">
+			<ext val="ext" />
+			<ext val="ext2" />
+			<ext val="ext3" />
+			<ext val="ext4" />
+			<ext val="img" />
+			<ext val="iso" />
+		</format>
+		<format description="VMDK" guid="{23170F69-40C1-278A-1000-000110C80000}">
+			<ext val="vmdk" />
+		</format>
+		<format description="VDI" guid="{23170F69-40C1-278A-1000-000110C90000}">
+			<ext val="vdi" />
+		</format>
+		<format description="QCOW" guid="{23170F69-40C1-278A-1000-000110CA0000}">
+			<ext val="qcow" />
+			<ext val="qcow2" />
+			<ext val="qcow2c" />
+		</format>
+		<format description="GPT" guid="{23170F69-40C1-278A-1000-000110CB0000}">
+			<ext val="gpt" />
+			<ext val="mbr" />
+		</format>
+		<format description="Rar5" guid="{23170F69-40C1-278A-1000-000110CC0000}">
+			<ext val="r00" />
+			<ext val="rar" />
+		</format>
+		<format description="IHex" guid="{23170F69-40C1-278A-1000-000110CD0000}">
+			<ext val="ihex" />
+		</format>
+		<format description="Hxs" guid="{23170F69-40C1-278A-1000-000110CE0000}">
+			<ext val="hxi" />
+			<ext val="hxq" />
+			<ext val="hxr" />
+			<ext val="hxs" />
+			<ext val="hxw" />
+			<ext val="lit" />
+		</format>
+		<format description="TE" guid="{23170F69-40C1-278A-1000-000110CF0000}">
+			<ext val="te" />
+		</format>
+		<format description="UEFIc" guid="{23170F69-40C1-278A-1000-000110D00000}">
+			<ext val="scap" />
+		</format>
+		<format description="UEFIf" guid="{23170F69-40C1-278A-1000-000110D10000}">
+			<ext val="uefif" />
+		</format>
+		<format description="SquashFS" guid="{23170F69-40C1-278A-1000-000110D20000}">
+			<ext val="squashfs" />
+		</format>
+		<format description="CramFS" guid="{23170F69-40C1-278A-1000-000110D30000}">
+			<ext val="cramfs" />
+		</format>
+		<format description="APM" guid="{23170F69-40C1-278A-1000-000110D40000}">
+			<ext val="apm" />
+		</format>
+		<format description="MsLZ" guid="{23170F69-40C1-278A-1000-000110D50000}">
+			<ext val="mslz" />
+		</format>
+		<format description="FLV" guid="{23170F69-40C1-278A-1000-000110D60000}">
+			<ext val="flv" />
+		</format>
+		<format description="SWF" guid="{23170F69-40C1-278A-1000-000110D70000}">
+			<ext val="swf" />
+		</format>
+		<format description="SWFc" guid="{23170F69-40C1-278A-1000-000110D80000}">
+			<ext val="swf" />
+			<ext val="swfc" />
+		</format>
+		<format description="NTFS" guid="{23170F69-40C1-278A-1000-000110D90000}">
+			<ext val="dd" />
+			<ext val="img" />
+			<ext val="imgptn" />
+			<ext val="ntfs" />
+		</format>
+		<format description="FAT" guid="{23170F69-40C1-278A-1000-000110DA0000}">
+			<ext val="fat" />
+			<ext val="img" />
+			<ext val="imgptn" />
+		</format>
+		<format description="MBR" guid="{23170F69-40C1-278A-1000-000110DB0000}">
+			<ext val="mbr" />
+		</format>
+		<format description="VHD" guid="{23170F69-40C1-278A-1000-000110DC0000}">
+			<ext val="vhd" />
+		</format>
+		<format description="PE" guid="{23170F69-40C1-278A-1000-000110DD0000}">
+			<ext val="dll" />
+			<ext val="exe" />
+			<ext val="pe" />
+			<ext val="sys" />
+			<ext val="tmp" />
+			<ext val="wcx" />
+			<ext val="wfx" />
+			<ext val="wfx_" />
+			<ext val="wlx" />
+		</format>
+		<format description="ELF" guid="{23170F69-40C1-278A-1000-000110DE0000}">
+			<ext val="elf" />
+		</format>
+		<format description="MachO" guid="{23170F69-40C1-278A-1000-000110DF0000}">
+			<ext val="mach-o" />
+			<ext val="macho" />
+		</format>
+		<format description="Udf" guid="{23170F69-40C1-278A-1000-000110E00000}">
+			<ext val="img" />
+			<ext val="iso" />
+			<ext val="udf" />
+		</format>
+		<format description="Xar" guid="{23170F69-40C1-278A-1000-000110E10000}">
+			<ext val="pkg" />
+			<ext val="xar" />
+		</format>
+		<format description="Mub" guid="{23170F69-40C1-278A-1000-000110E20000}">
+			<ext val="mub" />
+		</format>
+		<format description="HFS" guid="{23170F69-40C1-278A-1000-000110E30000}">
+			<ext val="hfs" />
+			<ext val="hfsx" />
+		</format>
+		<format description="Dmg" guid="{23170F69-40C1-278A-1000-000110E40000}">
+			<ext val="dmg" />
+		</format>
+		<format description="Compound" guid="{23170F69-40C1-278A-1000-000110E50000}">
+			<ext val="doc" />
+			<ext val="msi" />
+			<ext val="msp" />
+			<ext val="ppt" />
+			<ext val="sdv" />
+			<ext val="sts" />
+			<ext val="tmp" />
+			<ext val="xar" />
+			<ext val="xls" />
+		</format>
+		<format description="wim" guid="{23170F69-40C1-278A-1000-000110E60000}">
+			<ext val="esd" />
+			<ext val="swm" />
+			<ext val="wim" />
+		</format>
+		<format description="Iso" guid="{23170F69-40C1-278A-1000-000110E70000}">
+			<ext val="img" />
+			<ext val="iso" />
+			<ext val="isomem" />
+			<ext val="nrg" />
+		</format>
+		<format description="Chm" guid="{23170F69-40C1-278A-1000-000110E90000}">
+			<ext val="chi" />
+			<ext val="chm" />
+			<ext val="chq" />
+			<ext val="chw" />
+			<ext val="hxi" />
+			<ext val="hxq" />
+			<ext val="hxr" />
+			<ext val="hxs" />
+			<ext val="hxw" />
+			<ext val="lit" />
+		</format>
+		<format description="Split" guid="{23170F69-40C1-278A-1000-000110EA0000}">
+			<ext val="001" />
+		</format>
+		<format description="Rpm" guid="{23170F69-40C1-278A-1000-000110EB0000}">
+			<ext val="rpm" />
+		</format>
+		<format description="Ar" guid="{23170F69-40C1-278A-1000-000110EC0000}">
+			<ext val="a" />
+			<ext val="ar" />
+			<ext val="deb" />
+			<ext val="lib" />
+		</format>
+		<format description="Cpio" guid="{23170F69-40C1-278A-1000-000110ED0000}">
+			<ext val="cpio" />
+		</format>
+		<format description="tar" guid="{23170F69-40C1-278A-1000-000110EE0000}">
+			<ext val="ova" />
+			<ext val="tar" />
+		</format>
+		<format description="gzip" guid="{23170F69-40C1-278A-1000-000110EF0000}">
+			<ext val="gz" />
+			<ext val="gzip" />
+			<ext val="tgz" />
+			<ext val="tpz" />
+		</format>
+	</formats>
+	<formatsDisabled />
+</settings>

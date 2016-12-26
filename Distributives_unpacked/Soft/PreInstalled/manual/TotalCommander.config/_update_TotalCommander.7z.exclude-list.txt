@@ -1,0 +1,18 @@
+AutoHotkey.exe
+notepad2.ini.bak
+PlugIns\wcx\CopyTree\Language
+PlugIns\wcx\Total7zip\7z.dll 
+PlugIns\wcx\Total7zip\7z.sfx 
+PlugIns\wcx\Total7zip\7zG.exe 
+PlugIns\wcx\Total7zip\7-Zip History.txt 
+PlugIns\wcx\Total7zip\7-zip.chm 
+PlugIns\wcx\Total7zip\Lang
+PlugIns\wcx\Total7zip\License.txt
+PlugIns\wcx\zpaq\non-SSE2
+PlugIns\wlx\OOoViewer
+Total Updater
+TCUNIN64.EXE
+TCUNIN64.WUL
+TCUNINST.EXE
+TCUNINST.WUL
+WCUNINST.WUL

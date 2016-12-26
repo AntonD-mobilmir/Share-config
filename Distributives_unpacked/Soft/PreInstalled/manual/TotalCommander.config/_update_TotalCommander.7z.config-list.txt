@@ -1,0 +1,16 @@
+*.ini
+*.cmd
+*.bat
+*.ahk
+APPDATA.DEF
+notepad2.ini
+_copy_config.ahk
+_HideTC.ahk
+_ShowTC.ahk
+_update_TotalCommander.7z.cmd
+_update_TotalCommander.*-list.txt
+CleanupNotepad2Ini.ahk
+HardlinkOrReparse.ahk
+HardlinkOrReparse.cmd
+MultiDiff.ahk
+NoClose.ini
