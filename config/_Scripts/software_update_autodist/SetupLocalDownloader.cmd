@@ -88,7 +88,7 @@ START "install_software_update_scripts.cmd" /MIN %comspec% /C "%InstDest%\softwa
 
 ECHO N|%SystemRoot%\System32\net.exe SHARE "Distributives" /DELETE
 %SystemRoot%\System32\net.exe SHARE "Distributives=d:\Distributives"
-%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$" /DELETE
+ECHO Y|%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$" /DELETE
 %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Everyone,CHANGE
 %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Все,CHANGE
 %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update"
