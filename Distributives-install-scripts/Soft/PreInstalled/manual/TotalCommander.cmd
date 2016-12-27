@@ -98,33 +98,15 @@ EXIT /B
 )
 
 :FindAutoHotkeyExe
-FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :GetFirstArg AutohotkeyExe %%I
-)
 (
-    CALL :CheckAutohotkeyExe && EXIT /B
-    rem continuing here if AutoHotkeyScript type isn't defined or specified path points to incorect location
-    SET AutohotkeyExe="%ProgramFiles%\AutoHotkey\AutoHotkey.exe"
-    CALL :CheckAutohotkeyExe && EXIT /B
-    SET AutohotkeyExe="%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe"
-    CALL :CheckAutohotkeyExe && EXIT /B
-    SET AutohotkeyExe="%~dp0..\utils\AutoHotkey.exe"
+    FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :CheckAutohotkeyExe %%I
+    rem continuing if AutoHotkeyScript type isn't defined or specified path points to incorect location
+    IF NOT DEFINED AutohotkeyExe CALL :CheckAutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" || CALL :CheckAutohotkeyExe "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe" || SET AutohotkeyExe="%~dp0..\utils\AutoHotkey.exe"
+    EXIT /B
 )
-:CheckAutohotkeyExe
+:CheckAutohotkeyExe <exepath>
 (
-    IF NOT DEFINED AutohotkeyExe EXIT /B 1
-    IF NOT EXIST %AutohotkeyExe% EXIT /B 1
+    IF NOT EXIST %1 EXIT /B 1
+    SET AutohotkeyExe=%1
 EXIT /B 0
-)
-:tryutilsdir
-(
-    IF NOT DEFINED utilsdir CALL "%~dp0FindSoftwareSource.cmd"
-    IF NOT DEFINED utilsdir EXIT /B 1
-)
-(
-EXIT /B
-)
-:GetFirstArg
-(
-    SET %1=%2
-EXIT /B
 )
