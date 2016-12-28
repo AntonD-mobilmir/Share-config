@@ -78,10 +78,11 @@ EXIT /B
 (
     IF DEFINED OS64Bit (
 	"%utilsdir%7za.exe" x -r -aoa -o"%TCDir%\zpaq" -- %1 zpaq64.exe readme.txt
+	MOVE /Y "%TCDir%\zpaq\zpaq64.exe" "%TCDir%\zpaq64.exe"
     ) ELSE (
 	"%utilsdir%7za.exe" x -r -aoa -o"%TCDir%\zpaq" -- %1 zpaq.exe readme.txt
+	MOVE /Y "%TCDir%\zpaq\zpaq.exe" "%TCDir%\zpaq.exe"
     )
-    MOVE /Y "%TCDir%\zpaq\*.exe" "%TCDir%\*.*"
     MOVE /Y "%TCDir%\zpaq\readme.txt" "%TCDir%\zpaq-readme.txt"
     RD "%TCDir%\zpaq"
 )
