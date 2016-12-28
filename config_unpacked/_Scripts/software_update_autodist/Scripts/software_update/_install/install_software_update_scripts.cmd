@@ -32,6 +32,11 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
     CALL :GetDir configDir "%DefaultsSource%"
 )
 (
+    IF NOT DEFINED localStatus (
+	IF NOT EXIST "%SUScriptsStatus%" MKDIR "%SUScriptsStatus%"
+	IF NOT EXIST "%SUScriptsStatus%" SET "localStatus=1"
+    )
+    
     REM use user named admin-task-scheduler with random password, write password to an encrypted local file, use this password for tasks creation
     REM not in retail, because there server can have admin-task-scheduler user too -- IF NOT DEFINED schedUserName CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
     IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
@@ -57,6 +62,11 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
     IF "%desthost%"=="" (
 	IF NOT EXIST "%ProgramData%\mobilmir.ru" MKDIR "%ProgramData%\mobilmir.ru"||%ErrorCmd%
 	COPY /B "%srcpath%dist\*.cmd" "%ProgramData%\mobilmir.ru\*.*"
+	IF "%localStatus%"=="1" (
+	    ECHO.
+	    ECHO SET "SUScriptsStatus=%%PROGRAMDATA%%\mobilmir.ru\SoftUpdateScripts\status"
+	    ECHO SET "SUScriptsOldLogs=%%PROGRAMDATA%%\mobilmir.ru\SoftUpdateScripts\old\status"
+	)>>"%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd"
     ) ELSE (
 	IF NOT EXIST "%destpath%\ProgramData\mobilmir.ru" MKDIR "%destpath%\ProgramData\mobilmir.ru"
 	COPY /B "%srcpath%dist\*.cmd" "%destpath%\ProgramData\mobilmir.ru\*.*"
