@@ -43,6 +43,32 @@ FindThunderbirdProfile() {
 	Throw Exception("Профиль не найден", -1, "Ни одна из папок профилей, прочитанных из profiles.ini, не содержит prefs.js")
 }
 
-#Include <IniFilesUnicode>
+SelectMTProfileFolder(mtProfileDir, showDialogueBeforeChecking:=0) {
+    If (!mtProfileDir) {
+	EnvGet UserProfile, USERPROFILE
+	mtProfileDir = %UserProfile%\Mail\Thunderbird\profile
+    }
+    While ((A_Index==1 && showDialogueBeforeChecking) || (!FileExist(mtProfileDir . "\prefs.js") && reason:=" (в папке должен быть prefs.js)" )) {
+	FileSelectFolder mtProfileDir, *%mtProfileDir%, 2, Укажите путь к профилю Thunderbird%reason%
+	If (!mtProfileDir)
+	    Throw "Выбор папки отменён пользователем"
+    }
+    return mtProfileDir
+}
 
-FileAppend % FindThunderbirdProfile(), *, cp1
+If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
+    mtProfileDir := FindThunderbirdProfile()
+    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+    If (RunInteractiveInstalls != "0") {
+	If (!mtProfileDir) {
+	    EnvGet UserProfile, USERPROFILE
+	    mtProfileDir = %UserProfile%\Mail\Thunderbird\profile
+	}
+	mtProfileDir := SelectMTProfileFolder(mtProfileDir)
+    }
+    
+    FileAppend %mtProfileDir%`n, *, cp1
+    ExitApp
+}
+
+#Include <IniFilesUnicode>
