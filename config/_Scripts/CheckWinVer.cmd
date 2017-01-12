@@ -25,10 +25,12 @@ rem Compare Windows version with %1 by parts as numbers.
 rem This is required because string "10." is less (<, LSS) than "5.0".
 
 rem returns 1 if version provided via command line is greater than windows version
-rem %0 6 to check for Vista-or-higher (equiv to %0 6.0)
-rem %0 6.1 to check for Windows 7 / Server 2008 R2 (or higher)
-rem %0 6.2 to check for Windows 8 / Server 2012 (or higher)
-rem %0 6.3 to check for Windows 8.1 / Server 2012 R2 (or higher)
+rem %0 6 to check for Vista-or-higher --- equivalent to %0 6.0
+rem %0 6.1 to check for Windows 7 / Server 2008 R2 or higher
+rem %0 6.2 to check for Windows 8 / Server 2012 or higher
+rem %0 6.3 to check for Windows 8.1 / Server 2012 R2 or higher
+rem %0 6.4 to check for Windows 10 or higher
+rem actually current Win10 versions return "10" as their primary version number, but early preview builds returned 6.4. And it script for higher-or-equal anyway, so 6.4 will work reliably.
 
 FOR /F "delims=. tokens=1,2,3" %%I IN ("%WinVerNum%") DO (
     SET "verSub1=%%I"
