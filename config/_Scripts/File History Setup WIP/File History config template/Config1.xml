@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataProtectionUserConfig SchemaVersion="1">
+  <UserName>%USERNAME%</UserName>
+  <FriendlyName>%USERNAME%</FriendlyName>
+  <PCName>%COMPUTERNAME%</PCName>
+  <UserId>%GUID%</UserId>
+  <Library>
+    <LibraryName>*2112ab0a-c86a-4ffe-a368-0de96e47012e</LibraryName>
+    <Folder>%USERPROFILE%\Music</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*e25b5812-be88-4bd9-94b0-29233477b6c3</LibraryName>
+    <Folder>%USERPROFILE%\Pictures\Saved Pictures</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*491e922f-5643-4af4-a7eb-4e7a138d8174</LibraryName>
+    <Folder>%USERPROFILE%\Videos</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*2b20df75-1eda-4039-8097-38798227d5b7</LibraryName>
+    <Folder>%USERPROFILE%\Pictures\Camera Roll</Folder>
+  </Library>
+  <Library>
+    <LibraryName>Пленка</LibraryName>
+    <Folder>%USERPROFILE%\Pictures\Camera Roll</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*7b0db17d-9cd2-4a93-9733-46cc89022e7c</LibraryName>
+    <Folder>%USERPROFILE%\Documents</Folder>
+  </Library>
+  <Library>
+    <LibraryName>*a990ae9f-a03b-4e80-94bc-9912d7504104</LibraryName>
+    <Folder>%USERPROFILE%\Pictures</Folder>
+  </Library>
+  <UserFolder>%USERPROFILE%\Contacts</UserFolder>
+  <UserFolder>%USERPROFILE%\Desktop</UserFolder>
+  <UserFolder>%USERPROFILE%\Documents</UserFolder>
+  <UserFolder>%USERPROFILE%\Downloads</UserFolder>
+  <UserFolder>%USERPROFILE%\Favorites</UserFolder>
+  <UserFolder>%USERPROFILE%\Links</UserFolder>
+  <UserFolder>%USERPROFILE%\Mail</UserFolder>
+  <UserFolder>%USERPROFILE%\Music</UserFolder>
+  <UserFolder>%USERPROFILE%\OneDrive</UserFolder>
+  <UserFolder>%USERPROFILE%\Pictures</UserFolder>
+  <UserFolder>%USERPROFILE%\Saved Games</UserFolder>
+  <UserFolder>%USERPROFILE%\Searches</UserFolder>
+  <UserFolder>%USERPROFILE%\Videos</UserFolder>
+  <FolderExclude>%USERPROFILE%\.oracle_jre_usage</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Contacts</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Downloads</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Favorites</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Mail</FolderExclude>
+  <FolderExclude>%USERPROFILE%\OneDrive</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Saved Games</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Searches</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Searches</FolderExclude>
+  <FolderExclude>%USERPROFILE%\Tracing</FolderExclude>
+  <LibraryExclude>*2112ab0a-c86a-4ffe-a368-0de96e47012e</LibraryExclude>
+  <LibraryExclude>*491e922f-5643-4af4-a7eb-4e7a138d8174</LibraryExclude>
+  <LocalCatalogPath1>%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Configuration\Catalog1.edb</LocalCatalogPath1>
+  <LocalCatalogPath2>%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Configuration\Catalog2.edb</LocalCatalogPath2>
+  <StagingArea>
+    <StagingAreaPath>%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Data</StagingAreaPath>
+    <StagingAreaMaximumCapacity>134217728</StagingAreaMaximumCapacity>
+    <StagingAreaWarningThreshold>83886080</StagingAreaWarningThreshold>
+  </StagingArea>
+  <AvailabilityPolicies>
+    <TargetAbsenceTime>5</TargetAbsenceTime>
+    <TimeInUnprotectedState>3</TimeInUnprotectedState>
+  </AvailabilityPolicies>
+  <RetentionPolicies>
+    <RetentionPolicyType>NO LIMIT</RetentionPolicyType>
+    <MinimumRetentionAge>365</MinimumRetentionAge>
+  </RetentionPolicies>
+  <DPFrequency>3600</DPFrequency>
+  <DPStatus>ENABLED</DPStatus>
+  <Target>
+    <TargetName>\\localhost\File History$\</TargetName>
+    <TargetUrl>\\localhost\File History$\</TargetUrl>
+    <TargetDriveType>REMOTE</TargetDriveType>
+    <TargetConfigPath1>%USERNAME%\%COMPUTERNAME%\Configuration\Config1.xml</TargetConfigPath1>
+    <TargetConfigPath2>%USERNAME%\%COMPUTERNAME%\Configuration\Config2.xml</TargetConfigPath2>
+    <TargetCatalogPath1>%USERNAME%\%COMPUTERNAME%\Configuration\Catalog1.edb</TargetCatalogPath1>
+    <TargetCatalogPath2>%USERNAME%\%COMPUTERNAME%\Configuration\Catalog2.edb</TargetCatalogPath2>
+    <TargetBackupStorePath>%USERNAME%\%COMPUTERNAME%\Data</TargetBackupStorePath>
+    <TargetWarningThreshold>90</TargetWarningThreshold>
+  </Target>
+</DataProtectionUserConfig>

@@ -12,17 +12,18 @@ REM and http://superuser.com/questions/1044050/configuring-windows-8-8-1-10-file
 
 SET "localconfigpath=%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Configuration\Config"
 SET "remoteconfigpath=\\localhost\File History$\%USERNAME%\%COMPUTERNAME%\Configuration"
-)
-(
-rem as admin:
-rem CALL "%~dp0share File History for Windows 8.cmd"
-rem %SystemRoot%\System32\sc.exe config fhsvc start= delayed-auto
-rem REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\fhsvc\Parameters\Configs" /v "%localconfigpath%" /t REG_DWORD /d 1 /f
+
+IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 )
 (
 rem as user:
 MKDIR "%localconfigpath%"
-XCOPY "%~dp0File History config template" "%localconfigpath%" /E /I /H /Y
+%AutoHotkeyExe% "%~dp0FillInTemplate.ahk" "%~dp0File History config template\Config1.xml" "%localconfigpath%\Config1.xml"
+IF NOT EXIST "%localconfigpath%\Config2.xml" COPY /B "%localconfigpath%\Config1.xml" "%localconfigpath%\Config2.xml"
+
 MKDIR "%remoteconfigpath%"
-XCOPY "%~dp0File History config template" "%remoteconfigpath%" /E /I /H /Y
+XCOPY "%localconfigpath%\*.*" "%remoteconfigpath%" /E /I /H /Y
+
+rem as admin:
+powershell.exe -Command "Start-Process -FilePath \"%comspec%\" -ArgumentList \"/C `\"`\"%~dp0File History setup admin.cmd`\" `\"%localconfigpath%`\"`\"\" -Verb RunAs"
 )
