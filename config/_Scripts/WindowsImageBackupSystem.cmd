@@ -22,10 +22,11 @@
 
     IF NOT DEFINED includes SET "includes=-allCritical"
     SET "DstBaseDir=%~1"
-    IF NOT DEFINED DstBaseDir SET /P "DstBaseDir=Буква тома или сетевая папка для резервной копии: "
     REM Windows 8+ cannot restore from compressed images
     CALL "%~dp0CheckWinVer.cmd" 6.2 && SET "DontCompressLocal=1"
+    IF NOT DEFINED DstBaseDir SET /P "DstBaseDir=Буква тома или сетевая папка для резервной копии (без кавычек): "
 )
+IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
 (
     SET "DstDirWIB=%DstBaseDir%\WindowsImageBackup"
     IF /I "%DstBaseDir%"=="R:" SET "CopyToR=0"
@@ -45,14 +46,15 @@
     rem 	C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
     
     ECHO Расчёт сумм MD5
-    rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла)
+    rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла
+
     IF DEFINED md5sumexe START "Запись MD5" /MIN %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
 
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
 	CALL :CompressAndDefrag R:
     )
-    CALL :CompressAndDefrag %DstBaseDir%
+    CALL :CompressAndDefrag "%DstBaseDir%"
 
     EXIT /B
 )
@@ -67,11 +69,11 @@ EXIT /B
 (
     CALL :IfUNC %1 && (
 	START "Сжатие %~1" %SystemRoot%\System32\compact.exe /C /EXE:LZX /S:%1
-    ) ELSE (
-	IF "%DontCompressLocal%"=="1" EXIT /B
-	ECHO Запуск сжатия и дефрагментации %1
-	IF EXIST "%~dp0compress and defrag.cmd" START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C "%~dp0compress and defrag.cmd" %*
+	EXIT /B
     )
+    IF "%DontCompressLocal%"=="1" EXIT /B
+    ECHO Запуск сжатия и дефрагментации %1
+    IF EXIST "%~dp0compress and defrag.cmd" START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C "%~dp0compress and defrag.cmd" %*
 EXIT /B
 )
 :IfUNC <path>
