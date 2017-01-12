@@ -125,17 +125,13 @@ WaitCPUIdle() {
     Progress Off
     Progress A R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " секунд"
     Loop {
-	Loop
-	{
-	    Sleep %measurementTime%
-	    idle := GetIdleTime()
-	    If (idle > idleLimit)
-		break
-	    Else
-		cycle := 0
-	    Progress %cycle%, % "Текущий процент простоя: " . idle*100
-	}
-	cycle++
+	Sleep %measurementTime%
+	idle := GetIdleTime()
+	If (idle > idleLimit)
+	    cycle++
+	Else
+	    cycle := 0
+	Progress %cycle%, % "Текущий процент простоя: " . idle*100
     } Until cycle > cyclesLimit
     Progress Off
 }
