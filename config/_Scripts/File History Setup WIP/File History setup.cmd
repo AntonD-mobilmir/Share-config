@@ -10,7 +10,7 @@ REM written using http://www.verboon.info/2012/04/windows-8-file-history-feature
 REM http://randomthoughtsofforensics.blogspot.ru/2014/12/file-history-research-part-1.html
 REM and http://superuser.com/questions/1044050/configuring-windows-8-8-1-10-file-history-via-command-line?noredirect=1#comment1461681_1044050
 
-SET "localconfigpath=%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Configuration\Config"
+SET "localconfigpath=%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Configuration"
 SET "remoteconfigpath=\\localhost\File History$\%USERNAME%\%COMPUTERNAME%\Configuration"
 
 IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
