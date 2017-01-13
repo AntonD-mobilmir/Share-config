@@ -18,7 +18,7 @@ IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 (
 rem as user:
 MKDIR "%localconfigpath%"
-%AutoHotkeyExe% "%~dp0FillInTemplate.ahk" "%~dp0File History config template\Config1.xml" "%localconfigpath%\Config1.xml"
+%AutoHotkeyExe% "%~dp0FillInTemplate.ahk"
 IF NOT EXIST "%localconfigpath%\Config2.xml" COPY /B "%localconfigpath%\Config1.xml" "%localconfigpath%\Config2.xml"
 
 MKDIR "%remoteconfigpath%"

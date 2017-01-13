@@ -65,12 +65,12 @@
     <StagingAreaWarningThreshold>83886080</StagingAreaWarningThreshold>
   </StagingArea>
   <AvailabilityPolicies>
-    <TargetAbsenceTime>5</TargetAbsenceTime>
+    <TargetAbsenceTime>1</TargetAbsenceTime>
     <TimeInUnprotectedState>3</TimeInUnprotectedState>
   </AvailabilityPolicies>
   <RetentionPolicies>
     <RetentionPolicyType>NO LIMIT</RetentionPolicyType>
-    <MinimumRetentionAge>365</MinimumRetentionAge>
+    <MinimumRetentionAge>30</MinimumRetentionAge>
   </RetentionPolicies>
   <DPFrequency>3600</DPFrequency>
   <DPStatus>ENABLED</DPStatus>
