@@ -43,11 +43,14 @@ findexe(exe, paths*) {
 	Try return GetAppPathFromRegShellKey(exename, "HKEY_CLASSES_ROOT\" . %A_LoopRegName%)
     }
     
-    Try return GetPathForFile(exe, A_ScriptDir . "..\..\..\Distributives\Soft\PreInstalled\utils"
-				 , A_ScriptDir . "..\..\Soft\PreInstalled\utils"
-				 , "\Distributives\Soft\PreInstalled\utils"
-				 , "\\localhost\Distributives\Soft\PreInstalled\utils"
-				 , "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils" )
+    Try return GetPathForFile(exe, A_LineFile . "..\..\..\..\..\..\Distributives\Soft\PreInstalled\utils" ; Srv0 only
+				 , A_LineFile . "..\..\..\..\Program Files" ; Srv0 only
+				 , A_LineFile . "..\..\..\..\Soft\PreInstalled\utils" ; in retail, when config and soft are in D:\Distributives
+				 , A_LineFile . "..\..\..\..\..\Distributives\Soft\PreInstalled\utils" ; in retail, for case when config is in some other dir
+				 , "\Distributives\Soft\PreInstalled\utils" ; same
+				 , "\\localhost\Distributives\Soft\PreInstalled\utils" ; sometimes Distributives are somewhere else but available on net
+				 , "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils" ; almost last resort, only works in office0
+				 , "\\Srv0.office0.mobilmir\profiles$\Share\Program Files" ) ; last resort, only works in office0
 
     EnvGet SystemDrive,SystemDrive
     Loop Files, %SystemDrive%\SysUtils\%exename%, R

@@ -106,6 +106,11 @@ EXIT /B
 )
 :findPasswdExe
 (
-    FOR %%A IN ("c:\SysUtils\UnxUtils\Uri\passwd.exe" "\\Srv0\profiles$\Share\Program Files\passwd.exe") DO IF EXIST %%A SET "passwdexe=%%A" & EXIT /B
-EXIT /B 1
+    IF EXIST "%~dp0..\find_exe.cmd" (
+	CALL "%~dp0..\find_exe.cmd" "c:\SysUtils\UnxUtils\Uri\passwd.exe"
+    ) ELSE (
+	FOR %%A IN ("c:\SysUtils\UnxUtils\Uri\passwd.exe" "\\Srv0\profiles$\Share\Program Files\passwd.exe") DO IF EXIST %%A SET "passwdexe=%%A" & EXIT /B
+	EXIT /B 1
+    )
+    EXIT /B
 )
