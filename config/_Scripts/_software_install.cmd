@@ -47,7 +47,7 @@ XCOPY "%~dp0InstallQueue.%DefaultsName%" "%InstallQueue%" /E /I /H /Y
 
 rem TODO: доработать скрипт установки, чтобы следующее ПО (опционально) не устанавливалось, а вместо этого записывались флаги установки.
 rem Соответственно, здесь устанавливать либо если удалено (как сейчас), либо если есть флаги.
-CALL "%~dp0_software_install_queued.cmd"
+IF NOT "%SkipInstallsKeepQueue%"=="1" CALL "%~dp0_software_install_queued.cmd"
 
 EXIT /B
 
