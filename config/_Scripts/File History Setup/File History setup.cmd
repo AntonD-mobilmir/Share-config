@@ -19,10 +19,10 @@ IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 rem as user:
 MKDIR "%localconfigpath%"
 %AutoHotkeyExe% "%~dp0FillInTemplate.ahk"
-IF NOT EXIST "%localconfigpath%\Config2.xml" COPY /B "%localconfigpath%\Config1.xml" "%localconfigpath%\Config2.xml"
+COPY /B /Y "%localconfigpath%\Config1.xml" "%localconfigpath%\Config2.xml"
 
-MKDIR "%remoteconfigpath%"
-XCOPY "%localconfigpath%\*.*" "%remoteconfigpath%" /E /I /H /Y
+rem MKDIR "%remoteconfigpath%"
+rem XCOPY "%localconfigpath%\config?.xml" "%remoteconfigpath%" /E /I /H /Y
 
 rem as admin:
 powershell.exe -Command "Start-Process -FilePath \"%comspec%\" -ArgumentList \"/C `\"`\"%~dp0File History setup admin.cmd`\" `\"%localconfigpath%`\"`\"\" -Verb RunAs"
