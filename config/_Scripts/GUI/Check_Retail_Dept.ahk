@@ -21,10 +21,22 @@ OSVersionObj := RtlGetVersion()
 AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
 
+FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
+
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
 } Else {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
+    
+    AddLog("Скрипт RetailHelper")
+    shortcutPath=%A_Startup%\RetailHelper.lnk
+;    If (!FileExist(shortcutPath)) {
+	SetLastRowStatus("Добавление в автозагрузку", 0)
+	FileCreateShortcut D:\Local_Scripts\RetailHelper.ahk, %shortcutPath%
+	SetLastRowStatus(ErrorLevel, !ErrorLevel)
+;    } Else {
+;	SetLastRowStatus("Скрипт есть", 1)
+;    }
 }
 
 AddLog(A_AhkPath, A_AhkVersion)
@@ -55,11 +67,11 @@ xlnexe := findexe("xln.exe", "C:\SysUtils")
 If (xlnexe)
     AddLog("xln.exe: " . xlnexe, , 1)
 DriveSpaceFree dfc, C:\
-AddLog("Свободно на C:", dfc . " MB", dfc > 1536)
+AddLog("Свободно на C:", MBGB(dfc), dfc > 1536)
 DriveSpaceFree dfd, D:\
-AddLog("Свободно на D:", dfd . " MB", dfd > 1536)
+AddLog("Свободно на D:", MBGB(dfd), dfd > 1536)
 DriveSpaceFree dfr, R:\
-AddLog("Свободно на R:", dfr ? dfr . " MB" : "", dfr > 1536)
+AddLog("Свободно на R:", MBGB(dfr), dfr > 1536)
 
 AddLog("Скрипт на Srv0")
 FileGetTime timestampServerScript, %serverScriptPath%
@@ -172,6 +184,15 @@ If (FileExist(scriptInventoryReport)) {
 }
 
 CheckUpdateDefaultConfigName(reqdConfigName)
+
+If (A_OSVersion=="WIN_7") {
+    netshexe := findexe("netsh.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
+    AddLog("Отключение Teredo")
+    RunWait %netshexe% interface ipv6 set teredo disable,,Min UseErrorLevel
+    err1netsh:=ErrorLevel
+    RunWait %netshexe% interface teredo set state disable,,Min UseErrorLevel
+    SetLastRowStatus("ipv6 STD: " . err1netsh . " / TSSD: " . ErrorLevel,!(err1netsh || ErrorLevel))
+}
 
 ; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
 EnvGet SystemDrive, SystemDrive
@@ -407,6 +428,19 @@ ButtonCancel:
 	    return
     }
     ExitApp
+
+MBGB(val) {
+    If (!val)
+	return ""
+    format:="{:d}"
+    unit:="MB"
+    If (val > 1024) {
+	format:="{:0.2f}"
+	val /= 1024.
+	unit:="GB"
+    }
+    return Format(format, val) . " " . unit
+}
 
 CheckRemove(path) {
     trashDir := A_Temp . "\trash-" . A_ScriptName
