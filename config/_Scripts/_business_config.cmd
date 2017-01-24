@@ -17,6 +17,7 @@ START "Setting up Windows components" %comspec% /C ""%~dp0Windows Components\Win
 CALL "%~dp0DisablePasswordExpiration.cmd"
 CALL "%~dp0TimeSync-settings.cmd"
 CALL "%~dp0EnableRemoteDesktop.cmd"
+CALL "%~dp0Disable Teredo on WinVista or Win7.cmd"
 CALL "%~dp0CheckWinVer.cmd" 6 && bcdedit /set nx optout
 %comspec% /C "%~dp0registry\reg_commonlysafe.cmd"
 CALL "%~dp0CheckWinVer.cmd" 6.2 && CALL "%~dp0share File History for Windows 8.cmd"
