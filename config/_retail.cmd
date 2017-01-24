@@ -92,7 +92,7 @@ rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g
 
 :MTMail
 REM path workaround:
-SET PATH=%PATH%;C:\SysUtils\libs
+SET "PATH=%PATH%;C:\SysUtils\libs"
 
 REM скрипт создания п/я вылетает
 START "" /B /WAIT %comspec% /C "%~dp0_Scripts\CreateMTProfileForSharedUser.cmd"

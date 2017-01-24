@@ -1,7 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
-global GUID,r
+global GUID
 
 templateFile=%1%
 outFileName=%2%
@@ -72,10 +72,9 @@ Try {
 ExitApp
 
 Expand(string) {
-    PrevPctChr:=0
-    LastPctChr:=0
-    VarnameJustFound:=0
-    output:=""
+    global
+    
+    local PrevPctChr:=LastPctChr:=VarnameJustFound:=0, output:="", reqdVarName, CurrEnvVar
 
     While ( LastPctChr:=InStr(string, "%", true, LastPctChr+1) ) {
 	If (VarnameJustFound) {
@@ -85,6 +84,8 @@ Expand(string) {
 		    CurrEnvVar:=%reqdVarName%
 	    If (!CurrEnvVar)
 		EnvGet CurrEnvVar,%reqdVarName%
+	    If (!CurrEnvVar)
+		Throw "Переменная не найдена: " . reqdVarName
 	    output .= CurrEnvVar
 	    CurrEnvVar=
 	    VarnameJustFound:=0

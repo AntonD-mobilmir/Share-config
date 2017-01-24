@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libraryDescription xmlns="http://schemas.microsoft.com/windows/2009/library">
+  <name>@shell32.dll,-34584</name>
+  <ownerSID>S-1-5-21-2790064984-1477204702-3380208199-1011</ownerSID>
+  <version>10</version>
+  <isLibraryPinned>true</isLibraryPinned>
+  <iconReference>imageres.dll,-1004</iconReference>
+  <templateInfo>
+    <folderType>{94d6ddcc-4a68-4175-a374-bd584a510b78}</folderType>
+  </templateInfo>
+  <propertyStore>
+    <property name="HasModifiedLocations" type="boolean"><![CDATA[false]]></property>
+  </propertyStore>
+  <searchConnectorDescriptionList>
+    <searchConnectorDescription publisher="Microsoft" product="Windows">
+      <description>@shell32.dll,-34586</description>
+      <isDefaultSaveLocation>true</isDefaultSaveLocation>
+      <simpleLocation>
+        <url>knownfolder:{4BD8D571-6D19-48D3-BE97-422220080E43}</url>
+        <serialized>MBAAAEAFCAAAAAAAADAAAAAAAY0gAAQBRAAAA4wKT6Bti3cAGByoX0Z6NHQJFm/2/U7zBAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAsUAUAwHQB+TQDi66kGEiiNCAsCMw0ZGA8CR6wFAAAAAAAAAAAAAAAAAAAAAAAAAMBQMAAAAAAwMKNWPQAQVzVmczBAOAgAAEAw7+ePQ501MKNWPqAAAAgCAAAAAAIBAAAAAAAAAAAAAAAAAAAQVAMHAlBgcAMHAAAAFAwFAxAAAAAAAzoEn8ABAJZXYu5iRv1WauBAACBACAQAAv77MKJJPzoEn8oCAAAQeLAAAAAw7AAAAAAAAAAAAAAAAAAAAJBgdAEGAuBgLAYEAvBQbAkGAuBAAAoBA0BQMAAAAAAwMKpJPRAQT1NXajBAYAgAAEAw7+OjSSyzMKhJPqAAAAwjdAAAAA0KAAAAAAAAAAAgNAAAAAAQTAUHAzBQaAMGAAAAQAMHAoBQZAwGAsBwMAIDAuAAZAwGAsBALA0CAyAQMAcDA5AAMAAAAUAAAA0EAAAAHAAAABAAAAwBAAAQMAAAAAAAAAwEAAAQFAAAADAAAAAcd5qPEAAAAEFGdhBAR6wVVzVmczxFTvdWajRUYl12buxVT1NXajBAAgBAAAMAAAAKWAAAAAAAAAM2btRWZwRXLwQDAAAAAAAA6wlgKsZZfEBoXjtQX/XtVhxwmMxYViHBhdAXc822H2hOcJoCbW2HRA61YL01/VbVYMsJTMWl4RQYHwFHvt9hdQAAAAUAAAAaDAAAAJFAAAwBAAAwCAAAoxVN2LlRbTjkvXKkIgggDDlUAAAQmAAAAJAAAg2IAAAQMTB1UirIWGxLT4M0u8PxkmgZbOHHAAAABAAAAA8BAAAwLAAAATBQLAEDAtAQNA0CAyAQMA0CAyAwNAkDAwAAMAYDA0AQOAgDA0AQLAEDA0AwNAcDAyAAMAQDA3AAMAIDAtAwMAMDA4AAMAIDAwAAOAEDA5AQOA0CAxAAMAEDAxAAAAAAAAAAAAAAAAAAAAAAA</serialized>
+      </simpleLocation>
+    </searchConnectorDescription>
+  </searchConnectorDescriptionList>
+</libraryDescription>
