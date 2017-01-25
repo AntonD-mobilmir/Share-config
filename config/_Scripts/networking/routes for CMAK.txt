@@ -1,3 +1,0 @@
-ADD 192.168.1.0 MASK 255.255.255.0 default METRIC default IF default
-ADD 192.168.2.0 MASK 255.255.255.0 default METRIC default IF default
-ADD 172.22.0.0 MASK 255.255.0.0 default METRIC default IF default
