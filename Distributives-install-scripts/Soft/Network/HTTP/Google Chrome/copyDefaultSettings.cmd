@@ -1,53 +1,39 @@
-(
-    @REM coding:OEM
-    SETLOCAL ENABLEEXTENSIONS
-    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-    IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-    SET ChromeInstSubpath=Google\Chrome\Application
+@(REM coding:CP866
+REM by LogicDaemon <www.logicdaemon.ru>
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+SETLOCAL ENABLEEXTENSIONS
+IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    SET "ChromeInstSubpath=Google\Chrome\Application"
+    CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || EXIT /B
 )
+CALL :GetDir ConfigDir "%DefaultsSource%"
 (
-    IF NOT DEFINED DefaultsSource EXIT /B
-    SET lProgramFiles=%ProgramFiles%
+    IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd" || EXIT /B
+    IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sed.exe "%SystemDrive%\SysUtils\sed.exe" && CALL :AppendSedExeLibsPath
+
+    SET "lProgramFiles=%ProgramFiles%"
     IF DEFINED ProgramFiles^(x86^) IF EXIST "%ProgramFiles(x86)%\%ChromeInstSubpath%\*" SET "lProgramFiles=%ProgramFiles(x86)%"
-    CALL :findexe exe7z 7za.exe "%SystemDrive%\Arc\7-Zip\7za.exe" "%SystemDrive%\Arc\7-Zip\7z.exe" || CALL :findexe exe7z 7z.exe "%ProgramFiles%\7-Zip\7z.exe" "%ProgramFiles(x86)%\7-Zip\7z.exe" "%SystemDrive%\Program Files\7-Zip\7z.exe" || (ECHO  & EXIT /B 32767)
-    CALL :findexe sedexe sed.exe c:\SysUtils\UnxUtils\sed.exe
 )
-SET ChromeInstPath=%lProgramFiles%\%ChromeInstSubpath%
+SET "ChromeInstPath=%lProgramFiles%\%ChromeInstSubpath%"
 (
     IF NOT EXIST "%ChromeInstPath%\Chrome.exe" EXIT /B 2
     FOR /D %%I IN ("%ChromeInstPath%\*") DO RD /S /Q "%%~I\default_apps"
     %exe7z% x -aoa -y -o"%lProgramFiles%" -- "%DefaultsSource%" "%ChromeInstSubpath%"
-    PUSHD "%ChromeInstPath%" && (
+    IF DEFINED sedexe PUSHD "%ChromeInstPath%" && (
+	CALL :AppendLibsPath %sedexe%
 	%sedexe% -i "s/{ProgramFiles}/%lProgramFiles:\=\\\\%/" "%ChromeInstPath%\master_preferences"
 	POPD
     )
+EXIT /B
 )
-
+:GetDir
+(
+SET "%~1=%~dp2"
 EXIT /B
-
-:findexe
-    (
-    SET locvar=%1
-    SET seekforexecfname=%~2
-    )
-    (
-    CALL :testexe %locvar% %2 & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
-    IF DEFINED utilsdir CALL :testexe %locvar% "%utilsdir%%seekforexecfname%" & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
-    CALL :testexe %locvar% "%srcpath%..\..\..\PreInstalled\utils\%seekforexecfname%" & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
-    )
-    :findexeNextPath
-    (
-	IF "%~3"=="" GOTO :testexe
-	IF EXIST "%~3" FOR %%I IN ("%~3") DO CALL :testexe %locvar% "%%~I" & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
-	SHIFT /3
-    GOTO :findexeNextPath
-    )
-    :testexe
-    (
-	IF "%~2"=="" EXIT /B 9009
-	IF NOT EXIST "%~dp2" EXIT /B 9009
-	"%~2" >NUL 2>&1
-	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
-	SET %1=%2
-    )
+)
+:AppendLibsPath <exe-path>
+(
+    REM workaround for case if initial install, if install started before the path is added to registry
+    SET "PATH=%PATH%;%~dp1libs"
 EXIT /B
+)
