@@ -1,6 +1,10 @@
 ;Encoding:CP866
-;UserName	Full Name	Post URL	writeout-dir
-Anton.Derbenev/f	Дербенев Антон Леонидович	https://zapier.com/hooks/catch/b5lm1r/	\\AcerAspire7720G.office0.mobilmir\Admin passwords Incoming$
+;Флаги:
+;f - создавать без вопросов
+;p - пользователь без пароля
+;r - создавать (и запрашивать создание) только если в системе нет пользователей "Продавец" и "Пользователь"
+;UserName/flags	Full Name	writeout-dir	Post URL
+Anton.Derbenev/f	Дербенев Антон Леонидович	\\AcerAspire7720G.office0.mobilmir\Admin passwords Incoming$	https://zapier.com/hooks/catch/b5lm1r/
 Karina.Razuvaeva	Разуваева Карина Владимировна	
 Aleksandr.Gladkov	Гладков Александр Евгеньевич	
-Пользователь/r	Услуги в рознице
+Пользователь/rp	Услуги в рознице
