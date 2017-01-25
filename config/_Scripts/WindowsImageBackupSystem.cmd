@@ -5,7 +5,6 @@
 	"%SystemRoot%\SysNative\cmd.exe" /C %0 %*
 	EXIT /B
     )
-    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe %SystemDrive%\SysUtils\kliu\md5sum.exe "\\Srv0.office0.mobilmir\profiles$\Share\Program Files\md5sum.exe"
     rem ECHO OFF
     SETLOCAL ENABLEEXTENSIONS
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
@@ -35,7 +34,7 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
 	    SET "CopyToR=0"
 	) ELSE IF EXIST R:\ SET /P "CopyToR=Сделать копию образа на R: ? [1=да] "
 )
-    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe "%DstDirWIB%\md5sum.exe"
+    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe %SystemDrive%\SysUtils\kliu\md5sum.exe "\\Srv0.office0.mobilmir\profiles$\Share\Program Files\md5sum.exe" "%DstDirWIB%\md5sum.exe"
 (
     MKDIR "%DstDirWIB%" 2>NUL
     %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
