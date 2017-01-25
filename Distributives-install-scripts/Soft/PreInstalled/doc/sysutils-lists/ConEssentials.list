@@ -11,6 +11,8 @@ libs\regex2.dll
 libs\ssleay32.dll
 libs\zlib1.dll
 ln.exe
+sed.exe
+sed.htm
 SetACL errorcodes.txt
 SetACL.2.0.0.4.txt
 SetACL.exe
@@ -31,8 +33,6 @@ UnxUtils\grep.exe
 UnxUtils\grep_doc.txt
 UnxUtils\mv.exe
 UnxUtils\pclip.exe
-UnxUtils\sed.exe
-UnxUtils\sed.htm
 UnxUtils\tail.exe
 UnxUtils\tee.exe
 UnxUtils\touch.exe
