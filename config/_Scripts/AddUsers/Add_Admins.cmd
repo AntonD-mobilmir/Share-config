@@ -34,8 +34,8 @@ EXIT /B
 	NET USER Пользователь >NUL 2>&1 && EXIT /B
 	NET USER Продавец >NUL 2>&1 && EXIT /B
     )
-    IF NOT DEFINED flagf CALL :AskCreateUser || EXIT /B
-    IF DEFINED flagp (
+    IF NOT DEFINED flag_f CALL :AskCreateUser || EXIT /B
+    IF DEFINED flag_p (
 	NET USER %NewUsername% /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /FULLNAME:"%FullName%"
 	wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
 	GOTO :setupgroups
@@ -87,9 +87,9 @@ EXIT /B
 (
     SET /A "i=0"
     REM reset flags
-    SET "flagf="
-    SET "flagp="
-    SET "flagr="
+    SET "flag_f="
+    SET "flag_p="
+    SET "flag_r="
 )
 :ParseNextFlag
 (
@@ -97,9 +97,9 @@ EXIT /B
     SET "curFlag=!flags:~%i%,1!"
 )
 (
-    ENDLOCAL
     IF NOT DEFINED curFlag EXIT /B
-    IF NOT DEFINED flag%curFlag% SET "flag%curFlag%=1"
+    ENDLOCAL
+    IF NOT DEFINED flag_%curFlag% SET "flag_%curFlag%=1"
     SET /A "i+=1"
     GOTO :ParseNextFlag
 )
