@@ -5,15 +5,14 @@ PostWithProxies(URL,ByRef POSTDATA,tries:=20,retryDelay:=1000, debug:=0) {
     protoFound := RegexMatch(URL, "([^:]{3,6})://", URLproto)
     
     ; Очень странно: в Windows 7 префикс протокола ("https://") нужен для отправки через HTTPS, в Windows 10 – наоборот мешает :(
-    proxies := [ URLproto . "192.168.127.1:3128", "192.168.127.1:3128" ]
+    proxies := Object()
     If (lmProxy := ReadProxy("HKEY_LOCAL_MACHINE")) {
-	proxies.Push(URLproto . lmProxy)
-	proxies.Push(lmProxy)
+	proxies.Push(URLproto . lmProxy, lmProxy)
     }
     If (cuProxy := ReadProxy("HKEY_CURRENT_USER")) {
-	proxies.Push(URLproto . cuProxy)
-	proxies.Push(cuProxy)
+	proxies.Push(URLproto . cuProxy, cuProxy)
     }
+    proxies.Push(URLproto . "192.168.127.1:3128", "192.168.127.1:3128", "")
     
     Loop %tries%
     {
