@@ -9,12 +9,15 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 CALL :GetDir ConfigDir "%DefaultsSource%"
 (
     IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd" || EXIT /B
-    IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sed.exe "%SystemDrive%\SysUtils\sed.exe" && CALL :AppendSedExeLibsPath
+    IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\sed.exe"
 
     SET "lProgramFiles=%ProgramFiles%"
     IF DEFINED ProgramFiles^(x86^) IF EXIST "%ProgramFiles(x86)%\%ChromeInstSubpath%\*" SET "lProgramFiles=%ProgramFiles(x86)%"
 )
+(
+CALL :AppendLibsPath %sedexe%
 SET "ChromeInstPath=%lProgramFiles%\%ChromeInstSubpath%"
+)
 (
     IF NOT EXIST "%ChromeInstPath%\Chrome.exe" EXIT /B 2
     FOR /D %%I IN ("%ChromeInstPath%\*") DO RD /S /Q "%%~I\default_apps"
