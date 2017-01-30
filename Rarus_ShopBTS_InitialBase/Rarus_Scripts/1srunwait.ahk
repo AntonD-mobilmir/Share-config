@@ -82,7 +82,7 @@ If ErrorLevel
     }
 }
 
-If ( !FileExist(backupsDir . "\" . MonthlyArchiveFName || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) ) {	; ежемесячного архива нет. Если архивация работает, он будет создан (а не ежедневный)
+If ( !FileExist(backupsDir . "\" . MonthlyArchiveFName) || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) { ; ежемесячного архива нет. Если архивация работает, он будет создан (а не ежедневный)
     ; Ежемесячный архив может создаваться долго: 1-2 минуты перед появлением файла, и ещё 2-3 до создания архива. При этом r:\rarus-backup-start.log будет пустой с актуальной датой.
     If ( WaitFile(rarusbackupflag, backupsDir . "\" . MonthlyArchiveFName, WaitArchivingAfterBoot) ) {
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_????-??.7z")
@@ -91,7 +91,7 @@ If ( !FileExist(backupsDir . "\" . MonthlyArchiveFName || FileCreatedAfterBoot(b
     } Else {
 	BackupAppearanceTimeout()
     }
-} Else {							; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
+} Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
     If ( WaitFile(rarusbackupflag, backupsDir . "\" . DailyArchiveFName, WaitArchivingAfterBoot) ) {
 	If (A_MM==1)
 	    prevMonth := A_Year-1 . "-12"
@@ -235,7 +235,7 @@ WaitFile(flag, path, timeout, note:="") {
 	Sleep 250
 	Notify(note, (endTime - A_TickCount) >> 8)
     }
-    return FileExist(flag) ? FileExist(path) : -1
+    return FileExist(path)
 }
 
 ResetProgress(pRange:=0) {
