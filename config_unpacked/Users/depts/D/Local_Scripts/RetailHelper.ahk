@@ -9,17 +9,23 @@
 ;ahk_exe KKMGMSuite.exe
 GroupAdd KKMGMSuite, ahk_exe KKMGMSuite.exe
 
-SetTimer Fade, 3000
+SetTimer Periodic, 3000
 
 Loop
 {
     transp:=255
-    WinWaitActive ahK_group KKMGMSuite
+    WinWaitActive ahk_group KKMGMSuite
     WinSet Transparent, Off
 }
 
-Fade:
-    If (transp > 100)
+Periodic:
+;Отключить VPN, если компьютер не трогают пол-часа
+;rasdial [entryname] /DISCONNECT
+    If (A_TimeIdlePhysical > 1800000)
+	Run rasdial.exe /DISCONNECT,,Min UseErrorLevel
+    
+;Гифтоман
+    If (transp > 50)
 	transp-=10
     IfWinActive ahk_group KKMGMSuite
     WinSet AlwaysOnTop, Off
