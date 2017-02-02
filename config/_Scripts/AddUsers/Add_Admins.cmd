@@ -11,6 +11,7 @@ IF NOT DEFINED ErrorCmd SET "ErrorCmd=PAUSE"
 FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 rem Read file, and for each line add corresponding user
 FOR /F "usebackq eol=; tokens=1,2,3* delims=	" %%I IN ("%~dpn0_list.txt") DO CALL :SetupAdmin "%%~I" "%%~J" "%%~K" "%%~L"
+START "" control.exe userpasswords2
 EXIT /B
 )
 :SetupAdmin
