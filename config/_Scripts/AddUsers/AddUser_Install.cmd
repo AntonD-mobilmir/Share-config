@@ -30,7 +30,7 @@ rem Check user existence
 :CreateNewUser
 (
     ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Adding new user>>"%PassFilePath%"
-    "%SystemRoot%\System32\NET.exe" USER %InstallUsername% %newPwd% /ADD >>"%PassFilePath%" 2>&1
+    "%SystemRoot%\System32\NET.exe" USER "%InstallUsername%" "%newPwd%" /ADD >>"%PassFilePath%" 2>&1
     rem ERRORLEVEL=2 The account already exists.
     IF ERRORLEVEL 2 IF NOT ERRORLEVEL 3 GOTO :ExistingUser
     IF ERRORLEVEL 1 CALL :ErrorCreatingUser
@@ -42,7 +42,8 @@ GOTO :ShowFileAndPostPassword
 :ErrorCreatingUser
 (
     ECHO error %ERRORLEVEL% adding user>>"%PassFilePath%"
-    SET "InstallUsername=%InstallUsername%: UserAdd Error %ERRORLEVEL%"
+    SET "InstallUsername=%InstallUsername%"
+    SET "Status=UserAdd Error %ERRORLEVEL%"
 EXIT /B
 )
 :ExistingUser
@@ -74,7 +75,7 @@ GOTO :ExistingUserTryChange
 :ExistingUserChangePass
 (
     ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
-    %passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%">>"%PassFilePath%" 2>&1
+    %passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
     EXIT /B
     rem ERRORLEVELs:
     rem 53	Не найден сетевой путь.
@@ -84,15 +85,15 @@ GOTO :ExistingUserTryChange
 (
     ECHO error %ERRORLEVEL% changing password, will try to reset>>"%PassFilePath%"
     ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Resetting user password>>"%PassFilePath%"
-    "%SystemRoot%\System32\NET.exe" user %InstallUsername% %newPwd%>>"%PassFilePath%" && GOTO :ShowFileAndPostPassword
+    "%SystemRoot%\System32\NET.exe" user "%InstallUsername%" "%newPwd%" >>"%PassFilePath%" 2>&1 && GOTO :ShowFileAndPostPassword
 )
 (
-SET "InstallUsername=%InstallUsername% \\ LastError %ERRORLEVEL%"
+SET "Status=LastError %ERRORLEVEL%"
 GOTO :ShowFileAndPostPassword
 )
 :ShowFileAndPostPassword
 (
-    START "" %AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%newPwd%"
+    START "" %AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%newPwd%" "%Status%"
 
     rem Копирование данных из профиля по умолчанию
     IF /I "%InstallUsername%" NEQ "%USERNAME%" EXIT /B

@@ -10,9 +10,12 @@ RegRead Domain, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Para
 
 UserName=%1%
 Password=%2%
+Status=%3%
 
 URL:="https://docs.google.com/a/mobilmir.ru/forms/d/1eBHS2d49-qtD096mYZDK_wIXwjS1WyImFi-_kYWUkhY/formResponse"
-POSTDATA:="entry.1427319477=" . UriEncode(Hostname . "." . Domain) . "&entry.1727019064=" . UriEncode(UserName) . "&entry.1602906221=" . UriEncode(Password) . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"
+If (!Domain || !(Domain ~= "^(office0.mobilmir|officeVPN.mobilmir)$"))
+    Hostname .= "." . Domain
+POSTDATA:="entry.1427319477=" . UriEncode(Hostname) . "&entry.1727019064=" . UriEncode(UserName) . "&entry.1602906221=" . UriEncode(Password) . "&entry.1625305818=" . UriEncode(Status) . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"
 
 Loop
 {
