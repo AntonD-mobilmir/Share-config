@@ -58,8 +58,10 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     EXIT /B
 )
 :CopyEchoPassFilePath
+IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 (
     COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
+    IF DEFINED AutohotkeyExe START "" %AutohotkeyExe% \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\AddUsers\ReadPwd_PostToFormWithBackupName.ahk "%PassFilePath%" "%DstDirWIB%\%Hostname%"
     CALL :DirToPassFile "%DstDirWIB%\%Hostname%\Backup*"
 EXIT /B
 )
