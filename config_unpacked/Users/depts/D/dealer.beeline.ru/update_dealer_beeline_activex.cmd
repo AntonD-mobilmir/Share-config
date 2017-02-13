@@ -12,13 +12,13 @@ IF NOT DEFINED Download IF /I "%~1"=="/Unpack" SET "Download=0"
 IF NOT DEFINED Download IF /I "%~1"=="/Download" SET "Download=1"
 IF NOT DEFINED Download IF /I "%USERNAME%"=="Продавец" SET "Download=1"
 IF NOT DEFINED Download IF /I "%USERNAME%"=="Пользователь" SET "Download=1"
-
-SET "dest=%srcpath%bin"
 )
+SET "dest=%srcpath%bin"
 IF "%Download%"=="1" (
-    ECHO Только скачиваение
+    ECHO Скачиваение
     "%ProgramFiles%\Internet Explorer\IEXPLORE.EXE" https://dealer.beeline.ru/dealer/criacx.cab
-    EXIT /B
+    ECHO Когда свежий criacx.cab будет в папке "%dest%", нажмите любую клавишу для продолжения.
+    PAUSE>NUL
 )
 (
 IF NOT "%secondrun%"=="1" IF NOT "%PROCESSOR_ARCHITECTURE%"=="x86" (
@@ -32,7 +32,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 CALL :GetDir ConfigDir "%DefaultsSource%"
 IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
 (
-%exe7z% x -aoa -o"%dest%" -- "%srcpath%criacx.cab"
+%exe7z% x -aoa -o"%dest%" -- "%dest%\criacx.cab"
 
 FOR %%A IN ("%dest%\*.*") DO (
     CALL :CheckUnregRemove "%SystemRoot%\SysWOW64\%%~nxA"
