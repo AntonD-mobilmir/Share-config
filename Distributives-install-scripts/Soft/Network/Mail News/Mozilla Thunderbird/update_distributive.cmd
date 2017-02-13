@@ -14,5 +14,6 @@ rem workdir - baseWorkdir with relpath (or %srcpath%temp if baseWorkdir isn't de
 rem logsDir - baseLogsDir with relpath (or nothing)
 
 SET "distcleanup=1"
+SET "UseTimeAsVersion=1"
 CALL "%baseScripts%\_DistDownload.cmd" "https://download.mozilla.org/?product=thunderbird-latest&os=win&lang=ru" "Thunderbird Setup *.exe"
 )
