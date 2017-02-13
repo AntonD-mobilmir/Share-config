@@ -8,7 +8,15 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 
     IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
     SET "distcleanup=1"
-    SET wgetConf=-N -H -e "robots=off" --user-agent="Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US)" --no-config --no-if-modified-since
+    rem with -N, it says
+	rem --2017-02-10 09:43:07--  https://download-chromium.appspot.com/dl/Win?type=snapshots
+	rem Connecting to 192.168.127.1:3128... connected.
+	rem Proxy request sent, awaiting response... 405 Method Not Allowed
+	rem 2017-02-10 09:43:09 ERROR 405: Method Not Allowed.
+
+    SET wgetConf=-d -H -e "robots=off" --user-agent="Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US)" --no-timestamping
+    REM --no-timestamping
+    REM --no-if-modified-since
 )
 (
 CALL "%baseScripts%\_GetWorkPaths.cmd"
@@ -26,7 +34,10 @@ rem CALL "%baseScripts%\_DistDownload.cmd" http://download-chromium.appspot.com/
 rem Last Known Good: https://download-chromium.appspot.com/?platform=Win&type=continuous
 rem SET "dstrename=chrome-win32-continuous.zip"
 rem CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=continuous" "Win@type=continuous" %wgetConf% >"%logsDir%continuous-dl.log" 2>&1
-SET "dstrename=chrome-win32-snapshots.zip"
-CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "Win@type=snapshots" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
+rem SET "dstrename=chrome-win32.zip"
+rem CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "Win@type=snapshots" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
+
+DEL "%workdir%\chrome-win32.zip"
+CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "chrome-win32.zip" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
 EXIT /B
 )
