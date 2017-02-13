@@ -3,11 +3,21 @@
 
 #NoEnv
 
-If 0>0
-    Loop %1%, 2
-	cleanupDealerBeelineDir(A_LoopFileFullPath)
-Else
+argc=%0%
+If (argc) {
+    Loop %argc%
+    {
+	path:=%A_Index%
+	Loop Files, %path%, D
+	{
+	    cleanupDealerBeelineDir(A_LoopFileFullPath)
+	}
+    }
+} Else {
     cleanupDealerBeelineDir("d:\dealer.beeline.ru")
+}
+
+ExitApp
 
 cleanupDealerBeelineDir(dir) {
     backupWorkDir=%A_WorkingDir%
@@ -20,6 +30,7 @@ cleanupDealerBeelineDir(dir) {
 	FileDelete remote_register.cmd
 	FileDelete update_dealer_beeline_activex.cmd
 	FileDelete сделать ярлык для Билайн Дилер Он-Лайн.ahk
+	FileRemoveDir bin
 	
 	; Remove logs and static data
 	Loop *, 2
@@ -31,7 +42,12 @@ cleanupDealerBeelineDir(dir) {
 	; Remove empty dirs
 	Loop *, 2, 1
 	{
-	    FileRemoveDir %A_LoopFileFullPath%
+	    curPath:=A_LoopFileFullPath
+	    While curPath
+	    {
+		FileRemoveDir %curPath%
+		SplitPath curPath, , curPath
+	    }
 	}
     }
     SetWorkingDir %backupWorkDir%
