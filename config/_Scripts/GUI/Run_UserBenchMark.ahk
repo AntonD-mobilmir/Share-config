@@ -119,9 +119,8 @@ While (!FileExist(exeName)) {
 	Run %UBMURL%
 	
 	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMURL% запущен браузер. Пауза 30 секунд., 30
-	Sleep 30
 	
-	If (!FileExist(archiveName)) {
+	If (A_Index>1) {
 	    MsgBox 22, %A_ScriptName%, %UBMURL% не скачался., 300
 	    IfMsgBox Continue
 		break
@@ -463,18 +462,15 @@ WaitCPUIdle() {
     GetIdleTime()
     Progress Off
     Progress A R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " секунд"
-    Loop {
-	Loop
-	{
-	    Sleep %measurementTime%
-	    idle := GetIdleTime()
-	    If (idle > idleLimit)
-		break
-	    Else
-		cycle := 0
-	    Progress %cycle%, % "Текущий процент простоя: " . idle*100
+    Loop
+    {
+	Sleep %measurementTime%
+	If (( idle := GetIdleTime() ) > idleLimit) {
+	    cycle++
+	} Else {
+	    cycle := 0
 	}
-	cycle++
+	Progress %cycle%, % "Текущий процент простоя: " . idle*100
     } Until cycle > cyclesLimit
     Progress Off
 }
