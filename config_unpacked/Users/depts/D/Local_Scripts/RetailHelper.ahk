@@ -21,8 +21,13 @@ Loop
 Periodic:
 ;Отключить VPN, если компьютер не трогают пол-часа
 ;rasdial [entryname] /DISCONNECT
-    If (A_TimeIdlePhysical > 1800000)
-	Run rasdial.exe /DISCONNECT,,Min UseErrorLevel
+    If (A_TimeIdlePhysical > 1800000) {
+	If (!RasDisconnected)
+	    Run rasdial.exe /DISCONNECT,,Min UseErrorLevel
+	RasDisconnected:=1
+    } Else {
+	RasDisconnected=
+    }
     
 ;Гифтоман
     If (transp > 50)
