@@ -3,10 +3,18 @@
 #NoEnv
 #SingleInstance force
 
+ProxySettingsRegRoot	= HKEY_CURRENT_USER
+ProxySettingsIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
+EnvironmentRegKey	= Environment
+ProxyOverride		= <local>
+
+
 arg1=%1%
 ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
 
 reqdConfigName		:= "Apps_dept.7z"
+ServerPath		:= "\\Srv0.office0.mobilmir"
+ServerDistPath		:= ServerPath . "\Distributives"
 pathSrvConfigUpdater	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\update local config.cmd"
 maxAgeSavedInvReport	:= 1
 tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
@@ -45,9 +53,9 @@ If (A_AhkVersion < "1.1.24.01") {
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
     If (ReRunAsAdmin) {
 	Run %comspec% /C "TITLE Ожидание обновления AutoHotkey, перезапуск %A_ScriptName% & (PING 127.0.0.1 -n 30 >NUL) & (ECHO Нажмите любую клавишу в этом окне, когда завершится обнолвление.) & (PAUSE >NUL) & %ScriptRunCommand% /NoAdminRun"
-	Run *RunAs %comspec% /C "CALL "\\Srv0.office0.mobilmir\Distributives\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
+	Run *RunAs %comspec% /C "CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
     } Else {
-	Run %comspec% /C "PING Srv0.office0.mobilmir -n 5 >NUL & CALL "\\Srv0.office0.mobilmir\Distributives\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
+	Run %comspec% /C "PING Srv0.office0.mobilmir -n 5 >NUL & CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
     }
     If (ErrorLevel) {
 	SetLastRowStatus(ErrorLevel, 0)
@@ -207,7 +215,7 @@ If (gsussScript) {
 Distributives := EnvGetAfterScript(gsussScript, "Distributives")
 SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
 If (!FileExist(Distributives . "\Soft\PreInstalled\utils\7za.exe")) {
-    Distributives=\\Srv0.office0.mobilmir\Distributives
+    Distributives:=ServerDistPath
     AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
 }
 
@@ -218,7 +226,7 @@ ver7z_ := StrSplit(ver7z, ".")
 If (ver7z_[1] < 15) {
     SetLastRowStatus(ver7z, 0)
     AddLog("Требуется 7-Zip версии ≥15. Запуск обновления с Srv0.office0.mobilmir.")
-    RunWait %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Soft\Archivers Packers\7Zip\install.cmd",,Min UseErrorLevel
+    RunWait %comspec% /C "%ServerDistPath%\Soft\Archivers Packers\7Zip\install.cmd",,Min UseErrorLevel
     If (ErrorLevel) {
 	MsgBox Ошибка "%ErrorLevel%" при обновлении 7-Zip. Автоматическое продолжение невозможно.
 	ExitApp
@@ -285,13 +293,13 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     EnvSet Inst1S,1
 }
 
-AddLog("Ярлыки на рабочем столе и стандартные файлы","Замена")
-RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,!ErrorLevel)
+;AddLog("Ярлыки на рабочем столе и стандартные файлы","Замена")
+;RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel
+;SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"))
 If (IsObject(instCriacxocx)) {
-    criacxUpdater := CheckPath(LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk"))
+    criacxUpdater := CheckPath(LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk").Path)
     LV_Modify(LV_GetCount(),,"update_beeline_activex_and_desktop_shortcuts.ahk")
     criacxUpdaterPath := criacxUpdater.Path
     RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
@@ -310,8 +318,8 @@ If (IsObject(instCriacxocx)) {
     AddLog("CRIACX.ocx","отсутствует",1)
 }
 
-tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, "\\Srv0.office0.mobilmir\Distributives" . tv5settingsSubPath)
-AddLog("Обновление настроек TeamViewer 5", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, StrLen(Distributives)))
+tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
+AddLog("Обновление настроек TeamViewer 5", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
 RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
@@ -376,17 +384,51 @@ Loop Files, %A_AppDataCommon%\mobilmir.ru\Common_Scripts
     If (latestCommonScript < A_LoopFileTimeModified || !latestCommonScript)
 	latestCommonScript := A_LoopFileTimeModified
 }
-FileGetTime mtimeCommonScriptsSrv0, \\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\auto\Common_Scripts.7z
-FileGetTime mtimeCommonScriptslocal, %Distributives%\Soft\PreInstalled\auto\Common_Scripts.7z
+CommonScriptsCmdSubpath=\Soft\PreInstalled\auto\Common_Scripts.cmd
+CommonScripts7zSubpath=\Soft\PreInstalled\auto\Common_Scripts.7z
+FileGetTime mtimeCommonScriptsSrv0, %ServerDistPath%%CommonScripts7zSubpath%
+FileGetTime mtimeCommonScriptslocal, %Distributives%%CommonScripts7zSubpath%
 If (mtimeCommonScriptsSrv0 > latestCommonScript) {
     SetLastRowStatus("Обновление",0)
     If (mtimeCommonScriptslocal==mtimeCommonScriptsSrv0)
-	RunWait %comspec% /C "%Distributives%\Soft\PreInstalled\auto\Common_Scripts.cmd",,Min UseErrorLevel
+	RunWait %comspec% /C "%Distributives%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
     Else
-	RunWait %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\auto\Common_Scripts.cmd",,Min UseErrorLevel
+	RunWait %comspec% /C "%ServerDistPath%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 } Else {
     SetLastRowStatus()
+}
+
+If (FileExist("c:\squid\sbin\squid.exe")) {
+    FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
+    AddLog("squid.conf", mtimeSquidConf, 1)
+    
+    squidDistArcSubpath	:= "\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\SquidNT\squid.2.7.7z"
+    squidInstScript	:= "\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\SquidNT\install.cmd"
+    squidDistArc		:= LatestExisting(Distributives . squidDistArcSubpath, ServerDistPath . squidDistArcSubpath)
+    squidDistArcNewerThanConf := squidDistArc.mtime
+    squidDistArcNewerThanConf -= mtimeSquidConf, Days
+    If (squidDistArcNewerThanConf) { ; since date-diff result always rounded down, mtimeSquidConf will be non-0 only when time diff is >1 day
+	netexe := findexe("net.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
+	SetLastRowStatus("Остановка", 0)
+	RunWait "%netexe%" stop squid,,Min UseErrorLevel
+	;SetLastRowStatus("Удаление кэша", 0)
+	;FileRemoveDir D:\squid\var\cache, 1
+	;FileCreateDir D:\squid\var\cache
+	SetLastRowStatus("Обновление", 0)
+	squidDistArcPath := squidDistArc.Path
+	SplitPath squidDistArcPath,,squidDistDir
+	RunWait %comspec% /C "TITLE Установка squid & "%squidDistDir%\install.cmd"",, Min UseErrorLevel
+	If (ErrorLevel) {
+	    squidDistArcNewerThanConf:="Ошибка " . ErrorLevel
+	} Else {
+	    FileGetTime mtimeUpdatedSquidConf, c:\squid\etc\squid.conf
+	    squidDistArcNewerThanConf := squidDistArc.mtime
+	    squidDistArcNewerThanConf -= mtimeSquidConf, Days
+	}
+    }
+    If (!dontUpdateSquidStatus)
+	SetLastRowStatus(squidDistArcNewerThanConf, !squidDistArcNewerThanConf)
 }
 
 If (removeAppXPID)
@@ -536,12 +578,12 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
 
 LatestExisting(paths*) {
     for index,path in paths {
-	If (newFound := FindLatest(path,, latestTime)) {
+	If (FileExist(path) && newFound := FindLatest(path,, latestTime)) {
 	    curFound := newFound
 	}
     }
     
-    return curFound.path
+    return curFound
 }
 
 FindLatest(mask, LoopFlags:="", ByRef latestTime:=0) {
@@ -554,7 +596,7 @@ FindLatest(mask, LoopFlags:="", ByRef latestTime:=0) {
     }
     
     If (latestPath) {
-	objLatest := {"path":latestPath, "attr":FileExist(latestPath), "mtime":latestTime, "line":line}
+	objLatest := {"path": latestPath, "attr": FileExist(latestPath), "mtime": latestTime}
 	return objLatest
     } Else If (!latestTime) {
 	AddLog(AbbreviatePath(mask), "Не найдено подходящих файлов")
