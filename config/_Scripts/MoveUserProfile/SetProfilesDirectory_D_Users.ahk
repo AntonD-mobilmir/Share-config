@@ -58,4 +58,4 @@ Run "%SetACLexe%" -on %ProfilesDest% -ot file -actn clear -clr dacl -actn ace -a
 
 ExitApp
 
-#Include *i %A_ScriptDir%\..\Lib\find_exe.ahk
+#Include *i %A_ScriptDir%\..\Lib\findexe.ahk

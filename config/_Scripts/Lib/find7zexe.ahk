@@ -75,4 +75,4 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 }
 
 ;The FileName parameter may optionally be preceded by *i and a single space, which causes the program to ignore any failure to read the included file. For example: #Include *i SpecialOptions.ahk. This option should be used only when the included file's contents are not essential to the main script's operation.
-#include *i %A_LineFile%\..\find_exe.ahk
+#include *i %A_LineFile%\..\findexe.ahk

@@ -122,5 +122,5 @@ StartsWith(longstr, shortstr) {
 }
 
 #Include *i %A_ScriptDir%\..\_Scripts\Lib\getDefaultConfig.ahk
-#Include *i %A_ScriptDir%\..\_Scripts\Lib\find_exe.ahk
+#Include *i %A_ScriptDir%\..\_Scripts\Lib\findexe.ahk
 #include <IniFilesUnicode>
