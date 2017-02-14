@@ -6,22 +6,17 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64bit=1"
 IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 
-rem XP workaround
-IF NOT DEFINED ProgramData (
-    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "ProgramData" /t REG_EXPAND_SZ /d "%%ALLUSERSPROFILE%%\Application Data" /f
-    SET "ProgramData=%ALLUSERSPROFILE%\Application Data"
-)
+    rem XP workaround
+    IF NOT DEFINED ProgramData (
+	REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "ProgramData" /t REG_EXPAND_SZ /d "%%ALLUSERSPROFILE%%\Application Data" /f
+	SET "ProgramData=%ALLUSERSPROFILE%\Application Data"
+    )
+    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd" || EXIT /B
 
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-
-CALL :FindCommonDesktopPath
-
-rem Default user profile:
-IF NOT DEFINED DefaultUserProfile CALL "%~dp0copyDefaultUserProfile.cmd"
-
-IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd" || EXIT /B
-
-IF EXIST D:\1S\Rarus\ShopBTS SET "Inst1S=1"
+    CALL :FindCommonDesktopPath
+    IF NOT DEFINED DefaultUserProfile CALL "%~dp0copyDefaultUserProfile.cmd"
+    IF EXIST D:\1S\Rarus\ShopBTS SET "Inst1S=1"
 )
 IF DEFINED HKUDStartup %exe7z% x -aoa -o"%HKUDStartup%\" -- "%~dp0..\Users\depts\startup.7z"
 IF DEFINED CommonDesktop (
@@ -34,6 +29,8 @@ IF DEFINED CommonDesktop (
     IF NOT EXIST D:\Distributives\config IF EXIST W:\Distributives\config %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_W.7z"
     
     FOR %%I IN ("%~dp0..\Users\depts\?.7z") DO %exe7z% x -aoa -o"%%~nI:\" -- "%%~I"
+    FOR /D %%I IN ("%~dp0..\Users\depts\?") DO IF EXIST "%%~nI:\*.*" XCOPY "%%~I\*.*" "%%~nI:\" /E /I /Q /G /H /R /K /O /Y /B /J
+
     
     IF "%Inst1S%"=="1" (
 	%exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S.7z"
@@ -41,17 +38,31 @@ IF DEFINED CommonDesktop (
 	%exe7z% x -aoa -o"%ProgramData%\mobilmir.ru" -- "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts.7z"
     )
 
-ECHO N|%SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­" /Delete
-%SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public" /GRANT:"Everyone,CHANGE"
-%SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public" /GRANT:"‚á¥,CHANGE"
-%SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public"
+    ECHO N|%SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­" /Delete
+    %SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public" /GRANT:"Everyone,CHANGE"
+    %SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public" /GRANT:"‚á¥,CHANGE"
+    %SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public"
 
-CALL "%~dp0Tasks\All XML.cmd"
+    CALL "%~dp0Tasks\All XML.cmd"
+    
+    ENDLOCAL
+    
+    IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
+    IF DEFINED AutohotkeyExe (
+	FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+	IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
+	FOR %%A IN ("D:\Local_Scripts\RetailHelper.ahk") DO SET "RetailHelperAhkTime=%%~tA"
+	FOR %%A IN ("D:\dealer.beeline.ru\bin\criacx.cab") DO SET "criacxcabTime=%%~tA"
+	CALL :PostForm
+    )
 
-ENDLOCAL
+    EXIT /B
+)
+:PostForm
+(
+    START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfgTj9FsG59AXrNLACfINR8Qart94ehi3zTrZ2P3IaMeY0ABg/formResponse" "entry.1278320779=%MailUserId%" "entry.1958374743=%Hostname%" "entry.2091378917=%RetailHelperAhkTime%" "entry.1721351309=%criacxcabTime%"
 EXIT /B
 )
-
 :FindCommonDesktopPath
 (
     SET RegQueryParsingOptions="usebackq tokens=3* delims= "
