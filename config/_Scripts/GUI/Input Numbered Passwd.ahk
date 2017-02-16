@@ -25,9 +25,13 @@ WriteAndShowPassword(passwd) {
 	Run "%A_AhkPath%" "%A_LineFile%\..\..\Lib\PostNumberedPassword.ahk" %passwdNo% "%passwd%"
 
     Gui Add, Button, xm section gCopypasswdNo, Скопировать
+    Gui Font, , Consolas
     Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwdNo%
+    Gui Font
     Gui Add, Button, xm section gCopypasswd, Скопировать
-    Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwd%
+    Gui Font, , Consolas
+    Gui Add, Edit, ys ReadOnly gSelectAllCopy , %passwd%
+    Gui Font
     Gui Add, Button, xm section gReload, Получить ещё один код&.
     Gui Show
 
