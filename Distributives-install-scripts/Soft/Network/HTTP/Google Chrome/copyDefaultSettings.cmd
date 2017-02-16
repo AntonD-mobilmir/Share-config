@@ -9,13 +9,12 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 CALL :GetDir ConfigDir "%DefaultsSource%"
 (
     IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd" || EXIT /B
-    IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\sed.exe"
+    SET "pathAppendSubpath=libs" & CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\sed.exe"
 
     SET "lProgramFiles=%ProgramFiles%"
     IF DEFINED ProgramFiles^(x86^) IF EXIST "%ProgramFiles(x86)%\%ChromeInstSubpath%\*" SET "lProgramFiles=%ProgramFiles(x86)%"
 )
 (
-CALL :AppendLibsPath %sedexe%
 SET "ChromeInstPath=%lProgramFiles%\%ChromeInstSubpath%"
 )
 (
@@ -23,7 +22,6 @@ SET "ChromeInstPath=%lProgramFiles%\%ChromeInstSubpath%"
     FOR /D %%I IN ("%ChromeInstPath%\*") DO RD /S /Q "%%~I\default_apps"
     %exe7z% x -aoa -y -o"%lProgramFiles%" -- "%DefaultsSource%" "%ChromeInstSubpath%"
     IF DEFINED sedexe PUSHD "%ChromeInstPath%" && (
-	CALL :AppendLibsPath %sedexe%
 	%sedexe% -i "s/{ProgramFiles}/%lProgramFiles:\=\\\\%/" "%ChromeInstPath%\master_preferences"
 	POPD
     )
@@ -32,11 +30,5 @@ EXIT /B
 :GetDir
 (
 SET "%~1=%~dp2"
-EXIT /B
-)
-:AppendLibsPath <exe-path>
-(
-    REM workaround for case if initial install, if install started before the path is added to registry
-    SET "PATH=%PATH%;%~dp1libs"
 EXIT /B
 )

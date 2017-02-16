@@ -3,28 +3,28 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-SET "lProgramFiles=%ProgramFiles%"
-IF DEFINED ProgramFiles^(x86^) SET "lProgramFiles=%ProgramFiles(x86)%"
+IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    IF DEFINED ProgramFiles^(x86^) (SET "lProgramFiles=%ProgramFiles(x86)%") ELSE SET "lProgramFiles=%ProgramFiles%"
 
-CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
-SET "TempIni=%TEMP%\FirefoxInstall.ini"
+    SET "TempIni=%TEMP%\FirefoxInstall.ini"
 )
 (
-SET "MozMainSvcUninst=%lProgramFiles%\Mozilla Maintenance Service\Uninstall.exe"
-SET "InstDistributive=%srcpath%Firefox Setup *.exe"
-SET "cProgramFiles=%lProgramFiles:\=\\%"
+    SET "InstDistributive=%srcpath%Firefox Setup *.exe"
+    SET "MozMainSvcUninst=%lProgramFiles%\Mozilla Maintenance Service\Uninstall.exe"
+    SET "cProgramFiles=%lProgramFiles:\=\\%"
+    CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
+)
 IF DEFINED DefaultsSource CALL :GetDir ConfigDir "%DefaultsSource%"
-)
 (
-FOR %%A IN ("%InstDistributive%") DO SET "InstDistributive=%%~A"
-COPY /B /Y "%srcpath%install.ini" "%TempIni%"
+    FOR %%A IN ("%InstDistributive%") DO SET "InstDistributive=%%~A"
+    COPY /B /Y "%srcpath%install.ini" "%TempIni%"
 
-IF DEFINED ConfigDir CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\sed.exe"
+    IF DEFINED ConfigDir SET "pathAppendSubpath=libs" & CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\sed.exe"
+    )
 )
-IF DEFINED sedexe (
-    CALL :AppendLibsPath %sedexe%
-    %sedexe% "s/;InstallDirectoryPath={InstallDirectoryPath}/InstallDirectoryPath=%cProgramFiles%\\Mozilla Firefox/" "%srcpath%install.ini">"%TempIni%"
-)
+IF DEFINED sedexe %sedexe% "s/;InstallDirectoryPath={InstallDirectoryPath}/InstallDirectoryPath=%cProgramFiles%\\Mozilla Firefox/" "%srcpath%install.ini">"%TempIni%"
 "%InstDistributive%" /S /INI="%TempIni%" || CALL :SetErrorMemory
 
 REM Copying defaults and fixed
@@ -68,12 +68,6 @@ EXIT /B
 :GetDir
 (
     SET "%~1=%~dp2"
-EXIT /B
-)
-:AppendLibsPath <exe-path>
-(
-    REM workaround for case if initial install, if install started before the path is added to registry
-    SET "PATH=%PATH%;%~dp1libs"
 EXIT /B
 )
 :SetErrorMemory

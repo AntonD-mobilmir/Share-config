@@ -2,13 +2,19 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-IF NOT DEFINED srcpath GOTO :no_srcpath
+GOTO :preserveEnv
 )
 :findexe
     (
+    REM in:
     REM %1 variable which will get location
     REM %2 executable file name with optional suggested path
     REM %3... additional paths with filename (including masks) to look through
+    REM %findExeTestExecutionOptions%	parameters to pass to executable when trying to run it to ensure quiet unattended exit
+    REM %pathAppendSubpath%	subpath which will be appended to %PATH% with dir-to-found-executable prefix. For example, if sed.exe is in C:\SysUtils, and it requires libintl3.dll, which is in C:\SysUtils\libs. SET pathAppendSubpath=libs before calling the function.
+    
+    REM out:
+    REM !%1! Quoted path to requested executable. If not found, var contents not changed.
     REM ERRORLEVEL 3 The system cannot find the path specified.
     REM ERRORLEVEL 9009 'test.exe' is not recognized as an internal or external command, operable program or batch file.
 
@@ -21,7 +27,6 @@ IF NOT DEFINED srcpath GOTO :no_srcpath
     CALL :testexe %locvar% %2 & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
     
     REM checking paths suggestions
-    IF DEFINED srcpath CALL :testexe %locvar% "%srcpath%%seekforexecfname%" & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
     IF DEFINED utilsdir CALL :testexe %locvar% "%utilsdir%%seekforexecfname%" & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
     
     FOR /R "%SystemDrive%\SysUtils" %%I IN (.) DO IF EXIST "%%~I\%seekforexecfname%" CALL :testexe %locvar% "%%~I\%seekforexecfname%" & ( IF NOT ERRORLEVEL 9009 EXIT /B & IF ERRORLEVEL 9010 EXIT /B )
@@ -50,29 +55,31 @@ IF NOT DEFINED srcpath GOTO :no_srcpath
     :testexe
     (
 	IF "%~2"=="" EXIT /B 9009
-	IF NOT EXIST "%~dp2" EXIT /B 9009
+	IF NOT EXIST "%~2" EXIT /B 9009
+	SET "PATH=%PATH%;%~dp2"
 	"%~2" %findExeTestExecutionOptions% <NUL >NUL 2>&1
-	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
+	REM SET "PATH=%PATH%" restores PATH to one which was at start of the block
+	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 SET "PATH=%PATH%" & EXIT /B
 	SET %~1="%~2"
 EXIT /B
     )
 
-:no_srcpath
+:preserveEnv
 (
+    REM this is wrapper to preserve environment and only modify %1 on return
+    REM usually this is not needed when copy-pasting the function to another script
     SETLOCAL ENABLEEXTENSIONS
-    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 )
-    :addanotherpath
-(
-    SET morePaths=%morePaths% %3
-    SHIFT /3
-)
-    IF NOT "%~3"=="" GOTO :addanotherpath
-    
-    CALL :findexe outvar %2 %morePaths%
-    IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
+:addanotherpath
+    IF NOT "%~3"=="" (
+	SET morePaths=%morePaths% %3
+	SHIFT /3
+	GOTO :addanotherpath
+    )
+    CALL :findexe outvar %2 %morePaths% || IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
 (
     ENDLOCAL
     SET %~1=%outvar%
-EXIT /B
+    SET "PATH=%PATH%"
+    EXIT /B
 )
