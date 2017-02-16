@@ -30,7 +30,7 @@ EXIT /B
     NET USER "%NewUsername%" >NUL 2>&1 && EXIT /B
     IF DEFINED %NewUsername%_flags CALL :GetValue flags "%NewUsername%_flags"
     IF DEFINED flags CALL :ParseFlags
-    IF DEFINED flagr (
+    IF DEFINED flag_r (
 	rem break if any of following users exist
 	NET USER Пользователь >NUL 2>&1 && EXIT /B
 	NET USER Продавец >NUL 2>&1 && EXIT /B
