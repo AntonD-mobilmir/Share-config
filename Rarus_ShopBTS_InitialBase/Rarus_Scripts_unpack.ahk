@@ -11,23 +11,29 @@ if not A_IsAdmin
     ExitApp
 }
 
-Try
-    exe7z:=find7zexe()
-Catch
-    exe7z:=find7zaexe()
+exe7z:=find7zGUIorAny()
+pathRarusScripts7z=%A_ScriptDir%\Rarus_Scripts.7z
+FileGetTime dateRarusScripts7z, %pathRarusScripts7z%
+runString = "%exe7z%" x -aoa -o"%A_AppDataCommon%\mobilmir.ru" -- "%pathRarusScripts7z%"
+If (unpackError := RunCheckError(runString))
+    dateRarusScripts7z .= " | Unpack error: " . unpackError
+If (scheduleError := RunCheckError(ComSpec . " /C """ . A_ScriptDir . "\_shedule_backup1Sbase.cmd"""))
+    dateRarusScripts7z .= " | Schedule error: " . scheduleError
 
-runString = "%exe7z%" x -aoa -o"%A_AppDataCommon%\mobilmir.ru" -- "%A_ScriptDir%\Rarus_Scripts.7z"
-RunCheckError(runString)
-
-RunCheckError(ComSpec . " /C """ . A_ScriptDir . "\_shedule_backup1Sbase.cmd""")
+PostGoogleForm("https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSf5-px897966MD2bv05DELVFk8_HiDanM6higcUNboT_4QSlQ/formResponse"
+		,{"entry.1837477723":	GetMailUserId()
+		 ,"entry.456008757":	A_ComputerName
+		 ,"entry.1402897460":	dateRarusScripts7z})
 
 Exit
 
 RunCheckError(cmdline) {
-    RunWait %cmdline%,,Min UseErrorLevel
+    RunWait %cmdline%,%A_Temp%,Min UseErrorLevel
     If (ErrorLevel)
 	MsgBox "%cmdline%"`nerror: %ErrorLevel%
     return ErrorLevel
 }
 
 #include \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\find7zexe.ahk
+#include \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\PostGoogleForm.ahk
+#include \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\GetMailUserId.ahk
