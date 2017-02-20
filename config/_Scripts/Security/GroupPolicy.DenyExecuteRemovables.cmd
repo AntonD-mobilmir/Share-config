@@ -11,7 +11,7 @@ SET "policyArchivePrefix=%~dp0GroupPolicy.DenyExecuteRemovables"
 (
 CALL "%~dp0..\find7zexe.cmd"
 SET "System32=%SystemRoot%\System32"
-IF EXIST "%SystemRoot%\SysNative\*.*" SET "System32=%SystemRoot%\SysNative"
+IF EXIST "%SystemRoot%\SysNative\cmd.exe" SET "System32=%SystemRoot%\SysNative"
 rem via https://social.technet.microsoft.com/Forums/windows/en-US/2030e62e-a60d-442a-8455-647b569caffb/export-import-local-group-policy-objects?forum=itproxpsp
 
 CALL "%~dp0..\CheckWinVer.cmd" 10 || CALL :SetPolicyArchiveSuffix

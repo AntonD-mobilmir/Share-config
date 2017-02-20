@@ -13,7 +13,7 @@ REG ADD "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "DisableOSUp
 REG ADD "HKLM\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" /v "ReservationsAllowed" /t REG_DWORD /d 0 /f
 
 SET "System32=%SystemDrive%\Windows\System32"
-IF EXIST "%SystemDrive%\Windows\SysNative\*.*" SET "System32=%SystemDrive%\Windows\SysNative"
+rem IF EXIST "%SystemDrive%\Windows\SysNative\cmd.exe" SET "System32=%SystemDrive%\Windows\SysNative"
 )
 (
 CALL "%ConfigDir%_Scripts\find_exe.cmd" exeSetACL "%SystemDrive%\SysUtils\SetACL.exe"

@@ -12,8 +12,8 @@ rem SETLOCAL ENABLEEXTENSIONS
     CALL "%~dp0..\FindAutoHotkeyExe.cmd"
     
     SET "lProgramFiles=%ProgramFiles%" & IF DEFINED ProgramFiles^(x86^) SET "lProgramFiles=%ProgramFiles(x86)%"
-    SET "SysNative=%SystemRoot%\System32" & IF EXIST "%SystemRoot%\SysNative\*.*" SET "SysNative=%SystemRoot%\SysNative"
-    SET "SysWOW64=%SystemRoot%\System32" & IF EXIST "%SystemRoot%\SysWOW64\*.*" SET "SysWOW64=%SystemRoot%\SysWOW64"
+    SET "SysNative=%SystemRoot%\System32" & IF EXIST "%SystemRoot%\SysNative\cmd.exe" SET "SysNative=%SystemRoot%\SysNative"
+    SET "SysWOW64=%SystemRoot%\System32" & IF EXIST "%SystemRoot%\SysWOW64\cmd.exe" SET "SysWOW64=%SystemRoot%\SysWOW64"
 
     ECHO Running uninstall scripts...
 
