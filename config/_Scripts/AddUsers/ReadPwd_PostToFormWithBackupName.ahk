@@ -11,6 +11,11 @@ If (!passFileName || !FileExist(passFileName)) {
 backupPath=%2%
 If (!backupPath)
     SplitPath passFileName,,backupPath
+Loop Files, %backupPath%\Backup *, D
+{
+    backupPath:=A_LoopFileFullPath
+    break
+}
 
 SplitPath backupPath, backupName, backupDir
 SplitPath backupDir, backupHostname, backupBaseDir
