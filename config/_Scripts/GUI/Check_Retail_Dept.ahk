@@ -447,6 +447,7 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
 
 finished := 1
 AddLog("Готово",A_Now,1)
+Sleep 300000
 ExitApp
 
 ;Loop
