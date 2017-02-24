@@ -13,9 +13,9 @@ If (nArg) {
 	{
 	    If (   RegexMatch(A_LoopFileName,"TS_.._\d{6}_\d{6}.*\.7z")
 		|| RegexMatch(A_LoopFileName,"TS_\d{6}_\d{6}.*\.7z")) {
-                TrayTip,, Распаковка %A_LoopFileName% в Exchange, 0x21
 		Unpack(A_LoopFileLongPath, dest)
 	    } Else {
+                TrayTip,, Перемещение %A_LoopFileName% в Exchange без распаковки, 0x21
 		FileMove %A_LoopFileLongPath%, %dest%
 		If (ErrorLevel)
                     TrayTip,, Ошибка при перемещениии файла %A_LoopFileName% в Exchange, 0x23
@@ -33,6 +33,25 @@ ExitApp
 
 Unpack(arc, dest) {
     static exe7z := find7zGUIorAny()
+    SplitPath arc, arcName
+
+    If (!FileExist(arc)) {
+	msgText=Получен запрос на обработку файла %arcName%`, но этого файла не существует.
+	If (RegExMatch(arc, "(^.+)-[0-9]+(\.[^.]+)$", foundName)) {
+	    arc := foundName1 . foundName2
+	    If (FileExist(arc)) {
+		MsgBox 0x24, Файл не найден, %msgText%`nВместо него найден файл "%arc%"`, распаковать его?
+		IfMsgBox No
+		    return
+		SplitPath arc, arcName
+	    }
+	} Else {
+	    MsgBox 0x10, Файл не найден, %msgText%`nЭто известная пробелема с Thunderbird`, если перетаскивать файл из письма`, когда Thunderbird одновременно выполняет другие действия.`n`nПопробуйте перетащить повторно через несколько секунд.
+	    return
+	}
+    }
+    
+    TrayTip,, Распаковка %arcName% в Exchange, 0x21
     RunWait "%exe7z%" x -o"%dest%" -- "%arc%", %A_Temp%
 }
 
