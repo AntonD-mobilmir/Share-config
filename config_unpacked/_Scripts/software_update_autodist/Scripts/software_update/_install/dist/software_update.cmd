@@ -7,6 +7,7 @@ SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+IF DEFINED ProgramFiles^(x86^) (SET "lProgramFiles=%ProgramFiles(x86)%") ELSE SET "lProgramFiles=%ProgramFiles%"
 
 REM Errorlevels:
 REM >=32767 run again later
@@ -75,7 +76,6 @@ EXIT /B
     
     SET "logmsi=%SUScriptsStatus%\%~nx1-msiexec.log"
     SET "log=%SUScriptsStatus%\%~nx1%logsuffix%"
-
 
     IF "%~x1"==".cmd" (
 	ECHO %DATE% %TIME% Starting %comspec% /C "%~1"1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%"

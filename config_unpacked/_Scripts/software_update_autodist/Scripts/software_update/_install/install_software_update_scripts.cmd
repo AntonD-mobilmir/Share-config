@@ -112,9 +112,12 @@ IF /I "%schtasksRepeat:~0,1%"=="¤" GOTO :SchtasksRepeat
 )
 
 :AfterSchtasks
-IF "%desthost%"=="" IF NOT "%InstallAndMark%"=="1" EXIT /B
-"%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Run /TN SoftwareUpdate
-"%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Run /TN mobilmir.ru\SoftwareUpdate
+IF NOT "%desthost%"=="" (
+    "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Run /TN SoftwareUpdate
+    "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Run /TN mobilmir.ru\SoftwareUpdate
+) ELSE IF "%InstallAndMark%"=="1" (
+    rem Not implemented
+)
 EXIT /B
 rem CALL "%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd" || (%ErrorCmd% & EXIT /B)
 rem FOR %%I IN ("%SUScripts%\*.*") DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI.log" SET "ScriptName=%%~I" & CALL :MarkUpdate "%SUScripts%\%%~I"
