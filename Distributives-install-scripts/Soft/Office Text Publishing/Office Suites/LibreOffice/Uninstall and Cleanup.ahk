@@ -1,16 +1,11 @@
 ﻿#NoEnv
 #SingleInstance ignore
 Menu Tray, Tip, LibreOffice uninstall and cleanup
-EnvGet RunInteractiveInstalls,RunInteractiveInstalls
 
-if not A_IsAdmin
-{
-    If (RunInteractiveInstalls!="0")
-    {
-	ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-	Run *RunAs %ScriptRunCommand% ; Requires v1.0.92.01+
-	ExitApp
-    }
+EnvGet RunInteractiveInstalls,RunInteractiveInstalls
+If (!A_IsAdmin && RunInteractiveInstalls!="0") {
+    Run % "*RunAs " . DllCall( "GetCommandLine", "Str" )
+    ExitApp
 }
 
 SetRegView 32

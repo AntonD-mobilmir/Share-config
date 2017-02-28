@@ -2,6 +2,12 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
+EnvGet RunInteractiveInstalls,RunInteractiveInstalls
+If (!A_IsAdmin && RunInteractiveInstalls!="0") {
+    Run % "*RunAs " . DllCall( "GetCommandLine", "Str" )
+    ExitApp
+}
+
 uninstKey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
 SetRegView 32
 Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
