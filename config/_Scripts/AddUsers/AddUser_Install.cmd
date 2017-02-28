@@ -48,48 +48,42 @@ EXIT /B
 )
 :ExistingUser
 (
-    CALL :findPasswdExe || GOTO :ExistingUserResetPwd
+    SET "findExeTestExecutionOptions=-?"
+    CALL "%~dp0..\find_exe.cmd" passwdexe "c:\SysUtils\UnxUtils\Uri\passwd.exe" "\\Srv0\profiles$\Share\Program Files\passwd.exe" || (
+	ECHO passwd.exe not found. Trying to reset the password.
+	GOTO :ExistingUserResetPwd
+    )
     SET /A TryNo=0
 )
 :ExistingUserNextTry
-(
-    SET /A TryNo+=1
-    GOTO :ExistingUserTry%TryNo%
-)
-:ExistingUserTry0
-(
+SET /A TryNo+=1
+IF %TryNo% EQU 1 (
     rem Read last old password and username from the file OR try empty
-    IF EXIST "%PassFilePath%" FOR /F "usebackq tokens=1,2 delims=	" %%I IN ("%PassFilePath%") DO IF "%%~I"=="%InstallUsername%" SET "OldPwd=%%~J"
-GOTO :ExistingUserTryChange
-)
-:ExistingUserTry1
-(
+    IF NOT EXIST "%PassFilePath%" GOTO :ExistingUserNextTry
+    FOR /F "usebackq tokens=1,2 delims=	" %%I IN ("%PassFilePath%") DO IF "%%~I"=="%InstallUsername%" SET "OldPwd=%%~J"
+) ELSE IF %TryNo% EQU 2 (
+    rem Read each other password from the file
+    IF EXIST "%PassFilePath%" FOR /F "usebackq tokens=1,2 delims=	" %%I IN ("%PassFilePath%") DO IF "%%~I"=="%InstallUsername%" IF NOT "%%~I"=="%OldPwd%" (
+	SET "OldPwd=%%~J"
+	CALL :ExistingUserChangePass && GOTO :ShowFileAndPostPassword 
+    )
+) ELSE IF %TryNo% EQU 3 (
     SET "OldPwd=1"
-GOTO :ExistingUserTryChange
+) ELSE (
+    GOTO :ExistingUserResetPwd
 )
-:ExistingUserTryChange
 (
-    CALL :ExistingUserChangePass || GOTO :ExistingUserNextTry
-    GOTO :ShowFileAndPostPassword
+    CALL :ExistingUserChangePass && GOTO :ShowFileAndPostPassword
+    GOTO :ExistingUserNextTry
 )   
-:ExistingUserChangePass
-(
-    ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
-    %passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
-    EXIT /B
-    rem ERRORLEVELs:
-    rem 53	Не найден сетевой путь.
-)
-:ExistingUserTry2
 :ExistingUserResetPwd
 (
-    ECHO error %ERRORLEVEL% changing password, will try to reset>>"%PassFilePath%"
     ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Resetting user password>>"%PassFilePath%"
     "%SystemRoot%\System32\NET.exe" user "%InstallUsername%" "%newPwd%" >>"%PassFilePath%" 2>&1 && GOTO :ShowFileAndPostPassword
 )
 (
-SET "Status=LastError %ERRORLEVEL%"
-GOTO :ShowFileAndPostPassword
+    SET "Status=LastError %ERRORLEVEL%"
+    GOTO :ShowFileAndPostPassword
 )
 :ShowFileAndPostPassword
 (
@@ -105,13 +99,22 @@ GOTO :ShowFileAndPostPassword
     XCOPY "%~dp0..\..\Users\Default\*.*" "%USERPROFILE%" /E /I /Q /G /H /K /Y
 EXIT /B
 )
-:findPasswdExe
+:ExistingUserChangePass
 (
-    IF EXIST "%~dp0..\find_exe.cmd" (
-	CALL "%~dp0..\find_exe.cmd" "c:\SysUtils\UnxUtils\Uri\passwd.exe"
-    ) ELSE (
-	FOR %%A IN ("c:\SysUtils\UnxUtils\Uri\passwd.exe" "\\Srv0\profiles$\Share\Program Files\passwd.exe") DO IF EXIST %%A SET "passwdexe=%%A" & EXIT /B
-	EXIT /B 1
+    IF NOT "%LastTriedPass%"=="%OldPwd%" (
+	SET "LastTriedPass=%OldPwd%"
+	ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
+	%passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
+	IF ERRORLEVEL 1 CALL :EchoPasswdExeError
     )
     EXIT /B
+)
+:EchoPasswdExeError
+(
+    (
+	ECHO passwd.exe returned error %ERRORLEVEL%
+    )>>"%PassFilePath%"
+    EXIT /B
+    rem ERRORLEVELs:
+    rem 53	Не найден сетевой путь.
 )
