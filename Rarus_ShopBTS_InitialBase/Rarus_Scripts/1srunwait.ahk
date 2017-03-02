@@ -45,6 +45,8 @@ backupsDir := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cm
 If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
 	&& !FileExist(rarusbackupflag)  		    			; and no flag exist
 	&& !FileExist(backupsDir . "\" . DailyArchiveFName) 			; and no daily backup exist
+	&& !FileExist(backupsDir . "\" . DailyArchiveFName . ".tmp") 			; and no daily backup exist
+	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . "tmp")
 	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) {	; and monthly backup not exist or created before last boot
     ResetProgress(WaitArchivingAfterBoot)
     Loop {
@@ -82,7 +84,10 @@ If ErrorLevel
     }
 }
 
-If ( !FileExist(backupsDir . "\" . MonthlyArchiveFName) || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) { ; ежемесячного архива нет. Если архивация работает, он будет создан (а не ежедневный)
+If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
+      || FileExist(backupsDir . "\" . MonthlyArchiveFName . ".tmp") )
+    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName)
+    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp") ) { ; ежемесячного архива нет (если архивация работает, он будет создан), или он создан после загрузки. В этом случае ежедневного архива не будет до следующей перезагрузки.
     ; Ежемесячный архив может создаваться долго: 1-2 минуты перед появлением файла, и ещё 2-3 до создания архива. При этом r:\rarus-backup-start.log будет пустой с актуальной датой.
     If ( WaitFile(rarusbackupflag, backupsDir . "\" . MonthlyArchiveFName, WaitArchivingAfterBoot) ) {
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_????-??.7z")
@@ -93,13 +98,15 @@ If ( !FileExist(backupsDir . "\" . MonthlyArchiveFName) || FileCreatedAfterBoot(
     }
 } Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
     If ( WaitFile(rarusbackupflag, backupsDir . "\" . DailyArchiveFName, WaitArchivingAfterBoot) ) {
-	If (A_MM==1)
+	If (A_MM==1) {
 	    prevMonth := A_Year-1 . "-12"
-	Else 
+	} Else {
 	    prevMonth := A_Year . "-" . SubStr("0" . A_MM-1, -1)
+	}
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_" . prevMonth . "-??.7z", backupsDir . "\ShopBTS_" . A_Year . "-" . A_MM . "-??.7z")
-	If (avgArchivingTime<15)
-	    avgArchivingTime:=60
+	If (avgArchivingTime<30) {
+	    avgArchivingTime:=30
+	}
     } Else {
 	BackupAppearanceTimeout()
     }
@@ -504,7 +511,10 @@ GetAppPathFromRegShellKey(exename, regsubKeyShell) {
 }
 
 FileCreatedAfterBoot(path) {
-    return FileExist(path) && A_TickCount > FileAge(path)*1000
+    If (FileExist(path))
+	return A_TickCount > FileAge(path)*1000
+    Else
+	return
 }
 
 FileAge(path, unit="s", timestampType="M") {
