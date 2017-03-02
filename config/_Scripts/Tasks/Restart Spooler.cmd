@@ -14,8 +14,9 @@ rem RUNAS /User:Пользователь
 CALL "%~dp0_Schedule WinVista+ Task.cmd" "%~dp0Tasks.XML.7z" "*" "Restart Spooler.xml"
 )
 (
-REM Everyone=*S-1-1-0
-"%WinDir%\System32\icacls.exe" "%System32%\%TaskRelPath%" /grant "*S-1-1-0:RX"
+REM Everyone=S-1-1-0
+REM Interactive=S-1-5-4
+"%WinDir%\System32\icacls.exe" "%System32%\%TaskRelPath%" /grant "*S-1-5-4:RX"
 rem     read&execute, just "read" isn't enough!
 EXIT /B %ERRORLEVEL%
 )
