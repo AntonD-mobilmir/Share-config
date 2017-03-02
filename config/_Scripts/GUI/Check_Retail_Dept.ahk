@@ -297,23 +297,29 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
 ;RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel
 ;SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
-instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"))
+instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 2)
 If (IsObject(instCriacxocx)) {
-    criacxUpdater := CheckPath(LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk").Path)
-    LV_Modify(LV_GetCount(),,"update_beeline_activex_and_desktop_shortcuts.ahk")
-    criacxUpdaterPath := criacxUpdater.Path
-    RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
-    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
+    timecriacxcab -= instCriacxocx, Days
+    If (timecriacxcab) {
+	criacxUpdater := LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk")
+	LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
+	criacxUpdaterPath := criacxUpdater.Path
+	RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
+	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     
-    FileGetTime criacxocxTimeNew, % instCriacxocx.path
-    criacxocxTimeDiff:=criacxocxTimeNew
-    EnvSub criacxocxTimeDiff, instCriacxocx.mtime, Days
-    If (criacxocxTimeDiff) {
-	statusTextcriacxocx := " → " . criacxocxTimeNew . " (обновился)"
+	FileGetTime criacxocxTimeNew, % instCriacxocx.path
+	criacxocxTimeDiff:=criacxocxTimeNew
+	EnvSub criacxocxTimeDiff, instCriacxocx.mtime, Days
+	If (criacxocxTimeDiff) {
+	    statusTextcriacxocx := " → " . criacxocxTimeNew . " (обновился)"
+	} Else {
+	    statusTextcriacxocx := instCriacxocx.mtime . " (не обновился)"
+	}
+	SetRowStatus(instCriacxocx.line, statusTextcriacxocx, criacxocxTimeDiff > 0)
     } Else {
-	statusTextcriacxocx := instCriacxocx.mtime . " (не обновился)"
+	SetRowStatus(instCriacxocx.line,"Та же дата, что и у cab",1)
     }
-    SetRowStatus(instCriacxocx.line, statusTextcriacxocx, criacxocxTimeDiff > 0)
 } Else {
     AddLog("CRIACX.ocx","отсутствует",1)
 }
@@ -568,9 +574,19 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
     If (!path)
 	return
     exist := FileExist(path)
-    If (exist)
+    If (exist) {
 	FileGetTime mtime, %path%
-    line := AddLog(AbbreviatePath(path), logTime ? mtime : exist, checkboxIfExist & (exist!=""))
+	If (logTime==2) {
+	    logTime=
+	    logTime-=mtime, Days
+	} Else If (logTime==1) {
+	    logTime:=mtime
+	}
+    } Else {
+	If logTime is integer
+	    logTime:="Не найден"
+    }
+    line := AddLog(AbbreviatePath(path), logTime, checkboxIfExist & (exist!=""))
     If (exist)
 	return {"path":path, "attr":exist, "mtime":mtime, "line":line}
     Else
