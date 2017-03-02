@@ -24,7 +24,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 	If (!URL) {
 	    URL:=arg
 	} Else {
-	    foundPos := RegexMatch(arg, "([^=]+)=(.+)", argkv)
+	    foundPos := RegexMatch(arg, "([^=]+)=(.*)", argkv)
 	    If (!foundPos)
 		Throw Exception("Не удалось разрбрать параметр на ключ-значение", "([^=]+)=(.+)", arg)
 	    kv[argkv1] := argkv2
