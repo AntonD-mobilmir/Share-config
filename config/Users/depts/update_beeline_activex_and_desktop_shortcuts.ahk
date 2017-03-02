@@ -43,6 +43,7 @@ If (A_IsAdmin) {
     If (!exe7z)
 	Throw Exception("Не найден 7-Zip.")
     RunWait "%exe7z%" x -aoa -o"D:\" -- "%A_ScriptDir%\D.7z" dealer.beeline.ru
+    FileCopyDir %A_ScriptDir%\D\dealer.beeline.ru, D:\dealer.beeline.ru, 1
 
 }
 ; Обновление criacx.ocx
