@@ -23,6 +23,7 @@ IF "%Download%"=="1" (
 (
 IF NOT "%secondrun%"=="1" IF NOT "%PROCESSOR_ARCHITECTURE%"=="x86" (
     SET "secondrun=1"
+    SET "Download=0"
     "%SystemRoot%\SysWOW64\cmd.exe" /C %0 %*
     EXIT /B
 )
