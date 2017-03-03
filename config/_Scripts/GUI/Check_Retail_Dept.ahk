@@ -300,7 +300,7 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
 instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 2)
 If (IsObject(instCriacxocx)) {
     FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
-    timecriacxcab -= instCriacxocx, Days
+    timecriacxcab -= instCriacxocx.mtime, Days
     If (timecriacxcab) {
 	criacxUpdater := LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk")
 	LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
@@ -318,7 +318,8 @@ If (IsObject(instCriacxocx)) {
 	}
 	SetRowStatus(instCriacxocx.line, statusTextcriacxocx, criacxocxTimeDiff > 0)
     } Else {
-	SetRowStatus(instCriacxocx.line,"Та же дата, что и у cab",1)
+	FormatTime instCriacxocxTimeFmt, % instCriacxocx.mtime, dd.MM.yyyy
+	SetRowStatus(instCriacxocx.line, "ocx~=cab (" . instCriacxocxTimeFmt . ")",1)
     }
 } Else {
     AddLog("CRIACX.ocx","отсутствует",1)
