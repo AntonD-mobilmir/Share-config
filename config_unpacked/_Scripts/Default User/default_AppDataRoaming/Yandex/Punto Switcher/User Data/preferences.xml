@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<PuntoSwitcherSettings version="7">
-    <PuntoHotkeys>19,275,1043,1299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4694,0</PuntoHotkeys>
+<PuntoSwitcherSettings version="11">
+    <PuntoHotkeys>19,0,1043,1169,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</PuntoHotkeys>
     <LayoutSwitchKey>0</LayoutSwitchKey>
     <SeparateLangCombination>1</SeparateLangCombination>
     <TransparentFormsFiller>0</TransparentFormsFiller>
     <CheckForUpdate>No</CheckForUpdate>
     <RunAtStartup>No</RunAtStartup>
-    <DontConvertCapitals>Yes</DontConvertCapitals>
-    <DontShowTrayIcon>No</DontShowTrayIcon>
+    <DontConvertCapitals>No</DontConvertCapitals>
     <ChangeIconClrOnMisprint>Yes</ChangeIconClrOnMisprint>
     <ShowCurLayoutInWndIcon>No</ShowCurLayoutInWndIcon>
     <ShowPopupOnException>Yes</ShowPopupOnException>
     <ExceptionCount>2</ExceptionCount>
-    <FixTwoUpperLetters>No</FixTwoUpperLetters>
-    <FixInvertedCase>No</FixInvertedCase>
+    <FixTwoUpperLetters>Yes</FixTwoUpperLetters>
+    <FixInvertedCase>Yes</FixInvertedCase>
     <ShowLayoutFlags>No</ShowLayoutFlags>
     <OneKeySwitchLayoutEnabled>No</OneKeySwitchLayoutEnabled>
     <BinarySwitchLayout>No</BinarySwitchLayout>
@@ -35,25 +34,34 @@
     <ShowUsefulTips>No</ShowUsefulTips>
     <EnableIntelliMenus>No</EnableIntelliMenus>
     <AutoReplaceAlways>Yes</AutoReplaceAlways>
-    <TurnOffDiaryInProgExceptions>No</TurnOffDiaryInProgExceptions>
+    <TurnOffDiaryInProgExceptions>Yes</TurnOffDiaryInProgExceptions>
     <ShowFormsFiller>No</ShowFormsFiller>
     <ReplaceOnEnterAndTab>Yes</ReplaceOnEnterAndTab>
     <ReplaceOnSpace>No</ReplaceOnSpace>
     <DontShowTranslitWin>No</DontShowTranslitWin>
     <FullUnhookWhenDisabled>Yes</FullUnhookWhenDisabled>
     <EnableClipboardHistory>No</EnableClipboardHistory>
+    <PersistentClipboardHistory>No</PersistentClipboardHistory>
     <AutoSaveClipboardToDiary>No</AutoSaveClipboardToDiary>
     <EnableMouseEmulation>No</EnableMouseEmulation>
     <DisableCapsLock>No</DisableCapsLock>
     <PopupIndicatorPos>CPoint(300, 300)</PopupIndicatorPos>
+    <FormsFillerRect>CRect(100, 100, 350, 500)</FormsFillerRect>
     <RestrictKeysEnabled>Yes,Yes,No,No,No,Yes,No</RestrictKeysEnabled>
     <MinDiaryRecordWords>1</MinDiaryRecordWords>
     <CurrentAdviceNum>0</CurrentAdviceNum>
     <DontSwitchOnOtherLangs>Yes</DontSwitchOnOtherLangs>
+    <Sounds>C:\Program Files\Yandex\Punto Switcher\Sounds\typerus.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\typeeng.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\misprint.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\ru.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\en.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\reverse.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\switch.wav,C:\Program Files\Yandex\Punto Switcher\Sounds\replace.wav</Sounds>
     <SoundsStates>98304003,131072003,163840003,45875203,65536003,131072003,131072003,131072003,131072003,131072003,131072003,98304003,111411203,124518403,32768003,26214403</SoundsStates>
     <AskF12Support>No</AskF12Support>
-    <FolderExceptions>C:\WINDOWS,C:\WINNT,C:\SysUtils</FolderExceptions>
-    <ProgramsExceptions>C:\WINDOWS\system32\cmd.exe,C:\WINDOWS\SysWOW64\cmd.exe,C:\WINDOWS\SysNative\cmd.exe,C:\Program Files\Far\Far.exe,C:\Program Files (x86)\Far\Far.exe,C:\Program Files\Total Commander\TOTALCMD.EXE,C:\Program Files (x86)\Total Commander\TOTALCMD.EXE</ProgramsExceptions>
     <ShowLayoutFlagsAlwaysInColor>No</ShowLayoutFlagsAlwaysInColor>
-    <ShareHotKeyForUndoConvertAndSelectionConvert>No</ShareHotKeyForUndoConvertAndSelectionConvert>
+    <DoubleBackSpaceAction>0</DoubleBackSpaceAction>
+    <ShareHotKeyForUndoConvertAndSelectionConvert>Yes</ShareHotKeyForUndoConvertAndSelectionConvert>
+    <DiarySaveDays>0</DiarySaveDays>
+    <DetectPasswords>Yes</DetectPasswords>
+    <RunAtStartupElevated>No</RunAtStartupElevated>
+    <WantsBeta>No</WantsBeta>
+    <FolderExceptions>C:\SysUtils,C:\Windows</FolderExceptions>
+    <ProgramsExceptions>C:\WINDOWS\system32\cmd.exe,C:\WINDOWS\SysWOW64\cmd.exe,C:\WINDOWS\SysNative\cmd.exe,%LOCALAPPDATA%\Programs\Total Commander\TOTALCMD.EXE</ProgramsExceptions>
+    <TitlesExceptions />
 </PuntoSwitcherSettings>
