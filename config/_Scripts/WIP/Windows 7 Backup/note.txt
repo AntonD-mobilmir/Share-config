@@ -1,0 +1,6 @@
+* to list volume IDs
+    mountvol
+
+* to get most other aattributes
+     %SystemRoot%\System32\Wbem\wmic.exe logicaldisk where "( DriveType=6 Or DriveType=3 )" get Caption
+
