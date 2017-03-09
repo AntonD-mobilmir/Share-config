@@ -11,6 +11,7 @@ IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
 SET "InstallUsername=Install"
 SET "PasswdPart1=0000%RANDOM%"
 SET "PasswdPart2=0000%RANDOM%"
+SET "lastTriedPass=-"
 
 IF EXIST "C:\Users\Install\Install-pwd.txt" (
     SET "PassFilePath=C:\Users\Install\Install-pwd.txt"
@@ -43,7 +44,7 @@ GOTO :ShowFileAndPostPassword
 (
     ECHO error %ERRORLEVEL% adding user>>"%PassFilePath%"
     SET "InstallUsername=%InstallUsername%"
-    SET "Status=UserAdd Error %ERRORLEVEL%"
+    SET "status=UserAdd Error %ERRORLEVEL%"
 EXIT /B
 )
 :ExistingUser
@@ -78,11 +79,12 @@ IF %TryNo% EQU 1 (
 )   
 :ExistingUserResetPwd
 (
+    SET "status=Сброс пароля"
     ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Resetting user password>>"%PassFilePath%"
     "%SystemRoot%\System32\NET.exe" user "%InstallUsername%" "%newPwd%" >>"%PassFilePath%" 2>&1 && GOTO :ShowFileAndPostPassword
 )
 (
-    SET "Status=LastError %ERRORLEVEL%"
+    SET "status=%Status%, LastError %ERRORLEVEL%"
     GOTO :ShowFileAndPostPassword
 )
 :ShowFileAndPostPassword
@@ -97,24 +99,30 @@ IF %TryNo% EQU 1 (
 (
     %exe7z% x -aoa -y -o"%APPDATA%" -- "%~dp0..\Default User\default_AppDataRoaming.7z"
     XCOPY "%~dp0..\..\Users\Default\*.*" "%USERPROFILE%" /E /I /Q /G /H /K /Y
-EXIT /B
+EXIT /B %ERRORLEVEL%
 )
 :ExistingUserChangePass
 (
-    IF NOT "%LastTriedPass%"=="%OldPwd%" (
-	SET "LastTriedPass=%OldPwd%"
+    SET "lastError=32761"
+    IF NOT "%lastTriedPass%"=="%OldPwd%" (
+	SET "lastTriedPass=%OldPwd%"
+	SET "status=Смена пароля с "%OldPwd%""
 	ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
+	SET "lastError="
 	%passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
 	IF ERRORLEVEL 1 CALL :EchoPasswdExeError
     )
-    EXIT /B
+    IF NOT DEFINED lastError EXIT /B
 )
+EXIT /B %lastError%
 :EchoPasswdExeError
 (
+    SET "lastError=%ERRORLEVEL%"
+    SET "status=%Status%, LastError %ERRORLEVEL%"
     (
 	ECHO passwd.exe returned error %ERRORLEVEL%
     )>>"%PassFilePath%"
-    EXIT /B
+    EXIT /B %ERRORLEVEL%
     rem ERRORLEVELs:
     rem 53	Не найден сетевой путь.
 )
