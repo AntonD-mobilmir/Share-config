@@ -1,6 +1,7 @@
 (@REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+    SET "AutohotkeyExe="
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :CheckAutohotkeyExe %%I
     rem continuing if AutoHotkeyScript type isn't defined or specified path points to incorect location
     IF NOT DEFINED AutohotkeyExe (
