@@ -11,5 +11,6 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROF	ILE%\Application Data"
 
+rem according to https://technet.microsoft.com/en-us/library/ee791828(v=ws.10).aspx -- %windir%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "& {&'Import-Module' AppLocker}
 %windir%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -Command "& {&'Set-AppLockerPolicy' -XMLPolicy '%~dpn0.xml'}
 )
