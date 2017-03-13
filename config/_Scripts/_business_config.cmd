@@ -8,8 +8,6 @@ rem Disable IE 11 upgrade due to Megafon SBMS incompatibility
 rem REG ADD "HKLM\SOFTWARE\Microsoft\Internet Explorer\Setup\11.0" /v DoNotAllowIE11 /t REG_DWORD /d 1 /f
 CALL "%~dp0DoNotAllowIE11 Install via Windows Update.cmd"
 SET "dismLockFile=%TEMP%\WindowsComponentsSetup.lock"
-ECHO %DATE% %TIME% Run UserBenchmark
-%AutoHotkeyExe% "\\192.168.1.80\profiles$\Share\config\_Scripts\GUI\Run_UserBenchMark.ahk"
 )
 (
 START "Setting up Windows components" %comspec% /C ""%~dp0Windows Components\WindowsComponentsSetup.cmd">"%dismLockFile%""
