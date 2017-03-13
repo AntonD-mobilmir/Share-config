@@ -2,9 +2,6 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
-RunWait "%A_ScriptDir%\PuntoSwitcherSetup.exe" /quiet /norestart
-Sleep 5000
-
 uninstKey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
 SetRegView 32
 Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
@@ -14,6 +11,10 @@ Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
     RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
     
     If (Publisher == "Яндекс" && URLUpdateInfo == "http://punto.yandex.ru" && StartsWith(DisplayName, "Punto Switcher ")) {
+	RunWait "%A_ScriptDir%\PuntoSwitcherSetup.exe" /quiet /norestart
+	Sleep 5000
+	Process Close, punto.exe
+	Process Close, yupdate.exe
 	RunWait %A_WinDir%\System32\MsiExec.exe /X "%A_LoopRegName%" /qn /norestart
     }
 }
