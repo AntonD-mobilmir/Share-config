@@ -21,7 +21,7 @@
 	
 	IF NOT DEFINED backupscriptpath CALL :FindBackupScriptPath "Run WindowsImageBackup.cmd" || CALL :FindBackupScriptPath "backup image here and copy to R.cmd"
     )
-    CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd" || (ECHO Autohotkey.exe не найден!&PAUSE)
 )
 :SkipBackupScriptSearch
 (
@@ -32,6 +32,10 @@
     CALL "%~dp0uninstall_soft.cmd"
 
     START "BleachBit" /WAIT %comspec% /C "%~dp0BleachBit-auto.cmd"
+    IF EXIST "%SystemDrive%\bootsqm.dat" (
+	ECHO %DATE% %TIME% Удаление bootsqm.dat
+	DEL "%SystemDrive%\bootsqm.dat"
+    )
 
     ECHO %DATE% %TIME% Удаление содержимого %windir%\TEMP
     FOR /D %%I IN ("%windir%\TEMP\*.*") DO RD /S /Q "%%~fI"
@@ -63,7 +67,7 @@
 
     ECHO %DATE% %TIME% Удаление журналов USN
     fsutil usn deletejournal /D %SystemDrive%
-    fsutil usn deletejournal /D %SystemDrive%\WINDOWS\SwapSpace
+    rem -- не добавляется в бэкап -- fsutil usn deletejournal /D %SystemDrive%\WINDOWS\SwapSpace
 
     ECHO %DATE% %TIME% Emptying SoftwareDistribution\Download
     START "SoftwareDistribution\Download" /WAIT %comspec% /C "%~dp0Empty SoftwareDistribution_Download.cmd" /NOWAIT || PAUSE
@@ -85,12 +89,12 @@
 	ECHO.
 	ECHO.
 	ECHO %DATE% %TIME% Чистка закончена. Теперь можно делать резервную копию.
-	ECHO После резервного копирования нажмите в этом окне любую клавишу, удалённое ПО будет снова установлено.
+	ECHO После резервного копирования нажмите в этом окне любую клавишу, ПО из очереди будет установлено.
 	PAUSE
     )
 )
 (
-    ECHO %DATE% %TIME% Установка ПО, удалённого перед резервным копированием...
+    ECHO %DATE% %TIME% Установка ПО из очереди...
     %comspec% /C "%~dp0..\_software_install_queued.cmd"
     
     EXIT /B
