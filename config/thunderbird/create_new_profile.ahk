@@ -96,7 +96,7 @@ If (!skipCreatingProfile) {
     StringReplace prefsjs, prefsjs, {$MailDomain$}, %MailDomain%, 1
     prefsJsHndl := FileOpen(MailProfileDir "\prefs.js", "w-", "UTF-8"), prefsJsHndl.Write(prefsjs), prefsJsHndl.Close()
 
-    RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk", %MailProfileDir%
+    RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%MailProfileDir%\extensions"
 }
 
 findexefunc:="findexe"

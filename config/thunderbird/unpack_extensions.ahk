@@ -6,8 +6,8 @@ EnvGet SystemDrive,SystemDrive
 global defaultConfig
 retailDept := getDefaultConfigFileName() = "Apps_dept.7z"
 
-srcDir = %1%
-destDir = %2%
+destDir = %1%
+srcDir = %2%
 
 If (!srcDir)
     srcDir = %A_ScriptDir%\default_profile_template\extensions
