@@ -1,6 +1,7 @@
 @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
@@ -49,10 +50,10 @@ EXIT /B
     SET "PasswdPart1=0000%RANDOM%"
     SET "PasswdPart2=0000%RANDOM%"
     SET "PasswdPart3=0000%RANDOM%"
-)
-(
     rem if password is longer than 14 chars, NET USER /ADD asks stupid question
-    SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
+)
+SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
+(
     SET "UserAddError="
     rem Create new user
     IF DEFINED OutDir (
