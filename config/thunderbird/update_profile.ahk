@@ -26,7 +26,7 @@ backupPath=%MTProfilePath%\backup_%A_Now%
 FileCreateDir	%backupPath%
 
 FileMoveDir	%MTProfilePath%\extensions,	%backupPath%\extensions,	R
-Run "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%A_ScriptDir%\default_profile_template\extensions" "%MTProfilePath%\extensions", %MailProfileDir%,, PIDofUnpackScript
+Run "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%MTProfilePath%\extensions",,, PIDofUnpackScript
 FileCopyDir	%A_ScriptDir%\default_profile_template\extensions,	%MTProfilePath%\extensions
 
 FileRemoveDir	%MTProfilePath%\Cache, 1
