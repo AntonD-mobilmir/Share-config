@@ -50,22 +50,8 @@ Loop Read, %2%
 	}
 	files.Push(A_LoopReadLine)
 	If (!longPaths) {
-	    ; even with START "" /D "\\?\%curBasePath%" and relative paths to source files (or *), zpaq it still cannot pack if full path length is 260 or more chars (despire relative path is shorter). If such paths found, let's try to use \\?\ prefixes.
-	    If (SubStr(A_LoopReadLine, 0)=="\") {
-		;Loop Files explicitly ignores files with paths longer than 259 chars, even with \\?\ -- Loop Files, %A_LoopReadLine%*, R
-		tmpListName = %A_Temp%\%A_ScriptName%.%A_Now%.txt
-		RunWait %comspec% /U /C "DIR /S /B "%A_LoopReadLine%*" >"%tmpListName%""
-		Loop Read, %tmpListName%
-		{
-		    If (StrLen(A_LoopReadLine)>259) {
-			longPaths:=1
-			break
-		    }
-		}
-		FileDelete %tmpListName%
-	    } Else {
-		longPaths:=StrLen(A_LoopReadLine)>259
-	    }
+	    ; even with START "" /D "\\?\%curBasePath%" and relative paths to source files (or *), zpaq still cannot pack if full path length is 260 or more chars (despire relative path is shorter). If such paths found, fall back to \\?\ prefixes.
+	    longPaths := LongPathsInDir(A_LoopReadLine)
 	}
     } Else {
 	MsgBox Command unsupported: %cmd%
@@ -109,6 +95,81 @@ If (cmd="l") {
 }
 
 ExitApp
+
+LongPathsInDir(path) {
+    path := RTrim(path, "\")
+    remainingLen := 258 - StrLen(path) ; 260 - StrLen('\0') - StrLen('\') - StrLen(base_path).
+    ;If 1, there may still be 1-char-filenames in this directory
+    If (remainingLen < 1)
+	return 1
+    VarSetCapacity(vFINDDATA, A_IsUnicode ? 592 : 520, 0)
+    ;sizeof(WIN32_FIND_DATA) = 592 (Unicode) / 520 (ASCII)
+
+    ;typedef struct _WIN32_FIND_DATA {
+    ;  DWORD    dwFileAttributes;	//	4
+    ;  FILETIME ftCreationTime;	//	8
+    ;  FILETIME ftLastAccessTime;	//	8
+    ;  FILETIME ftLastWriteTime;	//	8
+    ;  DWORD    nFileSizeHigh;	//	4
+    ;  DWORD    nFileSizeLow;	//	4
+    ;  DWORD    dwReserved0;	//	4
+    ;  DWORD    dwReserved1;	//	4
+    ;  TCHAR    cFileName[MAX_PATH];	//	MAX_PATH*(A_IsUnicode+1)
+    ;  TCHAR    cAlternateFileName[14];	//	14*(A_IsUnicode+1)
+    ;} WIN32_FIND_DATA, *PWIN32_FIND_DATA, *LPWIN32_FIND_DATA;
+
+    ;MAX_PATH=260
+
+    ;#ifdef _UNICODE
+    ;typedef wchar_t TCHAR;
+    ;#else
+    ;typedef char TCHAR;
+    ;#endif
+    ;https://habrahabr.ru/post/164193/
+
+    ;Contains a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601 (UTC).
+    ;typedef struct _FILETIME {
+    ;  DWORD dwLowDateTime;
+    ;  DWORD dwHighDateTime;
+    ;} FILETIME, *PFILETIME;
+    
+    hFile := DllCall("Kernel32.dll\FindFirstFile", "str", "\\?\" . path . "\*", "ptr", &vFINDDATA)
+    if (hFile = -1)
+	Throw Exception(A_LastError, "Kernel32.dll\FindFirstFile", path)
+    subdirs := Object()
+    Loop
+    {
+	;vAttrib := NumGet(&vFINDDATA)
+	; https://msdn.microsoft.com/ru-ru/library/windows/desktop/gg258117.aspx
+	;attReadOnly	:= vAttrib & 0x1
+	;attHidden	:= vAttrib & 0x2
+	;attSystem	:= vAttrib & 0x4
+	;attDirectory	:= vAttrib & 0x10
+	;attArchive	:= vAttrib & 0x20
+	;attNormal	:= vAttrib & 0x80
+	;attTemporary	:= vAttrib & 0x100
+	;attSparse	:= vAttrib & 0x200
+	;attReparsePoint:= vAttrib & 0x400 ; A file or directory that has an associated reparse point, or a file that is a symbolic link
+	;attCompressed	:= vAttrib & 0x800
+	;attUnindexed	:= vAttrib & 0x2000
+	;attEncrypted	:= vAttrib & 0x4000
+	fname := StrGet(&vFINDDATA+44)
+	If (StrLen(fname) > remainingLen)
+	    return 1
+	if fname not in .,..
+	{
+	    If (NumGet(&vFINDDATA) & 0x10)
+		subdirs.Push(fname)
+	}
+    } Until !DllCall("Kernel32.dll\FindNextFile", "ptr", hFile, "ptr", &vFINDDATA)
+    DllCall("Kernel32.dll\FindClose", "ptr", hFile)
+    
+    For i,v in subdirs {
+	If (LongPathsInDir(path . "\" . v))
+	    return 1
+    }
+    return 0
+}
 
 WaitCPUIdle(pidToWait:=0, cpuLimit := 0.7, limitDuration := 15, processWaitTimeout := 120) {
     FileAppend Start waiting for idle CPU`n, *
