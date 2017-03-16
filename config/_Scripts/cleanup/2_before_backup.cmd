@@ -15,13 +15,13 @@
 	ECHO Текущий профиль питания остался от WSUSOffline. Удалите его. Подробности: https://trello.com/c/V2yWUnul/23--
 	PAUSE
     )
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd" || (ECHO Autohotkey.exe не найден!&PAUSE)
     
     IF NOT DEFINED backupscriptpath (
 	CALL :AskToSkipBackup || GOTO :SkipBackupScriptSearch
 	
 	IF NOT DEFINED backupscriptpath CALL :FindBackupScriptPath "Run WindowsImageBackup.cmd" || CALL :FindBackupScriptPath "backup image here and copy to R.cmd"
     )
-    CALL "%~dp0..\FindAutoHotkeyExe.cmd" || (ECHO Autohotkey.exe не найден!&PAUSE)
 )
 :SkipBackupScriptSearch
 (
