@@ -1,0 +1,30 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\SystemCertificates]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2\Appx]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2\Appx\32095775-5197-4f30-8cd8-990a7f2be3b7]
+"Value"="<FilePublisherRule Id=\"32095775-5197-4f30-8cd8-990a7f2be3b7\" Name=\"Microsoft.Windows.ContentDeliveryManager, from Microsoft Corporation\" Description=\"\" UserOrGroupSid=\"S-1-1-0\" Action=\"Deny\"><Conditions><FilePublisherCondition PublisherName=\"CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US\" ProductName=\"Microsoft.Windows.ContentDeliveryManager\" BinaryName=\"*\"><BinaryVersionRange LowSection=\"*\" HighSection=\"*\"/></FilePublisherCondition></Conditions></FilePublisherRule>"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2\Dll]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2\Exe]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2\Msi]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}Machine\Software\Policies\Microsoft\Windows\SrpV2\Script]
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects\{250FEABB-7D5C-4556-8753-B62A66E5858B}User]
