@@ -56,7 +56,7 @@ GOTO :preserveEnv
     (
 	IF "%~2"=="" EXIT /B 9009
 	IF NOT EXIST "%~2" EXIT /B 9009
-	SET "PATH=%PATH%;%~dp2"
+	SET "PATH=%PATH%;%~dp2%pathAppendSubpath%"
 	"%~2" %findExeTestExecutionOptions% <NUL >NUL 2>&1
 	REM SET "PATH=%PATH%" restores PATH to one which was at start of the block
 	IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 SET "PATH=%PATH%" & EXIT /B
