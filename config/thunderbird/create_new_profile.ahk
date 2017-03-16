@@ -1,5 +1,14 @@
-﻿;create_new_profile.ahk [username [full_path]]
-
+﻿;usage variants:
+;create_new_profile.ahk [MailUserId[@MailDomain] [any_path]]
+;create_new_profile.ahk [path_with_a_backslash_in_it [MailUserId[@MailDomain]]
+;
+;path_with_a_backslash_in_it must contain a "\"
+;any_path - not necessarily
+;
+;default MailUserId is UserName
+;default MailDomain is "mobilmir.ru"
+;default profile path is "%UserProfile%\Mail\Thunderbird\profile" 
+;
 ;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
@@ -16,37 +25,32 @@ Try {
 Loop %0%
 {
     argv := %A_Index%
-    If (InStr(argv,"\")) {
-	MailProfileDir:=argv
+    If (!MailUserId && posOfTheAtChar := InStr(argv,"@")) {
+	StringLeft MailUserId, argv, posOfTheAtChar - 1
+	StringMid MailDomain, argv, posOfTheAtChar + 1
+    } Else If (!MailUserId && !InStr(argv,"\")) {
+	MailUserId := argv
+    } Else If (!mailProfileDir) {
+	mailProfileDir := argv
     } Else {
-	MailAddress:=argv
-	StringGetPos PosOfTheAtChar, MailAddress, @
-	If (ErrorLevel) {
-	    MailUserId:=MailAddress
-	} Else {
-	    StringLeft MailUserId, MailAddress, PosOfTheAtChar
-	    StringMid MailDomain, MailAddress, PosOfTheAtChar + 2
-	}
+	Throw Exception("Лишний аргумент в командной строке", A_Index, argv)
     }
 }
 
-If Not MailUserId
+If (!MailUserId)
     MailUserId := A_UserName
-If Not MailDomain
+If (!MailDomain)
     MailDomain := "mobilmir.ru"
-MailAddress := MailUserId . "@" . MailDomain
+mailAddress := MailUserId . "@" . MailDomain
 
-If (!MailProfileDir)
+If (!mailProfileDir)
+    mailProfileDir=%UserProfile%\Mail\Thunderbird\profile
+
+;MsgBox,,%A_ScriptName% Debug, MailUserId = "%MailUserId%"`nMailDomain = "%MailDomain%"`nmailProfileDir = "%mailProfileDir%"
+
+IfExist %mailProfileDir%\prefs.js
 {
-    If (!MailProfileDir)
-	MailProfileDir=%UserProfile%\Mail\Thunderbird\profile
-}
-
-;MsgBox,,%A_ScriptName% Debug, MailUserId = "%MailUserId%"`nMailDomain = "%MailDomain%"`nMailProfileDir = "%MailProfileDir%"
-
-IfExist %MailProfileDir%\prefs.js
-{
-    MsgBox 35,, "%MailProfileDir%" уже существует.`nВсё равно копировать шаблон и генерировать ключ?`n(если нет`, просто будет записан путь к профилю в [Profile0] в profiles.ini)
+    MsgBox 35,, "%mailProfileDir%" уже существует.`nВсё равно копировать шаблон и генерировать ключ?`n(если нет`, просто будет записан путь к профилю в [Profile0] в profiles.ini)
 
     IfMsgBox Cancel
 	Exit
@@ -56,25 +60,25 @@ IfExist %MailProfileDir%\prefs.js
 
     IfMsgBox Yes
     {
-	FileMoveDir %MailProfileDir%, %MailProfileDir%.%A_Now%, R
+	FileMoveDir %mailProfileDir%, %mailProfileDir%.%A_Now%, R
 	If ErrorLevel
 	    Throw "Can't move existing profile"
     }
 }
 
 If (!skipCreatingProfile) {
-    FileCreateDir %MailProfileDir%
-    IfNotExist %MailProfileDir%
+    FileCreateDir %mailProfileDir%
+    IfNotExist %mailProfileDir%
     {
-	MsgBox Не удалось создать "%MailProfileDir%"!
+	MsgBox Не удалось создать "%mailProfileDir%"!
 	Exit
     }
 
-    FileCopyDir %A_ScriptDir%\default_profile_template, %MailProfileDir%, 1
-    Run %A_windir%\System32\compact.exe /C /S:"%MailProfileDir%\Mail" /I, %MailProfileDir%, Min UseErrorLevel
-    Run %A_windir%\System32\compact.exe /C /S:"%MailProfileDir%\ImapMail" /I, %MailProfileDir%, Min UseErrorLevel
+    FileCopyDir %A_ScriptDir%\default_profile_template, %mailProfileDir%, 1
+    Run %A_windir%\System32\compact.exe /C /S:"%mailProfileDir%\Mail" /I, %mailProfileDir%, Min UseErrorLevel
+    Run %A_windir%\System32\compact.exe /C /S:"%mailProfileDir%\ImapMail" /I, %mailProfileDir%, Min UseErrorLevel
 
-    If ( IsObject(prefsJsHndl := FileOpen(MailProfileDir "\prefs.js", "r-wd", "UTF-8")) ) {
+    If ( IsObject(prefsJsHndl := FileOpen(mailProfileDir "\prefs.js", "r-wd", "UTF-8")) ) {
 	prefsjs := prefsJsHndl.Read(), prefsJsHndl.Close()
     } Else {
 	MsgBox Не удалось открыть файл prefs.js. A_LastError=%A_LastError%
@@ -82,7 +86,7 @@ If (!skipCreatingProfile) {
     }
 
     If (retailDept) {
-	If ( IsObject(appendPrefsJsHndl := FileOpen(MailProfileDir "\prefs_AddressBookSync_retail.js", "r-wd", "UTF-8")) ) {
+	If ( IsObject(appendPrefsJsHndl := FileOpen(mailProfileDir "\prefs_AddressBookSync_retail.js", "r-wd", "UTF-8")) ) {
 	    appendprefsjs := appendPrefsJsHndl.Read(), appendPrefsJsHndl.Close()
 
 	    If (RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) {
@@ -94,24 +98,24 @@ If (!skipCreatingProfile) {
 
     StringReplace prefsjs, prefsjs, {$MailUserId$}, %MailUserId%, 1
     StringReplace prefsjs, prefsjs, {$MailDomain$}, %MailDomain%, 1
-    prefsJsHndl := FileOpen(MailProfileDir "\prefs.js", "w-", "UTF-8"), prefsJsHndl.Write(prefsjs), prefsJsHndl.Close()
+    prefsJsHndl := FileOpen(mailProfileDir "\prefs.js", "w-", "UTF-8"), prefsJsHndl.Write(prefsjs), prefsJsHndl.Close()
 
-    RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%MailProfileDir%\extensions"
+    RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%mailProfileDir%\extensions"
 }
 
 findexefunc:="findexe"
 If(IsFunc(findexefunc)) {
     Try xlnexe := %findexefunc%(SystemDrive . "\SysUtils\xln.exe")
     If (xlnexe) {
-	FileMoveDir %A_APPDATA%\gnupg, %MailProfileDir%\gnupg, R
-	RunWait "%xlnexe%" -n "%MailProfileDir%\gnupg" "%A_APPDATA%\gnupg",,Min UseErrorLevel
+	FileMoveDir %A_APPDATA%\gnupg, %mailProfileDir%\gnupg, R
+	RunWait "%xlnexe%" -n "%mailProfileDir%\gnupg" "%A_APPDATA%\gnupg",,Min UseErrorLevel
     }
 }
 
-If (skipCreatingProfile || StartsWith(MailProfileDir,UserProfile)) {
-    Run "%A_AhkPath%" "%MailProfileDir%\AddThisProfile.ahk", %MailProfileDir%
+If (skipCreatingProfile || StartsWith(mailProfileDir,UserProfile)) {
+    Run "%A_AhkPath%" "%mailProfileDir%\AddThisProfile.ahk", %mailProfileDir%
 
-    FileCreateShortcut notepad.exe, %A_Desktop%\подпись в письмах электронной почты (Thunderbird).lnk, , %MailProfileDir%\подпись.txt, Текст`, добавляемый в конец создаваемых писем
+    FileCreateShortcut notepad.exe, %A_Desktop%\подпись в письмах электронной почты (Thunderbird).lnk, , %mailProfileDir%\подпись.txt, Текст`, добавляемый в конец создаваемых писем
     Run "%A_AhkPath%" "%A_ScriptDir%\create_startup_shortcut.ahk", %A_ScriptDir%
 }
     
