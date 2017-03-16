@@ -21,6 +21,7 @@ tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\
 scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI\" . A_ScriptName
+ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 
 Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R30 w600 vLogListView, Операция|Статус
 Gui Show
@@ -119,10 +120,8 @@ If (IsObject(sendemailcfg)) {
     ;    ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
     ;}
     AddLog("ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix, "Запуск")
-    RunWait "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
+    RunWait "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
-    If (ErrorLevel)
-	keepOpen := 1
 }
 
 userFoldersChk := AddLog("Проверка доступности папок пользователя")
@@ -132,7 +131,7 @@ Loop Reg, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\U
     If (!FileExist(Expand(path))) {
 	AddLog(path, A_LoopRegName)
 	userFoldersChk=
-	keepOpen := 1
+	keepOpen++
     }
 }
 If (userFoldersChk) {
@@ -142,8 +141,7 @@ If (userFoldersChk) {
     IfMsgBox Yes
     {
 	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\..\_Scripts\MoveUserProfile\reset HKCU folders.ahk"
-	If (ErrorLevel)
-	    keepOpen := 1
+	keepOpen += !!ErrorLevel
     }
 }
 
@@ -152,16 +150,14 @@ If (!ErrorLevel) {
     AddLog("OneDriveSetup в автозагрузке", "Удаление")
     RegDelete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
     FileRemoveDir D:\Users\Пользователь\AppData\Local\Microsoft\OneDrive, 1
-    If (ErrorLevel)
-	keepOpen := 1
+    keepOpen += !!ErrorLevel
     SetLastRowStatus(ErrorLevel)
 }
 
 If (AppXSupported && (A_UserName="Продавец" || A_UserName="Пользователь")) {
     AddLog("Запуск удаления всех приложений AppX")
     Run %comspec% /C "TITLE Удаление всех приложений AppX & "%DefaultConfigDir%\_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /Quiet",, Min UseErrorLevel, removeAppXPID
-    If (ErrorLevel)
-	keepOpen := 1
+    keepOpen += !!ErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
@@ -169,10 +165,15 @@ If (ReRunAsAdmin) {
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
     If (removeAppXPID)
 	WaitProcessEnd(removeAppXPID, "Ожидание завершения скрипта удаления AppX")
+    If (keepOpen) {
+	MsgBox 0x31, %A_ScriptName%, При выполнении скрипта возникли ошибки. Проверьте журнал и нажмите OK для перезапуска с правами администратора., 300
+	IfMsgBox TIMEOUT
+	    ExitApp
+	IfMsgBox Cancel
+	    ExitApp
+    }
     AddLog("Перезапуск от имени администратора…")
     Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
-    If (keepOpen)
-	Sleep 3600000
     ExitApp
 }
 
@@ -288,7 +289,7 @@ If (!IsObject(sharePublic)) {
 
 If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     AddLog("Найден Рарус, замена Rarus_Scripts")
-    Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts_unpack.ahk",,UseErrorLevel
+    Run "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\Rarus_Scripts_unpack.ahk",,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     EnvSet Inst1S,1
 }
@@ -436,6 +437,24 @@ If (FileExist("c:\squid\sbin\squid.exe")) {
     }
     If (!dontUpdateSquidStatus)
 	SetLastRowStatus(squidDistArcNewerThanConf, !squidDistArcNewerThanConf)
+}
+
+backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
+If (IsObject(backup_1S_baseTask)) {
+    AddLog("Задача резервного копирования 1С-Рарус", backup_1S_baseTask.mtime)
+    Loop 2
+    {
+	FileGetTime xmlmtime, %ShopBTS_InitialBaseDir%\Tasks\backup_1S_base.xml
+	xmlmtime -= % backup_1S_baseTask.mtime, Days
+	If (xmlmtime) {
+	    SetLastRowStatus("Обновление", 0)
+	    RunWait %comspec% /C "%ShopBTS_InitialBaseDir%\_shedule_backup1Sbase.cmd",,Min UseErrorLevel
+	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+	} Else {
+	    SetLastRowStatus()
+	    break
+	}
+    }
 }
 
 If (removeAppXPID)
