@@ -9,8 +9,8 @@ Loop %0%
     skipSection := 0
     Loop Read, %1%
     {
-	If (RegExMatch(A_LoopReadLine, "^\[.+\]$")) { ; Section start
-	    skipSection := RegexMatch(A_LoopReadLine, "^\[Recent")
+	If (RegExMatch(A_LoopReadLine, "S)^\[.+\]$")) { ; Section start
+	    skipSection := StartsWith(A_LoopReadLine, "[Recent")
 	    ; --- debug --- sectionName := A_LoopReadLine
 	}
 	
@@ -24,3 +24,7 @@ Loop %0%
 }
 
 Exit
+
+StartsWith(s1, s2) {
+    return SubStr(s1, 1, StrLen(s2))=s2
+}
