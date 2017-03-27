@@ -25,6 +25,8 @@ If (argc) {
 Exit
 
 SplitMaildir(dir) {
+    If (!FileExist(dir))
+	Throw Exception("SplitMaildir", "Папка не найдена", dir)
     static MaxCount := 1000
     dstLim := MaxCount
     dst := CheckCreateNewPrefix(dir, 1)
