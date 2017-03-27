@@ -99,8 +99,8 @@ EXIT /B
     SET "curFlag=!flags:~%i%,1!"
 )
 (
-    IF NOT DEFINED curFlag EXIT /B
     ENDLOCAL
+    IF "%curFlag%"=="" EXIT /B
     IF NOT DEFINED flag_%curFlag% SET "flag_%curFlag%=1"
     SET /A "i+=1"
     GOTO :ParseNextFlag
