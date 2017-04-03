@@ -46,7 +46,7 @@ If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
 	&& !FileExist(rarusbackupflag)  		    			; and no flag exist
 	&& !FileExist(backupsDir . "\" . DailyArchiveFName) 			; and no daily backup exist
 	&& !FileExist(backupsDir . "\" . DailyArchiveFName . ".tmp") 			; and no daily backup exist
-	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . "tmp")
+	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp")
 	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) {	; and monthly backup not exist or created before last boot
     ResetProgress(WaitArchivingAfterBoot)
     Loop {
@@ -94,7 +94,7 @@ If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
 	If (avgArchivingTime<30)
 	    avgArchivingTime:=180
     } Else {
-	BackupAppearanceTimeout()
+	BackupAppearanceTimeout("Вышло время ожидания ежемесячного архива (" avgArchivingTime "с)")
     }
 } Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
     If ( WaitFile(rarusbackupflag, backupsDir . "\" . DailyArchiveFName, WaitArchivingAfterBoot) ) {
@@ -108,7 +108,7 @@ If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
 	    avgArchivingTime:=30
 	}
     } Else {
-	BackupAppearanceTimeout()
+	BackupAppearanceTimeout("Вышло время ожидания ежедневного архива (" avgArchivingTime "с)")
     }
 }
 
@@ -123,7 +123,7 @@ While FileExist(rarusbackupflag) {
 	If (timeWaiting > avgArchivingTime+ExcessArcTimeLim) {
 	    Run1S()
 	    
-	    MailWarning("Резервные копии создаются очень долго", "Ожидание остановлено после " . timeWaiting . " с.")
+	    MailWarning("Резервные копии создаются очень долго", "Ожидание остановлено после " . timeWaiting . " с.`nРасчётное среднее время архивации: " . avgArchivingTime)
 	    ExitApp
 	}
 	Notify("Резеревное копирование выполняется дольше обычного.`n1C-Рарус запустится через " . ExcessArcTimeLim//60 . " мин., даже если резервное копирование не завершится", timeWaiting, timeWaiting . " с / " . avgArchivingTime+ExcessArcTimeLim . " с")
@@ -142,9 +142,9 @@ Run1S()
 
 ExitApp
 
-BackupAppearanceTimeout() {
-    MailWarning("Не создаются резервные копии 1С-Рарус")
-    MsgBox 0x116, Резервные копии 1С-Рарус не создаются, Резервные копии должны создаваться каждый день при первом включении компьютера`, но cкрипт запуска 1С-Рарус не дождался появления резервной копии.`n`nМожно`n→отменить запуск 1С-Рарус`,`n→повторить проверку резервной копии или `n→продолжить запуск 1С-Рарус несмотря на ошибку., 300
+BackupAppearanceTimeout(t:="") {
+    MailWarning("Не создаются резервные копии 1С-Рарус`n" . t)
+    MsgBox 0x116, Резервные копии 1С-Рарус не создаются, %t%`nРезервные копии должны создаваться каждый день при первом включении компьютера`, но cкрипт запуска 1С-Рарус не дождался появления резервной копии.`n`nМожно`n→отменить запуск 1С-Рарус`,`n→повторить проверку резервной копии или `n→продолжить запуск 1С-Рарус несмотря на ошибку., 300
     ;Cancel/Try Again/Continue
     IfMsgBox Timeout
 	ReloadScript()
