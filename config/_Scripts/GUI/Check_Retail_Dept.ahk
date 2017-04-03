@@ -302,13 +302,17 @@ instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", 
 If (IsObject(instCriacxocx)) {
     FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     timecriacxcab -= instCriacxocx.mtime, Days
+    ;LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
+}
+
+criacxUpdater := LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk")
+criacxUpdaterPath := criacxUpdater.Path
+AddLog(AbbreviatePath(criacxUpdaterPath))
+RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
+SetLastRowStatus(ErrorLevel,!ErrorLevel)
+	
+If (IsObject(instCriacxocx)){
     If (timecriacxcab) {
-	criacxUpdater := LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk")
-	LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
-	criacxUpdaterPath := criacxUpdater.Path
-	RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
-	SetLastRowStatus(ErrorLevel,!ErrorLevel)
-    
 	FileGetTime criacxocxTimeNew, % instCriacxocx.path
 	criacxocxTimeDiff:=criacxocxTimeNew
 	EnvSub criacxocxTimeDiff, instCriacxocx.mtime, Days
