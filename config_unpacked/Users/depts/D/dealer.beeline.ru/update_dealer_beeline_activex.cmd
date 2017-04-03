@@ -19,6 +19,7 @@ IF "%Download%"=="1" (
     "%ProgramFiles%\Internet Explorer\IEXPLORE.EXE" https://dealer.beeline.ru/dealer/criacx.cab
     ECHO Когда свежий criacx.cab будет в папке "%dest%", нажмите любую клавишу для продолжения.
     PAUSE>NUL
+    "%SystemRoot%\System32\schtasks.exe" /Run /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx"
 )
 (
 IF NOT "%secondrun%"=="1" IF NOT "%PROCESSOR_ARCHITECTURE%"=="x86" (
@@ -28,35 +29,23 @@ IF NOT "%secondrun%"=="1" IF NOT "%PROCESSOR_ARCHITECTURE%"=="x86" (
     EXIT /B
 )
 
-IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-)
-CALL :GetDir ConfigDir "%DefaultsSource%"
-IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
-(
-%exe7z% x -aoa -o"%dest%" -- "%dest%\criacx.cab"
+IF EXIST "%dest%\tmp" RD /S /Q "%dest%\tmp"
+MKDIR "%dest%\tmp"
+%SystemRoot%\System32\extrac32.exe /Y /E "%dest%\criacx.cab" /L "%dest%\tmp"
 
-FOR %%A IN ("%dest%\*.*") DO (
-    CALL :CheckUnregRemove "%SystemRoot%\SysWOW64\%%~nxA"
-    CALL :CheckUnregRemove "%SystemRoot%\System32\%%~nxA"
-)
-
-"%SystemRoot%\System32\icacls.exe" "%dest%\criacx.ocx" /grant "%sidAuthenticatedUsers%:RX"
-"%SystemRoot%\System32\regsvr32.exe" /s "%dest%\criacx.ocx"
-
-EXIT /B
-)
-
-:CheckUnregRemove
-(
-    IF EXIST "%~dp1criacx.ocx" (
-	"%SystemRoot%\System32\regsvr32.exe" /u /s "%~dp1criacx.ocx"
-	DEL "%~dp1criacx.ocx"
+FOR %%A IN ("%dest%\tmp\*.*") DO (
+    IF /I "%%~nA"=="criacx.inf" (
+	IF NOT EXIST "%SystemRoot%\Downloaded Program Files" MKDIR "%SystemRoot%\Downloaded Program Files"
+	MOVE /Y "%%~A" "%SystemRoot%\Downloaded Program Files"
+    ) ELSE IF /I "%%~nA"=="criacx" (
+	MOVE /Y "%%~A" "%SystemRoot%\System32"
+	IF /I "%%~xA"==".ocx" (
+	    "%SystemRoot%\System32\icacls.exe" "%SystemRoot%\System32\criacx.ocx" /grant "%sidAuthenticatedUsers%:RX"
+	    "%SystemRoot%\System32\regsvr32.exe" /s "%SystemRoot%\System32\criacx.ocx"
+	)
     )
-    IF EXIST %1 DEL %1
-EXIT /B
 )
-:GetDir
-(
-SET "%~1=%~dp2"
+RD "%dest%\tmp"
+
 EXIT /B
 )
