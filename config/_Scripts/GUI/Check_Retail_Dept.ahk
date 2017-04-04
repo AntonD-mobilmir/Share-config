@@ -647,7 +647,7 @@ FindLatest(mask, LoopFlags:="", ByRef latestTime:=0) {
 AbbreviatePath(path) {
     path := RegExReplace(path, "i)^\\\\Srv0(\.office0\.mobilmir)?\\(profiles\$(\\Share)?|Distributives)?\\","{Srv0}")
     If (DefaultConfigDir)
-	path := RegExReplace(path,"\Q" . DefaultConfigDir . "\E", "{DefaultConfigDir}")
+	path := RegExReplace(path,"\Q" . DefaultConfigDir . "\E", "{configDir}")
     return path
 }
 
