@@ -12,40 +12,53 @@ IF NOT DEFINED Download IF /I "%~1"=="/Unpack" SET "Download=0"
 IF NOT DEFINED Download IF /I "%~1"=="/Download" SET "Download=1"
 IF NOT DEFINED Download IF /I "%USERNAME%"=="Продавец" SET "Download=1"
 IF NOT DEFINED Download IF /I "%USERNAME%"=="Пользователь" SET "Download=1"
-)
-SET "dest=%srcpath%bin"
-IF "%Download%"=="1" (
-    ECHO Скачиваение
-    "%ProgramFiles%\Internet Explorer\IEXPLORE.EXE" https://dealer.beeline.ru/dealer/criacx.cab
-    ECHO Когда свежий criacx.cab будет в папке "%dest%", нажмите любую клавишу для продолжения.
-    PAUSE>NUL
-    "%SystemRoot%\System32\schtasks.exe" /Run /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx"
+
+SET "suffix=%~3"
+SET "dest=%~3"
 )
 (
-IF NOT "%secondrun%"=="1" IF NOT "%PROCESSOR_ARCHITECTURE%"=="x86" (
-    SET "secondrun=1"
-    SET "Download=0"
-    "%SystemRoot%\SysWOW64\cmd.exe" /C %0 %*
-    EXIT /B
+IF DEFINED suffix SET "suffix= %suffix%"
+IF NOT DEFINED dest SET "dest=%srcpath%bin"
+SET "tmpdest=%srcpath%bin\tmp"
+SET "infdest=%SystemRoot%\Downloaded Program Files"
 )
+(
 
-IF EXIST "%dest%\tmp" RD /S /Q "%dest%\tmp"
-MKDIR "%dest%\tmp"
-%SystemRoot%\System32\extrac32.exe /Y /E "%dest%\criacx.cab" /L "%dest%\tmp"
+    IF "%Download%"=="1" (
+	ECHO Скачиваение
+	"%ProgramFiles%\Internet Explorer\IEXPLORE.EXE" https://dealer.beeline.ru/dealer/criacx.cab
+	ECHO Когда свежий criacx.cab будет в папке "%dest%", нажмите любую клавишу для продолжения.
+	PAUSE>NUL
+	"%SystemRoot%\System32\schtasks.exe" /Run /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx"
+	EXIT /B
+    )
+    IF /I "%PROCESSOR_ARCHITECTURE%" NEQ "x86" IF NOT "%secondrun%"=="1" (
+	ENDLOCAL
+	SET "secondrun=1"
+	SET "Download=0"
+	"%SystemRoot%\SysWOW64\cmd.exe" /C "%0 %*"
+	EXIT /B
+    )
+    IF EXIST "%tmpdest%" RD /S /Q "%tmpdest%"
+    MKDIR "%tmpdest%"
+    %SystemRoot%\System32\extrac32.exe /Y /E "%dest%\criacx.cab" /L "%tmpdest%"
 
-FOR %%A IN ("%dest%\tmp\*.*") DO (
-    IF /I "%%~nA"=="criacx.inf" (
-	IF NOT EXIST "%SystemRoot%\Downloaded Program Files" MKDIR "%SystemRoot%\Downloaded Program Files"
-	MOVE /Y "%%~A" "%SystemRoot%\Downloaded Program Files"
-    ) ELSE IF /I "%%~nA"=="criacx" (
-	MOVE /Y "%%~A" "%SystemRoot%\System32"
-	IF /I "%%~xA"==".ocx" (
-	    "%SystemRoot%\System32\icacls.exe" "%SystemRoot%\System32\criacx.ocx" /grant "%sidAuthenticatedUsers%:RX"
-	    "%SystemRoot%\System32\regsvr32.exe" /s "%SystemRoot%\System32\criacx.ocx"
+    FOR %%A IN ("%tmpdest%\*.*") DO (
+	IF /I "%%~nA"=="criacx" (
+	    IF /I "%%~xA"==".inf" (
+		IF NOT EXIST "%infdest%" MKDIR "%infdest%"
+		MOVE /Y "%%~A" "%infdest%"
+	    ) ELSE (
+		MOVE /Y "%%~A" "%dest%"
+		IF /I "%%~xA"==".ocx" (
+		    "%SystemRoot%\System32\icacls.exe" "%dest%\criacx.ocx" /grant "%sidAuthenticatedUsers%:RX"
+		    "%SystemRoot%\System32\regsvr32.exe" /s "%dest%\criacx.ocx"
+		    REG IMPORT "%~dp0\reg\32-bit LM%suffix%.reg" /reg:32
+		)
+	    )
 	)
     )
-)
-RD "%dest%\tmp"
+    RD "%tmpdest%"
 
 EXIT /B
 )
