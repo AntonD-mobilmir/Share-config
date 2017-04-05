@@ -11,7 +11,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 )
-FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%srcpath%AutoHotkey*_Install.exe"`) DO (
+FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%srcpath%AutoHotkey_*_setup.exe"`) DO (
     "%srcpath%%%~I" /s
     rem to extract without associating: /D="%ProgramFiles%\AutoHotkey" /E
     GOTO :ExitForFindInstaller
