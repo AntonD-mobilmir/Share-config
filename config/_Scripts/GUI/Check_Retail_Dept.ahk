@@ -135,7 +135,7 @@ Loop Reg, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\U
     }
 }
 If (userFoldersChk) {
-    SetLastRowStatus()
+    SetLastRowStatus("OK")
 } Else {
     MsgBox 4, %A_ScriptName%, Некоторые папки пользователя недоступны. Из-за этого могут также не работать библиотеки.`n`nСбросить пути к папкам пользователя на стандартные?
     IfMsgBox Yes
@@ -262,7 +262,7 @@ If (FileExist("D:\Credit")) {
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-sharePublic := CheckPath("D:\Users\Public", 0)
+sharePublic := CheckPath("D:\Users\Public", "")
 If (!IsObject(sharePublic)) {
     If (FileExist("W:\Media")) {
 	AddLog("Обнаружена папка W:\Media")
@@ -603,12 +603,13 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
 	If (logTime==2) {
 	    logTime=
 	    logTime-=mtime, Days
+	    logTime = возраст: %logTime% дн.
 	} Else If (logTime==1) {
-	    logTime:=mtime
+	    FormatTime logTime, mtime, yyyy-MM-dd HH:mm:ss
 	}
     } Else {
-	If logTime is integer
-	    logTime:="Не найден"
+;	If logTime is integer
+	logTime:="Не найден"
     }
     line := AddLog(AbbreviatePath(path), logTime, checkboxIfExist & (exist!=""))
     If (exist)
