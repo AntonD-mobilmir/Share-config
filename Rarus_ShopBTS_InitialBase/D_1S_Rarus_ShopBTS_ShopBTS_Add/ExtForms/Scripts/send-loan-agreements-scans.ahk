@@ -7,7 +7,8 @@ SetFormat IntegerFast, D
 OnExit("ExitFunc")
 
 global mainTitle := "Отправка сканов договоров в КРО"
-     , settingsRegPath := "HKEY_CURRENT_USER\Software\mobilmir.ru\Rarus-Scripts\%A_ScriptName%"
+     , settingsRegPathOld := "HKEY_CURRENT_USER\Software\mobilmir.ru\Rarus-Scripts\%A_ScriptName%"
+     , settingsRegPath := "HKEY_CURRENT_USER\Software\mobilmir.ru\Rarus-Scripts\" . A_ScriptName
      , outMailDir := A_ScriptDir . "\..\post\OutgoingText"
      , MailUserId, replyTo
 
@@ -172,6 +173,12 @@ SelectAddFiles() {
     static iconArray := {}
 
     RegRead lastUsedDir, %settingsRegPath%, LastUsedDir
+    If (ErrorLevel) {
+	RegRead lastUsedDir, %settingsRegPathOld%, LastUsedDir
+	If (!ErrorLevel) {
+	    deleteOldAfterWrite := 1
+	}
+    }
     If (!LastUsedDir) {
 	RegRead CommonPictures, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders, CommonPictures
 	lastUsedDir := Expand(CommonPictures) . "\Сканированное"
@@ -197,7 +204,10 @@ SelectAddFiles() {
     GuiControl +Redraw, FilesListView
 ;    SetFormat FloatFast, %prevFormat%
     
-    RegWrite REG_SZ, %settingsRegPath%, lastUsedDir
+    RegWrite REG_SZ, %settingsRegPath%, LastUsedDir, %lastUsedDir%
+    If (deleteOldAfterWrite) {
+	RegDelete %settingsRegPathOld%
+    }
     GuiControl Focus, FilesListView
 }
 
