@@ -48,8 +48,7 @@ If (!mailProfileDir)
 
 ;MsgBox,,%A_ScriptName% Debug, MailUserId = "%MailUserId%"`nMailDomain = "%MailDomain%"`nmailProfileDir = "%mailProfileDir%"
 
-IfExist %mailProfileDir%\prefs.js
-{
+If (FileExist(mailProfileDir . "\prefs.js")) {
     MsgBox 35,, "%mailProfileDir%" уже существует.`nВсё равно копировать шаблон и генерировать ключ?`n(если нет`, просто будет записан путь к профилю в [Profile0] в profiles.ini)
 
     IfMsgBox Cancel
@@ -68,13 +67,12 @@ IfExist %mailProfileDir%\prefs.js
 
 If (!skipCreatingProfile) {
     FileCreateDir %mailProfileDir%
-    IfNotExist %mailProfileDir%
-    {
+    FileCopyDir %A_ScriptDir%\default_profile_template, %mailProfileDir%, 1
+    If (!FileExist(mailProfileDir . "\*.*")) {
 	MsgBox Не удалось создать "%mailProfileDir%"!
 	Exit
     }
 
-    FileCopyDir %A_ScriptDir%\default_profile_template, %mailProfileDir%, 1
     Run %A_windir%\System32\compact.exe /C /S:"%mailProfileDir%\Mail" /I, %mailProfileDir%, Min UseErrorLevel
     Run %A_windir%\System32\compact.exe /C /S:"%mailProfileDir%\ImapMail" /I, %mailProfileDir%, Min UseErrorLevel
 
