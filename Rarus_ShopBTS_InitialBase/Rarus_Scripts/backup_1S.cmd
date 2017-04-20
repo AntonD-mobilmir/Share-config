@@ -73,8 +73,8 @@ EXIT /B
 :EXITWITHERROR
 (
     DEL "%rarusbackupflag%"
-    ECHO %DATE% TIME% Backup process terminated
-    ECHO %DATE% TIME% Backup process terminated>>"%rarusbackuplogfile%"
+    ECHO %DATE% %TIME% Backup process terminated
+    ECHO %DATE% %TIME% Backup process terminated>>"%rarusbackuplogfile%"
     SET "ExitErrorLevel=1"
 EXIT /B
 )
