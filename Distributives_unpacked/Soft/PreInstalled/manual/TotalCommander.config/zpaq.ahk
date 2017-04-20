@@ -55,6 +55,7 @@ Loop Read, %2%
 	}
     } Else {
 	MsgBox Command unsupported: %cmd%
+	ExitApp
     }
 }
 
@@ -91,7 +92,7 @@ If (cmd="l") {
     ; zpaq m4: 2h 15 m,	 8.4 GB
     
     ;WaitCPUIdle(zpaqPID)
-    Run %comspec% /U /C "CHCP 65001 & START "" /B /WAIT /D "\\?\%curBasePath%" %zpaqexe% a "%3%%arcName%.m3.zpaq" %filesList% -m3 2>>"%3%%arcName%.m3.errors.log" %redirCmd% "%3%%arcName%.m3.log" %cmdSuffix%",%curBasePath%,Min,zpaqPID
+    Run %comspec% /U /C "CHCP 65001 & START "" /B /LOW /WAIT /D "\\?\%curBasePath%" %zpaqexe% a "%3%%arcName%.m3.zpaq" %filesList% -m3 2>>"%3%%arcName%.m3.errors.log" %redirCmd% "%3%%arcName%.m3.log" %cmdSuffix%",%curBasePath%,Min,zpaqPID
 }
 
 ExitApp
