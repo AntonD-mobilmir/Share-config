@@ -1,6 +1,6 @@
 @REM coding:OEM
 IF NOT EXIST "%SystemDrive%\BOOT.INI" EXIT /B 1
-IF NOT DEFINED sedexe CALL "%~dp0find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || EXIT /B
+IF NOT DEFINED sedexe CALL "%~dp0findsedexe.cmd" || EXIT /B
 
 %sedexe% "s#/NoExecute=OptIn#/NoExecute=OptOut#ig" %SystemDrive%\BOOT.INI >%SystemDrive%\BOOT.NEW.INI || EXIT /B
 ATTRIB -R -H -S %SystemDrive%\BOOT.INI || EXIT /B

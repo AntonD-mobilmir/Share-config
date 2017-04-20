@@ -37,7 +37,8 @@ EXIT /B
 )
 :overwritecfg2
 (
-IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
+rem IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
+IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\findsedexe.cmd" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
 IF NOT DEFINED mtprofiledir CALL :CheckExistenceSetVar mtprofiledir d:\Mail\Thunderbird\profile
 )
 (
