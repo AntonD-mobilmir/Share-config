@@ -4,6 +4,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 
     FOR /D %%I IN ("%SystemDrive%\Users\*") DO (
 	CALL :RemoveCheckKill "%%~I\AppData\Local\Programs"
+	CALL :RemoveCheckKill "%%~I\AppData\Local\Microsoft\OneDrive"
     )
 EXIT /B
 )
