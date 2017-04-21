@@ -74,7 +74,7 @@ EXIT /B
     )
     IF "%DontCompressLocal%"=="1" EXIT /B
     ECHO Запуск сжатия и дефрагментации %1
-    IF EXIST "%~dp0compress and defrag.cmd" START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C "%~dp0compress and defrag.cmd" %*
+    START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C ""%~dp0compress and defrag WindowsImageBackup.cmd" %1"
 EXIT /B
 )
 :IfUNC <path>
