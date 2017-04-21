@@ -89,7 +89,7 @@ If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
     || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName)
     || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp") ) { ; ежемесячного архива нет (если архивация работает, он будет создан), или он создан после загрузки. В этом случае ежедневного архива не будет до следующей перезагрузки.
     ; Ежемесячный архив может создаваться долго: 1-2 минуты перед появлением файла, и ещё 2-3 до создания архива. При этом r:\rarus-backup-start.log будет пустой с актуальной датой.
-    If ( WaitFile(rarusbackupflag, backupsDir . "\" . MonthlyArchiveFName, WaitArchivingAfterBoot) ) {
+    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . MonthlyArchiveFName, backupsDir . "\" . MonthlyArchiveFName . ".tmp"], WaitArchivingAfterBoot) ) {
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_????-??.7z")
 	If (avgArchivingTime<30)
 	    avgArchivingTime:=180
@@ -97,7 +97,7 @@ If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
 	BackupAppearanceTimeout("Вышло время ожидания ежемесячного архива (" avgArchivingTime "с)")
     }
 } Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
-    If ( WaitFile(rarusbackupflag, backupsDir . "\" . DailyArchiveFName, WaitArchivingAfterBoot) ) {
+    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . DailyArchiveFName, backupsDir . "\" . DailyArchiveFName . ".tmp"], WaitArchivingAfterBoot) ) {
 	If (A_MM==1) {
 	    prevMonth := A_Year-1 . "-12"
 	} Else {
@@ -229,18 +229,23 @@ CalcAvgWritingTime(paths*) {
 	return -1
 }
 
-WaitFile(flag, path, timeout, note:="") {
+WaitFile(flag, paths, timeout, note:="") {
+    If (!IsObject(paths))
+	paths := [paths]
     If (!note)
 	note := "Ожидание появления файла " . path
     ResetProgress(timeout >> 8)
     endTime := A_TickCount + timeout
-    While (!FileExist(path) && (flag=="" || FileExist(flag))) {
+    While (flag && FileExist(flag)) {
+	For i,v in paths {
+	    If (e := FileExist(path))
+		return e
 	If (A_TickCount > endTime) {
 	    Progress Off
 	    return
 	}
-	Sleep 250
 	Notify(note, (endTime - A_TickCount) >> 8)
+	Sleep 250
     }
     return FileExist(path)
 }
