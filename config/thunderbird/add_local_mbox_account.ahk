@@ -21,8 +21,8 @@ FileDelete %tmpPrefs%
 If (FileExist(tmpPrefs))
     Throw "Не удалось удалить временный файл"
 
-WinClose ahk_exe thunderbird.exe
 While FileExist(mtProfileDir . "\parent.lock") {
+    WinClose ahk_exe thunderbird.exe
     If (!splashOn) {
 	Progress AM ZH0, При выходе Thunderbird перезаписывает prefs.js`, так что добавить учётную запись в открытый профиль нельзя., Профиль занят`, ожидание освобождения., %A_ScriptName%
 	splashOn := 1
