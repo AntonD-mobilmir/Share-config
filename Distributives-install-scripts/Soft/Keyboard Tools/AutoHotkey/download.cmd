@@ -26,7 +26,7 @@ FOR /F "usebackq tokens=1" %%I IN ("%workdir%ver.txt") DO SET "ver=%%I"
 IF NOT "%ver:~0,2%"=="1." EXIT /B 1
 
 SET "distfmask=AutoHotkey_*_setup.exe"
-SET "dstfname=AutoHotkey_%ver%m_setup.exe"
+SET "dstfname=AutoHotkey_%ver%_setup.exe"
 CALL :linkdst "%workdir%%fname%"
 
 EXIT /B
