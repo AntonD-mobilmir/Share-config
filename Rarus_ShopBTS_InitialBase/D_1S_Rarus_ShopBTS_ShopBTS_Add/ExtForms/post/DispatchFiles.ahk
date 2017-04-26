@@ -125,9 +125,9 @@ DeliverOneEmail(EmailFileName) {
 
     CheckTrayIcon()
     
-    static encodedFrom:="=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>"
-	 , bcc:="rarus-emails-replies_status-mobilmir-ru@googlegroups.com"
-         , smtpServer, smtpLogin, smtpPassword
+    static bcc:="rarus-emails-replies_status-mobilmir-ru@googlegroups.com"
+         , smtpServer, smtpLogin, smtpPassword, encodedFrom
+	 ;, encodedFrom:="=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>"
     If (!smtpServer) {
 	Loop Read, %A_ScriptDir%\DispatchFiles-NotificationsAccount.pwd
 	{
@@ -140,10 +140,12 @@ DeliverOneEmail(EmailFileName) {
 		break
 	    }
 	}
+	encodedFrom := "=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <" . smtpLogin . ">"
     }
-    If (!smtpServer || !smtpLogin || !smtpPassword)
+    If (!(smtpServer && smtpLogin && smtpPassword))
 	Throw Exception("Отправка уведомлений из 1С-Рарус не работает, немедленно свяжитесь со службой ИТ!", "Из файла DispatchFiles-NotificationsAccount.pwd не прочитались сервер или реквизиты учётной записи")
     
+    ; not static, can be changed based on following file contents
     replyToHeader = -o "reply-to=rarus-emails-replies@status.mobilmir.ru"
     
     FileRead emailFileText, %EmailFileName%
