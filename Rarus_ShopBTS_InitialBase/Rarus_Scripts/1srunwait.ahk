@@ -9,6 +9,7 @@ WaitArchivingAfterBoot:=5*60*1000 ; ms
 
 DailyArchiveFName = ShopBTS_%A_Year%-%A_MM%-%A_DD%.7z
 MonthlyArchiveFName = ShopBTS_%A_Year%-%A_MM%.7z
+zpaqFName = %A_YYYY%.zpaq
 
 IfWinExist 1С:Предприятие ahk_exe %run1sexe%
 {
@@ -31,6 +32,7 @@ run1spath=%lProgramFiles%\1Cv77\BIN
 params := ParseCommandLine()
 
 rarusbackupflag := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "rarusbackupflag")
+rarusbackupzpaqerrfile := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "rarusbackupzpaqerrfile")
 If (!rarusbackupflag) {
     MailWarning("Не удалось прочитать расположение флага архивации")
     MsgBox 0x24, Ошибка при выполнении скрипта запуска 1С, Не удалось получить размещение флага архивации`, поэтому невозможно определить`, идет ли архивация.`nЗапустить 1С`, игнорируя возможный процесс архивации?`n`n`(если 1С запустить во время архивации`, в работе как 1С`, так и архиватора может произойти сбой), 300
@@ -43,11 +45,12 @@ If (!rarusbackupflag) {
 backupsDir := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "destdir")
 
 If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
-	&& !FileExist(rarusbackupflag)  		    			; and no flag exist
-	&& !FileExist(backupsDir . "\" . DailyArchiveFName) 			; and no daily backup exist
-	&& !FileExist(backupsDir . "\" . DailyArchiveFName . ".tmp") 			; and no daily backup exist
-	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp")
-	&& !FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) {	; and monthly backup not exist or created before last boot
+	&& !(  FileExist(rarusbackupflag)  		    			; and no: flag
+	    || FileExist(backupsDir . "\" . zpaqFName)  		    	; 	or zpaq archive
+	    || FileExist(backupsDir . "\" . DailyArchiveFName) 			; 	or daily backup
+	    || FileExist(backupsDir . "\" . DailyArchiveFName . ".tmp")		; 	or daily backup temp exist
+	    || FileExist(backupsDir . "\" . MonthlyArchiveFName . ".tmp")	; 	or temporary file of monthly archive exist
+	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) ) { ;	or monthly backup created after last boot (e.g. just now) - because if it's created before last boot, we should wait daily archive instead
     ResetProgress(WaitArchivingAfterBoot)
     Loop {
 	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, A_TickCount//1000 . " / " . WaitArchivingAfterBoot//1000)
@@ -84,17 +87,24 @@ If ErrorLevel
     }
 }
 
-If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
-      || FileExist(backupsDir . "\" . MonthlyArchiveFName . ".tmp") )
-    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName)
-    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp") ) { ; ежемесячного архива нет (если архивация работает, он будет создан), или он создан после загрузки. В этом случае ежедневного архива не будет до следующей перезагрузки.
+If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
+    ; ToDo: рассчитать время создания архива по значениям в %rarusbackupzpaqerrfile%
+    If (!FileExist(backupsDir . "\" . zpaqFName)) { ; но нет архива за текущий год
+	avgArchivingTime := 600
+	If (!WaitFile(rarusbackupflag, backupsDir . "\" . zpaqFName, WaitArchivingAfterBoot))
+	    BackupAppearanceTimeout("Вышло время ожидания появления архива zpaq (" avgArchivingTime " с)")
+    } Else {
+	avgArchivingTime := 300
+    }
+} Else If ( !FileExist(backupsDir . "\" . MonthlyArchiveFName) ; если ежемесячного архива нет
+	 || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp") ; или есть временный файл ежемесячного архива
+	 || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) { ;или ежемесяный архив уже существует и создан после загрузки (ежедневного архива не будет до следующей перезагрузки)
+    ; то ожидание ежемесячного архива
     ; Ежемесячный архив может создаваться долго: 1-2 минуты перед появлением файла, и ещё 2-3 до создания архива. При этом r:\rarus-backup-start.log будет пустой с актуальной датой.
     If ( WaitFile(rarusbackupflag, [backupsDir . "\" . MonthlyArchiveFName, backupsDir . "\" . MonthlyArchiveFName . ".tmp"], WaitArchivingAfterBoot) ) {
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_????-??.7z")
-	If (avgArchivingTime<30)
-	    avgArchivingTime:=180
     } Else {
-	BackupAppearanceTimeout("Вышло время ожидания ежемесячного архива (" avgArchivingTime "с)")
+	BackupAppearanceTimeout("Вышло время ожидания ежемесячного архива (" avgArchivingTime " с)")
     }
 } Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
     If ( WaitFile(rarusbackupflag, [backupsDir . "\" . DailyArchiveFName, backupsDir . "\" . DailyArchiveFName . ".tmp"], WaitArchivingAfterBoot) ) {
@@ -104,13 +114,12 @@ If ( !( FileExist(backupsDir . "\" . MonthlyArchiveFName)
 	    prevMonth := A_Year . "-" . SubStr("0" . A_MM-1, -1)
 	}
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_" . prevMonth . "-??.7z", backupsDir . "\ShopBTS_" . A_Year . "-" . A_MM . "-??.7z")
-	If (avgArchivingTime<30) {
-	    avgArchivingTime:=30
-	}
     } Else {
-	BackupAppearanceTimeout("Вышло время ожидания ежедневного архива (" avgArchivingTime "с)")
+	BackupAppearanceTimeout("Вышло время ожидания ежедневного архива (" avgArchivingTime " с)")
     }
 }
+If (avgArchivingTime<30)
+    avgArchivingTime:=180
 
 ResetProgress(avgArchivingTime)
 
@@ -237,9 +246,8 @@ WaitFile(flag, paths, timeout, note:="") {
     ResetProgress(timeout >> 8)
     endTime := A_TickCount + timeout
     While (flag && FileExist(flag)) {
-	For i,v in paths {
-	    If (e := FileExist(path))
-		return e
+	If (path := FirstExisting(paths))
+	    return path
 	If (A_TickCount > endTime) {
 	    Progress Off
 	    return
@@ -247,7 +255,13 @@ WaitFile(flag, paths, timeout, note:="") {
 	Notify(note, (endTime - A_TickCount) >> 8)
 	Sleep 250
     }
-    return FileExist(path)
+    return FirstExisting(paths)
+}
+
+FirstExisting(paths) {
+    For i,path in paths
+	If (FileExist(path))
+	    return path
 }
 
 ResetProgress(pRange:=0) {
