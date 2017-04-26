@@ -20,6 +20,19 @@ tmpPrefs=%mtProfileDir%\prefs.js.tmp
 FileDelete %tmpPrefs%
 If (FileExist(tmpPrefs))
     Throw "Не удалось удалить временный файл"
+
+WinClose ahk_exe thunderbird.exe
+While FileExist(mtProfileDir . "\parent.lock") {
+    If (!splashOn) {
+	Progress AM ZH0, При выходе Thunderbird перезаписывает prefs.js`, так что добавить учётную запись в открытый профиль нельзя., Профиль занят`, ожидание освобождения., %A_ScriptName%
+	splashOn := 1
+    }
+    Sleep 1000
+    FileDelete %mtProfileDir%\parent.lock
+}
+If (splashOn)
+    SplashTextOff
+
 Loop Read, %mtProfileDir%\prefs.js, %tmpPrefs%
 {
     ;NewStr := RegExReplace(Haystack, NeedleRegEx [, Replacement = "", OutputVarCount = "", Limit = -1, StartingPosition = 1])
