@@ -12,15 +12,16 @@ Try {
     ;SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
     SplitPath destdir,,,,,destdrive
 
+    FileDelete %destdir%\*.tmp
     Loop %destdir%\*
     {
 	If (MaxSize < A_LoopFileSizeMB)
 	    MaxSize:=A_LoopFileSizeMB
 	BackupArchivesList .= A_LoopFileTimeModified . A_Tab . A_LoopFileName "`n"
     }
-
+    
     If !MaxSize
-	Throw ("In destdir, No files of size > 0")
+	Throw ("In destdir, no files with size > 0")
 
     Sort BackupArchivesList, C
 
