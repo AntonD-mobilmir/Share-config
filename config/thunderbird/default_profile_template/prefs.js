@@ -84,7 +84,9 @@ user_pref("config.trim_on_minimize", true);
 user_pref("extension.displayquota.donotwarn", false);
 user_pref("extension.displayquota.warnpercent", 65);
 user_pref("extension.displayquota.whenusenotif", 2);
+user_pref("extensions.AutoResizeImage.confirmResizing", false);
 user_pref("extensions.AutoResizeImage.filterMinimumSize", true);
+user_pref("extensions.AutoResizeImage.inlineImageTypes", 60);
 user_pref("extensions.AutoResizeImage.interactiveMode", false);
 user_pref("extensions.AutoResizeImage.maxResolutionX", 9);
 user_pref("extensions.AutoResizeImage.maxResolutionY", 9);
@@ -93,6 +95,7 @@ user_pref("extensions.AutoResizeImage.maxTriggerXList", "120,240,320,512,640,800
 user_pref("extensions.AutoResizeImage.maxTriggerY", 9);
 user_pref("extensions.AutoResizeImage.maxTriggerYList", "120,240,320,512,640,800,1024,1280,1600,2048");
 user_pref("extensions.AutoResizeImage.minimumSize", 512);
+user_pref("extensions.AutoResizeImage.selectedAttachmentResizing", true);
 user_pref("extensions.addressbookssync.autodownload", true);
 user_pref("extensions.addressbookssync.checkLastModTime", false);
 user_pref("extensions.addressbookssync.downloadpolicy", "overwrite");
