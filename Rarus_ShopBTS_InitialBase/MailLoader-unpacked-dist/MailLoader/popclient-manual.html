@@ -1,0 +1,111 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta name="keywords" content="command,line,pop,client,receive,receiver,e-mail,batch,download,directory,pop3">
+		<meta name="description" content="Command Line POP Client manual">
+		<style> 
+		<!-- 
+	body { margin: 2px 10px 0px 10px; padding: 0px 0px 0px 0px; background: #ffffff; color: #000000; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 70%; width: 100%; }
+	h1, h2 { font-family: Verdana, Arial, Helvetica, sans-serif; margin-left: 0px; font-weight: bold; margin-top: 0em; margin-bottom: 0em; }
+	h1 { font-size: 150%; }
+	h2 { font-size: 130%; }
+	p { margin: .5em 0em .5em 0em; }
+	div#dtHoverText { color: #000066; }
+	a:link { color: #0000ff; }
+	a:visited { color: #666699; }
+	a:hover { color: #3366ff; }
+	table { width: 100%; margin-top: .6em; margin-bottom: .3em; font-size: 100%; background-color: #999999; border-width: 1px 1px 0px 0px; border-style: solid; border-color: #999999; }
+	th, td { border-style: solid; border-width: 0px 0px 1px 1px; border-style: solid; border-color: #999999; padding: 4px 6px; text-align: left; }
+	th { background: #cccccc; vertical-align: bottom; }
+	td { background: #ffffff; vertical-align: top; }
+	p.indent {text-indent: 1cm}
+
+
+pre
+	{
+	margin-top: .5em;
+	margin-bottom: .5em; 
+	white-space: pre-wrap;       
+	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ *//* css-3 */
+}
+
+pre, code, .code
+	{
+	font: 100% Monospace, Courier New, Courier; /* This is 100% of 70% */
+	color: #000066;
+	}
+
+
+
+	--></style>
+	<title>Command Line POP Client manual</title>
+	</head>
+	<body>
+		<h1>Command Line POP Client   users manual</h1>
+		<P>&nbsp;</P>
+		<h1>Table of contents<br></h1>
+	<h2>
+			1. <a href="#1">Introduction</a><br>
+			2. <a href="#2">Install and uninstall</a><br>
+			3. <a href="#3">Using Command Line POP Client </a><br>
+		4. <a href="#4">Final word </a>
+    </h2>
+		<p>&nbsp;</p>
+		<hr>
+		<p>&nbsp;</p>
+			<H1>1 Introduction</H1>
+		<p class="text">Command Line POP Client is a free utility that allows you to receive your e-mails to a local directory. This e-mail POP client is robust and light weight. The settings are defined in an xml file. It is suitable for batch jobs or whenever there is a need to download e-mails as a files into a folder. This mail receiver supports the POP3 protocol. </p>
+		<p class="text">It is compatible for Windows 95, 98, Me, NT, 2000, XP and 2003. </p>
+		<p>&nbsp;</p>
+		<hr>
+		<p>&nbsp;</p>
+		<H1>2 Install and uninstall<a name="2"></a></H1>		
+		<p>&nbsp;</p>
+		<H2>2.1 Install</H2>
+		<p>Download it and run it, follow the install instructions.</p>
+		<p>&nbsp;</p>
+		<H2>2.2 Uninstall</H2>
+		<p>Uninstall it from the Add/Remove programs feature in the the control panel. </p>
+		<p>&nbsp;</p>
+		<hr>
+		<p>&nbsp;</p>
+		<H1>3&nbsp;Using Command Line POP Client<a name="3"></a></H1>
+		<H1>&nbsp;</H1>
+		<h2>3.1 Changing the settings</h2>
+		<p>The settings are defined in an xml file, you can create as many xml files as you wish. For example, you can have one settings file for each account. A default config file called democonfig.xml can be found under the directory of installation (default is 'c:\program files\command line pop client\'). Open this file in a text editor such as notepad. Make the settings for your e-mail account and save the file. </p>
+		<p>&nbsp;</p>
+		<h2>3.2 Receiving e-mail </h2>
+		<p> After that you have installed the software, start a command dos prompt (on XP: Start-&gt;run-&gt;cmd), then go to the directory of installation (default is 'c:\program files\command line pop client\). </p>
+		<p>&nbsp; </p>
+		<p>Run the pop client with an argument called '-configfile' that specifies the config file. For example, if you wish to receive the e-mail of the account you specified in section 3.1:</p>
+		<p>popclient.exe -configfile democonfig.xml</p>
+		<p>&nbsp;</p>
+		<p>If you wish to receive the e-mail silently, add the flag -quiet.</p>
+		<p>popclient.exe -configfile democonfig.xml -quiet </p>
+		<H1>&nbsp;</H1>
+		<h2>3.3  Schedule it to receive e-mails at time intervals </h2>
+		<p>Set up Command Line POP Client to run automatically use the Windows Task Scheduler. Here is a step by step guide: </p>
+		<p>1. Open the Windows Task Scheduler through Start-&gt;All Programs-&gt;Accessories-&gt;System Tools-&gt;Scheduled Tasks. </p>
+		<p>2. Double-Click on 'Add new scheduled task' and click on 'Next' in the schedule task dialog. </p>
+		<p>3. Click on 'Browse' and find popclient.exe (default under 'c:\program files\command line pop client\') and click on 'Next'. </p>
+		<p>4. Choose when you want it to run and click on 'Next' and follow the instructions until you get to the last page. </p>
+		<p>5. On the final page, select 'Open advanced settings...' and click on 'Finish'. </p>
+		<p>6. In the advanced settings dialog, add to the 'Run:' field a space followed by the command-line options. </p>
+		<p>E.g. 'C:\Program\Command Line POP Client 1.00\popclient.exe -configfile democonfig.xml' or </p>
+		<p>'C:\Program\Command Line POP Client 1.00\popclient.exe -configfile democonfig.xml -quiet'</p>
+		<p>7. Click on 'Ok'. </p>
+		<H1>&nbsp;</H1>
+		<h2>&nbsp;</h2>
+		<hr>
+		<p>&nbsp;</p>
+
+		<H1>4&nbsp;Final word <a name="4" id="4"></a></H1>
+		<P>Please don't hesitate to 
+			contact us with your questions or comments!</P>
+		<P>&nbsp;</P>
+		<P>Copyright <a href="http://www.codeode.com/index.html"> Codeode</a> 2005.</P>
+	</body>
+</html>

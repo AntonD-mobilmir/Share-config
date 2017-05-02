@@ -10,4 +10,5 @@ PUSHD "%~dp0"
 POPD
 %exe7z% x -aoa -o"%USERPROFILE%\Git\Share-config\Rarus_ShopBTS_InitialBase\Rarus_Scripts" -- Rarus_Scripts.7z
 %exe7z% x -aoa -o"%USERPROFILE%\Git\Share-config\Rarus_ShopBTS_InitialBase\D_1S_Rarus_ShopBTS_ShopBTS_Add" -- D_1S_Rarus_ShopBTS\ShopBTS_Add.7z
+%exe7z% x -aoa -o"%USERPROFILE%\Git\Share-config\Rarus_ShopBTS_InitialBase\MailLoader-unpacked-dist" -xr!*.exe -xr!*.chm -- MailLoader\dist.7z
 )

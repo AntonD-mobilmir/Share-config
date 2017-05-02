@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  This is the configuration file for Command Line Pop Client. I've developed this 
+  program on my spare time and if you find it useful and want to support me, see
+  www.codeode.com/donate.html. You can reach me here: support@codeode.com
+-->
+
+<ConfigData>
+
+	/*
+		Server
+		Specifies the address to the pop server. For example pop.mymailserver.com
+	*/
+	<Server>127.0.0.1</Server>
+
+	/*
+		Port
+		Specifies the port to connect to on the server. Usually it is 110.
+	*/
+	<Port>110</Port>
+
+	/*
+		Username
+		Specifies the mailbox username.
+	*/
+	<Username>{username}</Username>
+
+	/*
+		Password
+		Specifies the password for the mailbox user.
+	*/
+	<Password>{password}</Password>
+
+	/*
+		DeleteFromServer
+		Specifies if messages should be deleted from the server after they have been received.
+	*/
+	<DeleteFromServer>true</DeleteFromServer>
+
+	/*
+		OnlyDownloadOnce
+		Specifies if messages are to be downloaded only once. If messages are kept on the
+		server (DeleteFromServer is set to false) and you only want to download new messages
+		set this flag to true.
+	*/
+	<OnlyDownloadOnce>false</OnlyDownloadOnce>
+
+  /*
+  SaveMessagesDirectory
+  Specifies where the downloaded messages will be saved. Messages will be saved
+  as plaintext. The filenames will be named by the message subject and a unique
+  identifier. Leave it empty to download e-mails to the default direcotry called
+  'received' that is normally located at 'c:\program files\command line pop client\received\'.
+  */
+  <SaveMessagesDirectory>d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\received</SaveMessagesDirectory>
+
+  /*
+  SaveAttachments
+  Specifies if attachments should be saved independently of the containing email. If set to true - SaveAttachmentDirectory
+  will specify where they are saved.
+  */
+  <SaveAttachments>false</SaveAttachments>
+
+  /*
+    SaveAttachmentsDirectory
+    Specifies where emails attachments will be saved. The attachments will be named by
+    the attachment filename and a unique identifier. Leave it empty to save attachments 
+    to the default direcotry called 'attachments' that is normally located at
+    'c:\program files\command line pop client\attachments\'.
+  */
+  <SaveAttachmentsDirectory></SaveAttachmentsDirectory>
+
+</ConfigData>
