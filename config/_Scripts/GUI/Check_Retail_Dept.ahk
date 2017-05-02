@@ -8,7 +8,6 @@ ProxySettingsIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
 EnvironmentRegKey	= Environment
 ProxyOverride		= <local>
 
-
 arg1=%1%
 ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
 
