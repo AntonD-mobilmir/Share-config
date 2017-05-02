@@ -12,6 +12,8 @@ SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
 SET "RarusPostDir=d:\1S\Rarus\ShopBTS\ExtForms\post\"
 SET "overwritecfg=1"
+
+CALL "%~dp0MailLoader\install.cmd"
 )
 CALL :GetDir ConfigDir %DefaultsSource%
 
