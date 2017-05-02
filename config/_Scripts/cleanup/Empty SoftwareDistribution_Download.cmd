@@ -20,12 +20,13 @@ DEL "%ProgramData%\Microsoft\Network\Downloader\qmgr0.dat"
 DEL "%ProgramData%\Microsoft\Network\Downloader\qmgr1.dat"
 
 IF /I "%~1"=="/NOWAIT" EXIT /B
-IF NOT "%~1"=="" EXIT /B
-ECHO При продолжении служба обновления будет снова запущена
-PAUSE
+IF "%~1"=="" (
+    ECHO При продолжении служба обновления будет снова запущена
+    PAUSE
+) ELSE (
+    PING 127.0.0.1 -n 30
+)
+
 SC START BITS
 SC START WUAUSERV
-
-PING 127.0.0.1 -n 30
-
 compact /C /S:"%SystemRoot%\SoftwareDistribution" /I *
