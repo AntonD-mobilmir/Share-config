@@ -48,9 +48,9 @@ If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
 	&& !(  FileExist(rarusbackupflag)  		    			; and no: flag
 	    || FileExist(backupsDir . "\" . zpaqFName)  		    	; 	or zpaq archive
 	    || FileExist(backupsDir . "\" . DailyArchiveFName) 			; 	or daily backup
-	    || FileExist(backupsDir . "\" . DailyArchiveFName . ".tmp")		; 	or daily backup temp exist
-	    || FileExist(backupsDir . "\" . MonthlyArchiveFName . ".tmp")	; 	or temporary file of monthly archive exist
-	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) ) { ;	or monthly backup created after last boot (e.g. just now) - because if it's created before last boot, we should wait daily archive instead
+	    || FileCreatedAfterBoot(backupsDir . "\" . DailyArchiveFName . ".tmp")	; 	or daily backup temp exist
+	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp")	; 	or temporary file of monthly archive exist
+	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) ) { 	;	or monthly backup created after last boot (e.g. just now) - because if it's created before last boot, we should wait daily archive instead
     ResetProgress(WaitArchivingAfterBoot)
     Loop {
 	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, A_TickCount//1000 . " / " . WaitArchivingAfterBoot//1000)
