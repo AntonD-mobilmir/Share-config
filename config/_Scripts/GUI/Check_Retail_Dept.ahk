@@ -342,7 +342,7 @@ If (IsObject(softUpdScripts)) {
 	SetLastRowStatus(verFlagSoftUpdScripts,0)
     }
     
-    distSoftUpdScripts := CheckPath(DefaultConfigDir . "\_Scripts\software_update_autodist\Scripts.7z")
+    distSoftUpdScripts := CheckPath(DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z")
     If (!IsObject(distSoftUpdScripts))
 	softUpdScripts=
     FormatTime timeDistSoftUpdScripts, % distSoftUpdScripts.mtime, dd.MM.yyyy HH:mm
@@ -358,9 +358,9 @@ If (IsObject(softUpdScripts)) {
 
 If (IsObject(softUpdScripts)) {
     If (!IsObject(distSoftUpdScripts))
-	distSoftUpdScripts := CheckPath("\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\software_update_autodist\Scripts.7z", 0, 0)
+	distSoftUpdScripts := CheckPath("\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
     If (IsObject(distSoftUpdScripts)) {
-	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\Scripts.7z"
+	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
 	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",,Min UseErrorLevel
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)

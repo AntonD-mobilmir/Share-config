@@ -45,7 +45,8 @@
     DEL /S /Q "%InstDest%\software_update\scripts\!*.*"
     DEL /S /Q "%InstDest%\software_update\scripts\_*.*"
 
-    %exe7z% x -aoa -o"%InstDest%" -- "%~dp0Scripts.7z" || %ErrorCmd%
+    %exe7z% x -aoa -o"%InstDest%" -- "%~dp0downloader-dist.7z" || %ErrorCmd%
+    %exe7z% x -aoa -o"%InstDest%\software_update" -- "%~dp0software_update.7z" || %ErrorCmd%
     IF EXIST "%InstDest%\logs.bak" RD /S /Q "%InstDest%\logs.bak"
     IF EXIST "%InstDest%\logs" MOVE "%InstDest%\logs" "%InstDest%\logs.bak"
     MKDIR "%InstDest%\logs" || %ErrorCmd%
@@ -100,7 +101,7 @@ CALL :checkProxy
 
 START "Удаление старых SysUtils из Windows\Temp" /MIN %comspec% /C "%~dp0..\cleanup\special\RemoveSysutilsFromWinTemp.cmd"
 
-IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0Scripts.7z") DO (
+IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z") DO (
     (ECHO %%~tI)>"%InstDest%\ver.flag"
     SET "instVersion=%%~tI"
 )
