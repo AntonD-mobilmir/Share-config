@@ -33,5 +33,5 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     ExitApp !PostGoogleForm(URL,kv)
 }
 
-#include %A_LineFile%\..\HTTP_POST.ahk
+#include %A_LineFile%\..\WinHttp_POST.ahk
 #include %A_LineFile%\..\URIEncodeDecode.ahk

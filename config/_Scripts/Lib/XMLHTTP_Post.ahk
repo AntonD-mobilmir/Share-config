@@ -29,7 +29,7 @@ XMLHTTP_PostForm(URL, POSTDATA, ByRef response="") {
 	    debug.Message:=e.Message
 	    debug.Extra:=e.Extra
 	}
-	return 0
+	return
     } Finally {
 	XMLHttpRequest := ""
 	If (IsObject(debug)) {
@@ -81,7 +81,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     Loop %tries%
     {
 	If (XMLHTTP_PostForm(URL,POSTDATA, response))
-	    return 0
+	    Exit 0
 	sleep %retryDelay%
 	response := Object()
     }

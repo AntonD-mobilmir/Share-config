@@ -2,7 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
-PostGoogleForm(URL,ByRef kv,tries:=20,retryDelay:=20000) {
+PostGoogleForm(URL, ByRef kv, tries:=20, retryDelay:=20000) {
     If (!IsObject(kv))
 	Throw Exception("Keys and Values should be passed as an object", "PostGoogleForm", kv)
     
@@ -13,7 +13,8 @@ PostGoogleForm(URL,ByRef kv,tries:=20,retryDelay:=20000) {
 	POSTDATA .= k . "=" . UriEncode(v) . "&"
     POSTDATA := SubStr(POSTDATA,1,-1)
     
-    return PostWithProxies(URL, POSTDATA, tries, retryDelay)
+    While !XMLHTTP_PostForm(URL, POSTDATA) && tries--
+	Sleep retryDelay
 }
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
@@ -33,5 +34,5 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     ExitApp !PostGoogleForm(URL,kv)
 }
 
-#include %A_LineFile%\..\HTTP_POST.ahk
+#include %A_LineFile%\..\XMLHTTP_Post.ahk
 #include %A_LineFile%\..\URIEncodeDecode.ahk
