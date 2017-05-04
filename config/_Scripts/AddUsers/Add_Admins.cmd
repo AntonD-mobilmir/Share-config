@@ -67,7 +67,7 @@ SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
 )
 (
     rem Post password in background
-    IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\HTTP_POST.ahk" "%URL%" "Host=%Hostname%&UserName=%NewUsername%&Pwd=%pwd%&UserAddError=%UserAddError%"
+    IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\XMLHTTP_POST.ahk" "%URL%" "Host=%Hostname%" "UserName=%NewUsername%" "Pwd=%pwd%" "UserAddError=%UserAddError%"
 )
 :setupgroups
 (
