@@ -40,7 +40,7 @@ Loop Read, %2%
 	WaitCPUIdle (zpaqPID, 1, 30, 1)
 	Run %comspec% /U /C "CHCP 65001 & %zpaqexe% x "%A_LoopReadLine%" -to "%3%%lastListedNameNoExt%" 2>>"%3%%lastListedNameNoExt%.errors.log" %redirCmd% "%3%%lastListedNameNoExt%.log" %cmdSuffix%",,Min, zpaqPID
     } Else If (cmd="l") {
-	RunWait %comspec% /U /C "CHCP 65001 & %zpaqexe% l "%A_LoopReadLine%" 2>>&1 %redirCmd% "%tmpListFile%" %cmdSuffix%",,Min
+	RunWait %comspec% /U /C "CHCP 65001 & %zpaqexe% l "%A_LoopReadLine%" -all 2>>&1 %redirCmd% "%tmpListFile%" %cmdSuffix%",,Min
     } Else If (cmd="a") {
 	If (A_Index==1) {
 	    files := Object()

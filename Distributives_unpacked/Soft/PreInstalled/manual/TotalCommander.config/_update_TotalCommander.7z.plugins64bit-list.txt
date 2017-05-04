@@ -1,4 +1,5 @@
-*.wcx64
-*.wdx64
-*.wfx64
-*.wlx64
+PlugIns\*\*.wcx64
+PlugIns\*\*.wdx64
+PlugIns\*\*.wfx64
+PlugIns\*\*.wlx64
+PlugIns\*\*64.dll
