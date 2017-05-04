@@ -15,7 +15,7 @@ If (FileExist(configxml)) {
 	If (A_Index==1)
 	    username:=A_LoopReadLine
 	Else If (A_Index==2)
-	    password:=A_LoopReadLine
+	    password:=StrReplace(A_LoopReadLine, "&", "&amp;")
 	Else
 	    break
     }
