@@ -34,7 +34,7 @@ If (A_IsAdmin) {
 
     ; Замена ярлыков и распаковка D:\dealer.beeline.ru
     RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel, childPID
-    FileDelete %A_DesktopCommon%\Exchange.ahk
+    FileDelete %A_DesktopCommon%\Exchange.lnk
 } Else {
     comment := "Без прав администратора"
     ; Запущено из под пользователя без прав администратора
