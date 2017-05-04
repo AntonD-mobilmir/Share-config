@@ -48,10 +48,10 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 		ECHO %DATE% %TIME% Making differential archive>>"%rarusbackuplogfile%"
 		START "7z a diff" /B /WAIT /NORMAL %exe7z% a -r %Switches7z% -u- -up0q3z0!"%destdir%\%destdname%.tmp" %exclusions7z% -x!SYSLOG -- "%destdir%\%destfname%" *>>"%rarusbackuplogfile%" 2>&1
 		IF ERRORLEVEL 2 CALL :ExitWithError "при создании дифференциального архива" "%destdir%\%destdname%.tmp" & EXIT /B
-		REN "%destdir%\%destdname%.tmp" *.
 		CALL :DelBackupFlag
-		%exe7z% t -bd -- "%destdir%\%destdname%" >>"%rarusbackuplogfile%" 2>&1
+		%exe7z% t -bd -- "%destdir%\%destdname%.tmp" >>"%rarusbackuplogfile%" 2>&1
 		IF ERRORLEVEL 2 CALL :ExitWithError "при тестировании дифференциального архива" "%destdir%\%destdname%" & EXIT /B
+		REN "%destdir%\%destdname%.tmp" *.
 	    ) ELSE (
 		ECHO %DATE% %TIME% "%destdir%\%destdname%" already exist
 		ECHO %DATE% %TIME% "%destdir%\%destdname%" already exist>>"%rarusbackuplogfile%"
@@ -63,7 +63,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 	    START "7z a full" /B /WAIT /NORMAL %exe7z% a -r %Switches7z% %exclusions7z% -- "%destdir%\%destfname%.tmp" *>>"%rarusbackuplogfile%" 2>&1
 	    IF ERRORLEVEL 2 CALL :ExitWithError "При создании полного архива" "%destdir%\%destfname%.tmp" & EXIT /B
 	    CALL :DelBackupFlag
-	    %exe7z% t -bd -- "%destdir%\%destfname%" >>"%rarusbackuplogfile%" 2>&1
+	    %exe7z% t -bd -- "%destdir%\%destfname%.tmp" >>"%rarusbackuplogfile%" 2>&1
 	    IF ERRORLEVEL 2 CALL :ExitWithError "При тестировании полного архива" "%destdir%\%destfname%.tmp" & EXIT /B
 	    REN "%destdir%\%destfname%.tmp" *.
 	)
