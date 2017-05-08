@@ -30,7 +30,7 @@ EXIT /B 1
 :RunRsync
 (
     PUSHD "%configDir%" && (
-	%SystemRoot%\System32\schtasks.exe /S %rsyncHost% /Run /TN rsyncd
+	rem %SystemRoot%\System32\schtasks.exe /S %rsyncHost% /Run /TN rsyncd
 	CALL :rsync rsync://%rsyncHost%/config "%configDir%"
 	POPD
     )
