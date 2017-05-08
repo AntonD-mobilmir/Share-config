@@ -33,9 +33,10 @@ If (A_IsAdmin) {
     RunWait %comspec% /C "%runConfUpdScript%",,Min UseErrorLevel, childPID
 
     ; Замена ярлыков и распаковка D:\dealer.beeline.ru
-    RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel, childPID
     FileDelete %A_DesktopCommon%\Exchange.lnk
     FileDelete %A_DesktopCommon%\Ценники из выгрузок Рарус.lnk
+    FileDelete d:\Local_Scripts\beeline DOL2.cmd
+    RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel, childPID
 } Else {
     comment := "Без прав администратора"
     ; Запущено из под пользователя без прав администратора
