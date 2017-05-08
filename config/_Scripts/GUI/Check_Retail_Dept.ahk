@@ -22,14 +22,17 @@ maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collec
 serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 
+RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
+DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
+DOL2ReqdBaseDir=d:\dealer.beeline.ru\DOL2
+
 Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R30 w600 vLogListView, Операция|Статус
 Gui Show
 
 OSVersionObj := RtlGetVersion()
 AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
-
-FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
 
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
@@ -48,25 +51,6 @@ If (A_IsAdmin) {
 }
 
 AddLog(A_AhkPath, A_AhkVersion)
-If (A_AhkVersion < "1.1.24.01") {
-    AddLog("Запуск обновления с Srv0.office0.mobilmir.")
-    ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-    If (ReRunAsAdmin) {
-	Run %comspec% /C "TITLE Ожидание обновления AutoHotkey, перезапуск %A_ScriptName% & (PING 127.0.0.1 -n 30 >NUL) & (ECHO Нажмите любую клавишу в этом окне, когда завершится обнолвление.) & (PAUSE >NUL) & %ScriptRunCommand% /NoAdminRun"
-	Run *RunAs %comspec% /C "CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
-    } Else {
-	Run %comspec% /C "PING Srv0.office0.mobilmir -n 5 >NUL & CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
-    }
-    If (ErrorLevel) {
-	SetLastRowStatus(ErrorLevel, 0)
-	MsgBox Ошибка "%ErrorLevel%" при запуске обновления AutoHotkey. Автоматическое продолжение невозможно.
-    } Else {
-	SetLastRowStatus()
-    }
-    ExitApp
-} Else {
-    SetLastRowStatus()
-}
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
 global DefaultConfigDir := chkDefConfigDir.path
@@ -144,10 +128,10 @@ If (userFoldersChk) {
     }
 }
 
-RegRead OneDriveSetup, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
+RegRead OneDriveSetup, HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
 If (!ErrorLevel) {
     AddLog("OneDriveSetup в автозагрузке", "Удаление")
-    RegDelete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
+    RegDelete HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
     FileRemoveDir D:\Users\Пользователь\AppData\Local\Microsoft\OneDrive, 1
     keepOpen += !!ErrorLevel
     SetLastRowStatus(ErrorLevel)
@@ -158,6 +142,45 @@ If (AppXSupported && (A_UserName="Продавец" || A_UserName="Пользо�
     Run %comspec% /C "TITLE Удаление всех приложений AppX & "%DefaultConfigDir%\_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /Quiet",, Min UseErrorLevel, removeAppXPID
     keepOpen += !!ErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
+}
+
+FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
+
+;"C:\Program Files\KKMSuite\KKMWatcher.exe"
+;"C:\Program Files (x86)\KKMSuite\KKMWatcher.exe"
+bakRegView:=A_RegView
+regViews := [32,64]
+For i,regview in regViews {
+    SetRegView %regview%
+    HKLMRunKKMSuite=
+    RegRead HKLMRunKKMSuite, HKEY_LOCAL_MACHINE\%RunKey%, KKMSuite
+    If (!ErrorLevel && HKLMRunKKMSuite) {
+	If (A_IsAdmin) {
+	    AddLog("Значение KKMSuite найдено в HKLM\…\Run (" . regview . " бит), удаление…")
+	    FileAppend HKEY_LOCAL_MACHINE\%RunKey%: KKMSuite=%HKLMRunKKMSuite%`n, %A_Temp%\KKMSuite-reg-HKLM-Run.txt
+	    RegDelete HKEY_LOCAL_MACHINE\%RunKey%, KKMSuite
+	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+	} Else {
+	    If (A_UserName="Продавец") {
+		RegRead HKCURunKKMSuite, HKEY_CURRENT_USER\%RunKey%, KKMSuite
+		If (ErrorLevel) {
+		    AddLog("Запись значения KKMSuite в HKCU\…\Run")
+		    RegWrite REG_SZ, HKEY_CURRENT_USER\%RunKey%, KKMSuite, %HKLMRunKKMSuite%
+		    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+		}
+	    }
+	}
+	break
+    }
+}
+SetRegView %bakRegView%
+
+If (!A_IsAdmin) {
+    RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
+    If (!ErrorLevel && dol2regRootDir != DOL2ReqdBaseDir) {
+	keepOpen:=1
+	AddLog("Неправильная корневая папка DOL2", dol2regRootDir)
+    }
 }
 
 If (ReRunAsAdmin) {
@@ -470,11 +493,32 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
 
 If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
     AddLog("Запуск в фоновом режиме настройки ACL ФС")
-    Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd"",, Min UseErrorLevel
+    Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd" >"`%TEMP`%\FSACL _depts_simplified.cmd.log" 2>&1 ",, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
 finished := 1
+
+If (A_AhkVersion < "1.1.25.01" && A_IsAdmin) {
+    AddLog("Запуск обновления AutoHotkey с Srv0.office0.mobilmir.")
+    ;ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+    ;If (ReRunAsAdmin) {
+    ;	Run %comspec% /C "TITLE Ожидание обновления AutoHotkey, перезапуск %A_ScriptName% & (PING 127.0.0.1 -n 30 >NUL) & (ECHO Нажмите любую клавишу в этом окне, когда завершится обнолвление.) & (PAUSE >NUL) & %ScriptRunCommand% /NoAdminRun"
+    ;	Run *RunAs %comspec% /C "CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
+    ;} Else {
+    ;	Run %comspec% /C "PING Srv0.office0.mobilmir -n 5 >NUL & CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
+    ;}
+    Run %comspec% /C "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd"
+    If (ErrorLevel) {
+	SetLastRowStatus(ErrorLevel, 0)
+	MsgBox Ошибка "%ErrorLevel%" при запуске обновления AutoHotkey. Автоматическое продолжение невозможно.
+    } Else {
+	SetLastRowStatus()
+    }
+    ;ExitApp
+} Else {
+    SetLastRowStatus()
+}
 AddLog("Готово",A_Now,1)
 Sleep 300000
 ExitApp
@@ -597,20 +641,23 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
     If (!path)
 	return
     exist := FileExist(path)
-    If (exist) {
+    If (exist)
 	FileGetTime mtime, %path%
-	If (logTime==2) {
-	    logTime=
-	    logTime-=mtime, Days
-	    logTime = возраст: %logTime% дн.
-	} Else If (logTime==1) {
-	    FormatTime logTime, mtime, yyyy-MM-dd HH:mm:ss
+    If logTime is integer
+    {
+	If (exist) {
+	    If (logTime==2) {
+		logTime=
+		logTime-=mtime, Days
+		logTime = возраст: %logTime% дн.
+	    } Else If (logTime==1) {
+		FormatTime logTime, mtime, yyyy-MM-dd HH:mm:ss
+	    }
+	} Else {
+	    logTime:="(не найден)"
 	}
-    } Else {
-;	If logTime is integer
-	logTime:="Не найден"
+	line := AddLog(AbbreviatePath(path), logTime, checkboxIfExist & (exist!=""))
     }
-    line := AddLog(AbbreviatePath(path), logTime, checkboxIfExist & (exist!=""))
     If (exist)
 	return {"path":path, "attr":exist, "mtime":mtime, "line":line}
     Else
