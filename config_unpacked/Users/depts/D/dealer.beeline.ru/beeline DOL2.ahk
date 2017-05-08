@@ -25,7 +25,7 @@ If (ErrorLevel) {
     MsgBox 0x40, %ScriptTitle%, Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
 } Else {
     If (dol2regRootDir != DOL2ReqdBaseDir) {
-	ShowError(RTrim(dirErrText, ";"), "Если при первом запуске DOL2 не указать папку D:\dealer.beeline.ru\DOL2, настройки и договора не будут сохраняться в резервной копии и могут быть случайно или автоматически удалены или утеряны при переносе данных на другой компьютер.", "В настройках DOL2 есть ошибка!")
+	ShowError("В качестве корневой папки указана: " . dol2regRootDir, "Если при первом запуске DOL2 не указать папку D:\dealer.beeline.ru\DOL2, настройки и договора не будут сохраняться в резервной копии и могут быть случайно или автоматически удалены или утеряны при переносе данных на другой компьютер.", "В настройках DOL2 есть ошибка!")
 	ExitApp
     }
 
@@ -115,11 +115,8 @@ ShowError(text, explain:="", title:="") {
     FileAppend %A_Now%: %text%`n, %logfname%
     
     endTime := A_TickCount + 5 * 60 * 1000 ; 5 минут
-    Loop 3
-    {
-	Run http://l.mobilmir.ru/newtaskdept
-	MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
-    } Until A_TickCount > endTime
+    Run http://l.mobilmir.ru/newtaskdept
+    MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
 ;getDefaultConfig.ahk
