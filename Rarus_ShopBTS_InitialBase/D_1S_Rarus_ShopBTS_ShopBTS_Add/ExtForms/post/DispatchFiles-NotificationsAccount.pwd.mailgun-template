@@ -1,0 +1,3 @@
+﻿smtp.mailgun.org:587
+{login}@mg.robots.mobilmir.ru
+{mailgunpass}
