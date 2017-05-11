@@ -20,7 +20,7 @@ IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "d:\Distributives\conf
 (
     IF NOT EXIST "%RecvDir%" MKDIR "%RecvDir%"
     IF NOT EXIST "%RecvBakDir%" MKDIR "%RecvBakDir%"
-    IF NOT EXIST "%MonDir%" MKDIR "%MonDir%"
+    IF EXIST "%MonDir%" IF NOT EXIST "%MonDir%\*.*" FOR %%A IN ("%MonDir%") DO MOVE "%%~A" "%%~dpnA-%RANDOM%%%~xA" ||EXIT /B
 
     ECHO %DATE% %TIME% Проверка или завершение повисшего popclient.exe
     %SystemRoot%\System32\taskkill.exe /F /IM popclient.exe && EXIT /B
@@ -59,7 +59,7 @@ IF EXIST "%AttDir%\*.7z" (
 (
     ECHO %DATE% %TIME% Подчистка
     IF EXIST "%AttDir%\file01.txt" DEL "%AttDir%\file01.txt"
-    IF EXIST "%AttDir%\*.*" FOR %%A IN ("%AttDir%\*.*") DO MOVE /Y "%%~A" "%MonDir%\%%~nxA"
+    IF EXIST "%AttDir%\*.*" FOR %%A IN ("%AttDir%\*.*") DO ECHO.|MOVE "%%~A" "%MonDir%\%%~nxA"
     FOR %%I IN ("%RecvDir%\*") DO (
 	REM Can't do this immediately after deattaching, because uud32win.exe keeps file opened even after batch flow continues
 	IF DEFINED RecvBakDir (
@@ -76,7 +76,7 @@ IF EXIST "%AttDir%\*.7z" (
 	MOVE /Y "%%~I" "%MoveDest%\" || EXIT /B
     )
     
-    FOR %%I IN ("%ExtractDest%\*") DO ECHO Moving "%%~I" to Rarus-Exchange Incoming& MOVE /Y "%%~I" "%MonDir%"
+    FOR %%I IN ("%ExtractDest%\*") DO ECHO Moving "%%~I" to Rarus-Exchange Incoming& MOVE /Y "%%~I" "%MonDir%\"
     DEL /F /Q "%RecvBakDir%\*.*"
     EXIT /B
 )
