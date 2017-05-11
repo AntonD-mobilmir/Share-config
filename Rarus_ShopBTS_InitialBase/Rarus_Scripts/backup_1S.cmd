@@ -17,7 +17,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
     SET "dated=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%"
 
     SET "exclusionszpaq=-not Backup -not Exchange -not ExtForms/Scripts -not ExtForms/post -not NEW_STRU -not Shared -not *.rar -not *.7z -not *.LCK -not *.cdx -not !*.flag -not sendEmail* -not zpaq*"
-    SET "exclusions7z=-x!Backup -x!Exchange -x!ExtForms/Scripts -x!ExtForms/post -x!NEW_STRU -x!Shared -xr!*.rar -xr!*.7z -xr!*.LCK -xr!*.cdx -x!*.flag -x!sendEmail* -x!zpaq*"
+    SET "exclusions7z=-x!Backup -x!Exchange -x!ExtForms/Scripts -x!ExtForms/post -x!ExtForms/MailLoader -x!NEW_STRU -x!Shared -xr!*.rar -xr!*.7z -xr!*.LCK -xr!*.cdx -x!*.flag -x!sendEmail* -x!zpaq*"
 
     FOR /F "usebackq tokens=2 delims==" %%I IN (`FTYPE AutoHotkeyScript`) DO SET ahkexe=%%I
 )
