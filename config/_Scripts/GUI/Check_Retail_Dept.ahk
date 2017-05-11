@@ -462,7 +462,7 @@ If (FileExist("c:\squid\sbin\squid.exe")) {
 	}
     }
     If (!dontUpdateSquidStatus)
-	SetLastRowStatus(squidDistArcNewerThanConf, !squidDistArcNewerThanConf)
+	SetLastRowStatus("архив на " . squidDistArcNewerThanConf . " дн. новее конф.", !squidDistArcNewerThanConf)
 }
 
 backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
@@ -628,8 +628,10 @@ EnvGetAfterScript(batch, varName) {
     ),%tempFile%,CP1
     RunWait %comspec% /C "%tempFile%", %A_Temp%, Min UseErrorLevel
     FileRead out, *P1 *m65536 %outFile%
-    FileDelete %outFile%
+    Sleep 0
     FileDelete %tempFile%
+    Sleep 0
+    FileDelete %outFile%
     return Trim(out, "`r`n`t ")
 }
 
