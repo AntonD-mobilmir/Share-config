@@ -24,13 +24,17 @@ cleanupDealerBeelineDir(dir) {
     Loop %Dir%, 2
     {
 	SetWorkingDir %A_LoopFileFullPath%
-	FileDelete criacx.cab
+	FileDelete beeline DOL2.ahk
+	FileDelete beeline DOL2 fix dirs.ahk
 	FileDelete dealer.beeline.ru.cmd
 	FileDelete favicon.ico (16×16).ico
 	FileDelete remote_register.cmd
 	FileDelete update_dealer_beeline_activex.cmd
+	FileDelete update_dealer_beeline_activex in windir.cmd
 	FileDelete сделать ярлык для Билайн Дилер Он-Лайн.ahk
 	FileRemoveDir bin
+	FileRemoveDir reg
+	FileRemoveDir DOL2\DATA\ARCH.
 	
 	; Remove logs and static data
 	Loop *, 2
