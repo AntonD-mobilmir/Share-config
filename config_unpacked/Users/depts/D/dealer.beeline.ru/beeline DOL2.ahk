@@ -1,4 +1,5 @@
-﻿#NoEnv
+﻿
+#NoEnv
 #SingleInstance off
 SetRegView 32
 
@@ -12,15 +13,14 @@ EnvGet ProgramFilesx86,ProgramFiles(x86)
 IfNotExist %ProgramFilesx86%
     EnvGet ProgramFilesx86,ProgramFiles
 
-; это исходное ошибочное предположение. А вообще, DOL2 использует только одно значение – RootDir.
-;Loop Reg, %DOL2SettingsKey%
+; это исходное ошибочное предположение. А вообще, DOL2 использует только одно значение – RootDir. -- Loop Reg, %DOL2SettingsKey%
 RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
 
 If (ErrorLevel) {
     ;RootDir не указан = DOL2 ещё не запускался
     FileAppend %A_Now%: У пользователя %A_UserName% настроек в реестре нет`n, %logfname%
     Run http://l.mobilmir.ru/DOL2FirstRun
-    RegWrite REG_SZ, %DOL2SettingsKey%, RootDir, %DOL2ReqdBaseDir%
+    ;RegWrite REG_SZ, %DOL2SettingsKey%, RootDir, %DOL2ReqdBaseDir%
     RegWrite REG_DWORD, %DOL2SettingsRegRoot%\System, Master, 0
     MsgBox 0x40, %ScriptTitle%, Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
 } Else {
@@ -36,6 +36,28 @@ If (ErrorLevel) {
     }
 }
 
+If (!CrystalReportsInstalled())
+    ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
+
+CrystalReportsInstalled() {
+    static RegViews := [32,64]
+    
+    bakRegView := A_RegView
+    For i,RegView in RegViews {
+	SetRegView %RegView%
+	RegRead displayName, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, DisplayName
+	If (!ErrorLevel)
+	    break
+    }
+    
+    ;Crystal Reports for .NET Framework 2.0 (x86)
+    return StartsWith(displayName, "Crystal Reports for .NET Framework")
+}
+
+StartsWith(ByRef long, ByRef short) {
+    return SubStr(long,1,StrLen(short))=short
+}
+
 ; начальные проверки закончены, можно запускать
 runAppAgain:
 Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
@@ -43,7 +65,13 @@ Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru
 SplashTextOn 250,50,%ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
 WinSet AlwaysOnTop, Off, %ScriptTitle%
 
-DOLNavigatorErrors := ["Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации"]
+DOLNavigatorErrors := ["Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации"
+		      ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!",
+		      ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора."
+		      ,"Отказано в доступе по пути"]
+
+;For i,wintext in DOLNavigatorErrors
+;    GroupAdd grpDOLNavigatorErrors, On Line Dealer ahk_class #32770 ahk_exe DOLNavigator.exe, %wintext%
 
 Loop
 {
@@ -57,11 +85,18 @@ Loop
 	GoTo runAppAgain
     }
 
-    
+    IfWinExist Cannot Start Application ahk_exe dfsvc.exe, Application cannot be started. Contact the application vendor.
+    {
+	ControlClick &OK
+	configDir := getDefaultConfigDir()
+	RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
+	GoTo runAppAgain
+    }
+
     IfWinExist Обзор папок ahk_class #32770 ahk_exe DOLNavigator.exe, Выберите папку для хранения данных приложения DOL:
     {
 	SplashTextOff
-	Progress A M ZH0, В окне выбора папки укажите:`n%DOL2ReqdBaseDir%`n`nЕсли указать не ту папку`, самостоятельно не исправить. В таком случае делайте заявку (l.mobilmir.ru/newtaskdept).,,%ScriptTitle%
+	Progress A M ZH0, %DOL2ReqdBaseDir%,В окне выбора папки укажите:,%ScriptTitle%
 	
 	Loop
 	{
@@ -70,7 +105,10 @@ Loop
 	} Until !ErrorLevel
 	
 	If (dol2regRootDir!=DOL2ReqdBaseDir) {
-	    ShowError("Выбрана папка """ . dol2regRootDir """", "Вы отменили выбор или выбрали не ту папку. Чтобы исправить, надо удалить записи из реестра и переустановить DOL2.")
+	    Process Close, DOLNavigator.exe
+	    RegDelete %DOL2SettingsKey%, RootDir
+	    RegDelete HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\DB, Ver
+	    ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
 	    ExitApp
 	}
 	
@@ -84,23 +122,36 @@ Loop
 	Continue
     }
     
-    For i,wintext in DOLNavigatorErrors {
-	IfWinExist On Line Dealer ahk_class #32770 ahk_exe DOLNavigator.exe, %wintext%
-	{
-	    WinGetTitle fullTitle
-	    WinGetText fullText
-	    SplashTextOff
-	    FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n
-	    ShowError("Обнаружено окно DOLNavigator с ошибкой """ . wintext . """")
-	    ExitApp
-	}
-    }
-    
     IfWinExist DOL Навигатор - (Дилер: ahk_exe DOLNavigator.exe
 	break
+    
+    IfWinExist Навигатор ahk_exe DOLNavigator.exe, menuMain
+	continue ; ещё не запустился
+    
+    IfWinExist ahk_exe DOLNavigator.exe
+    {
+	WinGetTitle fullTitle
+	WinGetText fullText
+	SplashTextOff
+	
+	FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n
+	
+	;IfWinExist ahk_group grpDOLNavigatorErrors
+	For i,wintext in DOLNavigatorErrors {
+	    If (InStr(fullText, wintext)) {
+		ShowError("Обнаружено окно DOLNavigator с ошибкой """ . wintext . """")
+		ExitApp
+	    }
+	}
+	
+	ShowError("Обнаружено неизвестное окно DOLNavigator: " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+    }
 }
 
 SplashTextOff
+
+;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
+FileRemoveDir %A_Programs%\Vimpelcom
 
 ExitApp
 
