@@ -20,6 +20,7 @@ IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "d:\Distributives\conf
 (
     IF NOT EXIST "%RecvDir%" MKDIR "%RecvDir%"
     IF NOT EXIST "%RecvBakDir%" MKDIR "%RecvBakDir%"
+    IF NOT EXIST "%MonDir%" MKDIR "%MonDir%"
     IF EXIST "%MonDir%" IF NOT EXIST "%MonDir%\*.*" FOR %%A IN ("%MonDir%") DO MOVE "%%~A" "%%~dpnA-%RANDOM%%%~xA" ||EXIT /B
 
     ECHO %DATE% %TIME% Проверка или завершение повисшего popclient.exe
@@ -44,9 +45,10 @@ IF EXIST "%RecvDir%\*.txt" (
 )
 IF EXIST "%AttDir%\*.7z" (
     ECHO %DATE% %TIME% Распаковка архивов "%AttDir%\*.7z"
+    ( ECHO %DATE% %TIME%)>>"%~dp0unpacked-archives.log"
     FOR %%I IN ("%AttDir%\*.7z") DO (
 	ECHO 	%%~I
-	%exe7z% x -aoa -o"%ExtractDest%" -- "%%~I" && DEL "%%~I"
+	%exe7z% x -aoa -o"%ExtractDest%" -- "%%~I" && ( ECHO %%~nI)>>"%~dp0unpacked-archives.log" && DEL "%%~I"
     )
 ) ELSE (
     ECHO Архивов в %AttDir%\*.7z нет
