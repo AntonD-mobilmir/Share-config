@@ -28,22 +28,28 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SET "ProfilesDirectory=%%~I"
 (
-FOR /D %%I IN ("%ProfilesDirectory%\*.*") DO CALL :AskIfToProcessHomeDir "%%~nxI" && CALL "%~dp0FSACL_Homedir.cmd" "%%~I"
+    rem %SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set" -ignoreerr -silent
+    FOR /D %%I IN ("%ProfilesDirectory%\*.*") DO CALL :AskIfToProcessHomeDir "%%~nxI" && CALL "%~dp0FSACL_Homedir.cmd" "%%~I"
+    
+    IF EXIST "d:\1S\Rarus\ShopBTS" PUSHD "d:\1S\Rarus\ShopBTS" && (
+	%SetACLexe% -on . -ot file -actn ace -ace "n:%UIDUsers%;p:change" -ignoreerr -silent
+	rem TODO: MOdifyNoExecute *.*; ReadExecute *.DLL *.EXE
+	rem     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" Users Flags Jobs SYSLOG
+	POPD
+    )
 
-PUSHD "d:\1S\Rarus\ShopBTS" && (
-    %SetACLexe% -on . -ot file -actn ace -ace "n:%UIDUsers%;p:change" -ignoreerr -silent
-    rem TODO: MOdifyNoExecute *.*; ReadExecute *.DLL *.EXE
-    rem     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" Users Flags Jobs SYSLOG Users
-    POPD
-)
-CALL :MakeDirsReadOnlyForUsers "%UIDAuthenticatedUsers%" "%UIDUsers%"
-rem %SetACLexe% -on "D:\Users" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set" -ignoreerr -silent
-CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
-CALL "%srcpath%FSACL_PublicDirsRoot.cmd" D:\Users\Public "D:\Users\All Users" "D:\Users\Default User"
-CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
-CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files" "D:\dealer.beeline.ru\bin"
-CALL "%srcpath%FSACL_FileHistory.cmd"
-
+    ECHO Разрешение чтения и выполнения для системных папок 
+    CALL :MakeDirsReadOnlyForUsers "%UIDAuthenticatedUsers%" "%UIDUsers%"
+    ECHO Разрешение чтения и выполнения для Thunderbird\AddressBook и Distributives
+    CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
+    ECHO Настройка доступа к стандартным общим папкам
+    CALL "%srcpath%FSACL_PublicDirsRoot.cmd" D:\Users\Public "D:\Users\All Users" "D:\Users\Default User"
+    ECHO Настройка доступа к d:\dealer.beeline.ru и d:\Mail\Thunderbird\profile
+    CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
+    ECHO Разрешение записи и выполнения в d:\Mail\Thunderbird\profile\extensions, "d:\Program Files", "D:\dealer.beeline.ru\bin"
+    CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files" "D:\dealer.beeline.ru\bin"
+    ECHO Настройка доступа к папке истории файлов
+    CALL "%srcpath%FSACL_FileHistory.cmd"
 EXIT /B
 )
 
