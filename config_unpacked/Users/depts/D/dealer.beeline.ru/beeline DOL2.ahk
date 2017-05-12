@@ -103,6 +103,7 @@ Loop
 	    Sleep 500
 	    RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
 	} Until !ErrorLevel
+	Progress Off
 	
 	If (dol2regRootDir!=DOL2ReqdBaseDir) {
 	    Process Close, DOLNavigator.exe
