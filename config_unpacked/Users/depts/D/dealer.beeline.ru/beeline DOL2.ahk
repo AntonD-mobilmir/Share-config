@@ -49,10 +49,10 @@ If (WinExist("ahk_exe " . DOL2exe)) {
 GroupAdd WinWaitList, ahk_exe %DOL2exe%
 For wintext,v in AutoResponces
     If (v[1])
-	If (!InStr(v[1], "ahk_exe " . DOL2exe)
+	If (!InStr(v[1], "ahk_exe " . DOL2exe))
 	    GroupAdd WinWaitList, % v[1], %wintext%
     Else
-	If (!InStr(wintext, "ahk_exe " . DOL2exe)
+	If (!InStr(wintext, "ahk_exe " . DOL2exe))
 	    GroupAdd WinWaitList, %wintext%
 
 If (!CrystalReportsInstalled())
