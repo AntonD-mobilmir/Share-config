@@ -187,7 +187,7 @@ ShowError(text, explain:="", title:="") {
     } Else {
 	mailTitle := text
     }
-    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2: " . mailTitle) . "&body=" . UriEncode(text . "`n`n(" . explain . ")")
+    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(text . "`n`n(" . explain . ")")
     MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
