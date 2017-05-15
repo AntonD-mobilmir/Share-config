@@ -6,7 +6,7 @@ ScriptTitle=Скрипт проверки запуска DOL2
 logfname=%A_ScriptFullPath%.log
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
 DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
-DOL2ReqdBaseDir=d:\dealer.beeline.ru\DOL2
+DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
 
 EnvGet ProgramFilesx86,ProgramFiles(x86)
 IfNotExist %ProgramFilesx86%
@@ -72,16 +72,22 @@ If (ErrorLevel) {
     MsgBox 0x41, %ScriptTitle%, Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
     IfMsgBox Cancel
 	ExitApp
+    
+    ;If (!WinExist(DOL2ReqdBaseDir . "DATA\DB.mdb")) {
+	; распаковать DOL2.template.7z → DOL2\
+	; импортировать DOL2\DOL2.reg
+	; прописать действительный путь в [HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs] "RootDir" (REG_SZ)
+    ;}
 } Else {
     If (dol2regRootDir != DOL2ReqdBaseDir) {
-	ShowError("В качестве корневой папки указана: " . dol2regRootDir, "Если при первом запуске DOL2 не указать папку D:\dealer.beeline.ru\DOL2, настройки и договора не будут сохраняться в резервной копии и могут быть случайно или автоматически удалены или утеряны при переносе данных на другой компьютер.", "В настройках DOL2 есть ошибка!")
+	ShowError("В качестве корневой папки указана: " . dol2regRootDir, "Если при первом запуске DOL2 не указать папку " . DOL2ReqdBaseDir . ", настройки и договора не будут сохраняться в резервной копии и могут быть случайно или автоматически удалены или утеряны при переносе данных на другой компьютер.", "В настройках DOL2 есть ошибка!")
 	ExitApp
     }
-
+    
     RegRead dol2master, %DOL2SettingsRegRoot%\System, Master
     If (dol2master) {
-	ShowError("При первом запуске DOL2 было указано, что с компьютера будут устанавливаться обновления на другие компьютеры")
-	RegWrite REG_DWORD, HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\System, Master, 0
+	FileAppend %A_Now% было [%DOL2SettingsRegRoot%\System]: Master=%dol2master% (исправлено), %logfname%
+	RegWrite REG_DWORD, %DOL2SettingsRegRoot%\System, Master, 0
     }
 }
 
@@ -91,7 +97,7 @@ Loop
     If (!started) {
 	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
 	started:=1
-	SplashTextOn 250,50,%ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
+	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
 	WinSet AlwaysOnTop, Off, %ScriptTitle%
     }
     
@@ -102,6 +108,9 @@ Loop
     } Else {
 	WinGetTitle fullTitle
 	WinGetText fullText
+	WinGet exeName, ProcessName
+	;WinGet exePath, ProcessPath
+	;SplitPath exePath, exeName
 	FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n, %logfname%
 	SplashTextOff
 	a=
@@ -113,9 +122,6 @@ Loop
 		    FileRemoveDir %A_Programs%\Vimpelcom
 		    ExitApp
 		} Else If (a=-1) {
-		    WinGet exeName, ProcessName
-		    ;WinGet exePath, ProcessPath
-		    ;SplitPath exePath, exeName
 		    ShowError("Обнаружено окно " . exeName . " с ошибкой """ . wintext . """")
 		    ExitApp
 		} Else If (a=1) {
@@ -152,7 +158,7 @@ Loop
 	    }
 	}
 	If (!a)
-	    ShowError("Обнаружено неизвестное окно DOLNavigator: " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+	    ShowError("Обнаружено неизвестное окно " . exeName . ": " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
     }
 }
 ShowError("Выполнение цикла мониторинга прекратилось", "В скрипте запуска DOL2 есть ошибка")
@@ -177,21 +183,21 @@ StartsWith(ByRef long, ByRef short) {
     return SubStr(long, 1, StrLen(short)) = short
 }
 
-ShowError(text, explain:="", title:="") {
+ShowError(txt, explain:="", title:="") {
     global ScriptTitle, logfname
     If (!title)
 	title:=ScriptTitle
-    FileAppend %A_Now%: %text%`n, %logfname%
+    FileAppend %A_Now%: %txt%`n, %logfname%
     
     endTime := A_TickCount + 5 * 60 * 1000 ; 5 минут
     ;Run http://l.mobilmir.ru/newtaskdept
-    If (textcrpos := InStr(text, "`n")) {
-	mailTitle := SubStr(text, 1, textcrpos-1)
+    If (textcrpos := InStr(txt, "`n")) {
+	mailTitle := SubStr(txt, 1, textcrpos-1)
     } Else {
-	mailTitle := text
+	mailTitle := txt
     }
-    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(text . "`n`n" . explain)
-    MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
+    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(txt . "`n`n" . explain)
+    MsgBox 0x1030, %title%, %txt%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
 ;getDefaultConfig.ahk
