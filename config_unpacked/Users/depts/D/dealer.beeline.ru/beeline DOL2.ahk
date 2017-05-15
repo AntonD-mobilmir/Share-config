@@ -12,9 +12,11 @@ EnvGet ProgramFilesx86,ProgramFiles(x86)
 IfNotExist %ProgramFilesx86%
     EnvGet ProgramFilesx86,ProgramFiles
 
-; подготовка список окон для наблюдения
+; подготовка
+DOL2exe=DOLNavigator.exe
+DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe %DOL2exe%
 
-DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe DOLNavigator.exe
+; список окон для наблюдения
 ; ключ - текст в окне или заголовок окна (сначала проверяется текст)
 ; значение – объект []
 ;	1: заголовок окна (или пусто, если ключ = заголовок)
@@ -25,24 +27,33 @@ DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe DOLNavigator.exe
 ;		 2 – нажать OK, запустить FSACL_DOL2.cmd, перезапустить DOL2
 ; 		 3 – нажать Нет
 ;		 4 – подождать и проверить снова
-
-AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe DOLNavigator.exe": ["", 0]
+AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe " . DOL2exe: ["", 0]
     ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации": [DOL2NavErrTitle, -1]
     ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!"							: [DOL2NavErrTitle, -1]
     ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора."		: [DOL2NavErrTitle, -1]
     ,"Отказано в доступе по пути"												: [DOL2NavErrTitle, -1]
-    ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe": 2]
-    ,"Application cannot be started. Contact the application vendor."		: ["Cannot Start Application ahk_exe dfsvc.exe": 2]
+    ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
+    ,"Application cannot be started. Contact the application vendor."		: ["Cannot Start Application ahk_exe dfsvc.exe", 2]
     ,"Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг." : ["Невозможно запустить приложение ahk_exe dfsvc.exe", -1]
-    ,"Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?": ["Установка DOL ahk_class #32770 ahk_exe DOLNavigator.exe", 3]
-    ,"menuMain": ["Навигатор ahk_exe DOLNavigator.exe", 4]
+    ,"Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?": ["Установка DOL ahk_class #32770 ahk_exe " . DOL2exe, 3]
+    ,"menuMain": ["Навигатор ahk_exe " . DOL2exe, 4]}
+
+;если окно DOL2 обнаружено, оно просто будет активировано, а запуск выполняться не будет
+If (WinExist("ahk_exe " . DOL2exe)) {
+    WinSet AlwaysOnTop, On
+    WinActivate
+    WinSet AlwaysOnTop, Off
+    ExitApp
 }
 
+GroupAdd WinWaitList, ahk_exe %DOL2exe%
 For wintext,v in AutoResponces
     If (v[1])
-	GroupAdd WinWaitList, % v[1], %wintext%
+	If (!InStr(v[1], "ahk_exe " . DOL2exe)
+	    GroupAdd WinWaitList, % v[1], %wintext%
     Else
-	GroupAdd WinWaitList, %wintext%
+	If (!InStr(wintext, "ahk_exe " . DOL2exe)
+	    GroupAdd WinWaitList, %wintext%
 
 If (!CrystalReportsInstalled())
     ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
@@ -90,15 +101,19 @@ Loop
 	WinGetText fullText
 	FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n, %logfname%
 	SplashTextOff
+	a=
 	For wintext,v in AutoResponces {
-	    a:=v[2]
-	    If (InStr(fullText, wintext)) {
+	    If (v[1] && InStr(fullText, wintext) || InStr(fullTitle, SubStr(wintext, 1, InStr(wintext, " ahk_")-1))) {
+		a:=v[2]
 		If (a=0) {
 		    ;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
 		    FileRemoveDir %A_Programs%\Vimpelcom
 		    ExitApp
 		} Else If (a=-1) {
-		    ShowError("Обнаружено окно DOLNavigator с ошибкой """ . wintext . """")
+		    WinGet exeName, ProcessName
+		    ;WinGet exePath, ProcessPath
+		    ;SplitPath exePath, exeName
+		    ShowError("Обнаружено окно " . exeName . " с ошибкой """ . wintext . """")
 		    ExitApp
 		} Else If (a=1) {
 		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle%
@@ -112,32 +127,29 @@ Loop
 			RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
 		    } Until !ErrorLevel || A_TickCount > endTime
 		    
-		    If (dol2regRootDir=DOL2ReqdBaseDir) ; всё в порядке, можно проверять другие окна
-			Continue
-		    
-		    Process Close, DOLNavigator.exe
-		    RegDelete %DOL2SettingsKey%, RootDir
-		    RegDelete HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\DB, Ver
-		    ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
-		    ExitApp
+		    If (dol2regRootDir!=DOL2ReqdBaseDir) { ; всё в порядке, можно проверять другие окна
+			Process Close, %DOL2exe%
+			RegDelete %DOL2SettingsKey%, RootDir
+			RegDelete HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\DB, Ver
+			ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
+			ExitApp
+		    }
 		} Else If (a=2) {
 		    ControlClick &OK
 		    If (!configDir)
 			configDir := getDefaultConfigDir()
 		    RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
 		    started := 0
-		    continue
 		} Else If (a=3) {
 		    ControlClick &Нет
 		    ControlClick Button2
-		    Continue
 		} Else If (a=4) {
 		    Sleep 500
-		    continue
 		}
 	    }
 	}
-	ShowError("Обнаружено неизвестное окно DOLNavigator: " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+	If (!a)
+	    ShowError("Обнаружено неизвестное окно DOLNavigator: " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
     }
 }
 ShowError("Выполнение цикла мониторинга прекратилось", "В скрипте запуска DOL2 есть ошибка")
@@ -170,7 +182,12 @@ ShowError(text, explain:="", title:="") {
     
     endTime := A_TickCount + 5 * 60 * 1000 ; 5 минут
     ;Run http://l.mobilmir.ru/newtaskdept
-    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2: " . text) . "&body=" . UriEncode(explain)
+    If (textcrpos := InStr(text, "`n")) {
+	mailTitle := SubStr(text, 1, textcrpos-1)
+    } Else {
+	mailTitle := text
+    }
+    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2: " . mailTitle) . "&body=" . UriEncode(text . "`n`n(" . explain . ")")
     MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
