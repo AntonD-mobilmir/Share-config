@@ -28,6 +28,7 @@ DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe %DOL2exe%
 ; 		 3 – нажать Нет
 ;		 4 – подождать и проверить снова
 AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe " . DOL2exe: ["", 0]
+    ,"Выберите папку для хранения данных приложения DOL:": ["Обзор папок", 1]
     ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации": [DOL2NavErrTitle, -1]
     ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!"							: [DOL2NavErrTitle, -1]
     ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора."		: [DOL2NavErrTitle, -1]
@@ -68,7 +69,9 @@ If (ErrorLevel) {
     Run http://l.mobilmir.ru/DOL2FirstRun
     ;RegWrite REG_SZ, %DOL2SettingsKey%, RootDir, %DOL2ReqdBaseDir%
     RegWrite REG_DWORD, %DOL2SettingsRegRoot%\System, Master, 0
-    MsgBox 0x40, %ScriptTitle%, Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
+    MsgBox 0x41, %ScriptTitle%, Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
+    IfMsgBox Cancel
+	ExitApp
 } Else {
     If (dol2regRootDir != DOL2ReqdBaseDir) {
 	ShowError("В качестве корневой папки указана: " . dol2regRootDir, "Если при первом запуске DOL2 не указать папку D:\dealer.beeline.ru\DOL2, настройки и договора не будут сохраняться в резервной копии и могут быть случайно или автоматически удалены или утеряны при переносе данных на другой компьютер.", "В настройках DOL2 есть ошибка!")
@@ -187,7 +190,7 @@ ShowError(text, explain:="", title:="") {
     } Else {
 	mailTitle := text
     }
-    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(text . "`n`n(" . explain . ")")
+    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(text . "`n`n" . explain)
     MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
