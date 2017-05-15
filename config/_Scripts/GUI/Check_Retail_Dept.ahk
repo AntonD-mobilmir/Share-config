@@ -65,12 +65,12 @@ AddLog("Свободно на D:", MBGB(dfd), dfd > 1536)
 DriveSpaceFree dfr, R:\
 AddLog("Свободно на R:", MBGB(dfr), dfr > 1536)
 
+FileGetTime timestampRunningScript, %A_ScriptFullPath%
+runningScript := AddLog("Работающий скрипт", TimeFormat(timestampRunningScript))
+
 AddLog("Скрипт на Srv0")
 FileGetTime timestampServerScript, %serverScriptPath%
-SetLastRowStatus(timestampServerScript)
-
-AddLog("Работающий скрипт")
-FileGetTime timestampRunningScript, %A_ScriptFullPath%
+SetLastRowStatus(TimeFormat(timestampServerScript))
 
 If (timestampServerScript =! timestampRunningScript) {
     SetLastRowStatus("Не совпадает", 0)
@@ -83,7 +83,7 @@ If (timestampServerScript =! timestampRunningScript) {
 	ExitApp
     }
 } Else {
-    SetLastRowStatus(timestampRunningScript)
+    SetRowStatus(runningScript)
 }
 
 EnvGet UserProfile,UserProfile
@@ -345,8 +345,7 @@ If (IsObject(instCriacxocx)){
 	}
 	SetRowStatus(instCriacxocx.line, statusTextcriacxocx, criacxocxTimeDiff > 0)
     } Else {
-	FormatTime instCriacxocxTimeFmt, % instCriacxocx.mtime, dd.MM.yyyy
-	SetRowStatus(instCriacxocx.line, "ocx~=cab (" . instCriacxocxTimeFmt . ")",1)
+	SetRowStatus(instCriacxocx.line, "ocx~=cab (" . TimeFormat(instCriacxocx.mtime) . ")",1)
     }
 } Else {
     AddLog("CRIACX.ocx","отсутствует",1)
@@ -561,6 +560,11 @@ MBGB(val) {
     return Format(format, val) . " " . unit
 }
 
+TimeFormat(ByRef time, ByRef fmt:="dd.MM.yyyy HH:mm") {
+    FormatTime ftime, %time%, dd.MM.yyyy HH:mm
+    return ftime
+}
+
 CheckRemove(path) {
     trashDir := A_Temp . "\trash-" . A_ScriptName
     FileCreateDir %trashDir%
@@ -714,13 +718,14 @@ SetLastRowStatus(status:="", check:=1) {
     return SetRowStatus(LV_GetCount(),status,check)
 }
 
-SetRowStatus(row, status:="", check:=1) {
+SetRowStatus(ByRef roworobj, status:="", check:=1) {
     If (status==0) {
 	status:="OK"
     } Else If (RegexMatch(status,"^[\d\-]{1-7}$")) {
 	status=! %status%
     }
     
+    row := IsObject(roworobj) ? roworobj.line : roworobj
     If (status=="")
 	return LV_Modify(row, check ? "Check" : "")
     Else
