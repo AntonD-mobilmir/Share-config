@@ -1,5 +1,4 @@
-﻿
-#NoEnv
+﻿#NoEnv
 #SingleInstance off
 SetRegView 32
 
@@ -13,8 +12,44 @@ EnvGet ProgramFilesx86,ProgramFiles(x86)
 IfNotExist %ProgramFilesx86%
     EnvGet ProgramFilesx86,ProgramFiles
 
-; это исходное ошибочное предположение. А вообще, DOL2 использует только одно значение – RootDir. -- Loop Reg, %DOL2SettingsKey%
+; подготовка список окон для наблюдения
+
+DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe DOLNavigator.exe
+; ключ - текст в окне или заголовок окна (сначала проверяется текст)
+; значение – объект []
+;	1: заголовок окна (или пусто, если ключ = заголовок)
+;	2: требуемое действие
+;		-1 – показать сообщение об ошибке и открыть окно для регистрации заявки для службы ИТ
+;		 0 – всё ок, завершить скрипт
+;	 	 1 – выбор папки
+;		 2 – нажать OK, запустить FSACL_DOL2.cmd, перезапустить DOL2
+; 		 3 – нажать Нет
+;		 4 – подождать и проверить снова
+
+AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe DOLNavigator.exe": ["", 0]
+    ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации": [DOL2NavErrTitle, -1]
+    ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!"							: [DOL2NavErrTitle, -1]
+    ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора."		: [DOL2NavErrTitle, -1]
+    ,"Отказано в доступе по пути"												: [DOL2NavErrTitle, -1]
+    ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe": 2]
+    ,"Application cannot be started. Contact the application vendor."		: ["Cannot Start Application ahk_exe dfsvc.exe": 2]
+    ,"Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг." : ["Невозможно запустить приложение ahk_exe dfsvc.exe", -1]
+    ,"Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?": ["Установка DOL ahk_class #32770 ahk_exe DOLNavigator.exe", 3]
+    ,"menuMain": ["Навигатор ahk_exe DOLNavigator.exe", 4]
+}
+
+For wintext,v in AutoResponces
+    If (v[1])
+	GroupAdd WinWaitList, % v[1], %wintext%
+    Else
+	GroupAdd WinWaitList, %wintext%
+
+If (!CrystalReportsInstalled())
+    ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
+
+; проверка выбранной корневой папки
 RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
+; исходное ошибочное предположение. Вообще-то DOL2 использует только одно значение – RootDir. -- Loop Reg, %DOL2SettingsKey%
 
 If (ErrorLevel) {
     ;RootDir не указан = DOL2 ещё не запускался
@@ -36,8 +71,77 @@ If (ErrorLevel) {
     }
 }
 
-If (!CrystalReportsInstalled())
-    ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
+; начальные проверки закончены, можно запускать
+Loop
+{
+    If (!started) {
+	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
+	started:=1
+	SplashTextOn 250,50,%ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
+	WinSet AlwaysOnTop, Off, %ScriptTitle%
+    }
+    
+    WinWait ahk_group WinWaitList,,300
+    If (ErrorLevel) {
+	MsgBox За пять минут ни одно ожидаемое окно не появилось.
+	ExitApp
+    } Else {
+	WinGetTitle fullTitle
+	WinGetText fullText
+	FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n, %logfname%
+	SplashTextOff
+	For wintext,v in AutoResponces {
+	    a:=v[2]
+	    If (InStr(fullText, wintext)) {
+		If (a=0) {
+		    ;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
+		    FileRemoveDir %A_Programs%\Vimpelcom
+		    ExitApp
+		} Else If (a=-1) {
+		    ShowError("Обнаружено окно DOLNavigator с ошибкой """ . wintext . """")
+		    ExitApp
+		} Else If (a=1) {
+		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle%
+		    WinWaitClose
+		    Progress Off
+		    
+		    endTime := A_TickCount + 5000 ; 5 seconds
+		    Loop
+		    {
+			Sleep 100
+			RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
+		    } Until !ErrorLevel || A_TickCount > endTime
+		    
+		    If (dol2regRootDir=DOL2ReqdBaseDir) ; всё в порядке, можно проверять другие окна
+			Continue
+		    
+		    Process Close, DOLNavigator.exe
+		    RegDelete %DOL2SettingsKey%, RootDir
+		    RegDelete HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\DB, Ver
+		    ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
+		    ExitApp
+		} Else If (a=2) {
+		    ControlClick &OK
+		    If (!configDir)
+			configDir := getDefaultConfigDir()
+		    RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
+		    started := 0
+		    continue
+		} Else If (a=3) {
+		    ControlClick &Нет
+		    ControlClick Button2
+		    Continue
+		} Else If (a=4) {
+		    Sleep 500
+		    continue
+		}
+	    }
+	}
+	ShowError("Обнаружено неизвестное окно DOLNavigator: " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+    }
+}
+ShowError("Выполнение цикла мониторинга прекратилось", "В скрипте запуска DOL2 есть ошибка")
+ExitApp
 
 CrystalReportsInstalled() {
     static RegViews := [32,64]
@@ -55,109 +159,7 @@ CrystalReportsInstalled() {
 }
 
 StartsWith(ByRef long, ByRef short) {
-    return SubStr(long,1,StrLen(short))=short
-}
-
-; начальные проверки закончены, можно запускать
-runAppAgain:
-Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
-
-SplashTextOn 250,50,%ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
-WinSet AlwaysOnTop, Off, %ScriptTitle%
-
-DOLNavigatorErrors := ["Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации"
-		      ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!",
-		      ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора."
-		      ,"Отказано в доступе по пути"]
-
-;For i,wintext in DOLNavigatorErrors
-;    GroupAdd grpDOLNavigatorErrors, On Line Dealer ahk_class #32770 ahk_exe DOLNavigator.exe, %wintext%
-
-Loop
-{
-    Sleep 500
-    
-    IfWinExist Невозможно запустить приложение ahk_exe dfsvc.exe
-    {
-	ControlClick &OK
-	configDir := getDefaultConfigDir()
-	RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
-	GoTo runAppAgain
-    }
-
-    IfWinExist Cannot Start Application ahk_exe dfsvc.exe, Application cannot be started. Contact the application vendor.
-    {
-	ControlClick &OK
-	configDir := getDefaultConfigDir()
-	RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
-	GoTo runAppAgain
-    }
-
-    IfWinExist Обзор папок ahk_class #32770 ahk_exe DOLNavigator.exe, Выберите папку для хранения данных приложения DOL:
-    {
-	SplashTextOff
-	Progress A M ZH0, %DOL2ReqdBaseDir%,В окне выбора папки укажите:,%ScriptTitle%
-	
-	Loop
-	{
-	    Sleep 500
-	    RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
-	} Until !ErrorLevel
-	Progress Off
-	
-	If (dol2regRootDir!=DOL2ReqdBaseDir) {
-	    Process Close, DOLNavigator.exe
-	    RegDelete %DOL2SettingsKey%, RootDir
-	    RegDelete HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\DB, Ver
-	    ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
-	    ExitApp
-	}
-	
-	Continue
-    }
-    
-    IfWinExist Установка DOL ahk_class #32770 ahk_exe DOLNavigator.exe, Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?
-    {
-	ControlClick &Нет
-	ControlClick Button2
-	Continue
-    }
-    
-    IfWinExist DOL Навигатор - (Дилер: ahk_exe DOLNavigator.exe
-	break
-    
-    IfWinExist Навигатор ahk_exe DOLNavigator.exe, menuMain
-	continue ; ещё не запустился
-    
-    IfWinExist ahk_exe DOLNavigator.exe
-    {
-	WinGetTitle fullTitle
-	WinGetText fullText
-	SplashTextOff
-	
-	FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n
-	
-	;IfWinExist ahk_group grpDOLNavigatorErrors
-	For i,wintext in DOLNavigatorErrors {
-	    If (InStr(fullText, wintext)) {
-		ShowError("Обнаружено окно DOLNavigator с ошибкой """ . wintext . """")
-		ExitApp
-	    }
-	}
-	
-	ShowError("Обнаружено неизвестное окно DOLNavigator: " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
-    }
-}
-
-SplashTextOff
-
-;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
-FileRemoveDir %A_Programs%\Vimpelcom
-
-ExitApp
-
-BeginsWith(long, short) {
-    return short = SubStr(long, 1, StrLen(short))
+    return SubStr(long, 1, StrLen(short)) = short
 }
 
 ShowError(text, explain:="", title:="") {
@@ -167,7 +169,8 @@ ShowError(text, explain:="", title:="") {
     FileAppend %A_Now%: %text%`n, %logfname%
     
     endTime := A_TickCount + 5 * 60 * 1000 ; 5 минут
-    Run http://l.mobilmir.ru/newtaskdept
+    ;Run http://l.mobilmir.ru/newtaskdept
+    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2: " . text) . "&body=" . UriEncode(explain)
     MsgBox 0x1030, %title%, %text%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
@@ -203,4 +206,51 @@ ReadSetVarFromBatchFile(filename, varname) {
 	    }
 	}
     }
+}
+
+;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/
+; modified from jackieku's code (http://www.autohotkey.com/forum/post-310959.html#310959)
+UriEncode(Uri, Enc = "UTF-8")
+{
+	StrPutVar(Uri, Var, Enc)
+	f := A_FormatInteger
+	SetFormat, IntegerFast, H
+	Loop
+	{
+		Code := NumGet(Var, A_Index - 1, "UChar")
+		If (!Code)
+			Break
+		If (Code >= 0x30 && Code <= 0x39 ; 0-9
+			|| Code >= 0x41 && Code <= 0x5A ; A-Z
+			|| Code >= 0x61 && Code <= 0x7A) ; a-z
+			Res .= Chr(Code)
+		Else
+			Res .= "%" . SubStr(Code + 0x100, -1)
+	}
+	SetFormat, IntegerFast, %f%
+	Return, Res
+}
+
+UriDecode(Uri, Enc = "UTF-8")
+{
+	Pos := 1
+	Loop
+	{
+		Pos := RegExMatch(Uri, "i)(?:%[\da-f]{2})+", Code, Pos++)
+		If (Pos = 0)
+			Break
+		VarSetCapacity(Var, StrLen(Code) // 3, 0)
+		StringTrimLeft, Code, Code, 1
+		Loop, Parse, Code, `%
+			NumPut("0x" . A_LoopField, Var, A_Index - 1, "UChar")
+		StringReplace, Uri, Uri, `%%Code%, % StrGet(&Var, Enc), All
+	}
+	Return, Uri
+}
+
+StrPutVar(Str, ByRef Var, Enc = "")
+{
+	Len := StrPut(Str, Enc) * (Enc = "UTF-16" || Enc = "CP1200" ? 2 : 1)
+	VarSetCapacity(Var, Len, 0)
+	Return, StrPut(Str, &Var, Enc)
 }
