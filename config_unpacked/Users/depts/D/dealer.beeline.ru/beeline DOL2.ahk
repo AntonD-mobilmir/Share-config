@@ -1,16 +1,24 @@
 ﻿#NoEnv
-#SingleInstance off
+#SingleInstance
+MyPID:=DllCall("GetCurrentProcessId")
 SetRegView 32
+
+EnvGet ProgramFilesx86,ProgramFiles(x86)
+IfNotExist %ProgramFilesx86%
+    EnvGet ProgramFilesx86,ProgramFiles
+
+EnvGet LocalAppData,LOCALAPPDATA
+If (!LocalAppData) {
+    EnvGet UserProfile,USERPROFILE
+    LocalAppData=%UserProfile%\Local Settings\Application Data
+}
 
 ScriptTitle=Скрипт проверки запуска DOL2
 logfname=%A_ScriptFullPath%.log
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
 DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
 DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
-
-EnvGet ProgramFilesx86,ProgramFiles(x86)
-IfNotExist %ProgramFilesx86%
-    EnvGet ProgramFilesx86,ProgramFiles
+DOL2BinDir=%LocalAppData%\Apps\2.0
 
 ; подготовка
 DOL2exe=DOLNavigator.exe
@@ -27,17 +35,22 @@ DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe %DOL2exe%
 ;		 2 – нажать OK, запустить FSACL_DOL2.cmd, перезапустить DOL2
 ; 		 3 – нажать Нет
 ;		 4 – подождать и проверить снова
+;		 5 – дождаться закрытия
 AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe " . DOL2exe: ["", 0]
+    ,"Закончить работу? ahk_exe " . DOL2exe: ["On Line Dealer", 0]
     ,"Выберите папку для хранения данных приложения DOL:": ["Обзор папок", 1]
     ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации": [DOL2NavErrTitle, -1]
-    ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!"							: [DOL2NavErrTitle, -1]
-    ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора."		: [DOL2NavErrTitle, -1]
-    ,"Отказано в доступе по пути"												: [DOL2NavErrTitle, -1]
-    ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
-    ,"Application cannot be started. Contact the application vendor."		: ["Cannot Start Application ahk_exe dfsvc.exe", 2]
-    ,"Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг." : ["Невозможно запустить приложение ahk_exe dfsvc.exe", -1]
+    ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!"		: [DOL2NavErrTitle, -1]
+    ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора.": [DOL2NavErrTitle, -1]
+    ,"Отказано в доступе по пути"							: [DOL2NavErrTitle, -1]
+    ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."		: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
+    ,"Невозможно запустить приложение. Обратитесь за помощью к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
+    ,"Application cannot be started. Contact the application vendor."			: ["Cannot Start Application ahk_exe dfsvc.exe", 2]
+    ,"Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.": ["Невозможно запустить приложение ahk_exe dfsvc.exe", -1]
     ,"Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?": ["Установка DOL ahk_class #32770 ahk_exe " . DOL2exe, 3]
-    ,"menuMain": ["Навигатор ahk_exe " . DOL2exe, 4]}
+    ,"DOL"										: ["Установка приложения - Предупреждение о безопасности ahk_exe dfsvc.exe", 5] ; предложение установить. !ToDo: удалять предыдущие версии автоматически
+    ,"DOL"										: ["ahk_exe dfsvc.exe", 5] ; скачивание, заголовок окна: "(…%) Установка DOL"
+    ,"menuMain"										: ["Навигатор ahk_exe " . DOL2exe, 0]} ; окно DOL2 уже появилось, но ещё не заполнено
 
 ;если окно DOL2 обнаружено, оно просто будет активировано, а запуск выполняться не будет
 If (WinExist("ahk_exe " . DOL2exe)) {
@@ -45,6 +58,11 @@ If (WinExist("ahk_exe " . DOL2exe)) {
     WinActivate
     WinSet AlwaysOnTop, Off
     ExitApp
+}
+
+If (!InStr(FileExist(DOL2BinDir), "D")) {
+    FileCreateDir %DOL2BinDir%
+    run_FSACL_DOL2_cmd()
 }
 
 GroupAdd WinWaitList, ahk_exe %DOL2exe%
@@ -73,11 +91,26 @@ If (ErrorLevel) {
     IfMsgBox Cancel
 	ExitApp
     
-    ;If (!WinExist(DOL2ReqdBaseDir . "DATA\DB.mdb")) {
-	; распаковать DOL2.template.7z → DOL2\
-	; импортировать DOL2\DOL2.reg
-	; прописать действительный путь в [HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs] "RootDir" (REG_SZ)
-    ;}
+    If (!WinExist(DOL2ReqdBaseDir . "DATA\DB.mdb")) {
+	; распаковка DOL2.template.7z → DOL2\
+	If (!exe7z){
+	    If (!configDir)
+		configDir := getDefaultConfigDir()
+	    tempFile=%A_Temp%\%A_ScriptName%.exe7zpath.tmp
+	    FileAppend %A_Now% exe7z=, %logfname%
+	    RunWait %comspec% /C ""%A_AhkPath%" /ErrorStdOut "%configDir%\_Scripts\Lib\find7zexe.ahk" > "%tempFile%"",%A_Temp%,Min
+	    FileReadLine exe7z, %tempFile%, 1
+	    If (!FileExist(exe7z))
+		Throw "7-Zip не найден, распаковать шаблон настроек невозможно"
+	    FileAppend "%exe7z%"`n, %logfname%
+	}
+	RunWait %comspec% /C ""%exe7z%" x -o"%DOL2ReqdBaseDir%" -- "%A_ScriptDir%\DOL2.template.7z" >>"%logfname%" 2>&1", %A_ScriptDir%, Min
+	; импорт DOL2\DOL2.reg
+	RunWait %comspec% /C ""%A_WinDir%\system32\reg.exe" IMPORT "%DOL2ReqdBaseDir%\DOL2.reg" >>"%logfname%" 2>&1", %DOL2ReqdBaseDir%, Min
+	FileDelete %DOL2ReqdBaseDir%\DOL2.reg
+	; запись действительного пути в [HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs] "RootDir" (REG_SZ)
+	RegWrite REG_SZ, HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs, RootDir, %DOL2ReqdBaseDir%
+    }
 } Else {
     If (dol2regRootDir != DOL2ReqdBaseDir) {
 	ShowError("В качестве корневой папки указана: " . dol2regRootDir, "Если при первом запуске DOL2 не указать папку " . DOL2ReqdBaseDir . ", настройки и договора не будут сохраняться в резервной копии и могут быть случайно или автоматически удалены или утеряны при переносе данных на другой компьютер.", "В настройках DOL2 есть ошибка!")
@@ -98,7 +131,7 @@ Loop
 	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
 	started:=1
 	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
-	WinSet AlwaysOnTop, Off, %ScriptTitle%
+	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
     }
     
     WinWait ahk_group WinWaitList,,300
@@ -111,11 +144,12 @@ Loop
 	WinGet exeName, ProcessName
 	;WinGet exePath, ProcessPath
 	;SplitPath exePath, exeName
-	FileAppend %A_Now% Обнаружено окно: [%fullTitle%]`n%fullText%`n`n, %logfname%
+	FileAppend %A_Now% Обнаружено окно "%exeName%": [%fullTitle%]`n%fullText%`n`n, %logfname%
 	SplashTextOff
 	a=
 	For wintext,v in AutoResponces {
-	    If (v[1] && InStr(fullText, wintext) || InStr(fullTitle, SubStr(wintext, 1, InStr(wintext, " ahk_")-1))) {
+	    ;wintext = %fullTitle% … ahk_exe %exeName%
+	    If (v[1] && InStr(fullText, wintext) || wintext ~= "^" . fullTitle . ".* ahk_exe " . exeName) {
 		a:=v[2]
 		If (a=0) {
 		    ;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
@@ -145,15 +179,18 @@ Loop
 		    }
 		} Else If (a=2) {
 		    ControlClick &OK
-		    If (!configDir)
-			configDir := getDefaultConfigDir()
-		    RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
+		    run_FSACL_DOL2_cmd()
 		    started := 0
 		} Else If (a=3) {
 		    ControlClick &Нет
 		    ControlClick Button2
 		} Else If (a=4) {
 		    Sleep 500
+		} Else If (a=5) {
+		    SplashTextOn 450, 150, %ScriptTitle%, Ожидается закрытие окна [%fullTitle%]`n%wintext%
+		    WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
+		    WinWaitClose
+		    SplashTextOff
 		}
 	    }
 	}
@@ -198,6 +235,13 @@ ShowError(txt, explain:="", title:="") {
     }
     Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(txt . "`n`n" . explain)
     MsgBox 0x1030, %title%, %txt%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
+}
+
+run_FSACL_DOL2_cmd() {
+    global configDir
+    If (!configDir)
+	configDir := getDefaultConfigDir()
+    RunWait "%ComSpec%" /C "%configDir%\_Scripts\Security\FSACL_DOL2.cmd",,Min
 }
 
 ;getDefaultConfig.ahk
