@@ -68,13 +68,13 @@ If (!InStr(FileExist(DOL2BinDir), "D")) {
 }
 
 GroupAdd WinWaitList, ahk_exe %DOL2exe%
-For wintext,v in AutoResponces
+For winText,v in AutoResponces
     If (v[1])
 	If (!InStr(v[1], "ahk_exe " . DOL2exe))
-	    GroupAdd WinWaitList, % v[1], %wintext%
+	    GroupAdd WinWaitList, % v[1], %winText%
     Else
-	If (!InStr(wintext, "ahk_exe " . DOL2exe))
-	    GroupAdd WinWaitList, %wintext%
+	If (!InStr(winText, "ahk_exe " . DOL2exe))
+	    GroupAdd WinWaitList, %winText%
 
 If (!CrystalReportsInstalled())
     ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
@@ -161,16 +161,20 @@ Loop
 	FileAppend %A_Now% Обнаружено окно "%exeName%": [%fullTitle%]`n%fullText%`n`n, %logfname%
 	SplashTextOff
 	a=
-	For wintext,v in AutoResponces {
-	    ;wintext = %fullTitle% … ahk_exe %exeName%
-	    If (v[1] && InStr(fullText, wintext) || wintext ~= "^" . fullTitle . ".* ahk_exe " . exeName) {
+	For winText,v in AutoResponces {
+	    ;winText = %fullTitle% … ahk_exe %exeName%
+	    If (!(winTitle := v[1])) {
+		winTitle := winText
+		winText=
+	    }
+	    If (winTitle ~= "^" . fullTitle . ".* ahk_exe " . exeName && InStr(fullText, winText)) {
 		a:=v[2]
 		If (a=0) {
 		    ;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
 		    FileRemoveDir %A_Programs%\Vimpelcom
 		    ExitApp
 		} Else If (a=-1) {
-		    ShowError("Обнаружено окно " . exeName . " с ошибкой """ . wintext . """")
+		    ShowError("Обнаружено окно " . exeName . " с ошибкой """ . winText . """")
 		    ExitApp
 		} Else If (a=1) {
 		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle%
@@ -201,7 +205,7 @@ Loop
 		} Else If (a=4) {
 		    Sleep 500
 		} Else If (a=5) {
-		    SplashTextOn 450, 150, %ScriptTitle%, Ожидается закрытие окна [%fullTitle%]`n%wintext%
+		    SplashTextOn 450, 150, %ScriptTitle%, Ожидается закрытие окна [%fullTitle%]`n%winText%
 		    WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
 		    WinWaitClose
 		    SplashTextOff
