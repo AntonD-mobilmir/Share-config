@@ -46,6 +46,7 @@ AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe " . DOL2exe: ["
     ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."		: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
     ,"Невозможно запустить приложение. Обратитесь за помощью к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
     ,"Application cannot be started. Contact the application vendor."			: ["Cannot Start Application ahk_exe dfsvc.exe", 2]
+    ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы": ["On Line Dealer ahk_exe " . DOL2exe, 2]
     ,"Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.": ["Невозможно запустить приложение ahk_exe dfsvc.exe", -1]
     ,"Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?": ["Установка DOL ahk_class #32770 ahk_exe " . DOL2exe, 3]
     ,"DOL"										: ["Установка приложения - Предупреждение о безопасности ahk_exe dfsvc.exe", 5] ; предложение установить. !ToDo: удалять предыдущие версии автоматически
@@ -106,11 +107,23 @@ If (ErrorLevel) {
 	    FileAppend "%exe7z%"`n, %logfname%
 	}
 	RunWait %comspec% /C ""%exe7z%" x -o"%DOL2ReqdBaseDir%" -- "%A_ScriptDir%\DOL2.template.7z" >>"%logfname%" 2>&1", %A_ScriptDir%, Min
-	; импорт DOL2\DOL2.reg
-	RunWait %comspec% /C ""%A_WinDir%\system32\reg.exe" IMPORT "%DOL2ReqdBaseDir%\DOL2.reg" >>"%logfname%" 2>&1", %DOL2ReqdBaseDir%, Min
-	FileDelete %DOL2ReqdBaseDir%\DOL2.reg
-	; запись действительного пути в [HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs] "RootDir" (REG_SZ)
-	RegWrite REG_SZ, HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs, RootDir, %DOL2ReqdBaseDir%
+	;7-Zip returns the following exit codes:
+	;Code Meaning 
+	;0 No error 
+	;1 Warning (Non fatal error(s)). For example, one or more files were locked by some other application, so they were not compressed. 
+	;2 Fatal error 
+	;7 Command line error 
+	;8 Not enough memory for operation 
+	;255 User stopped the process 
+	If (ErrorLevel < 2 && FileExist(DOL2ReqdBaseDir "\DOL2.reg")) {
+	    ; импорт DOL2\DOL2.reg
+	    RunWait %comspec% /C ""%A_WinDir%\system32\reg.exe" IMPORT "%DOL2ReqdBaseDir%\DOL2.reg" >>"%logfname%" 2>&1", %DOL2ReqdBaseDir%, Min
+	    FileDelete %DOL2ReqdBaseDir%\DOL2.reg
+	    ; запись действительного пути в [HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs] "RootDir" (REG_SZ)
+	    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\Contract\Dirs, RootDir, %DOL2ReqdBaseDir%
+	} Else {
+	    FileAppend %A_Now% Шаблон БД не распакован. Импорт настроек и запись пути в реестр выполнена не будет`, пользователю придется самостоятельно выбрать правильную папку.`n, %logfname%
+	}
     }
 } Else {
     If (dol2regRootDir != DOL2ReqdBaseDir) {
