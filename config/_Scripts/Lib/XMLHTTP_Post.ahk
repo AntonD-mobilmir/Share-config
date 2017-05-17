@@ -1,7 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-XMLHTTP_PostForm(URL, POSTDATA, ByRef response="") {
+XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0) {
     global debug
     If (IsObject(debug)) {
 	FileAppend Отправка на адрес %URL% запроса %POSTDATA%`n, **
@@ -14,6 +14,8 @@ XMLHTTP_PostForm(URL, POSTDATA, ByRef response="") {
 	XMLHttpRequest.send(POSTDATA)
 	If (IsObject(response))
 	    response := {status: XMLHttpRequest.status, headers: XMLHttpRequest.getAllResponseHeaders, responseText: XMLHttpRequest.responseText}
+	Else
+	    response := XMLHttpRequest.responseText
 	If (IsObject(debug)) {
 	    debug.Headers := XMLHttpRequest.getAllResponseHeaders
 	    debug.Response := XMLHttpRequest.responseText
@@ -80,10 +82,10 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     }
     Loop %tries%
     {
+	response := Object()
 	If (XMLHTTP_PostForm(URL,POSTDATA, response))
 	    Exit 0
 	sleep %retryDelay%
-	response := Object()
     }
     ExitApp response.status
 }
