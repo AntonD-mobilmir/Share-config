@@ -7,7 +7,6 @@
 Thread NoTimers
 
 idletimeDisconnectVPN := 30 * 60 * 1000 ; 30 min
-idletimeRarusRestore := 10 * 60 * 1000 ; 10 min
 idletimeRarusCheckAutoLoad := 3 * 60 * 1000 ; 3 min
 idletimeGiftomanNonOnTop := 30 * 1000 ; 30 sec
 
@@ -15,13 +14,15 @@ idletimeGiftomanNonOnTop := 30 * 1000 ; 30 sec
 ;ahk_exe KKMGMSuite.exe
 GroupAdd KKMGMSuite, ahk_exe KKMGMSuite.exe
 
+;Progress A M R0-%idletimeRarusCheckAutoLoad% T, idle
 SetTimer Periodic, 3000
 
 Exit
 
 Periodic:
-    idle := A_TimeIdle ; на действия самого скрипта тоже стоит реагировать
     ;idle := A_TimeIdlePhysical
+    idle := A_TimeIdle ; на действия самого скрипта тоже стоит реагировать
+    ;Progress %idle%, %idle%
     If (idle > idletimeDisconnectVPN) {
 	If (!RasDisconnected)
 	    Run rasdial.exe /DISCONNECT,,Min UseErrorLevel
@@ -46,14 +47,17 @@ Periodic:
     }
 ;Рарус
     If (idle > idletimeRarusCheckAutoLoad && WinExist("ahk_exe 1cv7s.exe")) {
-	;WinGet rarusMinMax, MinMax
-	;If (rarusMinMax = -1)
-	;    WinRestore
+	WinGet rarusMinMax, MinMax
+	If (rarusMinMax = -1)
+	    WinRestore
 	ControlGetText txtBtn, Button20
 	If (ErrorLevel || txtBtn != "ОБМЕН УТ") {
-	    ControlSend F12
+	    ControlSend ahk_parent, {F12}
+	    ;Progress,, Фронт кассира развернут
 	    Sleep 2000
 	}
 	ControlClick Button20 ; ОБМЕН УТ
+	If (rarusMinMax = -1)
+	    WinMinimize
     }
 return
