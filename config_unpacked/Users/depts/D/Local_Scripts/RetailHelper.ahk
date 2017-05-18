@@ -46,17 +46,33 @@ Periodic:
 	}
     }
 ;Рарус
+    rarusMinMax := 2
     If (idle > idletimeRarusCheckAutoLoad && WinExist("ahk_exe 1cv7s.exe")) {
-	WinGet rarusMinMax, MinMax
-	If (rarusMinMax = -1)
-	    WinRestore
 	ControlGetText txtBtn, Button20
 	If (ErrorLevel || txtBtn != "ОБМЕН УТ") {
+	    WinGet rarusMinMax, MinMax
+	    If (rarusMinMax == -1)
+		WinRestore
 	    ControlSend ahk_parent, {F12}
 	    ;Progress,, Фронт кассира развернут
 	    Sleep 2000
+	    ControlGetText txtBtn, Button20
+	    If (ErrorLevel || txtBtn != "ОБМЕН УТ") ; че-то не сработало
+		Exit
 	}
-	ControlClick Button20 ; ОБМЕН УТ
+	ControlGetText txtStatic, Static2
+	If (ErrorLevel || txtStatic != "ОБМЕН УТ")
+	    Exit
+	; кроме Static2, можно проверять видимость Button21, но Button21 -- без текста
+	ControlGet s2vis, Visible,, Static2
+	If (!ErrorLevel && s2vis) { ; кнопка – красная
+	    If (rarusMinMax == 2) {
+		WinGet rarusMinMax, MinMax
+		If (rarusMinMax == -1)
+		    WinRestore
+	    }
+	    ControlClick Button20 ; ОБМЕН УТ
+	}
 	If (rarusMinMax = -1)
 	    WinMinimize
     }
