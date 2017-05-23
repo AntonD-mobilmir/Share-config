@@ -8,6 +8,7 @@ Thread NoTimers
 
 idletimeDisconnectVPN := 30 * 60 * 1000 ; 30 min
 idletimeRarusCheckAutoLoad := 3 * 60 * 1000 ; 3 min
+doublepressRarusTimeout := 20 * 60 * 1000 ; 20 min
 idletimeGiftomanNonOnTop := 30 * 1000 ; 30 sec
 
 ;ahk_class HwndWrapper[KKMGMSuite.exe;;ec6679dd-7266-4fe0-8880-fd566da471b0]
@@ -47,7 +48,7 @@ Periodic:
     }
 ;Рарус
     rarusMinMax := 2
-    If (idle > idletimeRarusCheckAutoLoad && WinExist("ahk_exe 1cv7s.exe")) {
+    If (idle > idletimeRarusCheckAutoLoad && A_TickCount > rarusLoadNextCheck && WinExist("ahk_exe 1cv7s.exe")) {
 	ControlGetText txtBtn, Button20
 	If (ErrorLevel || txtBtn != "ОБМЕН УТ") {
 	    WinGet rarusMinMax, MinMax
@@ -72,6 +73,7 @@ Periodic:
 		    WinRestore
 	    }
 	    ControlClick Button20 ; ОБМЕН УТ
+	    rarusLoadNextCheck := A_TickCount + doublepressRarusTimeout
 	}
 	If (rarusMinMax = -1)
 	    WinMinimize
