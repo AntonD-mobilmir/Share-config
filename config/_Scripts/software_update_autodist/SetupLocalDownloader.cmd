@@ -215,9 +215,11 @@ EXIT /B 32767
 )
 :distSysUtilsUpdated
 (
+IF EXIST "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe" SET "instgpg=1"
 MOVE /Y "%SystemDrive%\SysUtils" "%SystemDrive%\Windows\Temp\SysUtils_%DATE%_%RANDOM%"
 ECHO Running D:\Distributives\Soft\PreInstalled\prepare.cmd ...
 START "Installing PreInstalled" /MIN /WAIT %comspec% /C "D:\Distributives\Soft\PreInstalled\prepare.cmd"
+IF DEFINED instgpg START "Installing GnuPG" /MIN %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\PreInstalled\manual\SysUtils_GPG.cmd"
 ECHO Cleaning non-existing paths from PATH
 START "Cleaning non-existing paths from PATH" %AutohotkeyExe% "%configDir%_Scripts\cleanup\settings\cleanup Path var in reg.ahk"
 FOR /D %%A IN ("%SystemDrive%\Windows\Temp\SysUtils_*.*") DO RD /S /Q "%%~A"
