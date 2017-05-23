@@ -1,6 +1,10 @@
 #NoEnv
 #SingleInstance ignore
+EnvGet USERPROFILE,USERPROFILE
+
 logFile=%A_Temp%\%A_ScriptName%.%A_Now%.log
+unpackDest=%USERPROFILE%\Git\Share-config\config_unpacked
+
 arg1=%1%
 If (arg1="-batch") {
     runMode=Hide
@@ -15,31 +19,39 @@ If (!unisonexe)
 
 RunString=%unisonexe% profiles$ -root "%A_ScriptDir%\profiles$"
 
+SetStatus(RunString)
 RunWait %RunString% %1%,,%runMode%
-If ErrorLevel
+If (ErrorLevel)
     Run %RunString%
+SetStatus()
 
 Try
     exe7z:=find7zexe()
 Catch
     exe7z:=find7zaexe()
 
-EnvGet USERPROFILE,USERPROFILE
-
 backupWorkingDir := A_WorkingDir
 SetWorkingDir %A_ScriptDir%\profiles$\Share\config
 
+FileRemoveDir %unpackDest%, 1
+skipArchives := {"schtasks.7z":1,"staged.7z":1,"staged-crash201504.7z":1,"staged-not-retail.7z":1,"staged-retail.7z":1,"DOL2.template.7z":1}
 Loop Files, *.7z, R
-{
-;    If A_LoopFileDir not in thunderbird\default_profile_template\extensions
-    If A_LoopFileName not in schtasks.7z,staged.7z,staged-crash201504.7z,staged-not-retail.7z,staged-retail.7z
-    {
+    If (!skipArchives.HasKey(Format("{:L}", A_LoopFileName))) {
 	outDir := SubStr(A_LoopFileName, 1, -3)
-	RunWait %exe7z% x -aoa -o"%USERPROFILE%\Git\Share-config\config_unpacked\%A_LoopFileDir%\*" -- "%A_LoopFileFullPath%",, Min
+	SetStatus("Extracting """ . A_LoopFileFullPath . """")
+	RunWait %exe7z% x -aoa -o"%unpackDest%\%A_LoopFileDir%\*" -- "%A_LoopFileFullPath%",, Min
     }
-}
+SetStatus()
 
 SetWorkingDir %backupWorkingDir%
 ExitApp
 
 #include %A_ScriptDir%\profiles$\Share\config\_Scripts\Lib\find7zexe.ahk
+
+SetStatus(status:="", title:="", traytipOpt:="") {
+    If (status)
+	TrayTip %title%, %status%,, %traytipOpt%
+    Else
+	TrayTip
+    Menu Tray, Tip, %status%
+}
