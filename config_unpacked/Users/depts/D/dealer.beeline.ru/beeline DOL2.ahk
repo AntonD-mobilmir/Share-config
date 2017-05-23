@@ -19,16 +19,16 @@ DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_O
 DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
 DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
 DOL2BinDir=%LocalAppData%\Apps\2.0
+DOL2Navexe=DOLNavigator.exe
+DOL2NavErrTitle = On Line Dealer ahk_class #32770
+HKCUUninstallKey=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+MaxMailtoTextLength := 1024
 
 ; подготовка
-DOL2exe=DOLNavigator.exe
-DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe %DOL2exe%
 
 ; список окон для наблюдения
-; ключ - текст в окне или заголовок окна (сначала проверяется текст)
-; значение – объект []
-;	1: заголовок окна (или пусто, если ключ = заголовок)
-;	2: требуемое действие
+; [[exe, заголовок окна, текст в окне, требуемое действие], […], …]
+; 	требуемое действие:
 ;		-1 – показать сообщение об ошибке и открыть окно для регистрации заявки для службы ИТ
 ;		 0 – всё ок, завершить скрипт
 ;	 	 1 – выбор папки
@@ -36,26 +36,27 @@ DOL2NavErrTitle = On Line Dealer ahk_class #32770 ahk_exe %DOL2exe%
 ; 		 3 – нажать Нет
 ;		 4 – подождать и проверить снова
 ;		 5 – дождаться закрытия
-AutoResponces := {"DOL Навигатор - (Дилер: ahk_exe " . DOL2exe: ["", 0]
-    ,"Закончить работу? ahk_exe " . DOL2exe: ["On Line Dealer", 0]
-    ,"Выберите папку для хранения данных приложения DOL:": ["Обзор папок", 1]
-    ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации": [DOL2NavErrTitle, -1]
-    ,"Обновление базы данных прошло с ошибкой. Приложение не будет запущено!"		: [DOL2NavErrTitle, -1]
-    ,"Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора.": [DOL2NavErrTitle, -1]
-    ,"Отказано в доступе по пути"							: [DOL2NavErrTitle, -1]
-    ,"Запуск приложения невозможен. Обратитесь к поставщику приложения."		: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
-    ,"Невозможно запустить приложение. Обратитесь за помощью к поставщику приложения."	: ["Невозможно запустить приложение ahk_exe dfsvc.exe", 2]
-    ,"Application cannot be started. Contact the application vendor."			: ["Cannot Start Application ahk_exe dfsvc.exe", 2]
-    ,"Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы": ["On Line Dealer ahk_exe " . DOL2exe, 2]
-    ,"Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.": ["Невозможно запустить приложение ahk_exe dfsvc.exe", -1]
-    ,"Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?": ["Установка DOL ahk_class #32770 ahk_exe " . DOL2exe, 3]
-    ,"DOL"										: ["Установка приложения - Предупреждение о безопасности ahk_exe dfsvc.exe", 5] ; предложение установить. !ToDo: удалять предыдущие версии автоматически
-    ,"DOL"										: ["ahk_exe dfsvc.exe", 5] ; скачивание, заголовок окна: "(…%) Установка DOL"
-    ,"Вести журнал"									: ["Настройки Навигатора On Line Dealer ahk_exe " . DOL2exe, 0] ; #INC-5766
-    ,"menuMain"										: ["Навигатор ahk_exe " . DOL2exe, 0]} ; окно DOL2 уже появилось, но ещё не заполнено
+;		 6 – &Установить
+AutoResponces := [[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
+    ,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
+    ,[DOL2Navexe, "On Line Dealer", "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы", 2]
+    ,[DOL2Navexe, "Обзор папок", "Выберите папку для хранения данных приложения DOL:", 1]
+    ,[DOL2Navexe, "Установка DOL ahk_class #32770", "Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?", 3]
+    ,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации", -1]
+    ,[DOL2Navexe, DOL2NavErrTitle, "Обновление базы данных прошло с ошибкой. Приложение не будет запущено!" , -1]
+    ,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора.", -1]
+    ,[DOL2Navexe, DOL2NavErrTitle, "Отказано в доступе по пути" , -1]
+    ,["dfsvc.exe", "Невозможно запустить приложение", "Запуск приложения невозможен. Обратитесь к поставщику приложения." , 2]
+    ,["dfsvc.exe", "Невозможно запустить приложение", "Невозможно запустить приложение. Обратитесь за помощью к поставщику приложения." , 2]
+    ,["dfsvc.exe", "Cannot Start Application", "Application cannot be started. Contact the application vendor." , 2]
+    ,["dfsvc.exe", "Невозможно запустить приложение", "Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.", -1]
+    ,["dfsvc.exe", "Установка приложения - Предупреждение о безопасности", "SIGNER CLIENT DOL" , 6] ; предложение установить
+    ,["dfsvc.exe", "(", "Установка DOL", 5] ; скачивание, заголовок окна: "(…%) Установка DOL"
+    ,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Вести журнал" , 0] ; #INC-5766
+    ,[DOL2Navexe, "Навигатор", "menuMain", 0]] ; окно DOL2 уже появилось, но ещё не заполнено
 
 ;если окно DOL2 обнаружено, оно просто будет активировано, а запуск выполняться не будет
-If (WinExist("ahk_exe " . DOL2exe)) {
+If (WinExist("ahk_exe " . DOL2Navexe)) {
     WinSet AlwaysOnTop, On
     WinActivate
     WinSet AlwaysOnTop, Off
@@ -67,14 +68,10 @@ If (!InStr(FileExist(DOL2BinDir), "D")) {
     run_FSACL_DOL2_cmd()
 }
 
-GroupAdd WinWaitList, ahk_exe %DOL2exe%
-For winText,v in AutoResponces
-    If (v[1])
-	If (!InStr(v[1], "ahk_exe " . DOL2exe))
-	    GroupAdd WinWaitList, % v[1], %winText%
-    Else
-	If (!InStr(winText, "ahk_exe " . DOL2exe))
-	    GroupAdd WinWaitList, %winText%
+GroupAdd WinWaitList, ahk_exe %DOL2Navexe%
+For i,v in AutoResponces
+    If (v[1] != DOL2Navexe)
+	GroupAdd WinWaitList, % v[2] " ahk_exe " v[1], % v[3]
 
 If (!CrystalReportsInstalled())
     ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
@@ -144,7 +141,7 @@ Loop
     If (!started) {
 	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
 	started:=1
-	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидается появление окна (обычно до двух минут)
+	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, Ожидание появления окна (обычно до двух минут)
 	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
     }
     
@@ -161,14 +158,13 @@ Loop
 	FileAppend %A_Now% Обнаружено окно "%exeName%": [%fullTitle%]`n%fullText%`n`n, %logfname%
 	SplashTextOff
 	a=
-	For winText,v in AutoResponces {
-	    ;winText = %fullTitle% … ahk_exe %exeName%
-	    If (!(winTitle := v[1])) {
-		winTitle := winText
-		winText=
-	    }
-	    If (winTitle ~= "^" . fullTitle . ".* ahk_exe " . exeName && InStr(fullText, winText)) {
-		a:=v[2]
+	For i,v in AutoResponces {
+	    ;ahk_exe := v[1]
+	    ;winTitle := v[2]
+	    ;winText := v[3]
+	    ;action := v[4]
+	    If (exeName = v[1] && StartsWith(fullTitle, v[2]) && InStr(fullText, v[3])) {
+		a:=v[4]
 		If (a=0) {
 		    ;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
 		    FileRemoveDir %A_Programs%\Vimpelcom
@@ -189,7 +185,7 @@ Loop
 		    } Until !ErrorLevel || A_TickCount > endTime
 		    
 		    If (dol2regRootDir!=DOL2ReqdBaseDir) { ; всё в порядке, можно проверять другие окна
-			Process Close, %DOL2exe%
+			Process Close, %DOL2Navexe%
 			RegDelete %DOL2SettingsKey%, RootDir
 			RegDelete HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line\DB, Ver
 			ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
@@ -205,10 +201,41 @@ Loop
 		} Else If (a=4) {
 		    Sleep 500
 		} Else If (a=5) {
-		    SplashTextOn 450, 150, %ScriptTitle%, Ожидается закрытие окна [%fullTitle%]`n%winText%
+		    SplashTextOn 450, 150, %ScriptTitle%, Ожидание закрытия окна`n[%fullTitle%]`n%winText%
 		    WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
 		    WinWaitClose
 		    SplashTextOff
+		} Else If (a=6) {
+		    Loop Reg, %HKCUUninstallKey%, K
+		    {
+			currentKey:=HKCUUninstallKey "\" A_LoopRegName
+			If (RegCheck(currentKey, {"DisplayName": "DOL.*"
+									 ,"Publisher": "Vimpelcom"
+									 ,"UrlUpdateInfo": "https://dealer.beeline.ru/dealer/DOL2/DOL.application"})) {
+			    If (started) {
+				WinClose ; закрытие окна установки, чтобы пользователь там ничего не нажал во время удаления
+				started:=0 ; старых версий может быть несколько, закрыть окно надо только один раз
+				Process Close, %DOL2Navexe%
+				Process Close, DOLKernel.exe
+			    }
+			    RegRead UninstallString,%currentKey%,UninstallString
+			    Run %UninstallString%
+			    WinWait Обслуживание DOL ahk_exe dfsvc.exe
+			    Sleep 500
+			    ControlClick Удаление приложения с этого компьютера.
+			    Sleep 200
+			    ControlClick &OK
+			    WinWaitClose
+			    Sleep 2000
+			}
+		    }
+		    If (UninstallString) { ; что-то таки было удалено → окно установки было закрыто
+			Loop Files, %DOL2BinDir%\*, DR
+			    If (FileExist(A_LoopFileFullPath . "\" . DOL2Navexe) || FileExist(A_LoopFileFullPath . "\DOLKernel.exe"))
+				FileRemoveDir %A_LoopFileFullPath%, 1
+			break
+		    }
+		    ControlClick &Установить
 		}
 	    }
 	}
@@ -234,6 +261,15 @@ CrystalReportsInstalled() {
     return StartsWith(displayName, "Crystal Reports for .NET Framework")
 }
 
+RegCheck(key, valuesToCheck) {
+    For name, contents in valuesToCheck {
+	RegRead v, %key%, %name%
+	If (!(v ~= contents))
+	    return 0
+    }
+    return 1
+}
+
 StartsWith(ByRef long, ByRef short) {
     return SubStr(long, 1, StrLen(short)) = short
 }
@@ -244,6 +280,7 @@ ShowError(txt, explain:="", title:="") {
 	title:=ScriptTitle
     FileAppend %A_Now%: %txt%`n, %logfname%
     
+    txt := SubStr(txt, 1, MaxMailtoTextLength)
     endTime := A_TickCount + 5 * 60 * 1000 ; 5 минут
     ;Run http://l.mobilmir.ru/newtaskdept
     If (textcrpos := InStr(txt, "`n")) {
