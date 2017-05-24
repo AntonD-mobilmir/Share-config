@@ -1,5 +1,6 @@
 ﻿#NoEnv
-#SingleInstance
+#SingleInstance force
+FileEncoding UTF-8
 MyPID:=DllCall("GetCurrentProcessId")
 SetRegView 32
 
@@ -21,9 +22,9 @@ DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
 DOL2BinDir=%LocalAppData%\Apps\2.0
 DOL2Navexe=DOLNavigator.exe
 DOL2NavErrTitle = On Line Dealer ahk_class #32770
-HKCUUninstallKey=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
 MaxMailtoTextLength := 1024
-startDelay := 1000
+startDelay := 1000 ; пауза после запуска URL. Удваивается после каждого запуска.
+unkCount := 3 ; сколько раз можно обнаружить неизвестное окно, прежде чем сообщать
 
 ; подготовка
 
@@ -38,6 +39,8 @@ startDelay := 1000
 ;		 4 – подождать и проверить снова
 ;		 5 – дождаться закрытия
 ;		 6 – &Установить
+;		 7 - OK, удалить
+;		 8 - Отмена
 AutoResponces := [[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
     ,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
     ,[DOL2Navexe, "On Line Dealer", "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы", 2]
@@ -52,9 +55,12 @@ AutoResponces := [[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
     ,["dfsvc.exe", "Cannot Start Application", "Application cannot be started. Contact the application vendor." , 2]
     ,["dfsvc.exe", "Невозможно запустить приложение", "Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.", -1]
     ,["dfsvc.exe", "Установка приложения - Предупреждение о безопасности", "SIGNER CLIENT DOL" , 6] ; предложение установить
-    ,["dfsvc.exe", "(", "Установка DOL", 5] ; скачивание, заголовок окна: "(…%) Установка DOL"
+    ,["dfsvc.exe", "Невозможно запустить приложение", "Приложение DOL уже установлено из другого расположения. Удалите DOL." , 7] ; требование удалить
+    ,["dfsvc.exe", "(", "Установка DOL", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
+    ,["dfsvc.exe", "(100%) Установка DOL", "", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
     ,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Вести журнал" , 0] ; #INC-5766
-    ,[DOL2Navexe, "Навигатор", "menuMain", 0]] ; окно DOL2 уже появилось, но ещё не заполнено
+    ,[DOL2Navexe, "Навигатор", "menuMain", 0] ; окно DOL2 уже появилось, но ещё не заполнено
+    ,["rundll32.exe", "Оповещение системы безопасности Windows", "Отмена", 8]]
 
 ;если окно DOL2 обнаружено, оно просто будет активировано, а запуск выполняться не будет
 If (WinExist("ahk_exe " . DOL2Navexe)) {
@@ -209,46 +215,62 @@ Loop
 		    WinWaitClose
 		    SplashTextOff
 		} Else If (a=6) {
-		    UninstallString=
-		    Loop Reg, %HKCUUninstallKey%, K
-		    {
-			currentKey:=HKCUUninstallKey "\" A_LoopRegName
-			If (RegCheck(currentKey, {"DisplayName": "DOL.*"
-									 ,"Publisher": "Vimpelcom"
-									 ,"UrlUpdateInfo": "https://dealer.beeline.ru/dealer/DOL2/DOL.application"})) {
-			    If (started) {
-				WinClose ; закрытие окна установки, чтобы пользователь там ничего не нажал во время удаления
-				started:=0 ; старых версий может быть несколько, закрыть окно надо только один раз
-				Process Close, %DOL2Navexe%
-				Process Close, DOLKernel.exe
-			    }
-			    RegRead UninstallString,%currentKey%,UninstallString
-			    Run %UninstallString%
-			    WinWait Обслуживание DOL ahk_exe dfsvc.exe
-			    Sleep 500
-			    ControlClick Удаление приложения с этого компьютера.
-			    Sleep 200
-			    ControlClick &OK
-			    WinWaitClose
-			    Sleep 2000
-			}
+		    If (!UninstallDOL2(started)) { ; что-то таки было удалено → окно установки было закрыто
+			ControlClick &Установить
 		    }
-		    If (UninstallString) { ; что-то таки было удалено → окно установки было закрыто
-			Loop Files, %DOL2BinDir%\*, DR
-			    If (FileExist(A_LoopFileFullPath . "\" . DOL2Navexe) || FileExist(A_LoopFileFullPath . "\DOLKernel.exe"))
-				FileRemoveDir %A_LoopFileFullPath%, 1
-			break
-		    }
-		    ControlClick &Установить
+		} Else If (a=7) {
+		    ControlClick &OK
+		    UninstallDOL2(started)
+		} Else If (a=8) {
+		    ControlClick Отмена
 		}
+		break
 	    }
 	}
-	If (!a)
-	    ShowError("Обнаружено неизвестное окно " . exeName . ": " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+	If (!a) {
+	    If (!unkCount--) {
+		ShowError("Обнаружено неизвестное окно " . exeName . ": " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+		ExitApp
+	    }
+	    Sleep 1000 * unkCount
+	}
     }
 }
 ShowError("Выполнение цикла мониторинга прекратилось", "В скрипте запуска DOL2 есть ошибка")
 ExitApp
+
+UninstallDOL2(ByRef started) {
+    global DOL2BinDir, DOL2Navexe
+    static HKCUUninstallKey:="HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+    Loop Reg, %HKCUUninstallKey%, K
+    {
+	currentKey:=HKCUUninstallKey "\" A_LoopRegName
+	If (RegCheck(currentKey, {"DisplayName": "DOL.*"
+							 ,"Publisher": "Vimpelcom"
+							 ,"UrlUpdateInfo": "https://dealer.beeline.ru/dealer/DOL2/DOL.application"})) {
+	    If (started) {
+		WinClose ; закрытие окна установки, чтобы пользователь там ничего не нажал во время удаления
+		started:=0 ; старых версий может быть несколько, закрыть окно надо только один раз
+		Process Close, %DOL2Navexe%
+		Process Close, DOLKernel.exe
+	    }
+	    RegRead UninstallString,%currentKey%,UninstallString
+	    Run %UninstallString%
+	    WinWait Обслуживание DOL ahk_exe dfsvc.exe
+	    Sleep 500
+	    ControlClick Удаление приложения с этого компьютера.
+	    Sleep 200
+	    ControlClick &OK
+	    WinWaitClose
+	    Sleep 2000
+	}
+    }
+    If (UninstallString)
+	Loop Files, %DOL2BinDir%\*, DR
+	    If (FileExist(A_LoopFileFullPath . "\" . DOL2Navexe) || FileExist(A_LoopFileFullPath . "\DOLKernel.exe"))
+		FileRemoveDir %A_LoopFileFullPath%, 1
+    return UninstallString
+}
 
 CrystalReportsInstalled() {
     static RegViews := [32,64]
