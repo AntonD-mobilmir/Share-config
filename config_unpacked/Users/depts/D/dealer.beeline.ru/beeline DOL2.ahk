@@ -23,6 +23,7 @@ DOL2Navexe=DOLNavigator.exe
 DOL2NavErrTitle = On Line Dealer ahk_class #32770
 HKCUUninstallKey=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
 MaxMailtoTextLength := 1024
+startDelay := 1000
 
 ; подготовка
 
@@ -143,6 +144,8 @@ Loop
 	started:=1
 	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, Ожидание появления окна (обычно до двух минут)
 	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
+	Sleep startDelay
+	startDelay:=startDelay<<1 ; double delay each time
     }
     
     WinWait ahk_group WinWaitList,,300
