@@ -65,18 +65,20 @@ If (criacxinbin) {
     If (ErrorLevel)
 	comment .= ", ErrorLevel:" . errFinal
     FileGetTime newOcxDate, d:\dealer.beeline.ru\bin\criacx.ocx
-
+    FileGetTime newdol2ahkDate, d:\dealer.beeline.ru\beeline DOL2.ahk
+    
     diffOcxTime := newOcxDate
     diffOcxTime -= origOcxDate, Days
-
+    
     If (diffOcxTime)
 	comment .= ", timeDiff: " . diffOcxTime
-
+    
     PostGoogleForm("https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSeRvIBRHnVjhnUS09Dh7lNEoXtTRjkY9210stwJhftwqQ8tgg/formResponse"
 		    , {   "entry.1266830572": GetDeptID()
 			, "entry.298209335": A_ComputerName
 			, "entry.411109659": A_UserName
 			, "entry.831594180": newOcxDate
+			, "entry.357875961": newdol2ahkDate
 			, "entry.352111625": Trim(comment, ",`t ")})
 
     Exit diffOcxTime!=0
