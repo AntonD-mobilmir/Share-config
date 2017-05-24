@@ -84,7 +84,7 @@ If (!skipCreatingProfile) {
     }
 
     If (retailDept) {
-	If ( IsObject(appendPrefsJsHndl := FileOpen(mailProfileDir "\prefs_AddressBookSync_retail.js", "r-wd", "UTF-8")) ) {
+	If ( IsObject(appendPrefsJsHndl := FileOpen(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_retail.js", "r-wd", "UTF-8")) ) {
 	    appendprefsjs := appendPrefsJsHndl.Read(), appendPrefsJsHndl.Close()
 
 	    If (RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) {

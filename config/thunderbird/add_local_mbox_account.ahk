@@ -39,7 +39,7 @@ Loop Read, %mtProfileDir%\prefs.js, %tmpPrefs%
     FileAppend % RegexReplace(A_LoopReadLine, "S)" . regexS, regexR) . "`n"
 }
 
-FileRead mboxappend, %A_ScriptDir%\default_profile_template\prefs_MBOXLocalAccount.js
+FileRead mboxappend, %A_ScriptDir%\prefs-parts\prefs_MBOXLocalAccount.js
 FileAppend `n%mboxappend%,%tmpPrefs%
 FileMove %tmpPrefs%, %mtProfileDir%\prefs.js, 1
 

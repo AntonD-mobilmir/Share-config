@@ -46,8 +46,8 @@ FileCopy	%A_ScriptDir%\default_profile_template\user.js,		%MTProfilePath%\*.*
 FileCopy	%A_ScriptDir%\default_profile_template\extensions.*,	%MTProfilePath%\*.*
 FileCopy	%A_ScriptDir%\default_profile_template\*.mab,		%MTProfilePath%\*,*, 1
 
-FileRead	prefs_BusinessContacts,		%A_ScriptDir%\default_profile_template\prefs_BusinessContacts.js
-FileRead	prefsCommon,			%A_ScriptDir%\default_profile_template\prefs_commononly.js
+FileRead	prefs_BusinessContacts,		%A_ScriptDir%\prefs-parts\prefs_BusinessContacts.js
+FileRead	prefsCommon,			%A_ScriptDir%\prefs-parts\prefs_commononly.js
 FileAppend	`n%prefs_BusinessContacts%`n`n%prefsCommon%`n, %MTProfilePath%\prefs.js
 
 Process WaitClose, %PIDofUnpackScript%

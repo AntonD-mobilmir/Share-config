@@ -19,7 +19,7 @@ CloseThunderbirdAndWaitProfileUnlock()
 ToolTip,, Изменение настроек Business_contacts
 
 FileCopy %A_ScriptDir%\default_profile_template\business_contacts.mab, %MTProfilePath%\business_contacts.mab, 1
-FileRead prefs_BusinessContacts, %A_ScriptDir%\default_profile_template\prefs_BusinessContacts.js
+FileRead prefs_BusinessContacts, %A_ScriptDir%\prefs-parts\prefs_BusinessContacts.js
 FileAppend `n%prefs_BusinessContacts%,*%MTProfilePath%\prefs.js
 ToolTip
 
