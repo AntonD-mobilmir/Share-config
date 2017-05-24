@@ -206,6 +206,7 @@ Loop
 		    WinWaitClose
 		    SplashTextOff
 		} Else If (a=6) {
+		    UninstallString=
 		    Loop Reg, %HKCUUninstallKey%, K
 		    {
 			currentKey:=HKCUUninstallKey "\" A_LoopRegName
