@@ -32,6 +32,7 @@ FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SET "P
     FOR /D %%I IN ("%ProfilesDirectory%\*.*") DO CALL :AskIfToProcessHomeDir "%%~nxI" && CALL "%~dp0FSACL_Homedir.cmd" "%%~I"
     
     IF EXIST "d:\1S\Rarus\ShopBTS" PUSHD "d:\1S\Rarus\ShopBTS" && (
+	CALL :ResetACL .
 	%SetACLexe% -on . -ot file -actn ace -ace "n:%UIDUsers%;p:change" -ignoreerr -silent
 	rem TODO: MOdifyNoExecute *.*; ReadExecute *.DLL *.EXE
 	rem     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" Users Flags Jobs SYSLOG
@@ -45,6 +46,7 @@ FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SET "P
     ECHO Настройка доступа к стандартным общим папкам
     CALL "%srcpath%FSACL_PublicDirsRoot.cmd" D:\Users\Public "D:\Users\All Users" "D:\Users\Default User"
     ECHO Настройка доступа к d:\dealer.beeline.ru и d:\Mail\Thunderbird\profile
+    CALL :ResetACL d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
     ECHO Разрешение записи и выполнения в d:\Mail\Thunderbird\profile\extensions, "d:\Program Files", "D:\dealer.beeline.ru\bin"
     CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files" "D:\dealer.beeline.ru\bin"
@@ -59,6 +61,17 @@ EXIT /B
     IF "%~2"=="" EXIT /B
     SHIFT
 GOTO :MakeDirsReadOnlyForUsers
+)
+
+:ResetACL
+(
+    IF EXIST "%~1" (
+	%windir%\system32\takeown.exe /F %1 /R /A >NUL
+	%SetACLexe% -on %1 -ot file -rec cont_obj -actn rstchldrn -rst dacl -ignoreerr -silent
+    )
+    SHIFT
+    IF "%~2"=="" EXIT /B
+    GOTO :ResetACL
 )
 
 :AskIfToProcessHomeDir
