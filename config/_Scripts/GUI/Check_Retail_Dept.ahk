@@ -21,6 +21,7 @@ scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\coll
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
+AkhMinVer		:= "1.1.25.01"
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
@@ -50,7 +51,7 @@ If (A_IsAdmin) {
 ;    }
 }
 
-AddLog(A_AhkPath, A_AhkVersion)
+AddLog(A_AhkPath, A_AhkVersion, A_AhkVersion >= AkhMinVer)
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
 global DefaultConfigDir := chkDefConfigDir.path
@@ -490,18 +491,18 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
+;If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
     AddLog("Запуск в фоновом режиме настройки ACL ФС")
     If (teeexe := findexe("tee.exe", "C:\SysUtils"))
-	logsuffix= 2>&1 | tee -a "`%TEMP`%\FSACL _depts_simplified.cmd.log"
+	logsuffix= 2>&1 | "%teeexe%" -a "`%TEMP`%\FSACL _depts_simplified.cmd.log"
 	;>"`%TEMP`%\FSACL _depts_simplified.cmd.log" 2>&1 
     Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & CALL "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd" %logsuffix%",, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
-}
+;}
 
 finished := 1
 
-If (A_AhkVersion < "1.1.25.01" && A_IsAdmin) {
+If (A_AhkVersion < AkhMinVer && A_IsAdmin) {
     AddLog("Запуск обновления AutoHotkey с Srv0.office0.mobilmir.")
     ;ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
     ;If (ReRunAsAdmin) {
