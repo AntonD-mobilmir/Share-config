@@ -10,19 +10,21 @@ rem workaround for starting sed.exe in same batch as first run of software_insta
 SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
 
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
-SET "RarusPostDir=d:\1S\Rarus\ShopBTS\ExtForms\post\"
+SET "RarusMailLoaderDir=d:\1S\Rarus\MailLoader"
+SET "ExtFormsMailLoader=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader"
+SET "RarusPostDir=d:\1S\Rarus\ShopBTS\ExtForms\post"
 SET "overwritecfg=1"
 
 CALL "%~dp0MailLoader\install.cmd"
 )
 CALL :GetDir ConfigDir %DefaultsSource%
 
-IF EXIST "%RarusPostDir%sendemail.cfg" (
-    ECHO %RarusPostDir%sendemail.cfg уже существует, перезаписать?
-    ECHO 1=да, и добавить Обмен Рарус в prefs.js Thunderbird prefs.js
-    ECHO 2=нет, но добавить Обмен Рарус в prefs.js
+IF EXIST "%RarusPostDir%\sendemail.cfg" (
+    ECHO %RarusPostDir%\sendemail.cfg уже существует, перезаписать?
+    ECHO 1=да, и переустановить MailLoader
+    ECHO 2=нет, но переустановить MailLoader
     ECHO остальное=нет, прервать
-    SET /P "overwritecfg=[1|2|*]"
+    SET /P "overwritecfg=[1|2|*] > "
     IF NOT DEFINED overwritecfg EXIT /B
 )
 CALL :GetRarusExchParams
@@ -34,29 +36,34 @@ EXIT /B
 	(ECHO %rarusexchaddr%)>sendemail.cfg
 	ECHO Допишите пароль на вторую строку
 	PING 127.0.0.1 -n 3 >NUL
-	%SystemRoot%\System32\notepad.exe %RarusPostDir%sendemail.cfg
+	%SystemRoot%\System32\notepad.exe %RarusPostDir%\sendemail.cfg
     POPD
 )
 :overwritecfg2
 (
-rem IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
-IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\findsedexe.cmd" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
-IF NOT DEFINED mtprofiledir CALL :CheckExistenceSetVar mtprofiledir d:\Mail\Thunderbird\profile
-)
-(
-    SET "ErrorsHappened=0"
-    PUSHD "%mtprofiledir%"||(PAUSE & EXIT /B)
-	%sedexe% -e "s/!rarusexchaddr!/%rarusexchaddr%/g" -e "s/!rarusexchlogin!/%rarusexchaddr%/g" prefs_RarusExch.js >>prefs.js || CALL :CheckError
-	%sedexe% -ir -f prefs_AddRarusExchAcc.sed prefs.js || CALL :CheckError
-    POPD
-)
-(
-    IF "%ErrorsHappened%"=="0" (
-	DEL "%mtprofiledir%\prefs_RarusExch.js"
-	DEL "%mtprofiledir%\prefs_AddRarusExchAcc.sed"
-    )
+IF EXIST "%RarusMailLoaderDir%\gnupg" IF NOT EXIST "%RarusMailLoaderDir%.bak" MKDIR "%RarusMailLoaderDir%.bak"
+MOVE "%RarusMailLoaderDir%\gnupg" "%RarusMailLoaderDir%.bak\gnupg%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%"
+RD /S /Q "%RarusMailLoaderDir%"
+RD /S /Q "%ExtFormsMailLoader%"
+CALL "%~dp0\MailLoader\install.cmd"
+REM rem IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
+REM IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\findsedexe.cmd" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
+REM IF NOT DEFINED mtprofiledir CALL :CheckExistenceSetVar mtprofiledir d:\Mail\Thunderbird\profile
+REM )
+REM (
+REM     SET "ErrorsHappened=0"
+REM     PUSHD "%mtprofiledir%"||(PAUSE & EXIT /B)
+REM 	%sedexe% -e "s/!rarusexchaddr!/%rarusexchaddr%/g" -e "s/!rarusexchlogin!/%rarusexchaddr%/g" prefs_RarusExch.js >>prefs.js || CALL :CheckError
+REM 	%sedexe% -ir -f prefs_AddRarusExchAcc.sed prefs.js || CALL :CheckError
+REM     POPD
+REM )
+rem (
+REM    IF "%ErrorsHappened%"=="0" (
+REM	DEL "%mtprofiledir%\prefs_RarusExch.js"
+REM	DEL "%mtprofiledir%\prefs_AddRarusExchAcc.sed"
+REM    )
     EXIT /B
-)
+rem )
 :GetRarusExchParams
 (
     IF DEFINED rarusexchaddr GOTO :SkipAcquiringUserName

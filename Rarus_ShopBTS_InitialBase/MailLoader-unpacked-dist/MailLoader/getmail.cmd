@@ -5,12 +5,15 @@ SETLOCAL ENABLEEXTENSIONS
 
 SET "ExtractDest=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\unpacked"
 SET "MoveDest=d:\1S\Rarus\ShopBTS\Exchange"
-rem SET "MoveDest2=d:\Exchange\InOperator"
+SET "SignedFilesDir=d:\1S\Rarus\ShopBTS\Exchange\ExtForms"
 
 SET "RecvDir=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\received"
 SET "RecvBakDir=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\received.bak"
 SET "AttDir=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\attachments"
 SET "MonDir=d:\Users\Public\Documents\Рарус"
+
+IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
+SET "GNUPGHOME=%~dp0gnupg"
 
 SET uud32winexe="%~dp0uud32win.exe"
 SET popclientexe="%~dp0popclient.exe"
@@ -18,6 +21,7 @@ rem IF NOT DEFINED exe7z SET "exe7z=%~dp0..\bin\7za.exe"
 IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "d:\Distributives\config\_Scripts\find7zexe.cmd"
 )
 (
+    IF NOT EXIST "%SignedFilesDir%" MKDIR "%SignedFilesDir%"
     IF NOT EXIST "%RecvDir%" MKDIR "%RecvDir%"
     IF NOT EXIST "%RecvBakDir%" MKDIR "%RecvBakDir%"
     IF NOT EXIST "%MonDir%" MKDIR "%MonDir%"
@@ -61,7 +65,13 @@ IF EXIST "%AttDir%\*.7z" (
 (
     ECHO %DATE% %TIME% Подчистка
     IF EXIST "%AttDir%\file01.txt" DEL "%AttDir%\file01.txt"
-    IF EXIST "%AttDir%\*.*" FOR %%A IN ("%AttDir%\*.*") DO ECHO.|MOVE "%%~A" "%MonDir%\%%~nxA"
+    IF EXIST "%AttDir%\*.*" (
+	FOR %%A IN ("%AttDir%\*.sig") DO %gpgexe% --homedir "%GNUPGHOME%" --keyserver-options no-auto-key-retrieve --verify "%%~A" && (
+	    ECHO Y|MOVE /Y "%%~A" "%SignedFilesDir%\%%~nxA"
+	    CALL :TryUnpack "%%~dpnA" "%SignedFilesDir%" || ( ECHO Y| MOVE /Y "%%~dpnA" "%SignedFilesDir%\%%~nA" )
+	)
+	FOR %%A IN ("%AttDir%\*.*") DO ECHO.|MOVE "%%~A" "%MonDir%\%%~nxA"
+    )
     FOR %%I IN ("%RecvDir%\*") DO (
 	REM Can't do this immediately after deattaching, because uud32win.exe keeps file opened even after batch flow continues
 	IF DEFINED RecvBakDir (
@@ -70,10 +80,6 @@ IF EXIST "%AttDir%\*.7z" (
     )
     
     FOR %%I IN ("%ExtractDest%\TS_*.txt") DO (
-	IF DEFINED MoveDest2 (
-	    ECHO Moving "%%~nxI" to MoveDest2
-	    COPY /B /Y "%%~I" "%%~I-2" && MOVE /Y "%%~I-2" "%MoveDest2%\%%~nxI"
-	) || EXIT /B
 	ECHO Moving "%%~nxI" to MoveDest
 	MOVE /Y "%%~I" "%MoveDest%\" || EXIT /B
     )
@@ -81,4 +87,11 @@ IF EXIST "%AttDir%\*.7z" (
     FOR %%I IN ("%ExtractDest%\*") DO ECHO Moving "%%~I" to Rarus-Exchange Incoming& MOVE /Y "%%~I" "%MonDir%\"
     DEL /F /Q "%RecvBakDir%\*.*"
     EXIT /B
+)
+
+:TryUnpack <archive> <dest>
+(
+    IF "%~x1"==".7z" (
+	%exe7z% x -aoa -o%2 -- %1
+    ) ELSE EXIT /B 1
 )
