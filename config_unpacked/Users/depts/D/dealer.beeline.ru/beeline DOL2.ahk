@@ -22,9 +22,9 @@ DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
 DOL2BinDir=%LocalAppData%\Apps\2.0
 DOL2Navexe=DOLNavigator.exe
 DOL2NavErrTitle = On Line Dealer ahk_class #32770
-MaxMailtoTextLength := 1024
 startDelay := 1000 ; пауза после запуска URL. Удваивается после каждого запуска.
 unkCount := 3 ; сколько раз можно обнаружить неизвестное окно, прежде чем сообщать
+MaxMailtoTextLength := 1024
 
 ; подготовка
 
@@ -148,7 +148,7 @@ Loop
     If (!started) {
 	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
 	started:=1
-	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, Ожидание появления окна (обычно до двух минут)
+	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидание появления окна (обычно до двух минут)
 	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
 	Sleep startDelay
 	startDelay:=startDelay<<1 ; double delay each time
@@ -301,20 +301,16 @@ StartsWith(ByRef long, ByRef short) {
 }
 
 ShowError(txt, explain:="", title:="") {
-    global ScriptTitle, logfname
+    global ScriptTitle, logfname, MaxMailtoTextLength
     If (!title)
 	title:=ScriptTitle
     FileAppend %A_Now%: %txt%`n, %logfname%
     
-    txt := SubStr(txt, 1, MaxMailtoTextLength)
-    endTime := A_TickCount + 5 * 60 * 1000 ; 5 минут
-    ;Run http://l.mobilmir.ru/newtaskdept
-    If (textcrpos := InStr(txt, "`n")) {
-	mailTitle := SubStr(txt, 1, textcrpos-1)
-    } Else {
-	mailTitle := txt
-    }
-    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(txt . "`n`n" . explain)
+    txt		:= SubStr(txt . "`n`n" . explain, 1, MaxMailtoTextLength)
+    textcrpos	:= InStr(txt, "`n")
+    mailTitle	:= SubStr(txt, 1, textcrpos-1)
+    txt		:= SubStr(txt, textcrpos+1)
+    Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(txt)
     MsgBox 0x1030, %title%, %txt%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
