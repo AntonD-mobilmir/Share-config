@@ -9,7 +9,7 @@ configDir = %A_AppDataCommon%\mobilmir.ru\%ScriptName%
 logsDir = %A_Temp%
 FileCreateDir %configDir%
 FileCreateDir %logsDir%
-timesObjFName = %logsDir%\times.ahkjson
+timesObjFName = %configDir%\times.ahkjson
 cmdLogFName = %logsDir%\_depts_simplified.cmd.%A_Now%.log
 
 OnExit("CheckExit")
@@ -57,7 +57,7 @@ Loop
 	If (leftTime < 15) {
 	    leftTime := "Раньше за это время скрипт уже заканчивал"
 	} Else If (leftTime > 60)
-	    leftTime := Format("Осталось {1.1f} мин.", leftTime / 60)
+	    leftTime := "Осталось " . Format("{1.1f}", leftTime / 60) . " мин."
 	Else
 	    leftTime := "Осталось примерно " leftTime " с"
     }
