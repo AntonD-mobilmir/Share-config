@@ -493,10 +493,12 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
 
 ;If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
     AddLog("Запуск в фоновом режиме настройки ACL ФС")
-    If (teeexe := findexe("tee.exe", "C:\SysUtils"))
-	logsuffix= 2>&1 | "%teeexe%" -a "`%TEMP`%\FSACL _depts_simplified.cmd.log"
+;    If (teeexe := findexe("tee.exe", "C:\SysUtils"))
+;	logsuffix= 2>&1 | "%teeexe%" -a "`%TEMP`%\FSACL _depts_simplified.cmd.log"
 	;>"`%TEMP`%\FSACL _depts_simplified.cmd.log" 2>&1 
-    Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & CALL "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd" %logsuffix%",, Min UseErrorLevel
+;    Run %comspec% /C "TITLE Настройка параметров безопасности файловой системы & CALL "%DefaultConfigDir%\_Scripts\Security\_depts_simplified.cmd" %logsuffix%",, Min UseErrorLevel
+    Run "%A_AhkPath%" "%DefaultConfigDir%\_Scripts\Security\_run_depts_simplified.ahk",, UseErrorLevel
+    
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 ;}
 
