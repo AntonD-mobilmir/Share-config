@@ -16,68 +16,72 @@
 If A_OSVersion in WIN_2003,WIN_XP,WIN_2000
     ExitApp 1
 
-global clipHookMode := 0
-
 Arg1 = %1%
-If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="/WaitAndPostURL.lnk") {
+If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="-WaitAndPostURL.lnk") {
     OnClipboardChange("ClipHook")
     SetTitleMatchMode 2
-    btnCopytheseresults = Copy results
-    actnList := "_;^f;_;" . btnCopytheseresults . "{Esc};{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
+    actnList := "_;^f;_;Copy results{Esc};{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
+    wantUserIdle := 10000 ; ms
+    
+    
     Loop
     {
-	IfWinExist Performance Results - UserBenchmark
-	{
-	    Loop Parse, actnList, `;
-	    {
-		Sleep 250
-		While (A_TimeIdlePhysical < 10000) {
-		    If (A_Index==1) {
-			Progress Off
-			Progress R0-10000, `n, Ожидание бездействия пользователя
-		    }
-		    Progress %A_TimeIdlePhysical%
-		    Sleep 100
-		}
-		Progress Off
-		WinActivate
-		actn := SubStr(A_LoopField,1,1)
-		If (actn=="_") { 		; wait
-		    Sleep (1000 + (SubStr(A_LoopField,2) . "000"))
-		} Else If (actn=="-") { 	; clipboard
-		    subActn := SubStr(A_LoopField,2)
-		    Try {
-			If (subActn=="+") {
-			    clipBak := ClipboardAll
-			} Else If (subActn=="-") {
-			    Clipboard := clipBak
-			} Else {
-			    clipHookMode := subActn
-			    Send ^{Ins}
-			    Sleep 25
-			    WinActivate
-			    Send ^c
-			    ClipWait 10
-			}
-		    }
-		} Else { ; just send
-		    Send %A_LoopField%
-		}
-	    }
-	}
-	
 	;MsgBox ResultsURL: %ResultsURL%`nA_Index: %A_Index%
 	If (ResultsURL && (A_Index > 100 || IsObject(perfResultsObj)) ) {
 	    statusHTTP := PostURL(ResultsURL, perfResultsObj)
 	    If (statusHTTP>=200 && statusHTTP<300)
 		break
 	} Else {
-	    If (A_TimeIdle < 15000)
-		TrayTip,, Скопируйте результаты теста и ссылку на результаты в буфер обмена (в любом порядке)
-	    Sleep 5000
+	    IfWinExist Performance Results - UserBenchmark
+	    {
+		If (A_Index>1) {
+		    ControlGetFocus,ctl,A
+		    SendMessage 0x50,0,HKL,%ctl%,A ;WM_INPUTLANGCHANGEREQUEST
+		}
+		
+		Loop Parse, actnList, `;
+		{
+		    Sleep 250
+		    If (A_TimeIdlePhysical < wantUserIdle) {
+			TrayTip,, Скопируйте результаты теста и ссылку на результаты в буфер обмена (в любом порядке)
+			While (A_TimeIdlePhysical < wantUserIdle) {
+			    If (A_Index==1) {
+				Progress Off
+				Progress R0-%wantUserIdle%, `n, Ожидание бездействия пользователя
+			    }
+			    Progress %A_TimeIdlePhysical%
+			    Sleep 100
+			}
+			Progress Off
+			break
+		    }
+		    WinActivate
+		    actn := SubStr(A_LoopField,1,1)
+		    If (actn=="_") { 		; wait
+			Sleep (1000 + (SubStr(A_LoopField,2) * 1000))
+		    } Else If (actn=="-") { 	; clipboard
+			subActn := SubStr(A_LoopField,2)
+			Try {
+			    If (subActn=="+") {
+				clipBak := ClipboardAll
+			    } Else If (subActn=="-") {
+				Clipboard := clipBak
+			    } Else {
+				Send ^{Ins}
+				Sleep 25
+				WinActivate
+				Send ^c
+				ClipWait 10
+			    }
+			}
+		    } Else { ; just send
+			Send %A_LoopField%
+		    }
+		}
+	    }
+	    
+	    Sleep 1000
 	}
-	ControlGetFocus,ctl,A
-	SendMessage 0x50,0,HKL,%ctl%,A ;WM_INPUTLANGCHANGEREQUEST
     }
     Progress Off
     Sleep 1000
@@ -191,35 +195,32 @@ Run %ScriptRunCommand% /WaitAndPostURL, %A_ScriptDir%
 ExitApp
 
 ClipHook(cliptype) {
-    global clipHookMode, perfResultsObj, ResultsURL
+    global perfResultsObj, ResultsURL
+    static requiredURLprefix := "http://www.userbenchmark.com/UserRun/"
+	 , WrongContentsErrText := "Ожидается либо URL с префиксом " requiredURLprefix ", либо текст результатов."
     
-    If (cliptype != 1)
-	return
-
-    Try {
-	clipContents := Clipboard
-    } Catch e {
-	TrayTip Error reading clipboard, % Error e.Message . "`n" . e.Extra
-	return
-    }
-    
-    If (clipHookMode) {
-	perfResultsObjNew := ParsePerfResults(clipContents)
-	If ( IsObject(perfResultsObjNew) ) {
-	    clipHookMode := 0
-	    perfResultsObj := perfResultsObjNew
-	    perfResultsObjNew := ""
-	    TrayTip Parsed results, % perfResultsObj.ResultsText
-;	    MsgBox % perfResultsObj.Desktop . "`n" . 	    perfResultsObj.CPU . "`n" . 	    perfResultsObj.CPUModel . "`n" . 	    perfResultsObj.HDD . "`n" . 	    perfResultsObj.HDDModel . "`n" . 	    perfResultsObj.SSD . "`n" . 	    perfResultsObj.SSDModel
-	}
-    } Else {
-	requiredURLprefix := "http://www.userbenchmark.com/UserRun/"
-	If ( SubStr(clipContents,1,StrLen(requiredURLprefix)) == requiredURLprefix ) {
-	    ResultsURL := clipContents
-	} Else {
-	    TrayTip Неправильный URL, Ожидается URL с префиксом %requiredURLprefix%. Скопированный текст "%clipContents%" не будет отправлен.
+    If (cliptype == 1) {
+	Try {
+	    clipContents := Clipboard
+	} Catch e {
+	    TrayTip Error reading clipboard, % Error e.Message . "`n" . e.Extra
 	    return
 	}
+    
+    	If ( SubStr(clipContents,1,StrLen(requiredURLprefix)) == requiredURLprefix ) {
+	    TrayTip Найден URL, %ResultsURL%
+	    ResultsURL := clipContents
+	} Else If ( IsObject(perfResultsObjNew := ParsePerfResults(clipContents)) ) {
+	    perfResultsObj := perfResultsObjNew
+	    perfResultsObjNew := ""
+	    TrayTip Найден текст с результатами теста, % perfResultsObj.ResultsText
+	    ;MsgBox % perfResultsObj.Desktop . "`n" . 	    perfResultsObj.CPU . "`n" . 	    perfResultsObj.CPUModel . "`n" . 	    perfResultsObj.HDD . "`n" . 	    perfResultsObj.HDDModel . "`n" . 	    perfResultsObj.SSD . "`n" . 	    perfResultsObj.SSDModel
+	} Else {
+	    TrayTip Неправильный текст, %WrongContentsErrText%
+	}
+    } Else {
+	TrayTip Скопирован не текст, %WrongContentsErrText%
+	return
     }
 }
 
