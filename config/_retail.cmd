@@ -62,6 +62,8 @@ TITLE Running _all.cmd
 CALL "%~dp0_all.cmd" %arg%
 
 :AfterAll
+START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
+
 rem Without running ahk as an app (just starting .ahk), START /I misbehaves, ignoring the switch
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
 
@@ -86,6 +88,7 @@ MKDIR d:\Users
 IF EXIST d:\Users %AutohotkeyExe% "%~dp0_Scripts\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
 POWERCFG -h off & POWERCFG /H OFF
 
+rem TODO: не работает, если запускать "!run without installing soft.cmd"
 REM Копирование дистрибутивов, поскольку новые отделы не подключены к офисной сети
 START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
 rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g\Projects\depts-commands\execscripts\install.cmd"
@@ -94,8 +97,12 @@ rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g
 REM path workaround:
 SET "PATH=%PATH%;C:\SysUtils\libs"
 
+rem TODO: не работает, если запускать "!run without installing soft.cmd"
 REM скрипт создания п/я вылетает
 START "" /B /WAIT %comspec% /C "%~dp0_Scripts\CreateMTProfileForSharedUser.cmd"
+rem ECHO ---Отладка---
+rem ECHO Только что должен быть создаться общий профиль Thunderbird.
+rem PAUSE
 :skipMTMail
 
 REM Install 1S
@@ -116,7 +123,6 @@ IF /I "%instBTSyncandSoftUpdScripts%"=="1" (
     START "Установка скиптов BTSync" %comspec% /C "\\AcerAspire7720G\Projects\BTSync\Install_BTSync.cmd"
 )
 
-START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUSE & EXIT /B
 
 :AskAbout1S
