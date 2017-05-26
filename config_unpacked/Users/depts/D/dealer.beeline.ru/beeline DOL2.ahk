@@ -306,12 +306,12 @@ ShowError(txt, explain:="", title:="") {
 	title:=ScriptTitle
     FileAppend %A_Now%: %txt%`n, %logfname%
     
-    txt		:= SubStr(txt . "`n`n" . explain, 1, MaxMailtoTextLength)
-    textcrpos	:= InStr(txt, "`n")
-    mailTitle	:= SubStr(txt, 1, textcrpos-1)
-    txt		:= SubStr(txt, textcrpos+1)
+    mailtxt	:= SubStr(txt . "`n`n" . explain, 1, MaxMailtoTextLength)
+    textcrpos	:= InStr(mailtxt, "`n")
+    mailTitle	:= SubStr(mailtxt, 1, textcrpos-1)
+    mailtxt	:= SubStr(mailtxt, textcrpos+1)
     Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(txt)
-    MsgBox 0x1030, %title%, %txt%.`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
+    MsgBox 0x1030, %title%, %txt%`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
 
 run_FSACL_DOL2_cmd() {
