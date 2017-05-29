@@ -491,7 +491,7 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-;If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
+If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) { ; On Win 10 [1607] Start menu stops working after this
     aclSetupLine := AddLog("Запуск в фоновом режиме настройки ACL ФС")
 ;    If (teeexe := findexe("tee.exe", "C:\SysUtils"))
 ;	logsuffix= 2>&1 | "%teeexe%" -a "`%TEMP`%\FSACL _depts_simplified.cmd.log"
@@ -500,25 +500,28 @@ If (AppXSupported) { ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
     Run "%A_AhkPath%" "%DefaultConfigDir%\_Scripts\Security\_run_depts_simplified.ahk",, UseErrorLevel, aclSetupPID
     
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
-;}
+} Else {
+    AddLog("Настройка ACL пропущена, т.к. на Windows 10 [1607] это вызывает проблемы")
+}
 
 finished := 1
 
 If (A_AhkVersion < AkhMinVer && A_IsAdmin) {
-    AddLog("Запуск обновления AutoHotkey с Srv0.office0.mobilmir.")
-    Loop
-    {
-	Process Exist, %aclSetupPID%
-	If (!ErrorLevel) {
-	    SetRowStatus(aclSetupLine.line, "Завершено")
-	    break
+    AddLog("Обновление AutoHotkey с Srv0.office0.mobilmir.")
+    If (aclSetupLine) {
+	Loop
+	{
+	    Process Exist, %aclSetupPID%
+	    If (!ErrorLevel) {
+		SetRowStatus(aclSetupLine.line, "Завершено")
+		break
+	    }
+	    If (A_Index=1)
+		SetLastRowStatus("ожидание заверш. настр. ACL")
+	    Sleep 1000
 	}
-	If (A_Index=1)
-	    SetLastRowStatus("ожидание заверш. настр. ACL")
-	Sleep 1000
+	SetLastRowStatus("Запущено")
     }
-    SetLastRowStatus("Запущено…")
-
     ;ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
     ;If (ReRunAsAdmin) {
     ;	Run %comspec% /C "TITLE Ожидание обновления AutoHotkey, перезапуск %A_ScriptName% & (PING 127.0.0.1 -n 30 >NUL) & (ECHO Нажмите любую клавишу в этом окне, когда завершится обнолвление.) & (PAUSE >NUL) & %ScriptRunCommand% /NoAdminRun"
