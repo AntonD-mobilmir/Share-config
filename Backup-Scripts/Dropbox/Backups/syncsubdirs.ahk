@@ -8,7 +8,7 @@ If (!(gpgexe:=findexe("gpg.exe", "c:\SysUtils\gnupg\pub", LocalAppData . "\Progr
 
 arg1=%1%
 If (arg1="-batch") {
-    runMode=Hide
+    runMode=Min
     unisonExecType=unisontext
 } Else {
     unisonExecType=unisongui
@@ -17,6 +17,18 @@ If (arg1="-batch") {
 EnvGet unisonexe, %unisonExecType%
 If (!unisonexe)
     unisonexe := Expand(ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_unison_get_command.cmd", unisonExecType))
+
+Loop Files, %unisonexe%\..\..\*.*, DR
+{
+    If (FileExist(A_LoopFileFullPath "\*.dll")) {
+	If (!path)
+	    EnvGet path, PATH
+	If (!InStr(path, A_LoopFileLongPath))
+	    path .= ";" A_LoopFileLongPath
+    }
+}
+If (path)
+    EnvSet PATH, %path%
 
 Loop Files, .sync, FR
 {
@@ -32,12 +44,12 @@ Loop Files, .sync, FR
 	    ConfFileParams .= A_Space . A_LoopField
     }
     
-    RunString = %unisonexe% unattended -root "%SyncSource%" -root "%A_WorkingDir%\%A_LoopFileDir%" -force "%SyncSource%" -ignore "Path .sync" -ignore "Name desktop.ini" -auto -logfile "%A_ScriptDir%\unison.log" %ConfFileParams%
+    RunString = "%unisonexe%" unattended -root "%SyncSource%" -root "%A_WorkingDir%\%A_LoopFileDir%" -force "%SyncSource%" -ignore "Path .sync" -ignore "Name desktop.ini" -auto -logfile "%A_ScriptDir%\unison.log" %ConfFileParams%
     Menu Tray, Tip, %RunString%
     RunWait %RunString% %1%,,%runMode% UseErrorLevel
     If (ErrorLevel) {
 	FileAppend %ErrorLevel% after running «%RunString% %1%».`n, %logFile%
-	Run %RunString%,,UseErrorLevel
+	Run %comspec% /C "%RunString%",,UseErrorLevel
 	If (ErrorLevel)
 	    FileAppend ErrorLevel %ErrorLevel%%A_Space%, %logFile%
 	FileAppend Starting «%RunString%» in background.`n, %logFile%
