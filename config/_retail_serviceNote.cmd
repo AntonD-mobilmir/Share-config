@@ -11,8 +11,8 @@ CALL "%~dp0_Scripts\FindSoftwareSource.cmd"
 SET "Пользователь_flags=f"
 CALL "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 CALL "%~dp0_Scripts\AddUsers\AddUser_Install.cmd"
-START "" "%~dp0..\Inventory\SaveArchiveReport.lnk"
-START "" "\\Srv0\profiles$\Share\Program Files\collectProductKeys.exe"
+START "Inventory\collector-script\SaveArchiveReport.cmd" /B %comspec% /C "%~dp0..\Inventory\collector-script\SaveArchiveReport.cmd"
+START "..\Program Files\collectProductKeys.exe" /B "%~dp0..\Program Files\collectProductKeys.exe"
 )
 
 (
