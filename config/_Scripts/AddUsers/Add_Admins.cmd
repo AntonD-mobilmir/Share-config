@@ -66,8 +66,9 @@ SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
     )
 )
 (
-    rem Post password in background
-    IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\XMLHTTP_POST.ahk" "%URL%" "Host=%Hostname%" "UserName=%NewUsername%" "Pwd=%pwd%" "UserAddError=%UserAddError%"
+rem Post password in background
+rem separate scope from writing to file because UserAddError is set in previous scope
+IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\XMLHTTP_POST.ahk" "%URL%" "Host=%Hostname%" "UserName=%NewUsername%" "Pwd=%pwd%" "UserAddError=%UserAddError%"
 )
 :setupgroups
 (
