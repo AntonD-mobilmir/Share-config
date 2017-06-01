@@ -22,7 +22,11 @@ If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="-WaitAndPostURL.ln
     SetTitleMatchMode 2
     actnList := "_;^f;_;Copy results{Esc};{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
     wantUserIdle := 10000 ; ms
-    
+
+    KL_NAMELENGTH = 9
+    LANG_ENG := "00000409"
+    ;LANG_RUS := "00000419"
+    VarSetCapacity(layoutName, KL_NAMELENGTH * (A_IsUnicode+1) + 1) ; +1 for EOL
     
     Loop
     {
@@ -34,17 +38,12 @@ If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="-WaitAndPostURL.ln
 	} Else {
 	    IfWinExist Performance Results - UserBenchmark
 	    {
-		If (A_Index>1) {
-		    ControlGetFocus,ctl,A
-		    SendMessage 0x50,0,HKL,%ctl%,A ;WM_INPUTLANGCHANGEREQUEST
-		}
-		
 		Loop Parse, actnList, `;
 		{
 		    Sleep 250
 		    If (A_TimeIdlePhysical < wantUserIdle) {
 			TrayTip,, Скопируйте результаты теста и ссылку на результаты в буфер обмена (в любом порядке)
-			While (A_TimeIdlePhysical < wantUserIdle) {
+			While (A_TimeIdlePhysical < wantUserIdle && !(ResultsURL && IsObject(perfResultsObj))) {
 			    If (A_Index==1) {
 				Progress Off
 				Progress R0-%wantUserIdle%, `n, Ожидание бездействия пользователя
@@ -67,20 +66,40 @@ If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="-WaitAndPostURL.ln
 			    } Else If (subActn=="-") {
 				Clipboard := clipBak
 			    } Else {
+				WinActivate
 				Send ^{Ins}
 				Sleep 25
 				WinActivate
-				Send ^c
+				Send ^{vk43} ;^c, {vk43}=c
 				ClipWait 10
 			    }
 			}
 		    } Else { ; just send
+			;GetKeyboardLayoutName https://msdn.microsoft.com/en-us/library/windows/desktop/ms646298.aspx
+			If (DllCall(A_WinDir . "\System32\User32.dll\GetKeyboardLayoutName", "Str", layoutName)
+				&& layoutName != LANG_ENG) { ; if language is not english,
+			    Loop
+			    {
+				If (A_Index > 1)
+				    Send {Tab}
+				ControlGetFocus,ctl
+			    } Until !ErrorLevel || A_Index > 10
+			    SendMessage 0x50,0,HKL,%ctl%,A ;WM_INPUTLANGCHANGEREQUEST - change locale
+			}
 			Send %A_LoopField%
 		    }
 		}
 	    }
 	    
 	    Sleep 1000
+	    sendModeN := Mod(A_Index, 3) ; SendMode Input|Play|Event; on first loop, A_Index = 1, so remainder = 1 → SendMode Play for next try
+	    If (sendModeN = 0) {
+		SendMode Input
+	    } Else If (sendModeN = 1) {
+		SendMode Play
+	    } Else If (sendModeN = 2) {
+		SendMode Event
+	    }
 	}
     }
     Progress Off
@@ -216,7 +235,8 @@ ClipHook(cliptype) {
 	    TrayTip Найден текст с результатами теста, % perfResultsObj.ResultsText
 	    ;MsgBox % perfResultsObj.Desktop . "`n" . 	    perfResultsObj.CPU . "`n" . 	    perfResultsObj.CPUModel . "`n" . 	    perfResultsObj.HDD . "`n" . 	    perfResultsObj.HDDModel . "`n" . 	    perfResultsObj.SSD . "`n" . 	    perfResultsObj.SSDModel
 	} Else {
-	    TrayTip Неправильный текст, %WrongContentsErrText%
+	    TrayTip Скопированный текст не подходит, Текст не похож ни на URL`, ни на результаты:`n%WrongContentsErrText%
+	    return
 	}
     } Else {
 	TrayTip Скопирован не текст, %WrongContentsErrText%
