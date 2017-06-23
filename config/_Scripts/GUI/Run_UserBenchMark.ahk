@@ -11,7 +11,7 @@
 #NoEnv
 #InstallKeybdHook
 #InstallMouseHook
-;#SingleInstance ignore - don't do it, it brakes ="/WaitAndPostURL
+;#SingleInstance ignore - breaks /WaitAndPostURL
 #SingleInstance force
 If A_OSVersion in WIN_2003,WIN_XP,WIN_2000
     ExitApp 1
@@ -139,7 +139,11 @@ While (!FileExist(exeName)) {
 	If (FileExist(archiveName))
 	    break
 	
-	Run %UBMURL%
+	; If a new browser is installed, Win8+ will show app selection window instead of launching default one
+	; because of that, launching specific browser is much more safe
+	If (A_OSVersion != "WIN_7")
+	    browserexe := FindBrowserExe() . A_Space
+	Run %browserexe%%UBMURL%
 	
 	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMURL% запущен браузер. Пауза 30 секунд., 30
 	
@@ -212,6 +216,37 @@ FileAppend %A_Now% Запуск ожидания прявления резуль
 Run %ScriptRunCommand% /WaitAndPostURL, %A_ScriptDir%
 
 ExitApp
+
+FindBrowserExe() {
+    regRoots := ["HKEY_LOCAL_MACHINE", "HKEY_CLASSES_ROOT"]
+    regPaths := [["ChromeHTML\shell\open\command",, 1]
+		,["Software\Classes\ActivatableClasses\Package\DefaultBrowser_NOPUBLISHERID\Server\DefaultBrowserServer", "ExePath"]
+		,["SOFTWARE\Classes\Applications\chrome.exe\shell\open\command",, 1]
+		,["SOFTWARE\Clients\StartMenuInternet\Google Chrome\shell\open\command"]
+		,["SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"]]
+    If (A_Is64bitOS)
+	SetRegView 64
+    Loop % (1 + A_Is64bitOS)
+    {
+	If (A_Index > 1)
+	    SetRegView 32
+	For rri, regRoot in regRoots {
+	    For rpi, regPathObj in regPaths {
+		RegRead v, % regRoot "\" regPathObj[1], % regPathObj[2]
+		If (!ErrorLevel && v)
+		    If (regPathObj[3]==1)
+			return RemovePercent1(v)
+		    Else
+			return v
+	    }
+	}
+	return
+    }
+}
+
+RemovePercent1(str) {
+    return StrReplace(StrReplace(str, """%1""", ""), "%1", "")
+}
 
 ClipHook(cliptype) {
     global perfResultsObj, ResultsURL
