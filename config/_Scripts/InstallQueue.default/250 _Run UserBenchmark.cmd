@@ -5,7 +5,8 @@ ECHO %DATE% %TIME% Run UserBenchmark
 )
 IF NOT DEFINED AutoHotkeyExe CALL "%configDir%\_Scripts\FindAutoHotkeyExe.cmd"
 (
-%AutoHotkeyExe% "%configDir%\_Scripts\GUI\Run_UserBenchMark.ahk" >>%logfile% 2>&1
+START "" /LOW %AutoHotkeyExe% "%configDir%\_Scripts\GUI\Run_UserBenchMark.ahk"
+rem  >>%logfile% 2>&1
 EXIT /B
 )
 :GetConfigDir
