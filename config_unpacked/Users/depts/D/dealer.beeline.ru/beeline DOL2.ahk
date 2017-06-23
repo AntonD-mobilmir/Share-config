@@ -180,7 +180,7 @@ Loop
 		    FileRemoveDir %A_Programs%\Vimpelcom
 		    ExitApp
 		} Else If (a=-1) {
-		    ShowError("Обнаружено окно " . exeName . " с ошибкой """ . winText . """")
+		    ShowError("Обнаружено окно " . exeName . " с ошибкой: " . fullTitle . "`n" . fullText)
 		    ExitApp
 		} Else If (a=1) {
 		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle%
