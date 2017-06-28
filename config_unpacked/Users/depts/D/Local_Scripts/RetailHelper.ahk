@@ -10,6 +10,14 @@ idletimeDisconnectVPN := 30 * 60 * 1000 ; 30 min
 idletimeRarusCheckAutoLoad := 3 * 60 * 1000 ; 3 min
 doublepressRarusTimeout := 20 * 60 * 1000 ; 20 min
 idletimeGiftomanNonOnTop := 30 * 1000 ; 30 sec
+startDay := A_DD
+wintitle1s=ahk_exe 1cv7s.exe
+
+timeTillEndOfDay := A_YYYY . A_MM . A_DD + 1
+timeTillEndOfDay -= A_Now, Seconds
+
+nextRebootOffer := A_TickCount + TimeTillEndOfDay * 1000 ; ms
+rebootOfferDelay := 30 * 60 * 1000 ; 30 min in ms
 
 ;ahk_class HwndWrapper[KKMGMSuite.exe;;ec6679dd-7266-4fe0-8880-fd566da471b0]
 ;ahk_exe KKMGMSuite.exe
@@ -31,6 +39,19 @@ Periodic:
 	RasDisconnected:=1
     } Else {
 	RasDisconnected=
+	If (rarusPID && A_TickCount >= nextRebootOffer) {
+	    MsgBox 0x34, Компьютер не перезагружался, Компьютер включен со вчерашнего дня.`nДля создания резервной копии 1С-Рарус требуется перезагрузка. Перезагрузить сейчас?`n`n(если ответите нет – перезагрузите сами при первой возможности), 60
+	    IfMsgBox No
+	    {
+		nextRebootOffer := A_TickCount + rebootOfferDelay ; ms
+	    } Else {
+		WinClose %wintitle1s%
+		WinWaitClose,,, 30 ; seconds to wait for close
+		Shutdown 2
+	    }
+	} Else {
+	    rarusPID := getFirstPid("1cv7s.exe", "1cv7.exe")
+	}
     }
     
 ;Гифтоман
@@ -48,7 +69,7 @@ Periodic:
     }
 ;Рарус
     rarusMinMax := 2
-    If (idle > idletimeRarusCheckAutoLoad && A_TickCount > rarusLoadNextCheck && WinExist("ahk_exe 1cv7s.exe")) {
+    If (idle > idletimeRarusCheckAutoLoad && A_TickCount > rarusLoadNextCheck && WinExist(wintitle1s)) {
 	ControlGetText txtBtn, Button20
 	If (ErrorLevel || txtBtn != "ОБМЕН УТ") {
 	    WinGet rarusMinMax, MinMax
@@ -79,3 +100,12 @@ Periodic:
 	    WinMinimize
     }
 return
+
+getFirstPid(exeNames*) {
+    For i,Name in exeNames {
+	Process Exist, %Name%
+	If (ErrorLevel)
+	    return ErrorLevel
+    }
+    return
+}
