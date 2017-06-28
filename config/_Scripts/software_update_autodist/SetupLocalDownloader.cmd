@@ -59,8 +59,8 @@
     IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
 )
 :addTask
-IF NOT DEFINED schedUserName SET /P "schedUserName=Имя пользователя для задачи обновления дистрибутивов: "
 SET "schtaskPassSw=" & IF DEFINED schedUserPwd SET schtaskPassSw=/RP "%schedUserPwd%"
+IF NOT DEFINED schedUserName SET /P "schedUserName=Имя пользователя для задачи обновления дистрибутивов: "
 (
 SET "retaskq=0"
 CALL "%~dp0..\CheckWinVer.cmd" 6 || ( CALL :SchTasksXP & GOTO :checkSchtasksError )
@@ -160,8 +160,7 @@ EXIT /B
     EXIT /B
 )
 :GetCurrentUserName <varname>
-    IF NOT DEFINED configDir CALL :getconfigDir
-    IF NOT DEFINED whoamiexe CALL "%configDir%_Scripts\find_exe.cmd" whoamiexe "%SystemDrive%\SysUtils\UnxUtils\whoami.exe"
+    IF NOT DEFINED whoamiexe CALL "%~dp0..\find_exe.cmd" whoamiexe "%SystemDrive%\SysUtils\UnxUtils\whoami.exe"
 (
     FOR /F "usebackq delims=\ tokens=2" %%I IN (`%whoamiexe%`) DO SET "%~1=%%~I"
     IF NOT DEFINED %~1 SET "%~1=%USERNAME%"
@@ -171,10 +170,9 @@ EXIT /B
 (
     IF NOT DEFINED http_proxy EXIT /B
     IF "%http_proxy%"=="http://127.0.0.1:3128/" EXIT /B
-    IF NOT DEFINED configDir CALL :getconfigDir
 )
 (
-    "%configDir%_Scripts\SetProxy.ahk" ""
+    "%~dp0..\_Scripts\SetProxy.ahk" ""
     EXIT /B
 )
 :getconfigDir
