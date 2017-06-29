@@ -25,7 +25,12 @@ IF NOT EXIST %gpgexe% CALL "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\PreI
 IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
 rem IF NOT DEFINED SetACLexe CALL "%ConfigDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 IF NOT DEFINED AutohotkeyExe CALL "%ConfigDir%FindAutoHotkeyExe.cmd"
+
+IF NOT DEFINED schedUserName CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
+IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
+IF NOT DEFINED schedUserName SET /P "schedUserName=Имя пользователя для задачи обновления дистрибутивов: "
 )
+SET "schtaskPassSw=" & IF DEFINED schedUserPwd SET schtaskPassSw=/RP "%schedUserPwd%"
 (
 rem installer does not allow setting destination - "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\stunnel\stunnel-5.41-win32-installer.exe" /S
 %exe7z% x -aoa -o"D:\1S\Rarus\MailLoader\stunnel" -x!bin/openssl.exe -x!bin/stunnel.exe -x!*/*.pdb -x!$PLUGINSDIR -x!uninstall.exe "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\stunnel\stunnel-*-win32-installer.exe" || SET "ErrorOccured=1"
@@ -36,7 +41,8 @@ rem installer does not allow setting destination - "\\Srv0.office0.mobilmir\Dist
 %AutohotkeyExe% "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk" || SET "ErrorOccured=1"
 
 CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || SET "ErrorOccured=1"
-CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || SET "ErrorOccured=1"
+rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || SET "ErrorOccured=1"
+CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% /NP || SET "ErrorOccured=1"
 
 IF DEFINED ErrorOccured (
     %ErrorCmd%
@@ -57,4 +63,11 @@ EXIT /B
 (
 SET "%~1=%~dp2"
 EXIT /B
+)
+:GetCurrentUserName <varname>
+    IF NOT DEFINED whoamiexe CALL "%configDir%_Scripts\find_exe.cmd" whoamiexe "%SystemDrive%\SysUtils\UnxUtils\whoami.exe"
+(
+    FOR /F "usebackq delims=\ tokens=2" %%I IN (`%whoamiexe%`) DO SET "%~1=%%~I"
+    IF NOT DEFINED %~1 SET "%~1=%USERNAME%"
+    EXIT /B
 )
