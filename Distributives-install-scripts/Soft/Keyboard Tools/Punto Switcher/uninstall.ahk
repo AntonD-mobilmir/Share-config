@@ -10,7 +10,7 @@ Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
     RegRead URLUpdateInfo, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLUpdateInfo
     RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
     
-    If (Publisher == "Яндекс" && URLUpdateInfo == "http://punto.yandex.ru" && StartsWith(DisplayName, "Punto Switcher ")) {
+    If (Publisher == "Яндекс" && StartsWith(DisplayName, "Punto Switcher ")) {
 	RunWait "%A_ScriptDir%\PuntoSwitcherSetup.exe" /quiet /norestart
 	Sleep 5000
 	Process Close, punto.exe
