@@ -6,6 +6,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-CALL "%~dp0download.cmd" %*
-IF DEFINED SUScripts FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%~dp0AutoHotkey*.exe"`) DO CALL "%SUScripts%\..\templates\_add_withVer.cmd" "%%~I" & EXIT /B
+curl -x socks://localhost:9150 --remote-name-all -JRL https://autohotkey.com/download/ahk-install.exe
+rem  -O, --remote-name   Write output to a file named as the remote file
+rem      --remote-name-all  Use the remote file name for all URLs
 )
