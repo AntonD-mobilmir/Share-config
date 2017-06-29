@@ -1,4 +1,5 @@
 AutoHotkey.exe
+notepad2.exe
 notepad2.ini.bak
 PlugIns\wcx\CopyTree\Language
 PlugIns\wcx\Total7zip\7z.dll 
