@@ -41,29 +41,14 @@ EXIT /B
 )
 :overwritecfg2
 (
-IF EXIST "%RarusMailLoaderDir%\gnupg" IF NOT EXIST "%RarusMailLoaderDir%.bak" MKDIR "%RarusMailLoaderDir%.bak"
-MOVE "%RarusMailLoaderDir%\gnupg" "%RarusMailLoaderDir%.bak\gnupg%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%"
-RD /S /Q "%RarusMailLoaderDir%"
-RD /S /Q "%ExtFormsMailLoader%"
-CALL "%~dp0\MailLoader\install.cmd"
-REM rem IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe sed.exe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
-REM IF NOT DEFINED sedexe CALL "%ConfigDir%_Scripts\findsedexe.cmd" || (ECHO Не найден sed.exe для исправления профиля Thunderbird. & PAUSE & EXIT /B)
-REM IF NOT DEFINED mtprofiledir CALL :CheckExistenceSetVar mtprofiledir d:\Mail\Thunderbird\profile
-REM )
-REM (
-REM     SET "ErrorsHappened=0"
-REM     PUSHD "%mtprofiledir%"||(PAUSE & EXIT /B)
-REM 	%sedexe% -e "s/!rarusexchaddr!/%rarusexchaddr%/g" -e "s/!rarusexchlogin!/%rarusexchaddr%/g" prefs_RarusExch.js >>prefs.js || CALL :CheckError
-REM 	%sedexe% -ir -f prefs_AddRarusExchAcc.sed prefs.js || CALL :CheckError
-REM     POPD
-REM )
-rem (
-REM    IF "%ErrorsHappened%"=="0" (
-REM	DEL "%mtprofiledir%\prefs_RarusExch.js"
-REM	DEL "%mtprofiledir%\prefs_AddRarusExchAcc.sed"
-REM    )
+    IF EXIST "%RarusMailLoaderDir%\gnupg" IF NOT EXIST "%RarusMailLoaderDir%.bak" MKDIR "%RarusMailLoaderDir%.bak"
+    MOVE "%RarusMailLoaderDir%\gnupg" "%RarusMailLoaderDir%.bak\gnupg%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%"
+    DEL "%ExtFormsMailLoader%\config-localhost.xml"
+    RD /S /Q "%RarusMailLoaderDir%"
+    RD /S /Q "%ExtFormsMailLoader%"
+    CALL "%~dp0\MailLoader\install.cmd"
     EXIT /B
-rem )
+)
 :GetRarusExchParams
 (
     IF DEFINED rarusexchaddr GOTO :SkipAcquiringUserName
