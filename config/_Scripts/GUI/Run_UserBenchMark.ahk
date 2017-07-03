@@ -141,9 +141,12 @@ While (!FileExist(exeName)) {
 	
 	; If a new browser is installed, Win8+ will show app selection window instead of launching default one
 	; because of that, launching specific browser is much more safe
-	If (A_OSVersion != "WIN_7")
-	    browserexe := FindBrowserExe() . A_Space
-	Run %browserexe%%UBMURL%
+	If (A_OSVersion != "WIN_7") {
+	    browserexe := FindBrowserExe()
+	    If (browserexe)
+		UBMURL := browserexe . A_Space . UBMURL
+	}
+	Run %UBMURL%
 	
 	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMURL% запущен браузер. Пауза 30 секунд., 30
 	
@@ -219,11 +222,14 @@ ExitApp
 
 FindBrowserExe() {
     regRoots := ["HKEY_LOCAL_MACHINE", "HKEY_CLASSES_ROOT"]
+    ;regPaths: [[regkey, regvalname, remove %1?], …]
     regPaths := [["ChromeHTML\shell\open\command",, 1]
-		,["Software\Classes\ActivatableClasses\Package\DefaultBrowser_NOPUBLISHERID\Server\DefaultBrowserServer", "ExePath"]
 		,["SOFTWARE\Classes\Applications\chrome.exe\shell\open\command",, 1]
 		,["SOFTWARE\Clients\StartMenuInternet\Google Chrome\shell\open\command"]
-		,["SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"]]
+		,["SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"]
+		,["Software\Classes\ActivatableClasses\Package\DefaultBrowser_NOPUBLISHERID\Server\DefaultBrowserServer", "ExePath"]
+		,["HKEY_CLASSES_ROOT\Applications\iexplore.exe\shell\open\command",, 1]
+		,["HKEY_CLASSES_ROOT\IE.HTTP\shell\open\command",, 1]]
     If (A_Is64bitOS)
 	SetRegView 64
     Loop % (1 + A_Is64bitOS)
