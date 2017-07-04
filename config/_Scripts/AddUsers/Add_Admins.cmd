@@ -42,21 +42,23 @@ EXIT /B
 	wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
 	GOTO :setupgroups
     )
-
-    IF DEFINED SaveDir SET "OutDir=%SaveDir%\%Hostname%"
-    IF DEFINED URL IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
     
-    rem Generate new password
-    SET "PasswdPart1=0000%RANDOM%"
-    SET "PasswdPart2=0000%RANDOM%"
-    SET "PasswdPart3=0000%RANDOM%"
-    rem if password is longer than 14 chars, NET USER /ADD asks stupid question
+    REM IF NOT DEFINED flag_p
+    
+	IF DEFINED SaveDir SET "OutDir=%SaveDir%\%Hostname%"
+	IF NOT DEFINED OutDir SET "OutDir=%TEMP%"
+	IF DEFINED URL IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+	
+	rem Generate new password
+	SET "PasswdPart1=0000%RANDOM%"
+	SET "PasswdPart2=0000%RANDOM%"
+	SET "PasswdPart3=0000%RANDOM%"
+	rem if password is longer than 14 chars, NET USER /ADD asks stupid question
 )
-SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
-(
-    SET "UserAddError="
-    rem Create new user
-    IF DEFINED OutDir (
+	SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
+    (
+	SET "UserAddError="
+	rem Create new user
 	MKDIR "%OutDir%" 2>NUL
 	(
 	    rem Write password to file
@@ -64,19 +66,21 @@ SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
 	    NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:YES /FULLNAME:"%FullName%" || CALL :SetUserAddError
 	)>>"%OutDir%\%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt" 2>&1
     )
-)
-(
-rem Post password in background
-rem separate scope from writing to file because UserAddError is set in previous scope
-IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\XMLHTTP_POST.ahk" "%URL%" "Host=%Hostname%" "UserName=%NewUsername%" "Pwd=%pwd%" "UserAddError=%UserAddError%"
-)
+    (
+	rem Post password in background
+	rem separate scope from writing to file because UserAddError is set in previous scope
+	IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\XMLHTTP_POST.ahk" "%URL%" "Host=%Hostname%" "UserName=%NewUsername%" "Pwd=%pwd%" "UserAddError=%UserAddError%"
+    )
+    REM END IF [DEFINED flag_p]
 :setupgroups
 (
     rem Add to admin group. Its name differs depending on Windows language.
-    NET LOCALGROUP Users %NewUsername% /Delete >NUL 2>&1
-    NET LOCALGROUP Пользователи %NewUsername% /Delete >NUL 2>&1
-    NET LOCALGROUP Administrators %NewUsername% /Add >NUL 2>&1
-    NET LOCALGROUP Администраторы %NewUsername% /Add >NUL 2>&1
+    (
+	NET LOCALGROUP Administrators %NewUsername% /Add
+	NET LOCALGROUP Администраторы %NewUsername% /Add
+	NET LOCALGROUP Users %NewUsername% /Delete
+	NET LOCALGROUP Пользователи %NewUsername% /Delete
+    ) >NUL 2>&1
     ENDLOCAL
     SET AutoHotkeyExe=%AutoHotkeyExe%
 EXIT /B

@@ -8,7 +8,7 @@ CALL "%~dp0_Scripts\Lib\.utils.cmd" CheckSetSystemVars
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
 CALL "%~dp0_Scripts\FindSoftwareSource.cmd"
 
-SET "Пользователь_flags=f"
+SET "Пользователь_flags=rpf"
 CALL "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 CALL "%~dp0_Scripts\AddUsers\AddUser_Install.cmd"
 START "Inventory\collector-script\SaveArchiveReport.cmd" /B %comspec% /C "%~dp0..\Inventory\collector-script\SaveArchiveReport.cmd"
