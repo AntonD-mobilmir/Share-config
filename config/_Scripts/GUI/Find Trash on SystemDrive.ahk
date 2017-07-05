@@ -2,25 +2,30 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
+global flog, SystemDrive
 EnvGet SystemDrive, SystemDrive
+
+If (!IsObject(flog := FileOpen(logfn := A_Temp . "\" . A_ScriptName . ".log", "w-w"))) {
+    Throw Exception(A_LastError, "FileOpen", "При попытке открыть " . logfn)
+}
 
 GoodDirs =
 (LTrim
-$Recycle.Bin\
-BOOT\
-Common_Scripts\
-Documents and Settings\
-Local_Scripts\
-PerfLogs\
-Program Files (x86)\
-Program Files\
-ProgramData\
-Recovery\
-squid\
-System Volume Information\
-SysUtils\
-Users\
-Windows\
+$Recycle.Bin
+BOOT
+Common_Scripts
+Documents and Settings
+Local_Scripts
+PerfLogs
+Program Files (x86)
+Program Files
+ProgramData
+Recovery
+squid
+System Volume Information
+SysUtils
+Users
+Windows
 
 )
 
@@ -35,60 +40,94 @@ hiberfil.sys
 
 )
 
-foundFiles := Object()
-foundDirs := Object()
-showList=
+TrashDirs =
+(LTrim
+Intel
 
-Loop Files, %SystemDrive%\*.*, D
+)	
+
+Loop
 {
-    If (!InStr(GoodDirs, A_LoopFileName . "\`n")) {
-	foundDirs.Push(A_LoopFileName)
-	AppendShowList(A_LoopFileName . "\", showList)
-    }
-}
+    foundFiles := Object()
+    foundDirs := Object()
+    showList=
 
-Loop Files, %SystemDrive%\*.*, F
-{
-    If (!InStr(GoodFiles, A_LoopFileName . "`n")) {
-	foundFiles.Push(A_LoopFileName)
-	AppendShowList(A_LoopFileName, showList)
-    }
-}
-
-AppendShowList("", showList)
-
-If (showList) {
-    dest:="D:\ProgramData"
-    MsgBox 0x33, %A_ScriptName%, На %SystemDrive% обнаружены папки и файлы`, которых нет в списке стандартных. Переместить в D:\ProgramData? (Да = переместить`, Нет = удалить):`n%showList%
-    IfMsgBox Cancel
-	ExitApp
-    IfMsgBox No
-	dest:=""
-    
-    Try {
-	If (dest)
-	    FileCreateDir %dest%
-	For i, item in foundDirs {
-	    If (dest)
-		FileMoveDir %SystemDrive%\%item%, % dest . "\" . item
-	    Else
-		FileRemoveDir %SystemDrive%\%item%, 1
+    flog.WriteLine(A_Now . " Запущен поиск мусора на " . SystemDrive)
+    Loop Files, %SystemDrive%\*.*, D
+    {
+	If (!InStr(GoodDirs, A_LoopFileName . "`n")) {
+	    foundDirs.Push(A_LoopFileName)
+	    AppendShowList(A_LoopFileName . "\", showList)
 	}
-	For i, item in foundFiles {
-	    FileSetAttrib -RSH, %SystemDrive%\%item%, 1
-	    If (dest)
-		FileMove %SystemDrive%\%item%, %dest%
-	    Else
-		FileDelete %SystemDrive%\%item%
-	}
-    } catch e {
-	Throw e
     }
+
+    Loop Files, %SystemDrive%\*.*, F
+    {
+	If (!InStr(GoodFiles, A_LoopFileName . "`n")) {
+	    foundFiles.Push(A_LoopFileName)
+	    AppendShowList(A_LoopFileName, showList)
+	}
+    }
+
+    AppendShowList("", showList)
+
+    reqExitCode=127
+    If (showList) {
+	dest:="D:\ProgramData"
+	MsgBox 0x33, %A_ScriptName%, На %SystemDrive% обнаружены папки и файлы`, которых нет в списке стандартных. Переместить их в D:\ProgramData? (Да = переместить`, Нет = открыть командную строку):`n%showList%
+	IfMsgBox Cancel
+	    break
+	IfMsgBox No
+	{
+	    writeoutList=
+	    FileAppend %A_Now%`n,%A_Temp%\excessFilesList.txt
+	    For i, item in foundDirs
+		FileAppend %item%\`n,%A_Temp%\excessFilesList.txt
+	    For i, item in foundFiles
+		FileAppend %item%`n,%A_Temp%\excessFilesList.txt
+	    
+	    RunWait %comspec% /K "ECHO Чтобы удалить оставшиеся файлы и папки`, введите EXIT 222. При другом коде возврата будет выполнена повторная проверка.&ECHO Список обнаруженных файлов записан в "`%TEMP`%\excessFilesList.txt"", A_Temp
+	    If (ErrorLevel!=222)
+		continue
+	    dest:=""
+	}
+	
+	; Перемещение или удаление
+	Try {
+	    If (dest)
+		FileCreateDir %dest%
+	    For i, item in foundDirs {
+		If (dest)
+		    FileMoveDir %SystemDrive%\%item%, % dest . "\" . item
+		Else
+		    FileRemoveDir %SystemDrive%\%item%, 1
+	    }
+	    For i, item in foundFiles {
+		FileSetAttrib -RSH, %SystemDrive%\%item%, 1
+		If (dest)
+		    FileMove %SystemDrive%\%item%, %dest%
+		Else
+		    FileDelete %SystemDrive%\%item%
+	    }
+	} catch e {
+	    Throw e
+	}
+    }
+    break
 }
+flow.WriteLine(A_Now . " Завершено.")
+flog.Close()
+ExitApp
 
 AppendShowList(ByRef item, ByRef lst) {
-    static c:=0, item20
+    static c:=0, item20:=""
+    If (lst=="") {
+	c:=0
+	item20=
+    }
+    
     If (item) {
+	flog.WriteLine(item)
 	If (c++ < 20)
 	    lst .= "`n" . item
 	Else If (c==20)
