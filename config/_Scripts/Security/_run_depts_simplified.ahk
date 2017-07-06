@@ -57,7 +57,7 @@ Loop
 	If (leftTime < 15) {
 	    leftTime := "Раньше за это время скрипт уже заканчивал"
 	} Else If (leftTime > 60)
-	    leftTime := "Осталось " . Format("{1.1f}", leftTime / 60) . " мин."
+	    leftTime := "Осталось " . Format("{:1.1f}", leftTime / 60) . " мин."
 	Else
 	    leftTime := "Осталось примерно " leftTime " с"
     }
