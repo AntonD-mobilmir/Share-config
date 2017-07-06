@@ -16,6 +16,7 @@ If (!LocalAppData) {
 
 ScriptTitle=Скрипт проверки запуска DOL2
 logfname=%A_ScriptFullPath%.log
+logSizeLimit := 1024*1024
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
 DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
 DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
@@ -25,6 +26,10 @@ DOL2NavErrTitle = On Line Dealer ahk_class #32770
 startDelay := 1000 ; пауза после запуска URL. Удваивается после каждого запуска.
 unkCount := 3 ; сколько раз можно обнаружить неизвестное окно, прежде чем сообщать
 MaxMailtoTextLength := 1024
+
+FileGetSize logSize, %logfname%
+If (logSize>logSizeLimit)
+    FileMove %logfname%, %logfname%.bak, 1
 
 ; подготовка
 
@@ -41,9 +46,7 @@ MaxMailtoTextLength := 1024
 ;		 6 – &Установить
 ;		 7 - OK, удалить
 ;		 8 - Отмена
-AutoResponces := [[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
-    ,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
-    ,[DOL2Navexe, "On Line Dealer", "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы", 2]
+AutoResponces := [[DOL2Navexe, "On Line Dealer", "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы", 2]
     ,[DOL2Navexe, "Обзор папок", "Выберите папку для хранения данных приложения DOL:", 1]
     ,[DOL2Navexe, "Установка DOL ahk_class #32770", "Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?", 3]
     ,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации", -1]
@@ -58,10 +61,12 @@ AutoResponces := [[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
     ,["dfsvc.exe", "Невозможно запустить приложение", "Приложение DOL уже установлено из другого расположения. Удалите DOL." , 7] ; требование удалить
     ,["dfsvc.exe", "(", "Установка DOL", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
     ,["dfsvc.exe", "(100%) Установка DOL", "", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
+    ,["rundll32.exe", "Оповещение системы безопасности Windows", "Отмена", 8]
     ,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Вести журнал" , 0] ; #INC-5766
     ,[DOL2Navexe, "Навигатор", "menuMain", 0] ; окно DOL2 уже появилось, но ещё не заполнено
     ,[DOL2Navexe, "Выполнение задач", "", 0] ; если стоит галочка "выполнять при запуске"
-    ,["rundll32.exe", "Оповещение системы безопасности Windows", "Отмена", 8]]
+    ,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
+    ,[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]]
 
 ;если окно DOL2 обнаружено, оно просто будет активировано, а запуск выполняться не будет
 If (WinExist("ahk_exe " . DOL2Navexe)) {
@@ -176,9 +181,14 @@ Loop
 	    If (exeName = v[1] && StartsWith(fullTitle, v[2]) && InStr(fullText, v[3])) {
 		a:=v[4]
 		If (a=0) {
-		    ;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
-		    FileRemoveDir %A_Programs%\Vimpelcom
-		    ExitApp
+		    If (A_Index==1 || A_TickCount < timeoutSuccess) { ; если всё запустилось с первого раза или главое окно DOL Navigator уже обнаруживалось недавно, всё ok
+			;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
+			FileRemoveDir %A_Programs%\Vimpelcom
+			ExitApp
+		    } Else { ; иначе стоит подождать и проверить ещё раз, особенно при перезапуске – бывает, появляется окно об ошибке запуска DOLKernel.exe (#SR-5979)
+			Sleep startDelay
+			timeoutSuccess := A_TickCount + startDelay + 100
+		    }
 		} Else If (a=-1) {
 		    ShowError("Обнаружено окно " . exeName . " с ошибкой: " . fullTitle . "`n" . fullText)
 		    ExitApp
