@@ -21,7 +21,7 @@ scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\coll
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
-AkhMinVer		:= "1.1.25.01"
+AkhMinVer		:= "1.1.26.00"
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
