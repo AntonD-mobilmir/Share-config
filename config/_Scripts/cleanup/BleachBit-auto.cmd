@@ -9,7 +9,7 @@ ECHO BleachBit finished
 ENDLOCAL
 EXIT /B
 
-rem CALL "\\Srv0.office0.mobilmir\profiles$\Share\Program Files\BleachBit-Portable\_run_from_localtemp.cmd" -c --no-uac --preset
+rem CALL "\\Srv0.office0.mobilmir\profiles$\Share\Programs\BleachBit-Portable\_run_from_localtemp.cmd" -c --no-uac --preset
 
 :FindBleachBit
   IF EXIST "%~2\%relpath%" (

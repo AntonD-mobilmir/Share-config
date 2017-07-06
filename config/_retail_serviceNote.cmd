@@ -12,7 +12,7 @@ SET "Пользователь_flags=rpf"
 CALL "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 CALL "%~dp0_Scripts\AddUsers\AddUser_Install.cmd"
 START "Inventory\collector-script\SaveArchiveReport.cmd" /B %comspec% /C "%~dp0..\Inventory\collector-script\SaveArchiveReport.cmd"
-START "..\Program Files\collectProductKeys.exe" /B "%~dp0..\Program Files\collectProductKeys.exe"
+START "..\Programs\collectProductKeys.exe" /B "%~dp0..\Programs\collectProductKeys.exe"
 )
 
 (

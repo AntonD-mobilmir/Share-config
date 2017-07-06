@@ -6,7 +6,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 IF DEFINED PROCESSOR_ARCHITEW6432 "%SystemRoot%\SysNative\cmd.exe" /C %0 %* & EXIT /B
 
 REM Collect Windows Product Keys information
-"%~dp0..\Program Files\collectProductKeys.exe"
+"%~dp0..\Programs\collectProductKeys.exe"
 
 rem Disable password expiration
 "%SystemRoot%\System32\net.exe" accounts /maxpwage:unlimited

@@ -12,6 +12,9 @@ SET "PasswdPart2=0000%RANDOM%"
 SET "PasswdPart3=0000%RANDOM%"
 
 SET "ManagedUserName=admin-task-scheduler"
+
+SET passwdexe="%~dp0..\..\..\Programs\passwd.exe"
+rem SET passwdexe="\\Srv0.office0.mobilmir\profiles$\Share\Programs\passwd.exe"
 )
 SET "PassFileDir=%PROGRAMDATA%\mobilmir.ru"
 (
@@ -57,7 +60,7 @@ GOTO :SetVarsAndExit
 	EXIT /B
     )
     ECHO %ManagedUserName%	%newuserpwd%	%DATE% %TIME% Changing user password from "%OldPwd%">"%PassFilePath%"
-    "\\Srv0\profiles$\Share\Program Files\passwd.exe" -u "%ManagedUserName%" -c "%OldPwd%" "%newuserpwd%">>"%PassFilePath%" 2>&1
+    %passwdexe% -u "%ManagedUserName%" -c "%OldPwd%" "%newuserpwd%">>"%PassFilePath%" 2>&1
     IF NOT ERRORLEVEL 1 GOTO :SetVarsAndExit
     rem ERRORLEVELs:
     rem 4	invalid password

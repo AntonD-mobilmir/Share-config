@@ -50,7 +50,7 @@ EXIT /B
 :ExistingUser
 (
     SET "findExeTestExecutionOptions=-?"
-    CALL "%~dp0..\find_exe.cmd" passwdexe "c:\SysUtils\UnxUtils\Uri\passwd.exe" "\\Srv0\profiles$\Share\Program Files\passwd.exe" || (
+    CALL "%~dp0..\find_exe.cmd" passwdexe "%SystemRoot%\SysUtils\UnxUtils\Uri\passwd.exe" "%~dp0..\..\..\Programs\passwd.exe" "\\Srv0.office0.mobilmir\profiles$\Share\Programs\passwd.exe" || (
 	ECHO passwd.exe not found. Trying to reset the password.
 	GOTO :ExistingUserResetPwd
     )
