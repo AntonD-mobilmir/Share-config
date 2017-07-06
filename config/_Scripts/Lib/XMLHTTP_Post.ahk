@@ -1,7 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0) {
+XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0, moreHeaders:="") {
     global debug
     If (IsObject(debug)) {
 	FileAppend Отправка на адрес %URL% запроса %POSTDATA%`n, **
@@ -10,6 +10,11 @@ XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0) {
     ;XMLHttpRequest.open(bstrMethod, bstrUrl, varAsync, varUser, varPassword);
     XMLHttpRequest.open("POST", URL, false)
     XMLHttpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    
+    If (IsObject(moreHeaders))
+	For hName, hVal in moreHeaders
+	    XMLHttpRequest.setRequestHeader(hName, hVal)
+    
     Try {
 	XMLHttpRequest.send(POSTDATA)
 	If (IsObject(response))
