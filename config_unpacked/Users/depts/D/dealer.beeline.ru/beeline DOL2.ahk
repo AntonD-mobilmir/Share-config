@@ -16,7 +16,7 @@ If (!LocalAppData) {
 
 ScriptTitle=Скрипт проверки запуска DOL2
 logfname=%A_ScriptFullPath%.log
-logSizeLimit := 1024*1024
+logSizeLimit := 1024*1024 ; bytes
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
 DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
 DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
@@ -26,6 +26,7 @@ DOL2NavErrTitle = On Line Dealer ahk_class #32770
 startDelay := 1000 ; пауза после запуска URL. Удваивается после каждого запуска.
 unkCount := 3 ; сколько раз можно обнаружить неизвестное окно, прежде чем сообщать
 MaxMailtoTextLength := 1024
+DOL2WinWaitTimeout = 300 ; s
 
 FileGetSize logSize, %logfname%
 If (logSize>logSizeLimit)
@@ -82,10 +83,15 @@ If (!InStr(FileExist(DOL2BinDir), "D")) {
     run_FSACL_DOL2_cmd()
 }
 
-GroupAdd WinWaitList, ahk_exe %DOL2Navexe%
-For i,v in AutoResponces
+GroupAdd DOL2AnyRelatedWindow, ahk_exe %DOL2Navexe%
+For i,v in AutoResponces {
     If (v[1] != DOL2Navexe)
-	GroupAdd WinWaitList, % v[2] " ahk_exe " v[1], % v[3]
+	GroupAdd DOL2AnyRelatedWindow, % v[2] " ahk_exe " v[1], % v[3]
+    If (v[4] == 0)
+	GroupAdd DOL2RunningFine, % v[2] " ahk_exe " v[1], % v[3]
+    Else
+	GroupAdd DOL2Queries, % v[2] " ahk_exe " v[1], % v[3]
+}
 
 If (!CrystalReportsInstalled())
     ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
@@ -152,27 +158,29 @@ If (ErrorLevel) {
 ; начальные проверки закончены, можно запускать
 Loop
 {
-    If (!started) {
+    If (!(started || WinExist("ahk_group DOL2AnyRelatedWindow"))) {
 	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
 	started:=1
 	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидание появления окна (обычно до двух минут)
 	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
 	Sleep startDelay
-	startDelay:=startDelay<<1 ; double delay each time
+	startDelay:=startDelay<<1 ; задержка удваивается при каждом запуске
     }
     
-    WinWait ahk_group WinWaitList,,300
+    WinWait ahk_group DOL2AnyRelatedWindow,,%DOL2WinWaitTimeout%
     If (ErrorLevel) {
 	MsgBox За пять минут ни одно ожидаемое окно не появилось.
 	ExitApp
     } Else {
+	SplashTextOff
+	FileAppend %A_Now% Обнаружено окно "%exeName%": [%fullTitle%]`n%fullText%`n`n, %logfname%
+	WinExist("ahk_group DOL2Queries") || WinExist("ahk_group DOL2RunningFine") ; сначала проверять окна ошибок
+	
 	WinGetTitle fullTitle
 	WinGetText fullText
 	WinGet exeName, ProcessName
 	;WinGet exePath, ProcessPath
 	;SplitPath exePath, exeName
-	FileAppend %A_Now% Обнаружено окно "%exeName%": [%fullTitle%]`n%fullText%`n`n, %logfname%
-	SplashTextOff
 	a=
 	For i,v in AutoResponces {
 	    ;ahk_exe := v[1]
@@ -213,7 +221,21 @@ Loop
 			ExitApp
 		    }
 		} Else If (a=2) {
-		    ControlClick &OK
+		    Loop
+		    {
+			If (A_Index==1) { ; иногда нажатие OK не помогает
+			    ControlClick OK
+			    ControlClick ОК
+			} Else If (A_Index==2) {
+			    WinClose
+			} Else If (A_Index==3) {
+			    WinKill
+			} Else {
+			    ShowError("Не удаётся закрыть окно " . exeName . " с ошибкой: " . fullTitle . "`n" . fullText)
+			    break
+			}
+			WinWaitClose,,, 3
+		    } Until !ErrorLevel
 		    run_FSACL_DOL2_cmd()
 		    started := 0
 		} Else If (a=3) {
@@ -239,7 +261,7 @@ Loop
 		break
 	    }
 	}
-	If (!a) {
+	If (!a && fullTitle) { ; если fullTitle пустой, окно ещё не нарисовалось; иначе, открылось неизвестное окно
 	    If (!unkCount--) {
 		ShowError("Обнаружено неизвестное окно " . exeName . ": " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
 		ExitApp
