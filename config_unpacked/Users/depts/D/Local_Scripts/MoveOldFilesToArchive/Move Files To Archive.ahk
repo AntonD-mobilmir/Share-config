@@ -3,6 +3,12 @@
 #NoEnv
 FileEncoding UTF-8
 
+global ProfilePath, LocalAppData
+	, UIDSYSTEM:="S-1-5-18;s:y"
+	, UIDAdministrators:="S-1-5-32-544;s:y"
+EnvGet ProfilePath, USERPROFILE
+EnvGet LocalAppData, LOCALAPPDATA
+
 ; -1 = удалить
 ;  0 = оставить
 UserProfileDirs := {".oracle_jre_usage": -1
@@ -68,46 +74,87 @@ includeDirs := {  "." : ["", 30] ; -1 means special processing for root
 ;Loop Files, %ProfilesDirectory%\*, D ; Loop profiles
 ;{
 ;    profilePath := A_LoopFileFullPath
-    EnvGet profilePath, USERPROFILE
-    If (!InStr(profilePath, "D"))
-	ExitApp 1
-    backupsDest = %profilePath%\.Archive
-    logsDir = %profilePath%\AppData\Local\mobilmir.ru\%A_ScriptName%
-    SetWorkingDir %profilePath%
+Try {
+    SetWorkingDir %ProfilePath%
+    
+    backupsDest = %ProfilePath%\.Archive
+    logsDir = %LocalAppData%\mobilmir.ru\%A_ScriptName%
+    FileCreateDir %logsDir%
+    
     If (!InStr(backupsDest, "D")) {
 	FileCreateDir %backupsDest%
 	FileSetAttrib +H, %backupsDest%, 2
     }
-    FileCreateDir %logsDir%
+    
+    findexefunc:="findexe"
+    If(IsFunc(findexefunc)) {
+	Try SetACLexe := %findexefunc%(SystemDrive . "\SysUtils\SetACL.exe", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils")
+    } Else {
+	SetACLexe:=SystemDrive . "\SysUtils\SetACL.exe"
+    }
+
+    ;https://autohotkey.com/boards/viewtopic.php?t=21406
+    For process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process where ProcessId = " DllCall("GetCurrentProcessId")) {
+	VarSetCapacity(var, 24, 0), vref := ComObjActive(0x400C, &var)
+	process.GetOwnerSid(vref)
+	;https://msdn.microsoft.com/en-us/library/aa394372.aspx
+	ArchiveOwner := vref[] . ";s:y"
+	vref:=""
+	break
+    }
+    If (!ArchiveOwner)
+	ArchiveOwner=%A_UserName%;s:n
+    
+    ;ToDo: настроить доступ к backupsDest, чтобы можно было менять
+    RunWait "%SetACLexe%" -on "%backupsDest%" -ot file -actn setprot -op "dacl:p_nc;sacl:np" -actn clear -clr dacl -actn ace -ace "n:%UIDAdministrators%;p:full;i:sc`,so" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:sc`,so" -actn ace -ace "n:%ArchiveOwner%;p:change`,FILE_DELETE_CHILD`,WRITE_DAC;i:sc" -actn ace -ace "n:%ArchiveOwner%;p:write`,read`,FILE_DELETE_CHILD`,DELETE`,WRITE_DAC;i:io`,so" -ignoreerr -silent,, Hide UseErrorLevel
+    
     delList =
     moveList =
     skipList =
     For incDir, d in includeDirs {
 	If (incDir = ".")
 	    Loop Files, *, D
-		If (UserProfileDirs.HasKey(A_LoopFileName)) {
-		    actn := UserProfileDirs[A_LoopFileName]
-		    If (actn=-1)
+		If (UserProfileDirs.HasKey(A_LoopFileName)) { ; известная папка?
+		    If (UserProfileDirs[A_LoopFileName] == -1) ; для каждой известной папки указано значение, для большей части – 0, но для те, для которых -1, можно просто удалять
 			FileRemoveDir %A_LoopFileFullPath%, 1
-		} Else {
-		    MsgBox Перемещение %A_LoopFileFullPath%
+		} Else { ; папки нет в списке известных
+		    ; MsgBox Перемещение %A_LoopFileFullPath%
 		    destPath=Downloads\%A_LoopFileName%
 		    While FileExist(destPath)
 			destPath=Downloads\%A_LoopFileName% (%A_Index%)
 		    FileMoveDir %A_LoopFileFullPath%, %destPath%, R
 		    FileAppend %A_Now% "%A_LoopFileFullPath%" → "%destPath%"`n, %logsDir%\перемещенные папки.txt
 		}
+	
+	; для всех папок, в том числе корневой, также проверяются файлы
 	CheckDirAndArchiveFiles(backupsDest, incDir, d[1], d[2], delList, moveList)
     }
-;}
+    ;MsgBox 0,Список на удаление,%delList%
+    ;MsgBox --skipList--`n%skipList%
+    If (delList)
+	FileAppend %A_Now% файлы`, удаленные из %ProfilePath%:`n%delList%`n`n,%logsDir%\список удалённых файлов.txt
+    If (moveList)
+	FileAppend %A_Now% файлы`, перемещенные из %ProfilePath%:`n%moveList%`n`n,%logsDir%\список перемещённых в архив файлов.txt
 
-SetWorkingDir %A_ScriptDir%
-;MsgBox 0,Список на удаление,%delList%
-;MsgBox --skipList--`n%skipList%
-If (delList)
-    FileAppend %A_Now% файлы`, удаленные из %profilePath%:`n%delList%`n`n,%logsDir%\список удалённых файлов.txt
-If (moveList)
-    FileAppend %A_Now% файлы`, перемещенные из %profilePath%:`n%moveList%`n`n,%logsDir%\список перемещённых в архив файлов.txt
+    packDest = %ProfilePath%\.Archive-Pack
+    MoveToPackTimeHorizon += -90, Days
+    SetWorkingDir %backupsDest%
+    Loop Files, *, R
+    {
+	If (A_LoopFileTimeModified < MoveToPackTimeHorizon && A_LoopFileTimeCreated < MoveToPackTimeHorizon) {
+	    FileCreateDir %packDest%\%A_LoopFileDir%
+	    FileMove %A_LoopFileFullPath%, %packDest%\%A_LoopFileFullPath%
+	}
+    }
+    Loop Files, *, DR
+	RemoveEmptyDir(A_LoopFileFullPath)
+    
+} Catch e {
+    Throw e
+}
+
+; настройки доступа – только чтение и удаление (если не разрешить менять папки, нет доступа для удаления файлов)
+Run "%SetACLexe%" -on "%backupsDest%" -ot file -actn setprot -op "dacl:p_nc;sacl:np" -actn clear -clr dacl -actn ace -ace "n:%UIDAdministrators%;p:full;i:sc`,so" -actn ace -ace "n:%UIDSYSTEM%;p:full;i:sc`,so" -actn ace -ace "n:%ArchiveOwner%;p:change`,FILE_DELETE_CHILD`,WRITE_DAC;i:sc" -actn ace -ace "n:%ArchiveOwner%;p:read`,DELETE`,WRITE_DAC;i:io`,so" -ignoreerr -silent,, Hide UseErrorLevel
 
 Exit
 
@@ -132,7 +179,7 @@ CheckDirAndArchiveFiles(ByRef backupsDest, ByRef dirPath, loopOptions, ageLimit,
 	    } Else {
 		;MsgBox Перемещение %A_LoopFileLongPath% в %backupsDest%\%A_LoopFileDir%
 		currBackupDir = %backupsDest%\%A_LoopFileDir%
-		currBackupFPath =  %backupsDest%\%A_LoopFileFullPath%
+		currBackupFPath = %backupsDest%\%A_LoopFileFullPath%
 		If (currBackupDir != lastCreatedDest) {
 		    FileCreateDir %currBackupDir%
 		    lastCreatedDest := currBackupDir
@@ -154,6 +201,46 @@ CheckDirAndArchiveFiles(ByRef backupsDest, ByRef dirPath, loopOptions, ageLimit,
 	    ;Else skipList .= "`t" . A_LoopFileFullPath . "`n"
 	}
     }
+    
+    If (InStr(loopOptions, "R")) {
+	Loop Files, %dirPath%\*.*, D ; проверка папок, в которых остались только ссылки на архив
+	{
+	    currBackupFPath = %backupsDest%\%A_LoopFileFullPath%
+	    If (InStr(FileExist(currBackupFPath), "D") && CleanupArchives(A_LoopFileFullPath)) {
+		; если папка в архиве, а в исходном расположении остались только ярлыки на архивы – сделать ярлык на папку в архиве, почистить исходное расположение
+		FileCreateShortcut %currBackupFPath%, %A_LoopFileFullPath% (архив).lnk,,, %shortcutNote%
+		If (CleanupArchives(A_LoopFileFullPath, 1)) {
+		    ; CleanupArchives(путь, 1) удаляет все ярлыки на архив, папки должны остаться пустыми
+		    RemoveEmptyDir(A_LoopFileFullPath) ; удаление пустых папок с подпапками
+		}
+	    }
+
+	}
+    }
+}
+
+RemoveEmptyDir(path) {
+    Loop Files, %path%\*.*, D
+	RemoveEmptyDir(A_LoopFileFullPath)
+    Try {
+	FileRemoveDir %path%
+    }
+}
+
+CleanupArchives(path, rm:=0) {
+    Loop Files, %path%, R
+    {
+	If (!EndsWith(A_LoopFileName, " (архив).lnk")) {
+	    return 0
+	}
+	If (rm)
+	    FileDelete %A_LoopFileFullPath%
+    }
+    return 1
+}
+
+EndsWith(long,short) {
+    return short=SubStr(long,-StrLen(short)+1)
 }
 
 FillIgnoreRegex() {
