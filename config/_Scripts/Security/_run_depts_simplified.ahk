@@ -47,6 +47,8 @@ Sleep 200
 cmdLogF := FileOpen(cmdLogFName, "r", "CP1")
 ; ToDo: seek
 
+logLines := Object()
+
 Loop
 {
     Process Exist, %cmdPID%
@@ -61,12 +63,7 @@ Loop
 	Else
 	    leftTime := "Осталось примерно " leftTime " с"
     }
-    readLine := cmdLogF.ReadLine()
-    If (readLine) {
-	prevLine := curLine
-	curLine := readLine
-    }
-    Progress %A_TickCount%, %leftTime%`n%curLine%%prevLine%
+    Progress %A_TickCount%, % leftTime "`n" GetTextLinesReverse(AddSlice(logLines, cmdLogF.ReadLine()))
     Sleep 300
 }
 
@@ -77,6 +74,25 @@ If (SerDes(times, timesObjFName ".tmp"))
 global finished := 1 
 
 ExitApp %ERRORLEVEL%
+
+GetTextLinesReverse(ByRef o) {
+    i := o.MaxIndex()
+    Loop
+    {
+	t .= o[i] . "`n"
+	i--
+    } Until !o.HasKey(i)
+    return t
+}
+
+AddSlice(ByRef o, ByRef val, slice := 3) {
+    If (v := Trim(val, " `t`n`r")) {
+	o.Push(v)
+	If (o.MaxIndex() - o.MinIndex() >= slice)
+	    o.Delete(o.MinIndex(), o.MaxIndex()-slice)
+    }
+    return o
+}
 
 WM_QUERYENDSESSION(wParam, lParam)
 {
