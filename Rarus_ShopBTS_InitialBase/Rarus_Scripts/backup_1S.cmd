@@ -16,7 +16,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
     SET "datem=%DATE:~-4,4%-%DATE:~-7,2%"
     SET "dated=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%"
 
-    SET "exclusionszpaq=-not Backup -not Exchange -not ExtForms/Scripts -not ExtForms/post -not ExtForms/MailLoader -not NEW_STRU -not Shared -not *.rar -not *.7z -not *.LCK -not *.cdx -not !*.flag -not sendEmail* -not zpaq*"
+    SET "exclusionszpaq=-not *:*:$DATA -not Backup -not Exchange -not ExtForms/Scripts -not ExtForms/post -not ExtForms/MailLoader -not NEW_STRU -not Shared -not *.rar -not *.7z -not *.LCK -not *.cdx -not !*.flag -not sendEmail* -not zpaq*"
     SET "exclusions7z=-x!Backup -x!Exchange -x!ExtForms/Scripts -x!ExtForms/post -x!ExtForms/MailLoader -x!NEW_STRU -x!Shared -xr!*.rar -xr!*.7z -xr!*.LCK -xr!*.cdx -x!*.flag -x!sendEmail* -x!zpaq*"
 
     FOR /F "usebackq tokens=2 delims==" %%I IN (`FTYPE AutoHotkeyScript`) DO SET ahkexe=%%I
@@ -74,19 +74,28 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 EXIT /B
 )
 :Findzpaq
-SET "zpaqpath=%ProgramFiles%\zpaq"
 (
-    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET zpaqexe="%zpaqpath%\zpaq64.exe"
-    IF DEFINED PROCESSOR_ARCHITEW6432 SET zpaqexe="%zpaqpath%\zpaq64.exe"
-    IF NOT DEFINED zpaqexe SET zpaqexe="%zpaqpath%\zpaq.exe"
+    SET "OS64bit="
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+	SET "OS64bit=1"
+	SET zpaqexe="%ProgramFiles%\zpaq\zpaq64.exe"
+    ) ELSE IF DEFINED PROCESSOR_ARCHITEW6432 (
+	SET "OS64bit=1"
+	SET zpaqexe="%ProgramW6432%\zpaq\zpaq64.exe"
+    ) ELSE SET zpaqexe="%ProgramFiles%\zpaq\zpaq.exe"
 )
 (
     IF EXIST %zpaqexe% EXIT /B 0
     SET "zpaqexe="
-    EXIT /B 1
+    IF NOT DEFINED configDir CALL :GetDir configDir "%DefaultsSource%"
+)
+(
+    IF DEFINED OS64bit CALL "%configDir%_Scripts\find_exe.cmd" zpaqexe zpaq.exe
+    IF NOT DEFINED zpaqexe CALL "%configDir%_Scripts\find_exe.cmd" zpaqexe zpaq.exe
+    EXIT /B
 )
 :Find7z
-    IF NOT DEFINED configDir CALL :GetDir configDir %DefaultsSource%
+    IF NOT DEFINED configDir CALL :GetDir configDir "%DefaultsSource%"
 (
     CALL "%configDir%_Scripts\find7zexe.cmd" || CALL "%configDir%_Scripts\find_exe.cmd" exe7z "%configDir%..\Soft\PreInstalled\utils\7za.exe" || CALL :LogError "Не найден 7-Zip"
 EXIT /B
