@@ -1,6 +1,12 @@
-@ECHO OFF
-FOR %%i IN ("%~dp0*.dll") DO IF /I "%%~nxi" NEQ "Shop2EL.dll" regsvr32.exe /s "%%i"
-FOR %%i IN ("%~dp0*.ocx") DO regsvr32.exe /s "%%i"
+@(REM coding:CP866
+FOR %%A IN ("%~dp0*.dll" "%~dp0*.ocx") DO %SystemRoot%\System32\regsvr32.exe /s "%%~A" || CALL :EchoError "%%~A"
 
-PING 127.0.0.1 -n 5 >NUL
-regsvr32 /s "%~dp0Shop2EL.dll"
+%SystemRoot%\System32\ping.exe -n 5 127.0.0.1 >NUL
+%SystemRoot%\System32\regsvr32.exe /s "%~dp0Shop2EL.dll"
+EXIT /B
+)
+:EchoError
+(
+ECHO Error %ERRORLEVEL% registering %1
+EXIT /B
+)
