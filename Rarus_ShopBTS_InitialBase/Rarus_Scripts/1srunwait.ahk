@@ -3,16 +3,25 @@
 Menu Tray, Icon, shell32.dll,25,0
 Menu Tray, Tip, Запуск 1С-Рарус
 
-run1sexe:="1cv7s.exe"
-ExcessArcTimeLim:=5*60 ; s
-WaitArchivingAfterBoot:=5*60*1000 ; ms
+global	run1sexe:="1cv7s.exe"
+      , ExcessArcTimeLim:=5*60 ; s
+      , WaitArchivingAfterBoot:=5*60*1000 ; ms
+      , lProgramFiles
+      , run1sDir
+      , params := ParseCommandLine()
+      , rarusWinTitle := "1С:Предприятие"
 
 DailyArchiveFName = ShopBTS_%A_Year%-%A_MM%-%A_DD%.7z
 MonthlyArchiveFName = ShopBTS_%A_Year%-%A_MM%.7z
 zpaqFName = %A_YYYY%.zpaq
 
-IfWinExist 1С:Предприятие ahk_exe %run1sexe%
-{
+EnvGet lProgramFiles, ProgramFiles(x86)
+If (!lProgramFiles)
+    lProgramFiles=%A_ProgramFiles%
+
+run1sDir=%lProgramFiles%\1Cv77\BIN
+
+If (WinExist(rarusWinTitle " ahk_exe " run1sexe)) {
     WinRestore
     WinActivate
     TRAYTIP_ICON_INFO := 1
@@ -23,17 +32,7 @@ IfWinExist 1С:Предприятие ahk_exe %run1sexe%
     ExitApp
 }
 
-EnvGet lProgramFiles, ProgramFiles(x86)
-If Not lProgramFiles
-    lProgramFiles=%A_ProgramFiles%
-
-run1spath=%lProgramFiles%\1Cv77\BIN
-
-params := ParseCommandLine()
-
-rarusbackupflag := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "rarusbackupflag")
-rarusbackupzpaqerrfile := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "rarusbackupzpaqerrfile")
-If (!rarusbackupflag) {
+If (!(rarusbackupflag := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "rarusbackupflag"))) {
     MailWarning("Не удалось прочитать расположение флага архивации")
     MsgBox 0x24, Ошибка при выполнении скрипта запуска 1С, Не удалось получить размещение флага архивации`, поэтому невозможно определить`, идет ли архивация.`nЗапустить 1С`, игнорируя возможный процесс архивации?`n`n`(если 1С запустить во время архивации`, в работе как 1С`, так и архиватора может произойти сбой), 300
     IfMsgBox Timeout
@@ -72,8 +71,7 @@ Loop Files, %rarusbackupflag%
 }
 
 Process WaitClose, %run1sexe%, 8
-If ErrorLevel
-{
+If (ErrorLevel) {
     MsgBox 0x24, Процесс 1С существует, Процесс %run1sexe% существует (запущен)`, но не имеет окна.`n`nОстановить текущий процесс?`nУбедитесь`, что окна 1С действительно нет на экране`, прежде чем соглашаться., 300
     IfMsgBox TIMEOUT
 	ExitApp
@@ -87,8 +85,22 @@ If ErrorLevel
     }
 }
 
+; Проверить, когда выполнена загрузка – если не сегодня, создание архива не запускалось автоматически
+secSinceBoot := A_TickCount//1000
+bootTime += -%secSinceBoot%, Seconds
+;YYYYMMDDHH24MISS
+;↑↑↑↑↑↑↑↑ (8 char)
+If (SubStr(bootTime, 1, 8) != A_YYYY . A_MM . A_DD) {
+    MsgBox 0x34, Компьютер не перезагружался, Компьютер включен со вчерашнего дня.`nДля создания резервной копии 1С-Рарус требуется перезагрузка. Перезагрузить сейчас?`n`n(если ответите нет – перезагрузите сами при первой возможности), 60
+    IfMsgBox Yes
+    {
+	Shutdown 2
+	ExitApp
+    }
+}
+
 If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
-    ; ToDo: рассчитать время создания архива по значениям в %rarusbackupzpaqerrfile%
+    ; ToDo: рассчитать время создания архива по значениям в %rarusbackuplogfile%
     If (!FileExist(backupsDir . "\" . zpaqFName)) { ; но нет архива за текущий год
 	avgArchivingTime := 600
 	If (!WaitFile(rarusbackupflag, backupsDir . "\" . zpaqFName, WaitArchivingAfterBoot))
@@ -165,13 +177,13 @@ BackupAppearanceTimeout(t:="") {
 }
 
 Run1S() {
-    global run1sexe, params, run1spath
+    global run1sexe, params, run1sDir
     ResetProgress()
-    Run %run1sexe% ENTERPRISE %params%, %run1spath%, UseErrorLevel, PID1S
+    Run %run1sexe% ENTERPRISE %params%, %run1sDir%, UseErrorLevel, PID1S
     If ErrorLevel
     {
 	ResetProgress()
-	MsgBox 0x10,Ошибка при запуске 1С,Не удалось запустить %run1spath%\%run1sexe%.`nСообщите об этом технической поддержке.
+	MsgBox 0x10,Ошибка при запуске 1С,Не удалось запустить %run1sDir%\%run1sexe%.`nСообщите об этом технической поддержке.
 	ExitApp
     }
 
