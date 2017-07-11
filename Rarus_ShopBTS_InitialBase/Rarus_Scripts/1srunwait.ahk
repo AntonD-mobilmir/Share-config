@@ -85,20 +85,6 @@ If (ErrorLevel) {
     }
 }
 
-; Проверить, когда выполнена загрузка – если не сегодня, создание архива не запускалось автоматически
-secSinceBoot := A_TickCount//1000
-bootTime += -%secSinceBoot%, Seconds
-;YYYYMMDDHH24MISS
-;↑↑↑↑↑↑↑↑ (8 char)
-If (SubStr(bootTime, 1, 8) != A_YYYY . A_MM . A_DD) {
-    MsgBox 0x34, Компьютер не перезагружался, Компьютер включен со вчерашнего дня.`nДля создания резервной копии 1С-Рарус требуется перезагрузка. Перезагрузить сейчас?`n`n(если ответите нет – перезагрузите сами при первой возможности), 60
-    IfMsgBox Yes
-    {
-	Shutdown 2
-	ExitApp
-    }
-}
-
 If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
     ; ToDo: рассчитать время создания архива по значениям в %rarusbackuplogfile%
     If (!FileExist(backupsDir . "\" . zpaqFName)) { ; но нет архива за текущий год
@@ -164,16 +150,33 @@ Run1S()
 ExitApp
 
 BackupAppearanceTimeout(t:="") {
-    MailWarning("Не создаются резервные копии 1С-Рарус`n" . t)
-    MsgBox 0x116, Резервные копии 1С-Рарус не создаются, %t%`nРезервные копии должны создаваться каждый день при первом включении компьютера`, но cкрипт запуска 1С-Рарус не дождался появления резервной копии.`n`nМожно`n→отменить запуск 1С-Рарус`,`n→повторить проверку резервной копии или `n→продолжить запуск 1С-Рарус несмотря на ошибку., 300
-    ;Cancel/Try Again/Continue
-    IfMsgBox Timeout
-	ReloadScript()
-    IfMsgBox TryAgain
-	ReloadScript()
-    IfMsgBox Continue
-	Run1S()
-    ExitApp
+    ; Проверить, когда выполнена загрузка – если не сегодня, создание архива не запускалось автоматически
+    secSinceBoot := A_TickCount//1000
+    bootTime += -%secSinceBoot%, Seconds
+    MailWarning("Не создаются резервные копии 1С-Рарус`nuptime: " . secSinceBoot . ", bootTime: " . bootTime . "`n" . t)
+
+    ;YYYYMMDDHH24MISS
+    ;↑↑↑↑↑↑↑↑ (8 char)
+    If (SubStr(bootTime, 1, 8) != A_YYYY . A_MM . A_DD) {
+	FormatTime bootTimeLong, %bootTime%
+	uptimeHours := secSinceBoot // (60*60)
+	MsgBox 0x34, Компьютер загружался не сегодня, Компьютер включен с %bootTimeLong% (%uptimeHours% час.).`nДля создания резервной копии 1С-Рарус требуется перезагрузка. Перезагрузить сейчас?`n`n(если ответите нет – перезагрузите сами при первой возможности), 60
+	IfMsgBox Yes
+	{
+	    Shutdown 2
+	    ExitApp
+	}
+    } Else {
+	MsgBox 0x116, Резервные копии 1С-Рарус не создаются, %t%`nРезервные копии должны создаваться каждый день при первом включении компьютера`, но cкрипт запуска 1С-Рарус не дождался появления резервной копии.`n`nМожно`n→отменить запуск 1С-Рарус`,`n→повторить проверку резервной копии или `n→продолжить запуск 1С-Рарус несмотря на ошибку., 300
+	;Cancel/Try Again/Continue
+	IfMsgBox Timeout
+	    ReloadScript()
+	IfMsgBox TryAgain
+	    ReloadScript()
+	IfMsgBox Continue
+	    Run1S()
+	ExitApp
+    }
 }
 
 Run1S() {
