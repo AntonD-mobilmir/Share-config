@@ -112,7 +112,7 @@ EXIT /B %ERRORLEVEL%
     SET "lastError=32761"
     IF NOT "%lastTriedPass%"=="%OldPwd%" (
 	SET "lastTriedPass=%OldPwd%"
-	IF DEFINED OldPwd ( SET "status=Смена пароля с '%OldPwd%'" ) ELSE SET "status=Смена пароля с пустого"
+	IF DEFINED OldPwd ( SET "status=Успешная смена пароля с '%OldPwd%'" ) ELSE SET "status=Успешная смена пароля с пустого"
 	ECHO %InstallUsername%	%showPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
 	SET "lastError="
 	%passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
@@ -124,7 +124,7 @@ EXIT /B %lastError%
 :EchoPasswdExeError
 (
     SET "lastError=%ERRORLEVEL%"
-    SET "status=%Status%, LastError %ERRORLEVEL%"
+    SET "status=Ошибка %ERRORLEVEL% при попытке смены пароля с '%OldPwd%'"
     (
 	ECHO passwd.exe returned error %ERRORLEVEL%
     )>>"%PassFilePath%"
