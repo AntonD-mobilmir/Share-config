@@ -8,29 +8,35 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
 
-SET "InstallUsername=Install"
-SET "PasswdPart1=0000%RANDOM%"
-SET "PasswdPart2=0000%RANDOM%"
-SET "lastTriedPass=-"
+    SET "InstallUsername=Install"
+    SET "PasswdPart1=0000%RANDOM%"
+    SET "PasswdPart2=0000%RANDOM%"
+    SET "lastTriedPass=-"
 
-IF EXIST "C:\Users\Install\Install-pwd.txt" (
-    SET "PassFilePath=C:\Users\Install\Install-pwd.txt"
-) ELSE SET "PassFilePath=%USERPROFILE%\Install-pwd.txt"
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+    IF EXIST "C:\Users\Install\Install-pwd.txt" (
+	SET "PassFilePath=C:\Users\Install\Install-pwd.txt"
+    ) ELSE SET "PassFilePath=%USERPROFILE%\Install-pwd.txt"
+
+    FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 )
 (
-IF NOT EXIST "%PassFilePath%" IF EXIST "%TEMP%\install-pwd.txt" ECHO Y|MOVE /Y "%TEMP%\install-pwd.txt" "%PassFilePath%"
-IF NOT EXIST "%PassFilePath%" IF EXIST "%PROGRAMDATA%\mobilmir.ru\install-pwd.txt" ECHO Y|MOVE /Y "%PROGRAMDATA%\mobilmir.ru\install-pwd.txt" "%PassFilePath%"
-
-SET "NewPwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%"
-
-FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
-CALL "%~dp0..\FindAutoHotkeyExe.cmd"
-rem Check user existence
-"%SystemRoot%\System32\NET.exe" USER "%InstallUsername%" >NUL && GOTO :ExistingUser
+    SET "newPwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%"
+    SET "showPwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%"
+    IF NOT EXIST "%PassFilePath%" IF EXIST "%TEMP%\install-pwd.txt" ECHO Y|MOVE /Y "%TEMP%\install-pwd.txt" "%PassFilePath%"
+    IF NOT EXIST "%PassFilePath%" IF EXIST "%PROGRAMDATA%\mobilmir.ru\install-pwd.txt" ECHO Y|MOVE /Y "%PROGRAMDATA%\mobilmir.ru\install-pwd.txt" "%PassFilePath%"
 )
-:CreateNewUser
+rem :CreateNewUser
+%AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%showPwd%" "до установки пароля" || (
+    ECHO Отправка пароля в форму не удалась. Будет установлен пароль №287, смените его при первой возможности!
+    SET "newPwd=tadFtCnyrpIeUWxQob00"
+    SET "showPwd=№287"
+)
 (
-    ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Adding new user>>"%PassFilePath%"
+    rem Check user existence
+    "%SystemRoot%\System32\NET.exe" USER "%InstallUsername%" >NUL && GOTO :ExistingUser
+    
+    ECHO %InstallUsername%	%showPwd%	%DATE% %TIME% @%Hostname% Adding new user>>"%PassFilePath%"
     "%SystemRoot%\System32\NET.exe" USER "%InstallUsername%" "%newPwd%" /ADD >>"%PassFilePath%" 2>&1
     rem ERRORLEVEL=2 The account already exists.
     IF ERRORLEVEL 2 IF NOT ERRORLEVEL 3 GOTO :ExistingUser
@@ -80,7 +86,7 @@ IF %TryNo% EQU 1 (
 :ExistingUserResetPwd
 (
     SET "status=Сброс пароля"
-    ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Resetting user password>>"%PassFilePath%"
+    ECHO %InstallUsername%	%showPwd%	%DATE% %TIME% @%Hostname% Resetting user password>>"%PassFilePath%"
     "%SystemRoot%\System32\NET.exe" user "%InstallUsername%" "%newPwd%" >>"%PassFilePath%" 2>&1 && GOTO :ShowFileAndPostPassword
 )
 (
@@ -89,7 +95,7 @@ IF %TryNo% EQU 1 (
 )
 :ShowFileAndPostPassword
 (
-    START "" %AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%newPwd%" "%Status%"
+    START "" %AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%showPwd%" "%Status%"
 
     rem Копирование данных из профиля по умолчанию
     IF /I "%InstallUsername%" NEQ "%USERNAME%" EXIT /B
@@ -106,8 +112,8 @@ EXIT /B %ERRORLEVEL%
     SET "lastError=32761"
     IF NOT "%lastTriedPass%"=="%OldPwd%" (
 	SET "lastTriedPass=%OldPwd%"
-	SET "status=Смена пароля с %OldPwd%"
-	ECHO %InstallUsername%	%newPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
+	IF DEFINED OldPwd ( SET "status=Смена пароля с '%OldPwd%'" ) ELSE SET "status=Смена пароля с пустого"
+	ECHO %InstallUsername%	%showPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
 	SET "lastError="
 	%passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
 	IF ERRORLEVEL 1 CALL :EchoPasswdExeError
