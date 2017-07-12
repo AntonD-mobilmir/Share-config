@@ -13,8 +13,9 @@ PostGoogleForm(URL, ByRef kv, tries:=20, retryDelay:=20000) {
 	POSTDATA .= k . "=" . UriEncode(v) . "&"
     POSTDATA := SubStr(POSTDATA,1,-1)
     
-    While !XMLHTTP_PostForm(URL, POSTDATA) && tries--
+    While !(lastResult := XMLHTTP_PostForm(URL, POSTDATA)) && tries--
 	Sleep retryDelay
+    return lastResult
 }
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
