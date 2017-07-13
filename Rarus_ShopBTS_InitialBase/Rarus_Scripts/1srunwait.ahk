@@ -43,6 +43,18 @@ If (!(rarusbackupflag := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_g
 }
 backupsDir := ReadSetVarFromBatchFile(A_ScriptDir . "\_rarus_backup_get_files.cmd", "destdir")
 
+;проверить наличие и дату флага резервной копии
+Loop Files, %rarusbackupflag%
+{
+    t_UpTime := A_TickCount // 1000                     ; Количество секунд, прошедших с загрузки Windows
+    t_StartTime :=                                      ; Если к пустой переменной прибавить промежуток времени, получается время на указанную длительность больше текущего
+    t_StartTime += -t_UpTime, Seconds                   ; если длительность указана с минусом, получается время меньше текущего
+    If  ( A_LoopFileTimeCreated < t_StartTime ) {       ; Флаг создан до перезагрузки?
+	FileDelete %rarusbackupflag%			;	удалить
+	MailWarning("При запуске обнаружен флаг архивации, созданный до перезагрузки", "Время загрузки: " . t_StartTime "`nВремя создания флага: " . A_LoopFileTimeCreated )	;	отправлять уведомление о такой ситуации, поскольку это значит, что компьютер перезагрузили в процессе создания копии
+    }
+}
+
 If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
 	&& !(  FileExist(rarusbackupflag)  		    			; and no: flag
 	    || FileExist(backupsDir . "\" . zpaqFName)  		    	; 	or zpaq archive
@@ -56,18 +68,6 @@ If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
 	Sleep 100
     } Until (A_TickCount > WaitArchivingAfterBoot || FileExist(rarusbackupflag))
     Sleep 1000
-}
-
-;проверить наличие и дату флага резервной копии
-Loop Files, %rarusbackupflag%
-{
-    t_UpTime := A_TickCount // 1000                     ; Количество секунд, прошедших с загрузки Windows
-    t_StartTime :=                                      ; Если к пустой переменной прибавить промежуток времени, получается время на указанную длительность больше текущего
-    t_StartTime += -t_UpTime, Seconds                   ; если длительность указана с минусом, получается время меньше текущего
-    If  ( A_LoopFileTimeCreated < t_StartTime ) {       ; Флаг создан до перезагрузки?
-	FileDelete %rarusbackupflag%			;	удалить
-	MailWarning("При запуске обнаружен флаг архивации, созданный до перезагрузки", "Время загрузки: " . t_StartTime "`nВремя создания флага: " . A_LoopFileTimeCreated )	;	отправлять уведомление о такой ситуации, поскольку это значит, что компьютер перезагрузили в процессе создания копии
-    }
 }
 
 Process WaitClose, %run1sexe%, 8
