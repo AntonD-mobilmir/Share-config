@@ -26,6 +26,10 @@ GroupAdd KKMGMSuite, ahk_exe KKMGMSuite.exe
 ;Progress A M R0-%idletimeRarusCheckAutoLoad% T, idle
 SetTimer Periodic, 3000
 
+; Разрешение запуска PepperFlash из папки настроек Chrome пользователя
+EnvGet LocalAppData,LOCALAPPDATA
+RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C,%A_Temp%,Min UseErrorLevel
+
 Exit
 
 Periodic:
