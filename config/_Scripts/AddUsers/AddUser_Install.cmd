@@ -27,7 +27,7 @@ IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
     IF NOT EXIST "%PassFilePath%" IF EXIST "%PROGRAMDATA%\mobilmir.ru\install-pwd.txt" ECHO Y|MOVE /Y "%PROGRAMDATA%\mobilmir.ru\install-pwd.txt" "%PassFilePath%"
 )
 rem :CreateNewUser
-%AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%showPwd%" "до установки пароля" || (
+%AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%showPwd%" "предварительная отправка (до смены пароля)" || (
     ECHO Отправка пароля в форму не удалась. Будет установлен пароль №287, смените его при первой возможности!
     SET "newPwd=tadFtCnyrpIeUWxQob00"
     SET "showPwd=№287"

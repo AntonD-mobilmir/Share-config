@@ -36,7 +36,7 @@ While (!(success:=PostGoogleForm(URL, POSTDATA, 2, 1000))) {
 	break
 }
 
-;https://docs.google.com/spreadsheets/d/16j2LRTvGMsX5zLxrJJFC0eQtOMZYRVomwdJ5msqAu_A/export?format=tsv&gid=1201239047
+;ToDo: загружать https://docs.google.com/spreadsheets/d/16j2LRTvGMsX5zLxrJJFC0eQtOMZYRVomwdJ5msqAu_A/export?format=csv&gid=1201239047 и проверять, добавилась ли строчка с postID
 
 ExitApp !success
 
