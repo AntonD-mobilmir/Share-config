@@ -15,6 +15,8 @@ SET "MonDir=d:\Users\Public\Documents\Рарус"
 IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
 SET "GNUPGHOME=%~dp0gnupg"
 
+SET "maxLogSize=1048576"
+
 SET uud32winexe="%~dp0uud32win.exe"
 SET popclientexe="%~dp0popclient.exe"
 rem IF NOT DEFINED exe7z SET "exe7z=%~dp0..\bin\7za.exe"
@@ -30,6 +32,8 @@ IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "d:\Distributives\conf
     ECHO %DATE% %TIME% Проверка или завершение повисшего popclient.exe
     %SystemRoot%\System32\taskkill.exe /F /IM popclient.exe && EXIT /B
     REM Если ошибки нет, popclient.exe был убит. В этом случае продолжает работать пакетный файл, который запустил только что прибитый popclient.exe, значит этот процесс [который убил] надо завершить.
+    CALL :CheckSizeRotateLogs "%~dp0POPTrace.txt" "%~dp0unpacked-archives.log"
+    DEL /Q "%~dp0system\*.*"
 )
 (
     ECHO %DATE% %TIME% Запуск popclient.exe, см. лог в POPTrace.txt
@@ -88,7 +92,11 @@ IF EXIST "%AttDir%\*.7z" (
     DEL /F /Q "%RecvBakDir%\*.*"
     EXIT /B
 )
-
+:CheckSizeRotateLogs
+(
+    FOR %%A IN (%*) DO IF %%~zA GEQ %maxLogSize% MOVE /Y "%%~A" "%%~A.bak"
+    EXIT /B
+)
 :TryUnpack <archive> <dest>
 (
     IF "%~x1"==".7z" (
