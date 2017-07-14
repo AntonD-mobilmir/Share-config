@@ -6,7 +6,7 @@ CALL :FindBleachBit Distributives "%~d0\Distributives" "%~dp0..\..\..\Distributi
 
 CALL "%Distributives%\%relpath%"
 ECHO BleachBit finished
-TASKKILL /F /IM explorer.exe
+rem BleachBit, бывает работает, через планировщик. В этом случае explorer.exe закрывается у пользователя! TASKKILL /F /IM explorer.exe
 ENDLOCAL
 EXIT /B
 
