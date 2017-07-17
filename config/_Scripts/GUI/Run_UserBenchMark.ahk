@@ -320,15 +320,17 @@ ParsePerfResults(txt) {
 }
 
 PostURL(ResultsURL, perfResultsObj:="") {
+    static URL:="https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse"
     ;Results posted to https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo
 
     ;debug=1
-    Notify("Отправка ссылки на результаты в форму…")
+    stageTitle := "Отправка результатов в таблицу"
+    stageDetails := "Запись ссылки " . ResultsURL . (IsObject(perfResultsObj) ? " и текста результатов" ) . " в таблицу https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo"
+    Notify(stageTitle . "…")
     getURL("http://freegeoip.net/json/", , reqStatus, geoLocation)
     RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 ;    RegRead Domain, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
     
-    URL:="https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse"
     POSTDATA :="entry.781637524="  . UriEncode(Hostname)
 	    . "&entry.1905065751=" . UriEncode(A_UserName)
 	    . "&entry.157476182="  . UriEncode(Trim(geoLocation, " `t`n`r"))
@@ -346,8 +348,8 @@ PostURL(ResultsURL, perfResultsObj:="") {
 		  . "&entry.685726891="  . UriEncode(Trim(perfResultsObj.ResultsText, " `t`n`r"))
     }
     
-    Menu Tray, Tip, Отправка %ResultsURL% в форму…`n
-    FileAppend %A_Now% Отправка %ResultsURL% в форму…`n,*,CP866
+    Menu Tray, Tip, %stageDetails%`n
+    FileAppend %A_Now% %stageDetails%`n,*,CP866
     
     Loop
     {
@@ -358,7 +360,7 @@ PostURL(ResultsURL, perfResultsObj:="") {
 	If (success) {
 	    break
 	} Else {
-	    MsgBox 53, Отправка ссылки на результаты в таблицу, При отправке ссылки произошла ошибка`, HTTP-код %statusHTTP%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
+	    MsgBox 53, %stageTitle%, При отправке произошла ошибка`, HTTP-код %statusHTTP%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
 	    IfMsgBox Cancel
 		break
 	}
