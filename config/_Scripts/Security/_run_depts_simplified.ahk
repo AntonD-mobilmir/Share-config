@@ -35,6 +35,7 @@ For start,dur in times {
 If (sum) {
     avg := sum//c + 15
 } Else {
+    avg := 180
     leftTime = (рассчетное время неизвестно)
 }
 
