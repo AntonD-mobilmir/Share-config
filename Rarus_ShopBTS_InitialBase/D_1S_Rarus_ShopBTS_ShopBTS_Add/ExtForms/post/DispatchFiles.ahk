@@ -46,7 +46,7 @@ If (logfileDate) {
     logfileAge -= logfileDate, Seconds
     If (logfileAge < 60) {
 	TrayTip Отправка файлов отложена, Последний раз отправка выполнялась менее минуты назад`, поэтому данный запуск будет пропущен.
-	Sleep 3000
+	Sleep 1500
 	Exit
     }
 }
@@ -125,8 +125,7 @@ DeliverOneEmail(EmailFileName) {
 
     CheckTrayIcon()
     
-    static bcc:="rarus-emails-replies_status-mobilmir-ru@googlegroups.com"
-         , smtpServer, smtpLogin, smtpPassword, encodedFrom
+    static smtpServer, smtpLogin, smtpPassword, encodedFrom
 	 ;, encodedFrom:="=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>"
     If (!smtpServer) {
 	Loop Read, %A_ScriptDir%\DispatchFiles-NotificationsAccount.pwd
@@ -145,8 +144,11 @@ DeliverOneEmail(EmailFileName) {
     If (!(smtpServer && smtpLogin && smtpPassword))
 	Throw Exception("Отправка уведомлений из 1С-Рарус не работает, немедленно свяжитесь со службой ИТ!", "Из файла DispatchFiles-NotificationsAccount.pwd не прочитались сервер или реквизиты учётной записи")
     
-    ; not static, can be changed based on following file contents
-    replyToHeader = -o "reply-to=rarus-emails-replies@status.mobilmir.ru"
+    If (EndsWith(smtpLogin, "@status.mobilmir.ru")) {
+	; not static, can be changed based on following file contents
+	replyToHeader = -o "reply-to=rarus-emails-replies@status.mobilmir.ru"
+    }
+    bccHeader=-bcc "rarus-emails-replies_status-mobilmir-ru@googlegroups.com"
     
     FileRead emailFileText, %EmailFileName%
     textStart:=1
@@ -179,7 +181,7 @@ DeliverOneEmail(EmailFileName) {
     mailBodyFileName = %tempDir%\%A_Now%.txt
     FileDelete %mailBodyFileName%
     FileAppend % SubStr(emailFileText, textStart), %mailBodyFileName%, UTF-8
-    RunWait %sendemailexe% -o message-file="%mailBodyFileName%" -f "%encodedFrom%" -t "%HeaderTo%" %replyToHeader% -u "%HeaderSubject%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 -bcc "%bcc%" -l "%logfile%" %Attachments%,,Hide UseErrorLevel
+    RunWait %sendemailexe% -o message-file="%mailBodyFileName%" -f "%encodedFrom%" -t "%HeaderTo%" %replyToHeader% -u "%HeaderSubject%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 %bccHeader% -l "%logfile%" %Attachments%,,Hide UseErrorLevel
     FileDelete %mailBodyFileName%
     
     If (ErrorLevel) {
@@ -268,4 +270,8 @@ Base64Decode(ByRef bin, code) {
 Append(ByRef bin, ByRef pos, k, c1,c2,c3) {
    Loop %k%
       DllCall("RtlFillMemory",UInt,&bin+pos++, UInt,1, UChar,c%A_Index%)
+}
+
+EndsWith(long,short) {
+    return short=SubStr(long, 1-StrLen(short))
 }
