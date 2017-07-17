@@ -44,10 +44,11 @@ TrashDirs =
 (LTrim
 Intel
 
-)	
+)
 
 Loop
 {
+    done:=1
     foundFiles := Object()
     foundDirs := Object()
     showList=
@@ -74,7 +75,7 @@ Loop
     reqExitCode=127
     If (showList) {
 	dest:="D:\ProgramData"
-	MsgBox 0x33, %A_ScriptName%, На %SystemDrive% обнаружены папки и файлы`, которых нет в списке стандартных. Переместить их в D:\ProgramData? (Да = переместить`, Нет = открыть командную строку):`n%showList%
+	MsgBox 0x33, %A_ScriptName%, На %SystemDrive% обнаружены папки и файлы`, которых нет в списке стандартных. Переместить их в %dest%? (Да = переместить`, Нет = открыть командную строку):`n%showList%
 	IfMsgBox Cancel
 	    break
 	IfMsgBox No
@@ -97,24 +98,35 @@ Loop
 	    If (dest)
 		FileCreateDir %dest%
 	    For i, item in foundDirs {
-		If (dest)
-		    FileMoveDir %SystemDrive%\%item%, % dest . "\" . item
-		Else
-		    FileRemoveDir %SystemDrive%\%item%, 1
+		Try {
+		    If (FileExist(fp := SystemDrive . "\" . item)) {
+			If (dest)
+			    FileMoveDir %fp%, % dest . "\" . item
+			Else
+			    FileRemoveDir %fp%, 1
+		    }
+		} Catch e {
+		    done := 0
+		}
 	    }
 	    For i, item in foundFiles {
-		FileSetAttrib -RSH, %SystemDrive%\%item%, 1
-		If (dest)
-		    FileMove %SystemDrive%\%item%, %dest%
-		Else
-		    FileDelete %SystemDrive%\%item%
+		Try {
+		    If (FileExist(fp := SystemDrive . "\" . item)) {
+			FileSetAttrib -RSH, %fp%, 1
+			If (dest)
+			    FileMove %fp%, %dest%
+			Else
+			    FileDelete %fp%
+		    }
+		} Catch e {
+		    done := 0
+		}
 	    }
 	} catch e {
 	    Throw e
 	}
     }
-    break
-}
+} Until done
 flow.WriteLine(A_Now . " Завершено.")
 flog.Close()
 ExitApp
