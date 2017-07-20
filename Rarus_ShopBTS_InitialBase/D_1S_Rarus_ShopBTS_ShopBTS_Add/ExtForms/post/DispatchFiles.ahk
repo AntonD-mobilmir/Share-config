@@ -206,7 +206,7 @@ EncodeWrapBase64UTF8(textline) {
 }
 
 killSendEmail:
-    If (!pidSendEmail) {
+    If (pidSendEmail) {
         Process Exist, pidSendEmail
         If (ErrorLevel == pidSendEmail) {
 	    Process Close, %pidSendEmail%
