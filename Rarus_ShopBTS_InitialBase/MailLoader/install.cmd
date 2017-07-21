@@ -17,7 +17,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
 FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 FOR %%A IN ("%~dp0dist.7z") DO SET "distTime=%%~tA"
-
+IF NOT DEFINED verFile SET "verFile=D:\1S\Rarus\MailLoader\getmail_dist_ver.txt"
 )
 CALL :GetDir ConfigDir "%DefaultsSource%"
 (
@@ -47,6 +47,8 @@ DEL "D:\1S\Rarus\MailLoader\POPTrace.txt"
 CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || SET "ErrorOccured=1"
 rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || SET "ErrorOccured=1"
 CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% /NP || SET "ErrorOccured=1"
+
+(ECHO %distTime%) >"%verFile%"
 
 IF DEFINED ErrorOccured (
     %ErrorCmd%

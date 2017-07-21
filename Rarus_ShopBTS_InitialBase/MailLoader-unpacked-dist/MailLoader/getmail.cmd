@@ -19,10 +19,33 @@ SET "maxLogSize=1048576"
 
 SET uud32winexe="%~dp0uud32win.exe"
 SET popclientexe="%~dp0popclient.exe"
+
+DEL /F "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\getmail.lastrun.*.log"
+
 rem IF NOT DEFINED exe7z SET "exe7z=%~dp0..\bin\7za.exe"
 IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "d:\Distributives\config\_Scripts\find7zexe.cmd"
+
+SET "updateInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\install.cmd"
+SET "updateDist=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\dist.7z"
+SET "verFile=%~dpn0_dist_ver.txt"
 )
 (
+    FOR %%A IN ("%verFile%") DO FOR /F %%B IN ("%%~tA") DO SET "dateVerCheck=%%~tA"
+    IF NOT "%dateVerCheck%"=="%DATE%" (
+	FOR %%A IN ("%updateDist%") DO (
+	    SET "distVer=%%~tA"
+	    FOR /F "usebackq delims=" %%B IN ("%verFile%") DO (
+		IF NOT "%%~tA"=="%%~B" SET "runUpdate=1"
+	    )
+	)
+	IF DEFINED runUpdate (
+	    CALL "%updateInstallScript%"
+	    CALL :WriteoutDistVer
+	    EXIT /B
+	)
+	IF DEFINED distVer CALL :WriteoutDistVer
+    )
+
     IF NOT EXIST "%SignedFilesDir%" MKDIR "%SignedFilesDir%"
     IF NOT EXIST "%RecvDir%" MKDIR "%RecvDir%"
     IF NOT EXIST "%RecvBakDir%" MKDIR "%RecvBakDir%"
@@ -102,4 +125,11 @@ IF EXIST "%AttDir%\*.7z" (
     IF "%~x1"==".7z" (
 	%exe7z% x -aoa -o%2 -- %1
     ) ELSE EXIT /B 1
+)
+:WriteoutDistVer
+(
+    (
+	ECHO %distVer%
+    ) >"%verFile%"
+EXIT /B
 )
