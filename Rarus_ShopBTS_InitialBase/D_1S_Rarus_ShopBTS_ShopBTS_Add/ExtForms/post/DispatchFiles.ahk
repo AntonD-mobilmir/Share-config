@@ -1,4 +1,6 @@
-﻿#NoEnv
+﻿;by LogicDaemon <www.logicdaemon.ru>
+;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+#NoEnv
 #SingleInstance ignore
 #NoTrayIcon
 StringCaseSense On
@@ -7,8 +9,9 @@ FileEncoding CP1251
 Global sendemailexe, tailexe, ReturnError, logfile, localcfg
 
 ShopBTS_Add_install := "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk"
+verFName=%A_ScriptDir%\ShopBTS_Add_ver.txt
 
-FileGetTime timeVerCheck, %A_ScriptDir%\ShopBTS_Add_ver.txt
+FileGetTime timeVerCheck, %verFName%
 ageVerCheck=
 EnvSub ageVerCheck, timeVerCheck, Days
 If (ageVerCheck) { ; если последняя проверка больше дня назад, проверить дату архива на сервере.
@@ -18,6 +21,9 @@ If (ageVerCheck) { ; если последняя проверка больше �
 	If (timeArchShopBTSAdd != timeLocShopBTSAdd) { ; если дата на сервере != локальной, запустить ShopBTS_Add.install.ahk
 	    Run "%A_AhkPath%" "%ShopBTS_Add_install%" /autoupdate
 	    ; После обновления скриптов, ShopBTS_Add.install.ahk обновляет дату
+	} Else {
+	    ; Обновление даты проверки
+	    FileAppend,, %verFName%
 	}
     }
 }
