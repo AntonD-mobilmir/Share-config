@@ -54,9 +54,7 @@ findexe(exe, paths*) {
 
     EnvGet SystemDrive,SystemDrive
     Loop Files, %SystemDrive%\SysUtils\%exename%, R
-    {
-	Try return GetPathForFile(exe, A_LoopFileLongPath)
-    }
+	return A_LoopFileLongPath
     
     Throw { Message: "Requested execuable not found", What: A_ThisFunc, Extra: exe }
 }
