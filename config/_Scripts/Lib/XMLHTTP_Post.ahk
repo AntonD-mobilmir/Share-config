@@ -3,33 +3,47 @@
 
 XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0, moreHeaders:="") {
     global debug
+    static useObjName
+    
     If (IsObject(debug)) {
 	FileAppend Отправка на адрес %URL% запроса %POSTDATA%`n, **
     }
-    XMLHttpRequest := ComObjCreate("Microsoft.XMLHTTP") ; https://msdn.microsoft.com/en-us/library/ms535874.aspx
-    ;XMLHttpRequest.open(bstrMethod, bstrUrl, varAsync, varUser, varPassword);
-    XMLHttpRequest.open("POST", URL, false)
-    XMLHttpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    If (useObjName) {
+	xhr := ComObjCreate(useObjName)
+    } Else {
+	objNames := [ "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP", "Microsoft.XMLHTTP" ]
+	For i, objName in objNames {
+	    ;xhr=XMLHttpRequest
+	    xhr := ComObjCreate(objName) ; https://msdn.microsoft.com/en-us/library/ms535874.aspx
+	    If (IsObject(xhr)) {
+		useObjName := objName
+		break
+	    }
+	}
+    }
+    ;xhr.open(bstrMethod, bstrUrl, varAsync, varUser, varPassword);
+    xhr.open("POST", URL, false)
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
     
     If (IsObject(moreHeaders))
 	For hName, hVal in moreHeaders
-	    XMLHttpRequest.setRequestHeader(hName, hVal)
+	    xhr.setRequestHeader(hName, hVal)
     
     Try {
-	XMLHttpRequest.send(POSTDATA)
+	xhr.send(POSTDATA)
 	If (IsObject(response))
-	    response := {status: XMLHttpRequest.status, headers: XMLHttpRequest.getAllResponseHeaders, responseText: XMLHttpRequest.responseText}
+	    response := {status: xhr.status, headers: xhr.getAllResponseHeaders, responseText: xhr.responseText}
 	Else
-	    response := XMLHttpRequest.responseText
+	    response := xhr.responseText
 	If (IsObject(debug)) {
-	    debug.Headers := XMLHttpRequest.getAllResponseHeaders
-	    debug.Response := XMLHttpRequest.responseText
-	    debug.Status := XMLHttpRequest.status	;can be 200, 404 etc., including proxy responses
+	    debug.Headers := xhr.getAllResponseHeaders
+	    debug.Response := xhr.responseText
+	    debug.Status := xhr.status	;can be 200, 404 etc., including proxy responses
 	    
 	    FileAppend % "`tСтатус: " . debug.Status . "`n"
 		       . "`tЗаголовки ответа: " . debug.Headers . "`n", **
 	}
-	return XMLHttpRequest.Status >= 200 && XMLHttpRequest.Status < 300
+	return xhr.Status >= 200 && xhr.Status < 300
     } catch e {
 	If (IsObject(debug)) {
 	    debug.What:=e.What
@@ -38,7 +52,7 @@ XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0, moreHeaders:="") {
 	}
 	return
     } Finally {
-	XMLHttpRequest := ""
+	xhr := ""
 	If (IsObject(debug)) {
 	    ;http://www.autohotkey.com/board/topic/56987-com-object-reference-autohotkey-l/#entry358974
 	    ;static document
