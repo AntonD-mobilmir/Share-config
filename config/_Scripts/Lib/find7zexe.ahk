@@ -1,6 +1,17 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
+; include to auto-execute section to run this during initialization. Maybe define exe7z global beforehand.
+Try
+    exe7z:=find7zexe()
+Catch
+    exe7z:=find7zaexe()
+If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
+    FileAppend %exe7z%`n,*,CP1
+    
+    Exit
+}
+
 find7zexe(exename="7z.exe", paths*) {
     ;key, value, flag "this is path to exe (only use directory)"
     regPaths := [["HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command",,1]
@@ -62,16 +73,6 @@ find7zGUIorAny() {
     Try	return find7zexe("7zg.exe")
     Try return find7zexe()
     return find7zaexe()
-}
-
-If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
-    Try
-	exe7z:=find7zexe()
-    Catch
-	exe7z:=find7zaexe()
-    FileAppend %exe7z%`n,*,CP1
-    
-    Exit
 }
 
 ;The FileName parameter may optionally be preceded by *i and a single space, which causes the program to ignore any failure to read the included file. For example: #Include *i SpecialOptions.ahk. This option should be used only when the included file's contents are not essential to the main script's operation.
