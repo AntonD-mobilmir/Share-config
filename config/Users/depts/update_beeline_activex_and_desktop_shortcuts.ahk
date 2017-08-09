@@ -40,7 +40,7 @@ If (A_IsAdmin) {
     ; Замена ярлыков и распаковка D:\dealer.beeline.ru
     FileDelete %A_DesktopCommon%\Exchange.lnk
     FileDelete %A_DesktopCommon%\Ценники из выгрузок Рарус.lnk
-    RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel, childPID
+    RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", %DefaultConfigDir%\_Scripts, Min UseErrorLevel, childPID
 } Else {
     ; Запущено из под пользователя без прав администратора
     ; config обновить не получится
