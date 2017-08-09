@@ -20,7 +20,8 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     )
     IF NOT EXIST "%GNUPGHOME%" MKDIR "%GNUPGHOME%"
 
-    IF NOT DEFINED MailUserId SET /P "MailUserId=ID (до @): "
+rem     IF NOT DEFINED MailUserId SET /P "MailUserId=ID (до @): "
+    IF NOT DEFINED MailUserId SET "MailUserId=%USERNAME%_%COMPUTERNAME%"
 )
 rem -- for XP only: diskperf.exe -y
 @CHCP 65001 >NUL & (
