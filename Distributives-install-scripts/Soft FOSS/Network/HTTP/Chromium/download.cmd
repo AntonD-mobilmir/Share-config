@@ -34,10 +34,10 @@ rem CALL "%baseScripts%\_DistDownload.cmd" http://download-chromium.appspot.com/
 rem Last Known Good: https://download-chromium.appspot.com/?platform=Win&type=continuous
 rem SET "dstrename=chrome-win32-continuous.zip"
 rem CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=continuous" "Win@type=continuous" %wgetConf% >"%logsDir%continuous-dl.log" 2>&1
-SET "dstrename=chrome-win32.zip"
-CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "Win@type=snapshots" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
+rem SET "dstrename=chrome-win32.zip"
+rem CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "Win@type=snapshots" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
 
-rem DEL "%workdir%\chrome-win32.zip"
-rem CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "chrome-win32.zip" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
+DEL "%workdir%\chrome-win32.zip"
+CALL "%baseScripts%\_DistDownload.cmd" "https://download-chromium.appspot.com/dl/Win?type=snapshots" "chrome-win32.zip" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
 EXIT /B
 )
