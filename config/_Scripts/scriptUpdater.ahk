@@ -11,7 +11,7 @@
 ; вместо этого, если URL не указан, скрипт должен быть в архиве https://www.dropbox.com/s/an5nvf0hrofva7r/ScriptUpdater.7z.gpg?dl=1
 
 CommonGPGFName := "ScriptUpdater.7z.gpg"
-CommonScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" CommonGPGFName "?dl=0"
+CommonScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" CommonGPGFName "?dl=1"
 СfgDir := "D:\Local_Scripts\ScriptUpdater"
 GNUPGHOME := CfgDir "\gnupg"
 
@@ -22,7 +22,8 @@ tempDir := A_Temp "\" A_ScriptName ".tmp"
 FileCreateDir %tempDir%
 
 ; самообновление
-UpdateScript(A_ScriptFullPath, 48)
+;UpdateScript(A_ScriptFullPath, 48, CommonScriptsURL, CommonGPGFName)
+UpdateScript("D:\*", 48, CommonScriptsURL, CommonGPGFName)
 
 clURL = %2%
 If (StartsWith(clURL, "http")) {
@@ -63,7 +64,7 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
     
     SplitPath dstFullPath, dstFName, dstDir,,, drvltr ; drvltr is either d: or \\hostname (no ending backslash)
     If (StartsWith(drvltr, "\\Srv0"))
-	continue
+	return 0
     If (gpgFName) {
 	SplitPath gpgFName, , , , verifiedFName
 	If (dstFName != verifiedFName)
@@ -128,9 +129,9 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 			exe7z:=find7zaexe()
 		}
 
-		archSubdir := SubStr(dstDir, StrLen(drvltr) + 2), \ ; 2 for next character after backslash
+		archSubdir := SubStr(dstDir, StrLen(drvltr) + 2) ; 2 for next character after backslash
 		FileAppend %A_Now% Unpacking "%archSubdir%\%dstFName%" from "%verifiedFName%"…
-		RunWait %exe7z% x -o"%dstDir%" -- "%tempDir%\%verifiedFName%" "%archSubdir%\%dstFName%",, Hide UseErrorLevel
+		RunWait %exe7z% x -o"%drvltr%" -- "%tempDir%\%verifiedFName%" "%archSubdir%\%dstFName%",, Hide UseErrorLevel
 		;Code Meaning 
 		;0 No error 
 		;1 Warning (Non fatal error(s)). For example, one or more files were locked by some other application, so they were not compressed. 
