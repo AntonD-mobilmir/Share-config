@@ -18,35 +18,33 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
     IF NOT DEFINED DefaultUserProfile CALL "%~dp0copyDefaultUserProfile.cmd"
     IF EXIST D:\1S\Rarus\ShopBTS SET "Inst1S=1"
 )
-IF DEFINED HKUDStartup %exe7z% x -aoa -o"%HKUDStartup%\" -- "%~dp0..\Users\depts\startup.7z"
-IF DEFINED CommonDesktop (
-    REM Unpacking Desktop Shortcuts / Распаковка ярлыков на рабочий стол 
-    RD /S /Q "%CommonDesktop%\Дополнительные ярлыки"
-    RD /S /Q "%CommonDesktop%\Сервисы сторонних компаний"
-
-    %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts.7z"
-    IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_64bit.7z"
-    IF NOT EXIST D:\Distributives\config IF EXIST W:\Distributives\config %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_W.7z"
-    
+(
     FOR %%I IN ("%~dp0..\Users\depts\?.7z") DO %exe7z% x -aoa -o"%%~nI:\" -- "%%~I"
     FOR /D %%I IN ("%~dp0..\Users\depts\?") DO IF EXIST "%%~nI:\*.*" XCOPY "%%~I\*.*" "%%~nI:\" /E /I /Q /G /H /R /K /O /Y /B /J
 
-    
-    IF "%Inst1S%"=="1" (
-	%exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S.7z"
-	IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S_64bit.7z"
-	%exe7z% x -aoa -o"%ProgramData%\mobilmir.ru" -- "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts.7z"
-    )
+    START "" /B %comspec% /C "d:\Local_Scripts\UpdateShortcuts.cmd"
 
     ECHO N|%SystemRoot%\System32\net.exe SHARE "Обмен" /Delete
     %SystemRoot%\System32\net.exe SHARE "Обмен=d:\Users\Public" /GRANT:"Everyone,CHANGE"
     %SystemRoot%\System32\net.exe SHARE "Обмен=d:\Users\Public" /GRANT:"Все,CHANGE"
     %SystemRoot%\System32\net.exe SHARE "Обмен=d:\Users\Public"
 
-    CALL "%~dp0Tasks\All XML.cmd"
-    
-    ENDLOCAL
-    
+    IF DEFINED HKUDStartup %exe7z% x -aoa -o"%HKUDStartup%\" -- "%~dp0..\Users\depts\startup.7z"
+    IF DEFINED CommonDesktop (
+	REM Распаковка ярлыков на рабочий стол 
+	RD /S /Q "%CommonDesktop%\Дополнительные ярлыки"
+	RD /S /Q "%CommonDesktop%\Сервисы сторонних компаний"
+
+	%exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts.7z"
+	IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_64bit.7z"
+	
+	IF "%Inst1S%"=="1" (
+	    %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S.7z"
+	    IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S_64bit.7z"
+	    %exe7z% x -aoa -o"%ProgramData%\mobilmir.ru" -- "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts.7z"
+	)
+    )
+
     IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
     IF DEFINED AutohotkeyExe (
 	FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
@@ -55,7 +53,6 @@ IF DEFINED CommonDesktop (
 	FOR %%A IN ("D:\dealer.beeline.ru\bin\criacx.cab") DO SET "criacxcabTime=%%~tA"
 	CALL :PostForm
     )
-
     EXIT /B
 )
 :PostForm

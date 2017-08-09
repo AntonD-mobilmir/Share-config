@@ -285,41 +285,12 @@ If (FileExist("D:\Credit")) {
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-sharePublic := CheckPath("D:\Users\Public", "")
-If (!IsObject(sharePublic)) {
-    If (FileExist("W:\Media")) {
-	AddLog("Обнаружена папка W:\Media")
-	RunWait "%xlnexe%" -n W:\Media D:\Users\Public,,Min UseErrorLevel
-	AddLog("Создание ссылки D:\Users\Public",ErrorLevel,!ErrorLevel)
-    }
-    If (FileExist("W:\Обмен")) {
-	AddLog("Обнаружена папка W:\Обмен", "Перемещение")
-	Loop Files, W:\Обмен, D
-	    FileMoveDir %A_LoopFileFullPath%, W:\Media\Documents\%A_LoopFileName%, R
-	FileMove W:\Обмен\*.*, W:\Media\Documents
-	FileRemoveDir W:\Обмен
-	If (FileExist("W:\Обмен")) {
-	    ;if it still exist, some files are in-use or duplicated in Documents
-	    LV_Modify(LV_GetCount(),,,"Не перемещено")
-	    AddLog("Создание ссылки W:\Обмен → ""W:\Media\Documents\старый обмен""")
-	    RunWait "%xlnexe%" -n W:\Обмен "W:\Media\Documents\старый обмен",,Min UseErrorLevel
-	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-	} Else {
-	    SetLastRowStatus()
-	}
-    }
-}
-
 If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     AddLog("Найден Рарус, замена Rarus_Scripts")
     Run "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\Rarus_Scripts_unpack.ahk",,UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     EnvSet Inst1S,1
 }
-
-;AddLog("Ярлыки на рабочем столе и стандартные файлы","Замена")
-;RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"", %DefaultConfigDir%\_Scripts, Min UseErrorLevel
-;SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 2)
 If (IsObject(instCriacxocx)) {
@@ -328,11 +299,8 @@ If (IsObject(instCriacxocx)) {
     ;LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
 }
 
-criacxUpdater := LatestExisting(DefaultConfigDir . "\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk","\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk")
-criacxUpdaterPath := criacxUpdater.Path
-AddLog(AbbreviatePath(criacxUpdaterPath))
-RunWait "%A_AhkPath%" "%criacxUpdaterPath%"
-SetLastRowStatus(ErrorLevel,!ErrorLevel)
+RunFromConfigDir("Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk", "Замена ярлыков на рабочем столе и стандартных файлов")
+RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 	
 If (IsObject(instCriacxocx)){
     If (timecriacxcab) {
@@ -544,18 +512,6 @@ AddLog("Готово",A_Now,1)
 Sleep 300000
 ExitApp
 
-;Loop
-;{
-;    InputBox rmtHost, Remote Host
-;    IF (ErrorLevel || rmtHost=="")
-;	break
-;    If (!(SubStr(rmtHost, 1, 2)=="\\"))
-;	rmtHost = \\%rmtHost%
-
-;    Run %comspec% /C "CALL "D:\dealer.beeline.ru\remote_register.cmd" %rmtHost% || PAUSE", D\dealer.beeline.ru
-;}
-
-
 GuiEscape:
 GuiClose:
 ButtonCancel:
@@ -565,6 +521,32 @@ ButtonCancel:
 	    return
     }
     ExitApp
+
+RunFromConfigDir(ByRef subPath, ByRef comment:="", ByRef interpreter:=0, ByRef s:="") {
+    global DefaultConfigDir
+    
+    runSc := LatestExisting(DefaultConfigDir . "\" . subPath, "\\Srv0.office0.mobilmir\profiles$\Share\config\" . subPath)
+    runScPath := runSc.Path
+
+    If (interpreter==0) {
+	SplitPath runScPath, , , ext
+	If (ext="ahk")
+	    interpreter = "%A_AhkPath%"
+	Else If (ext="cmd" || ext = "bat")
+	    interpreter = %Comspec% /C
+	Else
+	    Throw Exception("Для этого расширения файла не определен интерпретатор",, ext)
+    }
+    
+    If (comment)
+	l := AddLog(comment)
+    Else
+	l := AddLog(AbbreviatePath(runScPath))
+    RunWait %interpreter% "%runScPath%",,Min UseErrorLevel
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    
+    return l
+}
 
 MBGB(val) {
     If (!val)
