@@ -24,6 +24,7 @@ Menu Tray, Tip, Выполняется настройка параметров �
 ;    logsuffix= 2>&1 | "%teeexe%" -a "`%TEMP`%\FSACL _depts_simplified.cmd.log"
 ;>"`%TEMP`%\FSACL _depts_simplified.cmd.log" 2>&1 
 
+startTicks := A_TickCount
 FileReadLine avg, %avgTFName%, 1
 If (avg) {
     ticksETA := startTicks + avg + timeMargin
@@ -31,7 +32,6 @@ If (avg) {
     leftTime = (рассчетное время неизвестно)
 }
 
-startTicks := A_TickCount
 Progress A M R%startTicks%-%ticksETA% FS8, %A_Space%`n`n`n`n`n`n`n`n, Настройка параметров доступа к ФС`n`nНе выключайте компьютер`, пока работает этот скрипт`, т.к. это может вызвать сбои.
 
 Run %comspec% /C " "%A_ScriptDir%\_depts_simplified.cmd" >"%cmdLogFName%" 2>&1",, Hide, cmdPID
