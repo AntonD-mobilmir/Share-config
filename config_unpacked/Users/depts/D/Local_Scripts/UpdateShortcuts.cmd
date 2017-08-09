@@ -17,6 +17,9 @@ IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 )
 (
+    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
+    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
+    
     RD /S /Q "%~dp0Shortcuts" || CALL :SaveErrorLevel cleaning up old Shortcuts
     %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts.7z" || CALL :SaveErrorLevel unpacking Shortcuts.7z
     IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts_64bit.7z" || CALL :SaveErrorLevel unpacking Shortcuts_64bit.7z
