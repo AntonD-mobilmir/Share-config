@@ -13,7 +13,7 @@ IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.
 CALL :GetDir configDir "%DefaultsSource%"
 (
 IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
-IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
+IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 )
 (
@@ -24,8 +24,8 @@ rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe S
     %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts.7z" || CALL :SaveErrorLevel unpacking Shortcuts.7z
     IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts_64bit.7z" || CALL :SaveErrorLevel unpacking Shortcuts_64bit.7z
     
-    FOR %%A IN ("%~dp0Shortcuts.7z") DO SET "ShortcutsTime=%%~tA"
-    FOR %%A IN ("%~dp0Shortcuts_64bit.7z") DO SET "Shortcuts_64bitTime=%%~tA"
+    FOR %%A IN ("%configDir%Users\depts\Shortcuts.7z") DO SET "ShortcutsTime=%%~tA"
+    FOR %%A IN ("%configDir%Users\depts\Shortcuts_64bit.7z") DO SET "Shortcuts_64bitTime=%%~tA"
     CALL :PostForm
 
     %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" "%~f0"
@@ -33,7 +33,7 @@ rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe S
 )
 :PostForm
 (
-    START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeNftB3Rwx9ztsZn6FD3mHbAOR87-nxPMaeSle80obZAIR3TQ/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%"
+    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeNftB3Rwx9ztsZn6FD3mHbAOR87-nxPMaeSle80obZAIR3TQ/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%"
 EXIT /B
 )
 :GetDir
