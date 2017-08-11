@@ -2,6 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 findexe(exe, paths*) {
+    local Path,utilsdir,SystemDrive
     ; exe is name only or full path
     ; paths are additional full paths, dirs or path-masks to check for
     ; first check if executable is in %PATH%
@@ -54,14 +55,13 @@ findexe(exe, paths*) {
 
     EnvGet SystemDrive,SystemDrive
     Loop Files, %SystemDrive%\SysUtils\%exename%, R
-    {
-	Try return GetPathForFile(exe, A_LoopFileLongPath)
-    }
+	return A_LoopFileLongPath
     
     Throw { Message: "Requested execuable not found", What: A_ThisFunc, Extra: exe }
 }
 
 GetPathForFile(file, paths*) {
+    local fullpath,path
     For i,path in paths {
 	Loop Files, %path%, D
 	{
@@ -89,6 +89,7 @@ RemoveParameters(runStr) {
 }
 
 GetAppPathFromRegShellKey(exename, regsubKeyShell) {
+    local regsubKey, regpath
     regsubKey=%regsubKeyShell%\shell
     Loop Reg, %regsubKey%, K
     {
