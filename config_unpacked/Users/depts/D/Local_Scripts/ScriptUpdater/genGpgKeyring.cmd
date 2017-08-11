@@ -16,9 +16,9 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 	SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
     ) ELSE CALL :FindGPGexe || EXIT /B
     rem IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
-    IF NOT DEFINED MailUserId SET "MailUserId=%Hostname%"
 )
 (
+    IF NOT DEFINED MailUserId SET "MailUserId=%Hostname%"
     FOR %%A IN ("%GNUPGHOME%\secring.gpg") DO IF EXIST "%%~A" IF %%~zA GTR 0 (
 	ECHO Keyring already exist!
 	EXIT /B 1
@@ -34,7 +34,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     ECHO Name-Real: %Hostname%
     ECHO Name-Comment: ScriptUpdater
     ECHO Name-Email: %MailUserId%@rarus.robots.mobilmir.ru
-) | %gpgexe% --homedir "%GNUPGHOME%" --batch --gen-key & CHCP 866
+) | %gpgexe% --homedir "%GNUPGHOME%" --batch --gen-key >> "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.gen.log" 2>&1 & CHCP 866
 (
     %gpgexe% --homedir "%GNUPGHOME%" --batch --armor --export "%MailUserId%@rarus.robots.mobilmir.ru" > "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.asc"
     rem cannot be done in batch mode -- %gpgexe% --homedir "%GNUPGHOME%" --batch --armor --gen-revoke "%MailUserId%@rarus.robots.mobilmir.ru" > "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.rev"
@@ -44,7 +44,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     %gpgexe% --homedir "%GNUPGHOME%" --batch --import-ownertrust "%GNUPGHOME%\trust.asc"
     %gpgexe% --homedir "%GNUPGHOME%" --batch --list-keys --fingerprint
     EXIT /B
-)
+) >> "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.gen.log" 2>&1 
 :FindGPGexe
 rem IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 rem CALL :GetDir ConfigDir "%DefaultsSource%"
