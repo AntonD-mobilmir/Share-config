@@ -9,7 +9,6 @@
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
     SET "RegTmpDir=%TEMP%\DefaultUserRegistrySettings"
-    SET "DefaultUserRegistrySettings=%LOCALAPPDATA%\DefaultUserRegistrySettings.7z"
 
     CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
     IF NOT DEFINED DefaultsSource EXIT /B 32010
@@ -18,10 +17,15 @@
     ECHO N|REG ADD "HKEY_CURRENT_USER\Software\TeamViewer\Version5.1" /v Username /t REG_SZ /d "%UserName% \\%COMPUTERNAME%"
     REG ADD "HKEY_CURRENT_USER\Software\TeamViewer\Version5.1" /v ShowTaskbarInfoOnMinimize /t REG_DWORD /d 0 /f
 
-    IF NOT EXIST "%DefaultUserRegistrySettings%" SET "DefaultUserRegistrySettings=%USERPROFILE%\..\Default\AppData\Local\DefaultUserRegistrySettings.7z"
+    IF /I "%USERNAME%"=="Продавец" SET "RemoveAllAppX=1"
+    IF /I "%USERNAME%"=="Пользователь" SET "RemoveAllAppX=1"
+    IF /I "%USERNAME%"=="Install" SET "RemoveAllAppX=1"
 )
 CALL :GetDir ConfigDir "%DefaultsSource%"
+(
 CALL "%ConfigDir%_Scripts\find7zexe.cmd"
+CALL :FirstExisting DefaultUserRegistrySettings "\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\DefaultUserRegistrySettings.7z" "%ConfigDir%\Users\Default\AppData\Local\DefaultUserRegistrySettings.7z" "%LOCALAPPDATA%\DefaultUserRegistrySettings.7z" "%USERPROFILE%\..\Default\AppData\Local\DefaultUserRegistrySettings.7z" "%SystemDrive%\Users\Default\AppData\Local\DefaultUserRegistrySettings.7z"
+)
 (
     IF EXIST "%DefaultUserRegistrySettings%" (
 	IF DEFINED exe7z %exe7z% x -o"%RegTmpDir%" -- "%DefaultUserRegistrySettings%"
@@ -29,9 +33,6 @@ CALL "%ConfigDir%_Scripts\find7zexe.cmd"
 	RD /S /Q "%RegTmpDir%"
 	DEL "%DefaultUserRegistrySettings%"
     )
-    IF /I "%USERNAME%"=="Продавец" SET "RemoveAllAppX=1"
-    IF /I "%USERNAME%"=="Пользователь" SET "RemoveAllAppX=1"
-    IF /I "%USERNAME%"=="Install" SET "RemoveAllAppX=1"
     IF DEFINED RemoveAllAppX (
 	CALL "%ConfigDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon
     ) ELSE (
@@ -44,4 +45,14 @@ CALL "%ConfigDir%_Scripts\find7zexe.cmd"
 (
     SET "%~1=%~dp2"
 EXIT /B
+)
+:FirstExisting <var> <path1> <path2> ...
+(
+    IF "%~2"=="" EXIT /B 1
+    IF EXIST %2 (
+	SET "%~1=%~2"
+	EXIT /B
+    )
+    SHIFT /2
+    GOTO :FirstExisting
 )
