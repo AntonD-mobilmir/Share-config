@@ -346,8 +346,7 @@ If (IsObject(softUpdScripts)) {
 	SetRowStatus(softUpdScripts.line, , 0)
     }
 }
-
-If (IsObject(softUpdScripts)) {
+If (IsObject(softUpdScripts)) { ; если обновлять скрипты software_update не надо, объект будет удален в блоке выше
     If (!IsObject(distSoftUpdScripts))
 	distSoftUpdScripts := CheckPath("\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
     If (IsObject(distSoftUpdScripts)) {
@@ -356,6 +355,8 @@ If (IsObject(softUpdScripts)) {
 	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",,Min UseErrorLevel
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
+} Else { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
+    CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", SystemDrive . "\SysUtils", loopOptn:="D")
 }
 
 AddLog("Журналы скриптов обновления")
@@ -380,26 +381,28 @@ If (hostSUScripts) {
     }
 }
 
-AddLog("Common_Scripts")
-Loop Files, %A_AppDataCommon%\mobilmir.ru\Common_Scripts
-{
-    If (latestCommonScript < A_LoopFileTimeModified || !latestCommonScript)
-	latestCommonScript := A_LoopFileTimeModified
-}
-CommonScriptsCmdSubpath=\Soft\PreInstalled\auto\Common_Scripts.cmd
-CommonScripts7zSubpath=\Soft\PreInstalled\auto\Common_Scripts.7z
-FileGetTime mtimeCommonScriptsSrv0, %ServerDistPath%%CommonScripts7zSubpath%
-FileGetTime mtimeCommonScriptslocal, %Distributives%%CommonScripts7zSubpath%
-If (mtimeCommonScriptsSrv0 > latestCommonScript) {
-    SetLastRowStatus("Обновление",0)
-    If (mtimeCommonScriptslocal==mtimeCommonScriptsSrv0)
-	RunWait %comspec% /C "%Distributives%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
-    Else
-	RunWait %comspec% /C "%ServerDistPath%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
-    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-} Else {
-    SetLastRowStatus()
-}
+; обновляется целиком PreInstalled
+;AddLog("Common_Scripts")
+;latestCommonScript:=0
+;Loop Files, %A_AppDataCommon%\mobilmir.ru\Common_Scripts
+;{
+;    If (latestCommonScript < A_LoopFileTimeModified)
+;	latestCommonScript := A_LoopFileTimeModified
+;}
+;CommonScriptsCmdSubpath=\Soft\PreInstalled\auto\Common_Scripts.cmd
+;CommonScripts7zSubpath=\Soft\PreInstalled\auto\Common_Scripts.7z
+;FileGetTime mtimeCommonScriptsSrv0, %ServerDistPath%%CommonScripts7zSubpath%
+;FileGetTime mtimeCommonScriptslocal, %Distributives%%CommonScripts7zSubpath%
+;If (mtimeCommonScriptsSrv0 > latestCommonScript) {
+;    SetLastRowStatus("Обновление",0)
+;    If (mtimeCommonScriptslocal==mtimeCommonScriptsSrv0)
+;	RunWait %comspec% /C "%Distributives%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
+;    Else
+;	RunWait %comspec% /C "%ServerDistPath%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
+;    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+;} Else {
+;    SetLastRowStatus()
+;}
 
 If (FileExist("c:\squid\sbin\squid.exe")) {
     FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
@@ -522,6 +525,36 @@ ButtonCancel:
     }
     ExitApp
 
+CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", ByRef flagMask:="", loopOptn:="") {
+    global ServerDistPath, Distributives
+    latestFlagTime:=0
+
+    If (!title)
+	title := AbbreviatePath(flagMask ? flagMask : archSubpath)
+    AddLog(title, "Проверка")
+    FindLatest(Distributives "\" archSubpath,, mtimelocal)
+    FindLatest(ServerDistPath "\" archSubpath,, mtimeSrv0)
+    
+    If (flagMask)
+	FindLatest(flagMask, loopOptn, latestFlagTime)
+    
+    If (latestFlagTime) {
+	timeDiff := mtimeSrv0
+	timeDiff -= latestFlagTime, Minutes
+    }
+    
+    If (!latestFlagTime || timeDiff > 5) { ; если архив на Srv0 новее всех файлов по маске больше, чем на 5 минут, – обновлять
+        SetLastRowStatus("Обновление…",0)
+        If (mtimelocal==mtimeSrv0)
+	    RunWait %comspec% /C "%Distributives%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
+        Else
+	    RunWait %comspec% /C "%ServerDistPath%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
+        SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    } Else {
+        SetLastRowStatus(TimeFormat(latestFlagTime), 1)
+    }
+}
+
 RunFromConfigDir(ByRef subPath, ByRef comment:="", ByRef interpreter:=0, ByRef s:="") {
     global DefaultConfigDir
     
@@ -559,11 +592,6 @@ MBGB(val) {
 	unit:="GB"
     }
     return Format(format, val) . " " . unit
-}
-
-TimeFormat(ByRef time, ByRef fmt:="dd.MM.yyyy HH:mm") {
-    FormatTime ftime, %time%, dd.MM.yyyy HH:mm
-    return ftime
 }
 
 CheckRemove(path) {
@@ -656,12 +684,8 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
     If logTime is integer
     {
 	If (exist) {
-	    If (logTime==2) {
-		logTime=
-		logTime-=mtime, Days
-		logTime = возраст: %logTime% дн.
-	    } Else If (logTime==1) {
-		FormatTime logTime, mtime, yyyy-MM-dd HH:mm:ss
+	    If (logTime==1 || logTime==2) {
+		logTime := TimeFormat(mtime)
 	    }
 	} Else {
 	    logTime:="(не найден)"
@@ -684,8 +708,8 @@ LatestExisting(paths*) {
     return curFound
 }
 
-FindLatest(mask, LoopFlags:="", ByRef latestTime:=0) {
-    Loop Files, %mask%, %LoopFlags%
+FindLatest(mask, loopOptn:="", ByRef latestTime:=0) {
+    Loop Files, %mask%, %loopOptn%
     {
 	If (A_LoopFileTimeModified > latestTime) {
 	    latestPath := A_LoopFileFullPath
@@ -720,17 +744,27 @@ SetLastRowStatus(status:="", check:=1) {
 }
 
 SetRowStatus(ByRef roworobj, status:="", check:=1) {
-    If (status==0) {
-	status:="OK"
-    } Else If (RegexMatch(status,"^[\d\-]{1-7}$")) {
-	status=! %status%
-    }
+    If status is integer
+	If (status==0)
+	    status:="OK"
+	Else If (status > 2000000000000000) ; If status is time but full YYYYMMDDHH24MISS, not like just year
+	    status := TimeFormat(status)
+	Else
+	    status=! %status%
+
     
     row := IsObject(roworobj) ? roworobj.line : roworobj
     If (status=="")
 	return LV_Modify(row, check ? "Check" : "")
     Else
 	return LV_Modify(row, check ? "Check" : "",,status)
+}
+
+TimeFormat(ByRef time) {
+    age=
+    age -= time, Days ; ago from now
+    FormatTime ft, %status%, yyyy-MM-dd HH:mm (%age% 'дн.')
+    return ft
 }
 
 FirstExisting(paths*) {
