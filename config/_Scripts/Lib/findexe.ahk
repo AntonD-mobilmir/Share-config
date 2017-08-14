@@ -41,7 +41,7 @@ findexe(exe, paths*) {
     Try return GetAppPathFromRegShellKey(exename, "HKEY_CLASSES_ROOT\Applications\" . exename)
     Loop Reg, HKEY_CLASSES_ROOT\, K
     {
-	Try return GetAppPathFromRegShellKey(exename, "HKEY_CLASSES_ROOT\" . %A_LoopRegName%)
+	Try return GetAppPathFromRegShellKey(exename, "HKEY_CLASSES_ROOT\" . A_LoopRegName)
     }
     
     Try return GetPathForFile(exe, A_LineFile . "..\..\..\..\..\..\Distributives\Soft\PreInstalled\utils" ; Srv0 only
