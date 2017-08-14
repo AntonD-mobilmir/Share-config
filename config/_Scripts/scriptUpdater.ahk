@@ -1,6 +1,6 @@
 ﻿#NoEnv
 #SingleInstance off
-#Warn
+;#Warn
 ;ToDo: off only for debugging --
 #ErrorStdOut
 FileEncoding UTF-8
