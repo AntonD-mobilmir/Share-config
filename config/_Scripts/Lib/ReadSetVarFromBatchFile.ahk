@@ -4,10 +4,11 @@
 ReadSetVarFromBatchFile(filename, varname) {
     Loop Read, %filename%
     {
-	If (mpos := RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", match)) {
-	    If (Trim(Trim(matchName), """") = varname) {
-		return Trim(Trim(matchValue), """")
+	If (RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
+	    If (Trim(Trim(mName), """") = varname) {
+		return Trim(Trim(mValue), """")
 	    }
 	}
     }
+    Throw Exception("Var not found",, varname)
 }
