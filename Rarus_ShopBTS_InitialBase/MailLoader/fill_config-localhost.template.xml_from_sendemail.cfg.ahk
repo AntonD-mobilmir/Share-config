@@ -8,7 +8,7 @@ configxml=%ExtFormsDir%\MailLoader\config-localhost.xml
 
 If (FileExist(configxml)) {
     FileAppend Файл уже существует: %configxml%`n,*, CP1
-    Exit 80
+    ExitApp 1
 } Else {
     Loop Read, %sendemailcfg%
     {
@@ -41,5 +41,5 @@ If (FileExist(configxml)) {
     </ConfigData>
     
     ), %configxml%, UTF-8-RAW
-    Exit ErrorLevel
+    ExitApp ErrorLevel << 8
 }

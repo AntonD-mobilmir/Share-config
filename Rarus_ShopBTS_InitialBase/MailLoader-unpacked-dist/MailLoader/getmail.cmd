@@ -40,10 +40,8 @@ SET "verFile=%~dpn0_dist_ver.txt"
 	)
 	IF DEFINED runUpdate (
 	    CALL "%updateInstallScript%"
-	    CALL :WriteoutDistVer
 	    EXIT /B
 	)
-	IF DEFINED distVer CALL :WriteoutDistVer
     )
 
     IF NOT EXIST "%SignedFilesDir%" MKDIR "%SignedFilesDir%"

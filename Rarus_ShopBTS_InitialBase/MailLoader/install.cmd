@@ -5,7 +5,8 @@ SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-IF NOT DEFINED ErrorCmd SET "ErrorCmd=PAUSE"
+rem --debug-- SET "ErrorCmd=PAUSE"
+IF NOT DEFINED ErrorCmd SET "ErrorCmd=SET ErrorOccured=1"
 IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
 
 SET "sidCREATOR_OWNER=S-1-3-0"
@@ -34,27 +35,29 @@ rem IF NOT DEFINED schedUserName SET /P "schedUserName=Имя пользователя для зада
 SET "schtaskPassSw=" & IF DEFINED schedUserPwd SET schtaskPassSw=/RP "%schedUserPwd%"
 (
 rem installer does not allow setting destination - "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\stunnel\stunnel-5.41-win32-installer.exe" /S
-%exe7z% x -aoa -o"D:\1S\Rarus\MailLoader\stunnel" -x!bin/openssl.exe -x!bin/stunnel.exe -x!*/*.pdb -x!$PLUGINSDIR -x!uninstall.exe "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\stunnel\stunnel-*-win32-installer.exe" || SET "ErrorOccured=1"
+%System32%\schtasks.exe /End /TN mobilmir.ru\stunnel
+%System32%\taskkill.exe /F /IM tstunnel.exe
+IF EXIST "D:\1S\Rarus\MailLoader\stunnel.bak" RD /S /Q "D:\1S\Rarus\MailLoader\stunnel.bak"
+MOVE /Y "D:\1S\Rarus\MailLoader\stunnel" "D:\1S\Rarus\MailLoader\stunnel.bak" && RD /S /Q "D:\1S\Rarus\MailLoader\stunnel.bak"
+%exe7z% x -aoa -o"D:\1S\Rarus\MailLoader\stunnel" -x!bin/openssl.exe -x!bin/stunnel.exe -x!*/*.pdb -x!$PLUGINSDIR -x!uninstall.exe "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\stunnel\stunnel-*-win32-installer.exe" || %ErrorCmd%
 rem /grant "*%sidCREATOR_OWNER%:(OI)(CI)F"
-%SystemRoot%\System32\icacls.exe "D:\1S\Rarus\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || SET "ErrorOccured=1"
-%SystemRoot%\System32\icacls.exe "D:\1S\Rarus\ShopBTS\ExtForms\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || SET "ErrorOccured=1"
+%SystemRoot%\System32\icacls.exe "D:\1S\Rarus\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
+%SystemRoot%\System32\icacls.exe "D:\1S\Rarus\ShopBTS\ExtForms\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
 
-%exe7z% x -aoa -oD:\1S\Rarus -- "%~dp0dist.7z" || SET "ErrorOccured=1"
+%exe7z% x -aoa -oD:\1S\Rarus -- "%~dp0dist.7z" || %ErrorCmd%
 DEL "D:\1S\Rarus\MailLoader\POPTrace.txt"
 
-%AutohotkeyExe% "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk" || SET "ErrorOccured=1"
+%AutohotkeyExe% "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk" || IF ERRORLEVEL 2 %ErrorCmd%
 
-CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || SET "ErrorOccured=1"
-rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || SET "ErrorOccured=1"
-CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% /NP || SET "ErrorOccured=1"
+CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || %ErrorCmd%
+rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || %ErrorCmd%
+CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% /NP || %ErrorCmd%
+
+CALL "D:\1S\Rarus\MailLoader\genGpgKeyring.cmd" || IF ERRORLEVEL 2 %ErrorCmd%
 
 (ECHO %distTime%) >"%verFile%"
 
-IF DEFINED ErrorOccured (
-    %ErrorCmd%
-) ELSE START "" %AutohotkeyExe% "%ConfigDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSe0zAvOtFvJ9hizWP6OMiGBKuQQHl90OvgywGP6vgWs9X_Yjg/formResponse" "entry.1309300051=%MailUserId%" "entry.859988755=%Hostname%" "entry.76258453=%distTime%"
-
-CALL "D:\1S\Rarus\MailLoader\genGpgKeyring.cmd"
+IF NOT DEFINED ErrorOccured START "" %AutohotkeyExe% "%ConfigDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSe0zAvOtFvJ9hizWP6OMiGBKuQQHl90OvgywGP6vgWs9X_Yjg/formResponse" "entry.1309300051=%MailUserId%" "entry.859988755=%Hostname%" "entry.76258453=%distTime%"
 
 EXIT /B
 )
