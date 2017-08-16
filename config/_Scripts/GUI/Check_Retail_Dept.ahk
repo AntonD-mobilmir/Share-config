@@ -299,31 +299,27 @@ If (IsObject(instCriacxocx)) {
     ;LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
 }
 
-RunFromConfigDir("Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk", "Замена ярлыков на рабочем столе и стандартных файлов")
-RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
-	
-If (IsObject(instCriacxocx)){
-    If (timecriacxcab) {
-	FileGetTime criacxocxTimeNew, % instCriacxocx.path
-	criacxocxTimeDiff:=criacxocxTimeNew
-	EnvSub criacxocxTimeDiff, instCriacxocx.mtime, Days
-	If (criacxocxTimeDiff) {
-	    statusTextcriacxocx := " → " . criacxocxTimeNew . " (обновился)"
+AddLog("Журналы скриптов обновления")
+suSettingsScript=%A_AppDataCommon%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
+hostSUScripts:=ReadSetVarFromBatchFile(suSettingsScript, "SUSHost")
+If (hostSUScripts) {
+    SetLastRowStatus(hostSUScripts, 0)
+    cmdCheckLocalUpdater := FirstExisting(A_ScriptDir . "\..\..\_Scripts\software_update_autodist\CheckLocalUpdater.cmd")
+    RunWait %comspec% /C "%cmdCheckLocalUpdater%",,Min UseErrorLevel
+    FileRead pathLastStatus, *P866 *m65536 %A_Temp%\CheckLocalUpdater.flag
+    pathLastStatus := Trim(pathLastStatus, "`r`n`t ")
+    If (!ErrorLevel && FileExist(pathLastStatus)) {
+	FileGetTime timeLastStatus, pathLastStatus
+	SplitPath pathLastStatus, fnameLastStatus
+	ageLastStatus=
+	ageLastStatus-=timeLastStatus, Days
+	If (ageLastStatus) {
+	    SetLastRowStatus(hostSUScripts . " [" . ageLastStatus . " дн.]", 0)
 	} Else {
-	    statusTextcriacxocx := instCriacxocx.mtime . " (не обновился)"
+	    SetLastRowStatus(fnameLastStatus . " (сегодня)")
 	}
-	SetRowStatus(instCriacxocx.line, statusTextcriacxocx, criacxocxTimeDiff > 0)
-    } Else {
-	SetRowStatus(instCriacxocx.line, "ocx~=cab (" . TimeFormat(instCriacxocx.mtime) . ")",1)
     }
-} Else {
-    AddLog("CRIACX.ocx","отсутствует",1)
 }
-
-tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
-AddLog("Обновление настроек TeamViewer 5", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
-RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
 softUpdScripts := CheckPath("d:\Scripts\_DistDownload.cmd", 1, 0)
 If (IsObject(softUpdScripts)) {
@@ -359,50 +355,31 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
     CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", SystemDrive . "\SysUtils", loopOptn:="D")
 }
 
-AddLog("Журналы скриптов обновления")
-suSettingsScript=%A_AppDataCommon%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
-hostSUScripts:=ReadSetVarFromBatchFile(suSettingsScript, "SUSHost")
-If (hostSUScripts) {
-    SetLastRowStatus(hostSUScripts, 0)
-    cmdCheckLocalUpdater := FirstExisting(A_ScriptDir . "\..\..\_Scripts\software_update_autodist\CheckLocalUpdater.cmd")
-    RunWait %comspec% /C "%cmdCheckLocalUpdater%",,Min UseErrorLevel
-    FileRead pathLastStatus, *P866 *m65536 %A_Temp%\CheckLocalUpdater.flag
-    pathLastStatus := Trim(pathLastStatus, "`r`n`t ")
-    If (!ErrorLevel && FileExist(pathLastStatus)) {
-	FileGetTime timeLastStatus, pathLastStatus
-	SplitPath pathLastStatus, fnameLastStatus
-	ageLastStatus=
-	ageLastStatus-=timeLastStatus, Days
-	If (ageLastStatus) {
-	    SetLastRowStatus(hostSUScripts . " [" . ageLastStatus . " дн.]", 0)
+RunFromConfigDir("Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk", "Замена ярлыков на рабочем столе и стандартных файлов")
+RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
+	
+If (IsObject(instCriacxocx)){
+    If (timecriacxcab) {
+	FileGetTime criacxocxTimeNew, % instCriacxocx.path
+	criacxocxTimeDiff:=criacxocxTimeNew
+	EnvSub criacxocxTimeDiff, instCriacxocx.mtime, Days
+	If (criacxocxTimeDiff) {
+	    statusTextcriacxocx := " → " . criacxocxTimeNew . " (обновился)"
 	} Else {
-	    SetLastRowStatus(fnameLastStatus . " (сегодня)")
+	    statusTextcriacxocx := instCriacxocx.mtime . " (не обновился)"
 	}
+	SetRowStatus(instCriacxocx.line, statusTextcriacxocx, criacxocxTimeDiff > 0)
+    } Else {
+	SetRowStatus(instCriacxocx.line, "ocx~=cab (" . TimeFormat(instCriacxocx.mtime) . ")",1)
     }
+} Else {
+    AddLog("CRIACX.ocx","отсутствует",1)
 }
 
-; обновляется целиком PreInstalled
-;AddLog("Common_Scripts")
-;latestCommonScript:=0
-;Loop Files, %A_AppDataCommon%\mobilmir.ru\Common_Scripts
-;{
-;    If (latestCommonScript < A_LoopFileTimeModified)
-;	latestCommonScript := A_LoopFileTimeModified
-;}
-;CommonScriptsCmdSubpath=\Soft\PreInstalled\auto\Common_Scripts.cmd
-;CommonScripts7zSubpath=\Soft\PreInstalled\auto\Common_Scripts.7z
-;FileGetTime mtimeCommonScriptsSrv0, %ServerDistPath%%CommonScripts7zSubpath%
-;FileGetTime mtimeCommonScriptslocal, %Distributives%%CommonScripts7zSubpath%
-;If (mtimeCommonScriptsSrv0 > latestCommonScript) {
-;    SetLastRowStatus("Обновление",0)
-;    If (mtimeCommonScriptslocal==mtimeCommonScriptsSrv0)
-;	RunWait %comspec% /C "%Distributives%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
-;    Else
-;	RunWait %comspec% /C "%ServerDistPath%%CommonScriptsCmdSubpath%",,Min UseErrorLevel
-;    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-;} Else {
-;    SetLastRowStatus()
-;}
+tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
+AddLog("Обновление настроек TeamViewer 5", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
+RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
+SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
 If (FileExist("c:\squid\sbin\squid.exe")) {
     FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
@@ -417,9 +394,6 @@ If (FileExist("c:\squid\sbin\squid.exe")) {
 	netexe := findexe("net.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
 	SetLastRowStatus("Остановка", 0)
 	RunWait "%netexe%" stop squid,,Min UseErrorLevel
-	;SetLastRowStatus("Удаление кэша", 0)
-	;FileRemoveDir D:\squid\var\cache, 1
-	;FileCreateDir D:\squid\var\cache
 	SetLastRowStatus("Обновление", 0)
 	squidDistArcPath := squidDistArc.Path
 	SplitPath squidDistArcPath,,squidDistDir
@@ -511,7 +485,7 @@ If (A_AhkVersion < AkhMinVer && A_IsAdmin) {
 } Else {
     SetLastRowStatus()
 }
-AddLog("Готово",A_Now,1)
+AddLog("Готово", A_Now, 1)
 Sleep 300000
 ExitApp
 
