@@ -39,6 +39,7 @@ SET "verFile=%~dpn0_dist_ver.txt"
 	    )
 	)
 	IF DEFINED runUpdate (
+	    SET "RunInteractiveInstalls=0"
 	    CALL "%updateInstallScript%"
 	    EXIT /B
 	)

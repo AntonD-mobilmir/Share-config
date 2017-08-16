@@ -52,7 +52,7 @@ DEL "D:\1S\Rarus\MailLoader\POPTrace.txt"
 CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || %ErrorCmd%
 rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || %ErrorCmd%
 rem /NP не использовать, т.к. файл настроек шифруется от имени пользователя, запустившего getmail.cmd
-CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% || %ErrorCmd%
+IF NOT "%RunInteractiveInstalls%"=="0" CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% || %ErrorCmd%
 
 CALL "D:\1S\Rarus\MailLoader\genGpgKeyring.cmd" || IF ERRORLEVEL 2 %ErrorCmd%
 
