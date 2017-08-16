@@ -9,7 +9,7 @@ FileEncoding UTF-8
 ;to update separately signed script:
 ;    scriptUpdater.ahk destFullPath URL [CheckPeriod]
 ;to update common script:
-;    scriptUpdater.ahk destMask [CheckPeriod] [ScriptsMask [CheckPeriod] …]
+;    scriptUpdater.ahk destMask [CheckPeriod] [destMask [CheckPeriod] …]
 
 ; Ссылки на подпапки в dropbox непредсказуемы (обычный путь не допишешь), поэтому выкладывать папку / делать к ней доступ нет смысла
 ; вместо этого, если URL не указан, скрипт должен быть в архиве https://www.dropbox.com/s/an5nvf0hrofva7r/ScriptUpdater.7z.gpg?dl=1
@@ -34,9 +34,8 @@ If (StartsWith(clURL, "http")) {
     checkPeriod = %3%
     destPath = %1%
     ExitApp UpdateScript(destPath, checkPeriod, clURL)
-    ;URL, gpgFName
 } Else {
-    nexti=
+    checkPeriod=
     Loop %0%
     {
 	If (checkPeriod) { ; on prev loop, current arg was the checkPeriod
@@ -45,9 +44,8 @@ If (StartsWith(clURL, "http")) {
 	}
 	
 	nexti := A_Index+1
-	checkPeriod := %nexti%
-	If checkPeriod is not Integer
-	    checkPeriod=
+	If checkPeriod is Integer
+	    checkPeriod := %nexti%
 	
 	Loop Files, % %A_Index%
 	    UpdateScript(A_LoopFileLongPath, checkPeriod, CommonScriptsURL, CommonGPGFName)
