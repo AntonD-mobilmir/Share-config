@@ -4,6 +4,7 @@ FileEncoding UTF-8
 MyPID:=DllCall("GetCurrentProcessId")
 SetRegView 32
 
+global ProgramFilesx86, LocalAppData, UserProfile
 EnvGet ProgramFilesx86,ProgramFiles(x86)
 IfNotExist %ProgramFilesx86%
     EnvGet ProgramFilesx86,ProgramFiles
@@ -14,61 +15,32 @@ If (!LocalAppData) {
     LocalAppData=%UserProfile%\Local Settings\Application Data
 }
 
-ScriptTitle=Скрипт проверки запуска DOL2
-logfname=%A_ScriptFullPath%.log
-logSizeLimit := 1024*1024 ; bytes
-DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
-DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
-DOL2ReqdBaseDir=%A_ScriptDir%\DOL2
-DOL2BinDir=%LocalAppData%\Apps\2.0
-DOL2Navexe=DOLNavigator.exe
-DOL2NavErrTitle = On Line Dealer ahk_class #32770
-startDelay := 1000 ; пауза после запуска URL. Удваивается после каждого запуска.
-unkCount := 3 ; сколько раз можно обнаружить неизвестное окно, прежде чем сообщать
-MaxMailtoTextLength := 1024
-DOL2WinWaitTimeout = 300 ; s
+ScriptTitle		 = Скрипт проверки запуска DOL2
+logfname		 = %A_ScriptFullPath%.log
+logSizeLimit		:= 1024*1024 ; bytes
+DOL2SettingsRegRoot	 = HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
+DOL2SettingsKey		 = %DOL2SettingsRegRoot%\Contract\Dirs
+DOL2ReqdBaseDir		 = %A_ScriptDir%\DOL2
+DOL2BinDir		 = %LocalAppData%\Apps\2.0
+DOL2Navexe		 = DOLNavigator.exe
+DOL2NavErrTitle		 = On Line Dealer ahk_class #32770
+addInteractDelay	:= 1000 ; пауза после запуска URL = N запуска * addInteractDelay
+unkCount		:= 3	; сколько раз должно быть обнаружено неизвестное окно, прежде чем сообщать
+MaxMailtoTextLength	:= 1024
+DOL2WinWaitTimeout	:= 300	; s
 
+EnvGet configDir, configDir
+If (!configDir)
+    configDir := getDefaultConfigDir()
+;"https://www.dropbox.com/sh/v0c4jw6n26p259u/AAC8w2B9ksXnKdqcoc_RZmURa/dealer.beeline.ru/beeline%20DOL2.gpg?dl=1"
+scriptUpdateAhk := configDir "\_Scripts\scriptUpdater.ahk"
+If(FileExist(scriptUpdateAhk))
+    Run "%A_AhkPath%" "%scriptUpdateAhk%" "%A_ScriptFullPath%",,UseErrorLevel
+
+; logrotate
 FileGetSize logSize, %logfname%
 If (logSize>logSizeLimit)
     FileMove %logfname%, %logfname%.bak, 1
-
-; подготовка
-
-; список окон для наблюдения
-; [[exe, заголовок окна, текст в окне, требуемое действие], […], …]
-; 	требуемое действие:
-;		-1 – показать сообщение об ошибке и открыть окно для регистрации заявки для службы ИТ
-;		 0 – всё ок, завершить скрипт
-;	 	 1 – выбор папки
-;		 2 – нажать OK, запустить FSACL_DOL2.cmd, перезапустить DOL2
-; 		 3 – нажать Нет
-;		 4 – подождать и проверить снова
-;		 5 – дождаться закрытия
-;		 6 – &Установить
-;		 7 - OK, удалить
-;		 8 - Отмена
-AutoResponces := [["rundll32.exe", "Оповещение системы безопасности Windows", "Отмена", 8]
-    ,[DOL2Navexe, "On Line Dealer", "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы", 2]
-    ,[DOL2Navexe, "Обзор папок", "Выберите папку для хранения данных приложения DOL:", 1]
-    ,[DOL2Navexe, "Установка DOL ahk_class #32770", "Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?", 3]
-    ,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации", -1]
-    ,[DOL2Navexe, DOL2NavErrTitle, "Обновление базы данных прошло с ошибкой. Приложение не будет запущено!" , -1]
-    ,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора.", -1]
-    ,[DOL2Navexe, DOL2NavErrTitle, "Отказано в доступе по пути" , -1]
-    ,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Параметры соединения" , 8]
-    ,["dfsvc.exe", "Невозможно запустить приложение", "Запуск приложения невозможен. Обратитесь к поставщику приложения." , 2]
-    ,["dfsvc.exe", "Невозможно запустить приложение", "Невозможно запустить приложение. Обратитесь за помощью к поставщику приложения." , 2]
-    ,["dfsvc.exe", "Cannot Start Application", "Application cannot be started. Contact the application vendor." , 2]
-    ,["dfsvc.exe", "Невозможно запустить приложение", "Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.", -1]
-    ,["dfsvc.exe", "Установка приложения - Предупреждение о безопасности", "SIGNER CLIENT DOL" , 6] ; предложение установить
-    ,["dfsvc.exe", "Невозможно запустить приложение", "Приложение DOL уже установлено из другого расположения. Удалите DOL." , 7] ; требование удалить
-    ,["dfsvc.exe", "(", "Установка DOL", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
-    ,["dfsvc.exe", "(100%) Установка DOL", "", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
-    ,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Вести журнал" , 0] ; #INC-5766
-    ,[DOL2Navexe, "Навигатор", "menuMain", 0] ; окно DOL2 уже появилось, но ещё не заполнено
-    ,[DOL2Navexe, "Выполнение задач", "", 0] ; если стоит галочка "выполнять при запуске"
-    ,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
-    ,[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]]
 
 ;если окно DOL2 обнаружено, оно просто будет активировано, а запуск выполняться не будет
 If (WinExist("ahk_exe " . DOL2Navexe)) {
@@ -78,28 +50,17 @@ If (WinExist("ahk_exe " . DOL2Navexe)) {
     ExitApp
 }
 
-If (!InStr(FileExist(DOL2BinDir), "D")) {
+If (!InStr(FileExist(DOL2BinDir), "D")) { ; если папки BIN ещё нет, создать и настроить доступ
     FileCreateDir %DOL2BinDir%
     run_FSACL_DOL2_cmd()
-}
-
-GroupAdd DOL2AnyRelatedWindow, ahk_exe %DOL2Navexe%
-For i,v in AutoResponces {
-    If (v[1] != DOL2Navexe)
-	GroupAdd DOL2AnyRelatedWindow, % v[2] " ahk_exe " v[1], % v[3]
-    If (v[4] == 0)
-	GroupAdd DOL2RunningFine, % v[2] " ahk_exe " v[1], % v[3]
-    Else
-	GroupAdd DOL2Queries, % v[2] " ahk_exe " v[1], % v[3]
 }
 
 If (!CrystalReportsInstalled())
     ShowError("CrystalReports не установлен", "Без CrystalReports не будет работать печать договоров.")
 
 ; проверка выбранной корневой папки
+; // Loop Reg, %DOL2SettingsKey% -- исходное ошибочное предположение. Вообще-то DOL2 использует только одно значение – RootDir.
 RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
-; исходное ошибочное предположение. Вообще-то DOL2 использует только одно значение – RootDir. -- Loop Reg, %DOL2SettingsKey%
-
 If (ErrorLevel) {
     ;RootDir не указан = DOL2 ещё не запускался
     FileAppend %A_Now%: У пользователя %A_UserName% настроек в реестре нет`n, %logfname%
@@ -112,9 +73,7 @@ If (ErrorLevel) {
     
     If (!WinExist(DOL2ReqdBaseDir . "DATA\DB.mdb")) {
 	; распаковка DOL2.template.7z → DOL2\
-	If (!exe7z){
-	    If (!configDir)
-		configDir := getDefaultConfigDir()
+	If (!exe7z) {
 	    tempFile=%A_Temp%\%A_ScriptName%.exe7zpath.tmp
 	    FileAppend %A_Now% exe7z=, %logfname%
 	    RunWait %comspec% /C ""%A_AhkPath%" /ErrorStdOut "%configDir%\_Scripts\Lib\find7zexe.ahk" > "%tempFile%"",%A_Temp%,Min
@@ -150,12 +109,14 @@ If (ErrorLevel) {
     
     RegRead dol2master, %DOL2SettingsRegRoot%\System, Master
     If (dol2master) {
-	FileAppend %A_Now% было [%DOL2SettingsRegRoot%\System]: Master=%dol2master% (исправлено), %logfname%
 	RegWrite REG_DWORD, %DOL2SettingsRegRoot%\System, Master, 0
+	FileAppend %A_Now% было [%DOL2SettingsRegRoot%\System]: Master=%dol2master% (исправлено), %logfname%
     }
 }
 
 ; начальные проверки закончены, можно запускать
+PrepareGroups()
+
 Loop
 {
     If (!(started || WinExist("ahk_group DOL2AnyRelatedWindow"))) {
@@ -163,8 +124,7 @@ Loop
 	started:=1
 	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидание появления окна (обычно до двух минут)
 	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
-	Sleep startDelay
-	startDelay:=startDelay<<1 ; задержка удваивается при каждом запуске
+	Sleep curInteractDelay+=addInteractDelay ; задержка увеличивается после каждого запуска
     }
     
     WinWait ahk_group DOL2AnyRelatedWindow,,%DOL2WinWaitTimeout%
@@ -189,19 +149,19 @@ Loop
 	    ;action := v[4]
 	    If (exeName = v[1] && StartsWith(fullTitle, v[2]) && InStr(fullText, v[3])) {
 		a:=v[4]
-		If (a=0) {
+		If (a=-1) {    ;		-1 – показать сообщение об ошибке и открыть окно для регистрации заявки для службы ИТ
+		    ShowError("Обнаружено окно " . exeName . " с ошибкой: " . fullTitle . "`n" . fullText)
+		    ExitApp
+		} Else If (a=0) {    ;		 0 – всё ок, завершить скрипт
 		    If (A_Index==1 || A_TickCount < timeoutSuccess) { ; если всё запустилось с первого раза или главое окно DOL Navigator уже обнаруживалось недавно, всё ok
 			;FileSetAttrib +H, %A_Programs%\Vimpelcom, 2
 			FileRemoveDir %A_Programs%\Vimpelcom
 			ExitApp
 		    } Else { ; иначе стоит подождать и проверить ещё раз, особенно при перезапуске – бывает, появляется окно об ошибке запуска DOLKernel.exe (#SR-5979)
-			Sleep startDelay
-			timeoutSuccess := A_TickCount + startDelay + 100
+			Sleep curInteractDelay
+			timeoutSuccess := A_TickCount + curInteractDelay + 100
 		    }
-		} Else If (a=-1) {
-		    ShowError("Обнаружено окно " . exeName . " с ошибкой: " . fullTitle . "`n" . fullText)
-		    ExitApp
-		} Else If (a=1) {
+		} Else If (a=1) {    ;	 	 1 – выбор папки
 		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle%
 		    WinWaitClose
 		    Progress Off
@@ -220,7 +180,7 @@ Loop
 			ShowError("Выбрана папка """ . dol2regRootDir . """", "Вы отменили выбор или выбрали не ту папку.")
 			ExitApp
 		    }
-		} Else If (a=2) {
+		} Else If (a=2) {    ;		 2 – нажать OK, запустить FSACL_DOL2.cmd, перезапустить DOL2
 		    Loop
 		    {
 			If (A_Index==1) { ; иногда нажатие OK не помогает
@@ -238,24 +198,24 @@ Loop
 		    } Until !ErrorLevel
 		    run_FSACL_DOL2_cmd()
 		    started := 0
-		} Else If (a=3) {
+		} Else If (a=3) {    ; 		 3 – нажать Нет
 		    ControlClick &Нет
 		    ControlClick Button2
-		} Else If (a=4) {
+		} Else If (a=4) {    ;		 4 – подождать и проверить снова
 		    Sleep 500
-		} Else If (a=5) {
+		} Else If (a=5) {    ;		 5 – дождаться закрытия
 		    SplashTextOn 450, 150, %ScriptTitle%, Ожидание закрытия окна`n[%fullTitle%]`n%winText%
 		    WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
 		    WinWaitClose
 		    SplashTextOff
-		} Else If (a=6) {
+		} Else If (a=6) {    ;		 6 – &Установить
 		    If (!UninstallDOL2(started)) { ; что-то таки было удалено → окно установки было закрыто
 			ControlClick &Установить
 		    }
-		} Else If (a=7) {
+		} Else If (a=7) {    ;		 7 - OK, удалить
 		    ControlClick &OK
 		    UninstallDOL2(started)
-		} Else If (a=8) {
+		} Else If (a=8) {    ;		 8 - Отмена
 		    ControlClick Отмена
 		}
 		break
@@ -272,6 +232,62 @@ Loop
 }
 ShowError("Выполнение цикла мониторинга прекратилось", "В скрипте запуска DOL2 есть ошибка")
 ExitApp
+
+PrepareGroups() {
+    global AutoResponces,DOL2Navexe
+    If (!AutoResponces)
+	FillInDefaultAutoResponces()
+    GroupAdd DOL2AnyRelatedWindow, ahk_exe %DOL2Navexe%
+    For i,v in AutoResponces {
+	If (v[1] != DOL2Navexe)
+	    GroupAdd DOL2AnyRelatedWindow, % v[2] " ahk_exe " v[1], % v[3]
+	If (v[4] == 0)
+	    GroupAdd DOL2RunningFine, % v[2] " ahk_exe " v[1], % v[3]
+	Else
+	    GroupAdd DOL2Queries, % v[2] " ahk_exe " v[1], % v[3]
+    }
+}
+
+FillInDefaultAutoResponces() {
+    global
+    ; список окон для наблюдения
+    ; [[exe, заголовок окна, текст в окне, требуемое действие], […], …]
+    ; 	требуемое действие:
+    ;		-1 – показать сообщение об ошибке и открыть окно для регистрации заявки для службы ИТ
+    ;		 0 – всё ок, завершить скрипт
+    ;	 	 1 – выбор папки
+    ;		 2 – нажать OK, запустить FSACL_DOL2.cmd, перезапустить DOL2
+    ; 		 3 – нажать Нет
+    ;		 4 – подождать и проверить снова
+    ;		 5 – дождаться закрытия
+    ;		 6 – &Установить
+    ;		 7 - OK, удалить
+    ;		 8 - Отмена
+    AutoResponces := [["rundll32.exe", "Оповещение системы безопасности Windows", "Отмена", 8]
+	,[DOL2Navexe, "On Line Dealer", "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось запустить модуль Ядра системы", 2]
+	,[DOL2Navexe, "Обзор папок", "Выберите папку для хранения данных приложения DOL:", 1]
+	,[DOL2Navexe, "Установка DOL ahk_class #32770", "Этот компьютер будет использоваться для установки с него клиентского приложения DOL и обновлений на другие компьютеры в локальной сети?", 3]
+	,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Не удалось определить значение ключа 'LogMask' в таблице конфигурации", -1]
+	,[DOL2Navexe, DOL2NavErrTitle, "Обновление базы данных прошло с ошибкой. Приложение не будет запущено!" , -1]
+	,[DOL2Navexe, DOL2NavErrTitle, "Не удалось соединиться с Ядром системы (localhost:2000). Ожидание закончилось вследствие освобождения семафора.", -1]
+	,[DOL2Navexe, DOL2NavErrTitle, "Отказано в доступе по пути" , -1]
+	,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Параметры соединения" , 8]
+	,["dfsvc.exe", "Невозможно запустить приложение", "Запуск приложения невозможен. Обратитесь к поставщику приложения." , 2]
+	,["dfsvc.exe", "Невозможно запустить приложение", "Невозможно запустить приложение. Обратитесь за помощью к поставщику приложения." , 2]
+	,["dfsvc.exe", "Cannot Start Application", "Application cannot be started. Contact the application vendor." , 2]
+	,["dfsvc.exe", "Невозможно запустить приложение", "Скачивание приложения не выполнено. Проверьте сетевое подключение или обратитесь к системному администратору или поставщику сетевых услуг.", -1]
+	,["dfsvc.exe", "Установка приложения - Предупреждение о безопасности", "SIGNER CLIENT DOL" , 6] ; предложение установить
+	,["dfsvc.exe", "Невозможно запустить приложение", "Приложение DOL уже установлено из другого расположения. Удалите DOL." , 7] ; требование удалить
+	,["dfsvc.exe", "(", "Установка DOL", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
+	,["dfsvc.exe", "(100%) Установка DOL", "", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
+	,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Вести журнал" , 0] ; #INC-5766
+	,[DOL2Navexe, "Навигатор", "menuMain", 4] ; окно DOL2 уже появилось, но ещё не заполнено
+	,[DOL2Navexe, "DOL Навигатор", "menuMain", 4] ; #INC-6610
+	,[DOL2Navexe, "Выполнение задач", "", 0] ; если стоит галочка "выполнять при запуске"
+	,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
+	,[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
+	,[DOL2Navexe, "NativePopupMenu", "", 4]]
+}
 
 UninstallDOL2(ByRef started) {
     global DOL2BinDir, DOL2Navexe
@@ -307,7 +323,13 @@ UninstallDOL2(ByRef started) {
 }
 
 CrystalReportsInstalled() {
-    static RegViews := [32,64]
+    static RegViews:=[]
+    local bakRegView,i,RegView
+    If (!RegViews.GetCapacity()) {
+	RegViews := [32]
+	If (A_Is64bitOS)
+	    RegViews.Push(64)
+    }
     
     bakRegView := A_RegView
     For i,RegView in RegViews {
@@ -322,6 +344,7 @@ CrystalReportsInstalled() {
 }
 
 RegCheck(key, valuesToCheck) {
+    local name, contents
     For name, contents in valuesToCheck {
 	RegRead v, %key%, %name%
 	If (!(v ~= contents))
@@ -356,34 +379,40 @@ run_FSACL_DOL2_cmd() {
 }
 
 ;getDefaultConfig.ahk
-getDefaultConfig() {
-    defaultConfig := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd", "DefaultsSource")
-    If (!defaultConfig) {
-	EnvGet SystemDrive, SystemDrive
-	defaultConfig := ReadSetVarFromBatchFile(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd", "DefaultsSource")
-    }
-    return defaultConfig
-}
-
-getDefaultConfigFileName() {
-    defaultConfig := getDefaultConfig()
-    SplitPath defaultConfig, OutFileName
+getDefaultConfigFileName(defCfg := -1) {
+    If (defCfg==-1)
+	defCfg := getDefaultConfig()
+    SplitPath defCfg, OutFileName
     return OutFileName
 }
 
-getDefaultConfigDir() {
-    defaultConfig := getDefaultConfig()
-    SplitPath defaultConfig,,OutDir
+getDefaultConfigDir(defCfg := -1) {
+    If (defCfg==-1)
+	defCfg := getDefaultConfig()
+    SplitPath defCfg,,OutDir
     return OutDir
+}
+
+getDefaultConfig(path := -1) {
+    If (path == -1) {
+	Try {
+	    return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
+	}
+	EnvGet SystemDrive, SystemDrive
+	return getDefaultConfig(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd")
+    } Else {
+	return ReadSetVarFromBatchFile(path, "DefaultsSource")
+    }
 }
 
 ;ReadSetVarFromBatchFile.ahk
 ReadSetVarFromBatchFile(filename, varname) {
+    local m, mName, mValue
     Loop Read, %filename%
     {
-	If (mpos := RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", match)) {
-	    If (Trim(Trim(matchName), """") = varname) {
-		return Trim(Trim(matchValue), """")
+	If (RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
+	    If (Trim(Trim(mName), """") = varname) {
+		return Trim(Trim(mValue), """")
 	    }
 	}
     }
@@ -391,8 +420,9 @@ ReadSetVarFromBatchFile(filename, varname) {
 
 ;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/
 ; modified from jackieku's code (http://www.autohotkey.com/forum/post-310959.html#310959)
-UriEncode(Uri, Enc = "UTF-8")
-{
+UriEncode(Uri, Enc = "UTF-8") {
+    local Res, f, Code
+    Res := ""
 	StrPutVar(Uri, Var, Enc)
 	f := A_FormatInteger
 	SetFormat, IntegerFast, H
@@ -412,8 +442,8 @@ UriEncode(Uri, Enc = "UTF-8")
 	Return, Res
 }
 
-UriDecode(Uri, Enc = "UTF-8")
-{
+UriDecode(Uri, Enc = "UTF-8") {
+    local Pos, Code
 	Pos := 1
 	Loop
 	{
@@ -429,8 +459,8 @@ UriDecode(Uri, Enc = "UTF-8")
 	Return, Uri
 }
 
-StrPutVar(Str, ByRef Var, Enc = "")
-{
+StrPutVar(Str, ByRef Var, Enc = "") {
+    local Len
 	Len := StrPut(Str, Enc) * (Enc = "UTF-16" || Enc = "CP1200" ? 2 : 1)
 	VarSetCapacity(Var, Len, 0)
 	Return, StrPut(Str, &Var, Enc)
