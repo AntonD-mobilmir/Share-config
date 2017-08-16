@@ -60,6 +60,7 @@ SET "verFile=%~dpn0_dist_ver.txt"
     ECHO %DATE% %TIME% Запуск popclient.exe, см. лог в POPTrace.txt
     ECHO %DATE% %TIME%>>"%~dp0POPTrace.txt"
     rem start нужен, чтобы cmd.exe не задавал глупый вопрос, прервать ли выполнение пакетного файла, когда popclient.exe будет убит
+    CIPHER /E "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\config-localhost.xml"
     START "" /B /WAIT %popclientexe% -configfile "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\config-localhost.xml"
 )
 IF EXIST "%RecvDir%\*.txt" (

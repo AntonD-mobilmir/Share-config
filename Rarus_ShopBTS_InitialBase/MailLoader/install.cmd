@@ -51,7 +51,8 @@ DEL "D:\1S\Rarus\MailLoader\POPTrace.txt"
 
 CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || %ErrorCmd%
 rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || %ErrorCmd%
-CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% /NP || %ErrorCmd%
+rem /NP не использовать, т.к. файл настроек шифруется от имени пользователя, запустившего getmail.cmd
+CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% || %ErrorCmd%
 
 CALL "D:\1S\Rarus\MailLoader\genGpgKeyring.cmd" || IF ERRORLEVEL 2 %ErrorCmd%
 
@@ -63,9 +64,10 @@ EXIT /B
 )
 :SchTask <xml>
 (
-rem %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~n1" /F
-ECHO.|%System32%\SCHTASKS.exe /Create /F /TN "mobilmir.ru\%~n1" /XML %* || EXIT /B
-%System32%\SCHTASKS.exe /Run /TN "mobilmir.ru\%~n1"
+rem rem %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~n1" /F
+rem ECHO.|%System32%\SCHTASKS.exe /Create /F /TN "mobilmir.ru\%~n1" /XML %* || EXIT /B
+rem %System32%\SCHTASKS.exe /Run /TN "mobilmir.ru\%~n1"
+START "Добавлене задачи %~n1 в планировщик" %comspec% /C ""%~dp0SchTasks-Add.cmd" %*"
 EXIT /B
 )
 :GetDir
