@@ -1,7 +1,7 @@
 ﻿;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/
 ; modified from jackieku's code (http://www.autohotkey.com/forum/post-310959.html#310959)
-UriEncode(Uri, Enc = "UTF-8")
-{
+UriEncode(Uri, Enc = "UTF-8") {
+    Res := ""
 	StrPutVar(Uri, Var, Enc)
 	f := A_FormatInteger
 	SetFormat, IntegerFast, H
@@ -21,8 +21,7 @@ UriEncode(Uri, Enc = "UTF-8")
 	Return, Res
 }
 
-UriDecode(Uri, Enc = "UTF-8")
-{
+UriDecode(Uri, Enc = "UTF-8") {
 	Pos := 1
 	Loop
 	{
@@ -38,8 +37,7 @@ UriDecode(Uri, Enc = "UTF-8")
 	Return, Uri
 }
 
-StrPutVar(Str, ByRef Var, Enc = "")
-{
+StrPutVar(Str, ByRef Var, Enc = "") {
 	Len := StrPut(Str, Enc) * (Enc = "UTF-16" || Enc = "CP1200" ? 2 : 1)
 	VarSetCapacity(Var, Len, 0)
 	Return, StrPut(Str, &Var, Enc)
