@@ -205,7 +205,7 @@ CALL :ensureRsyncReady
 ECHO Waiting for PreInstalled to be copied...
 )
 (
-(%comspec% /C ""%configDir%_Scripts\rSync_DistributivesFromSrv0.cmd" "D:\Distributives\Soft\PreInstalled"") && GOTO :distSysUtilsUpdated
+( %comspec% /C ""%configDir%_Scripts\rSync_DistributivesFromSrv0.cmd" "D:\Distributives\Soft\PreInstalled"" ) && GOTO :distSysUtilsUpdated
 XCOPY "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled" "D:\Distributives\Soft\PreInstalled" /D /E /C /I /H /K /Y && GOTO :distSysUtilsUpdated
 EXIT /B 32767
 )
