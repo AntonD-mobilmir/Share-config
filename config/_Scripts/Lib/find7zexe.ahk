@@ -13,7 +13,6 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 }
 
 find7zexe(exename="7z.exe", paths*) {
-    local fullpath
     ;key, value, flag "this is path to exe (only use directory)"
     regPaths := [["HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command",,1]
 		,["HKEY_CURRENT_USER\Software\7-Zip", "Path"]
@@ -55,7 +54,6 @@ find7zexe(exename="7z.exe", paths*) {
 }
 
 Check7zDir(exename,dir7z) {
-    local exe7z
     If(SubStr(dir7z,0)=="\")
 	dir7z:=SubStr(dir7z,1,-1)
     If (!FileExist(exe7z := dir7z "\" exename))
