@@ -301,12 +301,13 @@ SendEmail() {
 	}
 	FileAppend,
 	(LTrim
-	    loan-agreements@status.mobilmir.ru
+	    loan-agreements_status-mobilmir-ru@googlegroups.com
 	    Reply-To: %replyTo%
 	    %laNum% {сканы договоров отправлены скриптом с компьютера %A_ComputerName% отдела %MailUserId%}
 	    Список файлов:
 	    %filesList%
 	),%outMsgPath%.tmp, UTF-8
+	;старое Кому: loan-agreements@status.mobilmir.ru
 	FileMove %outMsgPath%.tmp, %outMsgPath%.txt, 1
 	exitOK := 1
 	TrayTip %mainTitle%, Сформировано письмо с %itmc% файлами. Будет отправлено через стандатный механизм отправки уведомлений 1С-Рарус.
