@@ -4,7 +4,7 @@ FileEncoding UTF-8
 MyPID:=DllCall("GetCurrentProcessId")
 SetRegView 32
 
-global ProgramFilesx86, LocalAppData, UserProfile
+global ProgramFilesx86, LocalAppData
 EnvGet ProgramFilesx86,ProgramFiles(x86)
 IfNotExist %ProgramFilesx86%
     EnvGet ProgramFilesx86,ProgramFiles
@@ -28,6 +28,9 @@ addInteractDelay	:= 1000 ; пауза после запуска URL = N запу
 unkCount		:= 3	; сколько раз должно быть обнаружено неизвестное окно, прежде чем сообщать
 MaxMailtoTextLength	:= 1024
 DOL2WinWaitTimeout	:= 300	; s
+
+FileGetTime ScriptVer, %A_ScriptFullPath%
+FormatTime ScriptVer, %ScriptVer%, yyyy-MM-dd HH:mm:ss
 
 EnvGet configDir, configDir
 If (!configDir)
@@ -67,7 +70,7 @@ If (ErrorLevel) {
     Run http://l.mobilmir.ru/DOL2FirstRun
     ;RegWrite REG_SZ, %DOL2SettingsKey%, RootDir, %DOL2ReqdBaseDir%
     RegWrite REG_DWORD, %DOL2SettingsRegRoot%\System, Master, 0
-    MsgBox 0x41, %ScriptTitle%, Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
+    MsgBox 0x41, %ScriptTitle% (вер. %ScriptVer%), Вы запускаете DOL2 первый раз. Должна была открыться инструкция по настройке DOL2 при первом запуске`, если этого не произошло`, перейдите по ссылке: http://l.mobilmir.ru/DOL2FirstRun`n`nЕсли DOL2 не настроить по инструкции`, он может не работать нормально`, а договоры могут теряться.
     IfMsgBox Cancel
 	ExitApp
     
@@ -122,8 +125,8 @@ Loop
     If (!(started || WinExist("ahk_group DOL2AnyRelatedWindow"))) {
 	Run "%ProgramFilesx86%\Internet Explorer\iexplore.exe" https://dealer.beeline.ru/dealer/DOL2/DOL.application
 	started:=1
-	SplashTextOn 250, 50, %ScriptTitle%, DOL2 запущен`, ожидание появления окна (обычно до двух минут)
-	WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
+	SplashTextOn 250, 50, %ScriptTitle% (вер. %ScriptVer%), DOL2 запущен`, ожидание появления окна (обычно до двух минут)
+	WinSet AlwaysOnTop, Off, %ScriptTitle% (вер. %ScriptVer%) ahk_pid %MyPID%
 	Sleep curInteractDelay+=addInteractDelay ; задержка увеличивается после каждого запуска
     }
     
@@ -162,7 +165,7 @@ Loop
 			timeoutSuccess := A_TickCount + curInteractDelay + 100
 		    }
 		} Else If (a=1) {    ;	 	 1 – выбор папки
-		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle%
+		    Progress A M ZH0, %DOL2ReqdBaseDir%,В окне «Обзор папок» выберите папку,%ScriptTitle% (вер. %ScriptVer%)
 		    WinWaitClose
 		    Progress Off
 		    
@@ -204,8 +207,8 @@ Loop
 		} Else If (a=4) {    ;		 4 – подождать и проверить снова
 		    Sleep 500
 		} Else If (a=5) {    ;		 5 – дождаться закрытия
-		    SplashTextOn 450, 150, %ScriptTitle%, Ожидание закрытия окна`n[%fullTitle%]`n%winText%
-		    WinSet AlwaysOnTop, Off, %ScriptTitle% ahk_pid %MyPID%
+		    SplashTextOn 450, 150, %ScriptTitle% (вер. %ScriptVer%), Ожидание закрытия окна`n[%fullTitle%]`n%winText%
+		    WinSet AlwaysOnTop, Off, %ScriptTitle% (вер. %ScriptVer%) ahk_pid %MyPID%
 		    WinWaitClose
 		    SplashTextOff
 		} Else If (a=6) {    ;		 6 – &Установить
@@ -358,15 +361,16 @@ StartsWith(ByRef long, ByRef short) {
 }
 
 ShowError(txt, explain:="", title:="") {
-    global ScriptTitle, logfname, MaxMailtoTextLength
+    global ScriptTitle, ScriptVer, logfname, MaxMailtoTextLength
     If (!title)
-	title:=ScriptTitle
+	title := ScriptTitle " (вер. " ScriptVer ")"
     FileAppend %A_Now%: %txt%`n, %logfname%
+    txtsuffix	:= "`n(скрипт версии " ScriptVer ")"
     
-    mailtxt	:= SubStr(txt . "`n`n" . explain, 1, MaxMailtoTextLength)
+    mailtxt	:= SubStr(txt . "`n`n" . explain, 1, MaxMailtoTextLength - StrLen(txtsuffix))
     textcrpos	:= InStr(mailtxt, "`n")
     mailTitle	:= SubStr(mailtxt, 1, textcrpos-1)
-    mailtxt	:= SubStr(mailtxt, textcrpos+1)
+    mailtxt	:= SubStr(mailtxt . txtsuffix, textcrpos+1)
     Run % "mailto:it-task@status.mobilmir.ru?subject=" . UriEncode("Ошибка при запуске DOL2 на \\" . A_ComputerName . ": " . mailTitle) . "&body=" . UriEncode(txt)
     MsgBox 0x1030, %title%, %txt%`n%explain%`nНезамедлительно сообщите в службу ИТ и не используйте DOL2 на этом компьютере до исправления.
 }
