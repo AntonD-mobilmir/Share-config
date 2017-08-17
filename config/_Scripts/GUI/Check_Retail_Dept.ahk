@@ -23,7 +23,9 @@ serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI
 ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 
 FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
-If (!RegexMatch(AhkDistVer, "(?P<DistVer>^\d+\.\d+\.\d+\.\d+)\t", Ahk))
+If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc)) {
+    AhkDistVer		:= Format("{:02u}.{:02u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
+} Else
     AhkDistVer		:= "1.1.26.01"
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
