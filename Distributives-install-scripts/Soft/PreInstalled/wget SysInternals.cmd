@@ -7,6 +7,6 @@ PUSHD c:\SysUtils\SysInternals\pstools-eulaed && (
 )
 
 PUSHD c:\SysUtils\SysInternals && (
-    FOR %%I IN (*.*) DO IF NOT EXIST "pstools-eulaed\%%~nxI" wget -N live.sysinternals.com/%%~nxI
+    FOR %%I IN (*.*) DO IF NOT EXIST "pstools-eulaed\%%~nxI" wget -N https://live.sysinternals.com/%%~nxI
     POPD
 )
