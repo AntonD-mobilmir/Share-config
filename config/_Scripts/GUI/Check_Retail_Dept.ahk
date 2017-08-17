@@ -21,7 +21,10 @@ scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\coll
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
-AkhMinVer		:= "1.1.26.00"
+
+FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
+If (!RegexMatch(AhkDistVer, "(?P<DistVer>^\d+\.\d+\.\d+\.\d+)\t", Ahk))
+    AhkDistVer		:= "1.1.26.01"
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
@@ -51,7 +54,8 @@ If (A_IsAdmin) {
 ;    }
 }
 
-AddLog(A_AhkPath, A_AhkVersion, A_AhkVersion >= AkhMinVer)
+runAhkUpdate := A_AhkVersion < AhkDistVer
+AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист. " AhkDistVer ")"), !runAhkUpdate)
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
 global DefaultConfigDir := chkDefConfigDir.path
@@ -240,8 +244,8 @@ If (gsussScript) {
 }
 Distributives := EnvGetAfterScript(gsussScript, "Distributives")
 SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
-If (!FileExist(Distributives . "\Soft\PreInstalled\utils\7za.exe")) {
-    Distributives:=ServerDistPath
+If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
+    Distributives := ServerDistPath
     AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
 }
 
@@ -349,12 +353,17 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
     If (IsObject(distSoftUpdScripts)) {
 	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
-	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",,Min UseErrorLevel
+	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",, Min UseErrorLevel
 	MsgBox SetupLocalDownloader.cmd finished
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
 If (!(gpgexist := FileExist("C:\SysUtils\gnupg")) || !(IsObject(softUpdScripts) && IsObject(distSoftUpdScripts))) { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
+    If (FileExist(Distributives "\rSync_DistributivesFromSrv0.cmd")) {
+	AddLog("rSync_DistributivesFromSrv0.cmd PreInstalled")
+	RunWait %comspec% /C ""%Distributives%\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
+	SetLastRowStatus(ErrorLevel, !ErrorLevel)
+    }
     CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="D")
 }
 ;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
@@ -455,7 +464,7 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
 
 finished := 1
 
-If (A_AhkVersion < AkhMinVer && A_IsAdmin) {
+If (runAhkUpdate && A_IsAdmin) {
     AddLog("Обновление AutoHotkey с Srv0.office0.mobilmir.")
     If (aclSetupLine) {
 	Loop
