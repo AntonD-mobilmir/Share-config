@@ -6,10 +6,11 @@ ExtFormsDir=d:\1S\Rarus\ShopBTS\ExtForms
 sendemailcfg=%ExtFormsDir%\post\sendemail.cfg
 configxml=%ExtFormsDir%\MailLoader\config-localhost.xml
 
-If (FileExist(configxml)) {
+If (FileExist(configxml) && IsObject(FileOpen(configxml, "r"))) {
     FileAppend Файл уже существует: %configxml%`n,*, CP1
     ExitApp 1
 } Else {
+    FileMove %configxml%, %configxml%.%A_Now%, 1
     Loop Read, %sendemailcfg%
     {
 	If (A_Index==1)
