@@ -33,7 +33,7 @@ If (!LocalAppData)
 confDir := LocalAppData "\mobilmir.ru\" A_ScriptName
 FileCreateDir %confDir%
 
-If (!FileOpen(GNUPGHOME "\lock.tmp", "w")) { ; 
+If (!IsObject(FileOpen(GNUPGHOME "\lock.tmp", "w"))) { ; 
     FileCopyDir %GNUPGHOME%, %tempDir%\gnupg, 1
     GNUPGHOME = %tempDir%\gnupg
 }
