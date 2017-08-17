@@ -22,7 +22,12 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
     FOR %%I IN ("%~dp0..\Users\depts\?.7z") DO %exe7z% x -aoa -o"%%~nI:\" -- "%%~I"
     FOR /D %%I IN ("%~dp0..\Users\depts\?") DO IF EXIST "%%~nI:\*.*" XCOPY "%%~I\*.*" "%%~nI:\" /E /I /Q /G /H /R /K /O /Y /B /J
     
-    FOR %%A IN ("d:\Local_Scripts\ScriptUpdater\gnupg\secring.gpg") DO IF EXIST "%%~A" IF %%~zA GTR 0 (ECHO Keyring already exist) ELSE CALL "d:\Local_Scripts\ScriptUpdater\genGpgKeyring.cmd"
+    SET "GenKeyring="
+    FOR %%A IN ("d:\Local_Scripts\ScriptUpdater\gnupg\secring.gpg") DO (
+	IF NOT EXIST "%%~A" SET "GenKeyring=1"
+	IF %%~zA. EQU 0. SET "GenKeyring=1"
+    )
+    IF DEFINED GenKeyring CALL "d:\Local_Scripts\ScriptUpdater\genGpgKeyring.cmd"
     START "" /B %comspec% /C "d:\Local_Scripts\UpdateShortcuts.cmd"
 
     ECHO N|%SystemRoot%\System32\net.exe SHARE "Обмен" /Delete
@@ -32,10 +37,12 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 
     IF DEFINED HKUDStartup %exe7z% x -aoa -o"%HKUDStartup%\" -- "%~dp0..\Users\depts\startup.7z"
     IF DEFINED CommonDesktop (
-	REM Распаковка ярлыков на рабочий стол 
+	ECHO.|DEL /F "%CommonDesktop%\Exchange.lnk"
+	ECHO.|DEL /F "%CommonDesktop%\Ценники из выгрузок Рарус.lnk"
 	RD /S /Q "%CommonDesktop%\Дополнительные ярлыки"
 	RD /S /Q "%CommonDesktop%\Сервисы сторонних компаний"
 
+	REM Распаковка ярлыков на рабочий стол 
 	%exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts.7z"
 	IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_64bit.7z"
 	

@@ -17,8 +17,8 @@ IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 )
 (
-    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
-    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
+    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
+    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
     
     RD /S /Q "%~dp0Shortcuts" || CALL :SaveErrorLevel cleaning up old Shortcuts
     %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts.7z" || CALL :SaveErrorLevel unpacking Shortcuts.7z
@@ -28,7 +28,7 @@ rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe S
     FOR %%A IN ("%configDir%Users\depts\Shortcuts_64bit.7z") DO SET "Shortcuts_64bitTime=%%~tA"
     CALL :PostForm
 
-    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" "%~f0"
+    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%~f0"
     EXIT /B
 )
 :PostForm
