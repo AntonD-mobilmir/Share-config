@@ -30,7 +30,7 @@ MaxMailtoTextLength	:= 1024
 DOL2WinWaitTimeout	:= 300	; s
 
 FileGetTime ScriptVer, %A_ScriptFullPath%
-FormatTime ScriptVer, %ScriptVer%, yyyy-MM-dd HH:mm:ss
+FormatTime ScriptVer, %ScriptVer%, yyyy-MM-dd HH:mm
 
 EnvGet configDir, configDir
 If (!configDir)
@@ -38,7 +38,7 @@ If (!configDir)
 ;"https://www.dropbox.com/sh/v0c4jw6n26p259u/AAC8w2B9ksXnKdqcoc_RZmURa/dealer.beeline.ru/beeline%20DOL2.gpg?dl=1"
 scriptUpdateAhk := configDir "\_Scripts\scriptUpdater.ahk"
 If(FileExist(scriptUpdateAhk))
-    Run "%A_AhkPath%" "%scriptUpdateAhk%" "%A_ScriptFullPath%",,UseErrorLevel
+    Run "%A_AhkPath%" "%scriptUpdateAhk%" /ErrorStdOut "%A_ScriptFullPath%",,UseErrorLevel
 
 ; logrotate
 FileGetSize logSize, %logfname%
@@ -224,9 +224,9 @@ Loop
 		break
 	    }
 	}
-	If (!a && fullTitle) { ; если fullTitle пустой, окно ещё не нарисовалось; иначе, открылось неизвестное окно
+	If (a=="" && fullTitle) { ; если fullTitle пустой, окно ещё не нарисовалось; иначе, открылось неизвестное окно
 	    If (!unkCount--) {
-		ShowError("Обнаружено неизвестное окно " . exeName . ": " . fullTitle . "`n" . fullText, "Описания этого окна нет в скрипте запуска.")
+		ShowError("Обнаружено неизвестное окно """ . exeName . """: [" . fullTitle . "]`n" . fullText, "Описания этого окна нет в скрипте запуска.")
 		ExitApp
 	    }
 	    Sleep 1000 * unkCount
@@ -285,7 +285,7 @@ FillInDefaultAutoResponces() {
 	,["dfsvc.exe", "(100%) Установка DOL", "", 4] ; скачивание, заголовок окна: "(…%) Установка DOL"
 	,[DOL2Navexe, "Настройки Навигатора On Line Dealer", "Вести журнал" , 0] ; #INC-5766
 	,[DOL2Navexe, "Навигатор", "menuMain", 4] ; окно DOL2 уже появилось, но ещё не заполнено
-	,[DOL2Navexe, "DOL Навигатор", "menuMain", 4] ; #INC-6610
+	,[DOL2Navexe, "DOL Навигатор", "menuMain", 0] ; #INC-6610; почему 0: http://imgur.com/a/O2otQ
 	,[DOL2Navexe, "Выполнение задач", "", 0] ; если стоит галочка "выполнять при запуске"
 	,[DOL2Navexe, "On Line Dealer", "Закончить работу?", 0]
 	,[DOL2Navexe, "DOL Навигатор - (Дилер:", "", 0]
