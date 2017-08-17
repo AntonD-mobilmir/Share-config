@@ -18,6 +18,13 @@ IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 %AutohotkeyExe% /ErrorStdOut "%ConfigDir%_Scripts\scriptUpdater.ahk" >"%TEMP%\scriptUpdater.ahk.log" 2>&1
 %exe7z% x -y -o"D:\" "%TEMP%\scriptUpdater.ahk.tmp\ScriptUpdater.7z"
 
+SET "GenKeyring="
+FOR %%A IN ("%~dp0gnupg\secring.gpg") DO  (
+    IF NOT EXIST "%%~A" SET "GenKeyring=1"
+    IF %%~zA. EQU 0. SET "GenKeyring=1"
+)
+IF DEFINED GenKeyring CALL "%~dp0genGpgKeyring.cmd"
+
 CALL "%~dp0..\UpdateShortcuts.cmd"
 EXIT /B
 )

@@ -28,7 +28,7 @@ DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_O
 DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
 DOL2ReqdBaseDir=d:\dealer.beeline.ru\DOL2
 
-Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R30 w600 vLogListView, Операция|Статус
+Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R35 w600 vLogListView, Операция|Статус
 Gui Show
 
 OSVersionObj := RtlGetVersion()
@@ -145,12 +145,14 @@ If (AppXSupported && (A_UserName="Продавец" || A_UserName="Пользо�
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
-
 ;"C:\Program Files\KKMSuite\KKMWatcher.exe"
 ;"C:\Program Files (x86)\KKMSuite\KKMWatcher.exe"
+FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
+
 bakRegView:=A_RegView
-regViews := [32,64]
+regViews := [32]
+If (A_Is64bitOS)
+    regViews.Push(64)
 For i,regview in regViews {
     SetRegView %regview%
     HKLMRunKKMSuite=
@@ -268,7 +270,7 @@ locConfigUpdater := CheckPath(pathLocConfigUpdater,1,0)
 
 If (locConfigUpdater.mtime == srvConfigUpdater.mtime) {
     SetLastRowStatus("Актуальный")
-    runConfUpdScript:= locConfigUpdater
+    runConfUpdScript := locConfigUpdater
 } Else {
     SetLastRowStatus("Устаревший", 0)
     runConfUpdScript := srvConfigUpdater
@@ -296,7 +298,6 @@ instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", 
 If (IsObject(instCriacxocx)) {
     FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     timecriacxcab -= instCriacxocx.mtime, Days
-    ;LV_Modify(instCriacxocx.line,,"update_beeline_activex_and_desktop_shortcuts.ahk")
 }
 
 AddLog("Журналы скриптов обновления")
@@ -349,13 +350,16 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
 	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",,Min UseErrorLevel
+	MsgBox SetupLocalDownloader.cmd finished
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
-} Else { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
-    CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", SystemDrive . "\SysUtils", loopOptn:="D")
 }
+If (!(gpgexist := FileExist("C:\SysUtils\gnupg")) || !(IsObject(softUpdScripts) && IsObject(distSoftUpdScripts))) { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
+    CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="D")
+}
+;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
 
-RunFromConfigDir("Users\depts\update_beeline_activex_and_desktop_shortcuts.ahk", "Замена ярлыков на рабочем столе и стандартных файлов")
+RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 	
 If (IsObject(instCriacxocx)){
@@ -518,11 +522,13 @@ CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", 
     }
     
     If (!latestFlagTime || timeDiff > 5) { ; если архив на Srv0 новее всех файлов по маске больше, чем на 5 минут, – обновлять
-        SetLastRowStatus("Обновление…",0)
-        If (mtimelocal==mtimeSrv0)
+        If (mtimelocal==mtimeSrv0) {
+	    SetLastRowStatus("Обновление из " Distributives,0)
 	    RunWait %comspec% /C "%Distributives%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
-        Else
+        } Else {
+	    SetLastRowStatus("Обновление с " ServerDistPath,0)
 	    RunWait %comspec% /C "%ServerDistPath%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
+	}
         SetLastRowStatus(ErrorLevel,!ErrorLevel)
     } Else {
         SetLastRowStatus(TimeFormat(latestFlagTime), 1)
@@ -549,7 +555,7 @@ RunFromConfigDir(ByRef subPath, ByRef comment:="", ByRef interpreter:=0, ByRef s
 	l := AddLog(comment)
     Else
 	l := AddLog(AbbreviatePath(runScPath))
-    RunWait %interpreter% "%runScPath%",,Min UseErrorLevel
+    RunWait %interpreter% "%runScPath%", %A_Temp%, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     
     return l
