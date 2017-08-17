@@ -15,18 +15,34 @@ FileEncoding UTF-8
 ; вместо этого, если URL не указан, скрипт должен быть в архиве https://www.dropbox.com/s/an5nvf0hrofva7r/ScriptUpdater.7z.gpg?dl=1
 
 CommonScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" . (CommonGPGFName := "ScriptUpdater.7z.gpg") . "?dl=1"
-GNUPGHOME := (CfgDir := "D:\Local_Scripts\ScriptUpdater") . "\gnupg"
-EnvSet GNUPGHOME, %GNUPGHOME%
+GNUPGHOME = D:\Local_Scripts\ScriptUpdater\gnupg
 global childPID
+
+FileGetSize secringSize, %GNUPGHOME%\secring.gpg
+If (ErrorLevel || !secringSize)
+    Throw Exception("Secring not generated yet")
 
 timeout := 15 ; seconds
 tries := 15
 
 tempDir := A_Temp "\" A_ScriptName ".tmp"
 FileCreateDir %tempDir%
+EnvGet LocalAppData, LOCALAPPDATA
+If (!LocalAppData)
+    LocalAppData := A_AppData
+confDir := LocalAppData "\mobilmir.ru\" A_ScriptName
+FileCreateDir %confDir%
+
+If (!FileOpen(GNUPGHOME "\lock.tmp", "w")) { ; 
+    FileCopyDir %GNUPGHOME%, %tempDir%\gnupg, 1
+    GNUPGHOME = %tempDir%\gnupg
+}
+FileDelete GNUPGHOME "\lock.tmp"
+EnvSet GNUPGHOME, %GNUPGHOME%
 
 ; самообновление
-UpdateScript(A_ScriptFullPath, 48, CommonScriptsURL, CommonGPGFName)
+If (A_IsAdmin)
+    UpdateScript(A_ScriptFullPath, 48, CommonScriptsURL, CommonGPGFName)
 ;UpdateScript("D:\*", 48, CommonScriptsURL, CommonGPGFName)
 
 clURL = %2%
@@ -55,7 +71,7 @@ If (StartsWith(clURL, "http")) {
 ExitApp
 
 UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
-    global tempDir, GNUPGHOME, timeout, tries
+    global tempDir, confDir, GNUPGHOME, timeout, tries
     static curlexe := "", wgetexe := "", exe7z := ""
 	 , gpgexe  := findexe("gpg.exe", "c:\SysUtils\gnupg\pub")
 	 , nextMethod:=2
@@ -74,8 +90,8 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	verifiedFName := dstFName
     }
     
-    runLog = %tempDir%\%verifiedFName%.UpdateRunning.log
-    endLog = %tempDir%\%verifiedFName%.Update.log
+    runLog = %confDir%\%verifiedFName%.UpdateRunning.log
+    endLog = %confDir%\%verifiedFName%.Update.log
     
     FileGetTime ctime, %endLog%, C
     FileGetTime ctimeUpdRun, %runLog%, C
@@ -83,12 +99,14 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	ctime := ctimeUpdRun
     checkAge=
     checkAge -= ctime, Hours
-    If (checkAge > 0 && checkAge < checkPeriod)
-	return 2
+    If (checkAge >= 0 && checkAge < checkPeriod) {
+	FileAppend %A_Now% Last check %checkAge% hours ago`, min %checkPeriod% h needed`n, %runLog%
+	return 1
+    }
     FileGetSize runLogSize, %runLog%
     If (runLogSize > 1048576)
 	FileDelete %runLog%
-    FileAppend %A_Now% Downloading %URL% to update "%dstFullPath%"…`n, %runLog%
+    FileAppend %A_Now% Downloading %URL% to update "%dstFullPath%" due to last check %checkAge% hours ago…`n, %runLog%
     ;FileSetTime,, %endLog%, C
     
     Loop %tries% ; tries
@@ -98,11 +116,11 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	    If (curMethod==0) {
 		If (!curlexe)
 		    curlexe := findexe("curl.exe")
-		RunWait %curlexe% -qvfL --compressed -m %timeout% -b "%tempDir%\curl-cookies.txt" -c "%tempDir%\curl-cookies.txt" -z "%dstFullPath%" -o "%tempDir%\%gpgFName%" %URL%, %tempDir%, Hide, childPID
+		RunWait %curlexe% -qvfL --compressed -m %timeout% -b "%confDir%\curl-cookies.txt" -c "%confDir%\curl-cookies.txt" -z "%dstFullPath%" -o "%tempDir%\%gpgFName%" %URL%, %tempDir%, Hide, childPID
 	    } Else If (curMethod==1) {
 		If (!wgetexe)
 		    wgetexe := findexe("wget.exe")
-		RunWait %wgetexe% --no-config -d -T %timeout% --load-cookies="%tempDir%\wget-cookies.txt" --save-cookies="%tempDir%\wget-cookies.txt" -O "%tempDir%\%gpgFName%" %URL%, %tempDir%, Hide, childPID
+		RunWait %wgetexe% --no-config -d -T %timeout% --load-cookies="%confDir%\wget-cookies.txt" --save-cookies="%confDir%\wget-cookies.txt" -O "%tempDir%\%gpgFName%" %URL%, %tempDir%, Hide, childPID
 	    } Else If (curMethod==2) {
 		URLDownloadToFile %URL%, %tempDir%\%gpgFName%
 	    }
@@ -114,6 +132,7 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	}
 	
 	FileDelete %tempDir%\%verifiedFName%
+	; --never-lock unsupported
 	cmdlgpg = "%gpgexe%" --homedir "%GNUPGHOME%" --batch -o "%verifiedFName%" -d "%gpgFName%"
 	FileAppend %A_Now% > %cmdlgpg%`n, %runLog%
 	RunWait %comspec% /C "%cmdlgpg% 2>"%gpgFName%.log"", %tempDir%, Hide, childPID
