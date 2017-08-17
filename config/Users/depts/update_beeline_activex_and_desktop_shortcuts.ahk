@@ -7,40 +7,13 @@ global childPID
 OnExit("KillChild")
 
 FileGetTime origOcxDate, d:\dealer.beeline.ru\bin\criacx.ocx
+criacxinbin := !ErrorLevel
+
 FileDelete d:\Local_Scripts\beeline DOL2.cmd
 FileDelete d:\dealer.beeline.ru\criacx.cab
 
-criacxinbin := FileExist("D:\dealer.beeline.ru\bin\criacx.ocx")
-
 If (A_IsAdmin) {
-    ;Запущено с правами админстратора
-    pathSrvConfigUpdater:="\\Srv0.office0.mobilmir\profiles$\Share\config\update local config.cmd"
-    
-    If (!FileExist(pathSrvConfigUpdater)) {
-	Exit 4
-    }
-    
-    global DefaultConfigDir := getDefaultConfigDir()
-    
-    SplitPath pathSrvConfigUpdater, fnameConfigUpdater
-    pathLocConfigUpdater=%DefaultConfigDir%\%fnameConfigUpdater%
-    
-    FileGetTime srvConfigUpdaterMtime, %pathSrvConfigUpdater%
-    FileGetTime locConfigUpdaterMtime, %pathLocConfigUpdater%
-    
-    If (locConfigUpdaterMtime == srvConfigUpdaterMtime) {
-	runConfUpdScript:= pathLocConfigUpdater
-    } Else {
-	runConfUpdScript := pathSrvConfigUpdater
-    }
-    
-    ; Обновление локальной конфигурации
-    RunWait %comspec% /C "%runConfUpdScript%",,Min UseErrorLevel, childPID
-    
-    ; Замена ярлыков и распаковка D:\dealer.beeline.ru
-    FileDelete %A_DesktopCommon%\Exchange.lnk
-    FileDelete %A_DesktopCommon%\Ценники из выгрузок Рарус.lnk
-    RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", %DefaultConfigDir%\_Scripts, Min UseErrorLevel, childPID
+    MsgBox Используйте Check_Retail_Dept.ahk!
 } Else {
     ; Запущено из под пользователя без прав администратора
     ; config обновить не получится
@@ -55,13 +28,13 @@ If (A_IsAdmin) {
     If (!criacxinbin) {
 	Run http://l.mobilmir.ru/newtaskdept
 	MsgBox На Вашем компьютере criacx.ocx не был установлен скриптом`, поэтому обновить его скриптом не получится. Делайте заявку для отдела ИТ <http://l.mobilmir.ru/newtaskdept>.
-	Exit
+	ExitApp
     }
 }
 
 If (criacxinbin) {
     ; Обновление criacx.ocx
-    RunWait %comspec% /C "d:\dealer.beeline.ru\update_dealer_beeline_activex.cmd" /Unpack, d:\dealer.beeline.ru, Min UseErrorLevel,childPID
+    RunWait %comspec% /C ""d:\dealer.beeline.ru\update_dealer_beeline_activex.cmd" /Unpack", d:\dealer.beeline.ru, Min UseErrorLevel, childPID
     If (ErrorLevel)
 	comment .= ", ErrorLevel:" . errFinal
     FileGetTime newOcxDate, d:\dealer.beeline.ru\bin\criacx.ocx
