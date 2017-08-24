@@ -6,5 +6,5 @@
 ;UserName/flags	Full Name	writeout-dir	Post URL
 Anton.Derbenev/f	Дербенев Антон Леонидович	\\Srv1S.office0.mobilmir\Users\LogicDaemon\Documents\Accounts\AdminPasswords\Incoming	https://zapier.com/hooks/catch/b5lm1r/
 Karina.Razuvaeva	Разуваева Карина Владимировна	
-Aleksandr.Gladkov	Гладков Александр Евгеньевич	
+;Aleksandr.Gladkov	Гладков Александр Евгеньевич	
 Пользователь/rp	Услуги в рознице
