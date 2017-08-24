@@ -127,6 +127,7 @@ While (!FileExist(exeName)) {
     If Not dlDir
 	dlDir = %A_MyDocuments%\Downloads
 
+    delay := 15
     While !FileExist(archiveName) {
 	IfExist %dlDir%\UserBenchMark.zip
 	{
@@ -141,14 +142,18 @@ While (!FileExist(exeName)) {
 	
 	; If a new browser is installed, Win8+ will show app selection window instead of launching default one
 	; because of that, launching specific browser is much more safe
-	If (A_OSVersion != "WIN_7") {
-	    browserexe := FindBrowserExe()
-	    If (browserexe)
-		UBMURL := browserexe . A_Space . UBMURL
+	If (A_OSVersion != "WIN_7" && browserexe := FindBrowserExe())
+	    runUBMDL := browserexe . A_Space . UBMURL
+	Else
+	    runUBMDL := UBMURL
+	Run %runUBMDL%
+	If (browserexe) {
+	    MsgBox Нажмите OK`, затем Выберите браузер по умолчанию (поставьте галочку)`, иначе UserBenchmark не сможет открыть страницу результатов.
+	    Run http://
 	}
-	Run %UBMURL%
 	
-	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMURL% запущен браузер. Пауза 30 секунд., 30
+	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMURL% запущен браузер. Пауза %delay% секунд., %delay%
+	delay := delay * 2
 	
 	If (A_Index>1) {
 	    MsgBox 22, %A_ScriptName%, %UBMURL% не скачался., 300
