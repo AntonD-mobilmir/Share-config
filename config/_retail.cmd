@@ -43,57 +43,65 @@ IF "%Inst1S%"=="1" (
     NET USER Пользователь /ADD /passwordchg:no /passwordreq:no
     wmic path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
 )
-
+(
 START "" control userpasswords2
 
-REM Writing DefaultsSource
+TITLE Writing DefaultsSource
 IF NOT EXIST "%ProgramData%\mobilmir.ru" MKDIR "%ProgramData%\mobilmir.ru"
 CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd" Apps_dept.7z
 
-REM Executing _business_config.cmd
+TITLE Running _business_config.cmd
+POWERCFG -h off & POWERCFG /H OFF
 CALL "%~dp0_Scripts\_business_config.cmd"
 WMIC computersystem where name="%COMPUTERNAME%" call joindomainorworkgroup name="OFFICE0"
 REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Domain" /d "office0.mobilmir" /f
 REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain" /d "office0.mobilmir" /f
-
+)
 :All
-REM Common procedure
+(
 TITLE Running _all.cmd
 CALL "%~dp0_all.cmd" %arg%
-
+)
 :AfterAll
+(
+TITLE AfterAll
 START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 
 rem Without running ahk as an app (just starting .ahk), START /I misbehaves, ignoring the switch
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
-
 CALL "%~dp0_Scripts\ChangeNXOptInToOptOut.cmd"
-
 CALL "%~dp0_Scripts\defrag in background.cmd"
-
+)
 :SchTasks
+(
+TITLE SchTasks
 CALL "%~dp0_Scripts\Tasks\remove_old_Windows_Backups.cmd"
 SET "srcpath="
+)
 :PageFile
+(
+TITLE PageFile
 IF EXIST c:\WINDOWS\SwapSpace CALL "%~dp0_Scripts\pagefile_on_Windows_SwapSpace.cmd"
 SET "srcpath="
-
+)
+:PrepareProfiles
+(
+TITLE PrepareProfiles
 CALL "%~dp0_Scripts\HideShortcutsInAllUsersStartMenu.cmd"
 CALL "%~dp0_Scripts\copyDefaultUserProfile.cmd"
 REM Unpacking Desktop Shortcuts / Распаковка ярлыков на рабочий стол 
 CALL "%~dp0_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"
-
 rem Изменение пути профилей
 MKDIR d:\Users
 IF EXIST d:\Users %AutohotkeyExe% "%~dp0_Scripts\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
-POWERCFG -h off & POWERCFG /H OFF
 
 rem TODO: не работает, если запускать "!run without installing soft.cmd"
 REM Копирование дистрибутивов, поскольку новые отделы не подключены к офисной сети
 START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
 rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g\Projects\depts-commands\execscripts\install.cmd"
-
+)
 :MTMail
+(
 REM path workaround:
 SET "PATH=%PATH%;C:\SysUtils\libs"
 
@@ -103,20 +111,24 @@ START "" /B /WAIT %comspec% /C "%~dp0_Scripts\CreateMTProfileForSharedUser.cmd"
 rem ECHO ---Отладка---
 rem ECHO Только что должен быть создаться общий профиль Thunderbird.
 rem PAUSE
+)
 :skipMTMail
-
+(
 REM Install 1S
 IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF NOT "%Inst1S%"=="1" GOTO :Skip1SAndRelated
+)
 :r1SAndRelated
+(
     SET "RarusInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
     IF NOT EXIST "%RarusInstallScript%" (
 	ECHO Дистрибутив Рарус недоступен по стандартному пути [%RarusInstallScript%]. Укажите полный путь к файлу ShopBTS_InitialBase\_install_ask_parm.cmd
 	SET /P RarusInstallScript=^>
     )
     START "Installing Rarus" /I /WAIT %comspec% /C "%RarusInstallScript%"
+)
 :Skip1SAndRelated
-
+(
 IF NOT DEFINED instBTSyncandSoftUpdScripts CALL :AskAboutBTSync
 IF /I "%instBTSyncandSoftUpdScripts%"=="1" (
     START "Установка скрипта авто-обновления ПО" %comspec% /C "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
@@ -124,8 +136,9 @@ IF /I "%instBTSyncandSoftUpdScripts%"=="1" (
 )
 
 ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUSE & EXIT /B
-
+)
 :AskAbout1S
+(
     IF "%COMPUTERNAME:~-2,1%"=="-" (
 	IF /I "%COMPUTERNAME:~-1%"=="K" (
 	    SET "Inst1S=1"
@@ -139,7 +152,9 @@ ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUS
     IF /I "%Inst1S:~0,1%"=="y" SET "Inst1S=1"
     IF /I "%Inst1S:~0,1%"=="д" SET "Inst1S=1"
 EXIT /B
-
+)
 :AskAboutBTSync
+(
     ECHO /P "instBTSyncandSoftUpdScripts=Запустить установку BTSync и скриптов автообновления ПО? [1=да]"
 EXIT /B
+)
