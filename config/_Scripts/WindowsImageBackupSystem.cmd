@@ -90,7 +90,7 @@ EXIT /B
 :CopyImageTo <path>
 (
     IF EXIST "%~1\WindowsImageBackup\%Hostname%" (
-	ECHO Папка "%~1\WindowsImageBackup\%Hostname%" уже существует. Её содержимое будет перезаписано.
+	ECHO Папка "%~1\WindowsImageBackup\%Hostname%" уже существует. Она будет переименована.
 	MOVE /Y "%~1\WindowsImageBackup\%Hostname%" "%~1\WindowsImageBackup\%Hostname%.%RANDOM%"
     )
 
@@ -115,16 +115,16 @@ EXIT /B
 
     ECHO Ожидание окончания записи MD5
 )
-:DirToPassFile <path>
-(
-    DIR /AD /B /O-D %1 >>"%PassFilePath%"
-EXIT /B
-)
 :waitmore
 (
     PING 127.0.0.1 -n 2 >NUL
     IF NOT EXIST "%DstDirWIB%\%Hostname%\checksums.md5" IF EXIST "%DstDirWIB%\%Hostname%-checksums.md5" GOTO :waitmore
     COPY /Y /D /B "%DstDirWIB%\%Hostname%\checksums.md5" "%~1\WindowsImageBackup\%Hostname%\checksums.md5"
+EXIT /B
+)
+:DirToPassFile <path>
+(
+    DIR /AD /B /O-D "%~1" >>"%PassFilePath%" 2>&1
 EXIT /B
 )
 rem Синтаксис: WBADMIN START BACKUP
