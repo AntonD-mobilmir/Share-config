@@ -67,7 +67,7 @@ GOTO :MakeDirsReadOnlyForUsers
 :ResetACL
 (
     IF EXIST "%~1" (
-	%windir%\system32\takeown.exe /F %1 /R /A >NUL
+	%windir%\system32\takeown.exe /F %1 /R /A /D Y >NUL
 	%SetACLexe% -on %1 -ot file -rec cont_obj -actn rstchldrn -rst dacl -ignoreerr -silent
     )
     SHIFT
