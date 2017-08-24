@@ -32,11 +32,9 @@ SET "verFile=%~dpn0_dist_ver.txt"
 (
     FOR %%A IN ("%verFile%") DO FOR /F %%B IN ("%%~tA") DO SET "dateVerCheck=%%~tA"
     IF NOT "%dateVerCheck%"=="%DATE%" (
-	FOR %%A IN ("%updateDist%") DO (
+	IF EXIST "%updateDist%" FOR %%A IN ("%updateDist%") DO (
 	    SET "distVer=%%~tA"
-	    FOR /F "usebackq delims=" %%B IN ("%verFile%") DO (
-		IF NOT "%%~tA"=="%%~B" SET "runUpdate=1"
-	    )
+	    FOR /F "usebackq delims=" %%B IN ("%verFile%") DO IF NOT "%%~tA"=="%%~B" SET "runUpdate=1"
 	)
 	IF DEFINED runUpdate (
 	    SET "RunInteractiveInstalls=0"
