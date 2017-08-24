@@ -13,13 +13,14 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 
     IF NOT DEFINED gpgexe IF EXIST "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe" (
+	SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
 	SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
     ) ELSE CALL :FindGPGexe || EXIT /B
     rem IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
 )
 (
     IF NOT DEFINED MailUserId SET "MailUserId=%Hostname%"
-    FOR %%A IN ("%GNUPGHOME%\secring.gpg") DO IF EXIST "%%~A" IF %%~zA GTR 0 (
+    FOR %%A IN ("%GNUPGHOME%\secring.gpg") DO IF EXIST "%%~A" IF "%%~zA" NEQ "0" (
 	ECHO Keyring already exist!
 	EXIT /B 1
     )
@@ -36,6 +37,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     ECHO Name-Email: %MailUserId%@rarus.robots.mobilmir.ru
 ) | %gpgexe% --homedir "%GNUPGHOME%" --batch --gen-key >> "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.gen.log" 2>&1 & CHCP 866
 (
+    FOR %%A IN ("%GNUPGHOME%\secring.gpg") DO IF EXIST "%%~A" IF "%%~zA"=="0" (
+	DEL "%%~A"
+	EXIT /B 1
+    )
     %gpgexe% --homedir "%GNUPGHOME%" --batch --armor --export "%MailUserId%@rarus.robots.mobilmir.ru" > "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.asc"
     rem cannot be done in batch mode -- %gpgexe% --homedir "%GNUPGHOME%" --batch --armor --gen-revoke "%MailUserId%@rarus.robots.mobilmir.ru" > "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.rev"
     FOR %%A IN ("%GNUPGHOME%\key*.asc") DO %gpgexe% --homedir "%GNUPGHOME%" --batch --import "%%~A"
@@ -46,9 +51,11 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     EXIT /B
 ) >> "%outDir%%MailUserId%@rarus.robots.mobilmir.ru.gen.log" 2>&1 
 :FindGPGexe
+(
 rem IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 rem CALL :GetDir ConfigDir "%DefaultsSource%"
-(
+SET findExeTestExecutionOptions=--homedir "%GNUPGHOME%" --batch --help
+SET "pathAppendSubpath=..\..\libs"
 IF NOT DEFINED gpgexe CALL "%~dp0..\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
 rem IF NOT DEFINED gpgexe CALL "%ConfigDir%_Scripts\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
 rem IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
