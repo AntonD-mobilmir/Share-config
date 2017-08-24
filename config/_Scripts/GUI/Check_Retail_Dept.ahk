@@ -24,7 +24,7 @@ ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS
 
 FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
 If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc)) {
-    AhkDistVer		:= Format("{:02u}.{:02u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
+    AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
 } Else
     AhkDistVer		:= "1.1.26.01"
 
@@ -473,7 +473,7 @@ If (runAhkUpdate && A_IsAdmin) {
 	{
 	    Process Exist, %aclSetupPID%
 	    If (!ErrorLevel) {
-		SetRowStatus(aclSetupLine.line, "Завершено")
+		SetRowStatus(aclSetupLine, "Завершено")
 		break
 	    }
 	    If (A_Index=1)
