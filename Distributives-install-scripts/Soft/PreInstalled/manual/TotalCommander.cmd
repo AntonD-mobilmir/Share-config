@@ -31,9 +31,14 @@ SET "TCDir=%LOCALAPPDATA%\Programs\Total Commander"
     )
     SET "dist7zDir=%~dp0..\..\Archivers Packers\7Zip"
     SET "distzpaqDir=%~dp0..\..\..\Soft FOSS\Archivers Packers\zpaq"
-    SET "distNotepad2Dir=%~dp0..\..\..\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod"
     SET "distNotepad2Mask=Notepad2-mod.*"
     IF DEFINED OS64Bit ( SET "Notepad2DistSuffix=_x64.zip" ) ELSE SET "Notepad2DistSuffix=_x86.zip"
+    SET "distNotepad2Dir=%~dp0..\..\..\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod"
+)
+(
+    IF NOT EXIST "%dist7zDir%" SET "dist7zDir=\\Srv0.office0.mobilmir\Distributives\Soft\Archivers Packers\7Zip"
+    IF NOT EXIST "%distzpaqDir%" SET "distzpaqDir=\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Archivers Packers\zpaq"
+    IF NOT EXIST "%distNotepad2Dir%" SET "distNotepad2Dir=\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod"
 )
 (
     CALL :UnpackNotepad2Mod
