@@ -47,7 +47,7 @@ rem /grant "*%sidCREATOR_OWNER%:(OI)(CI)F"
 %exe7z% x -aoa -oD:\1S\Rarus -- "%~dp0dist.7z" || %ErrorCmd%
 DEL "D:\1S\Rarus\MailLoader\POPTrace.txt"
 
-%AutohotkeyExe% "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk" || IF ERRORLEVEL 2 %ErrorCmd%
+rem %AutohotkeyExe% "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk" || IF ERRORLEVEL 2 %ErrorCmd%
 
 CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\stunnel.xml" /RU "" /NP || %ErrorCmd%
 rem CALL :SchTask "D:\1S\Rarus\MailLoader\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || %ErrorCmd%
