@@ -6,7 +6,7 @@
 StringCaseSense On
 FileEncoding CP1251
 
-Global sendemailexe, tailexe, ReturnError, logfile, localcfg
+Global sendemailexe, tailexe, ReturnError, logfile, localcfg, arcDir
 
 ShopBTS_Add_install := "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk"
 verFName=%A_ScriptDir%\ShopBTS_Add_ver.txt
@@ -42,10 +42,10 @@ If (!sendemailexe || !tailexe) {
     Reload
 }
 
-If Not logfile
-    logfile=%A_Temp%\%A_ScriptName%.log
+logfile=%A_ScriptFullPath%.log
 OutgoingFilesQueueDir=%A_ScriptDir%\OutgoingFiles
 OutgoingTextsQueueDir=%A_ScriptDir%\OutgoingText
+arcDir=%A_ScriptDir%\Arc
 
 FileGetTime logfileDate,%logfile%
 If (logfileDate) {
@@ -53,9 +53,26 @@ If (logfileDate) {
     If (logfileAge < 60) {
 	TrayTip Отправка файлов отложена, Последний раз отправка выполнялась менее минуты назад`, поэтому данный запуск будет пропущен.
 	Sleep 1500
-	Exit
+	ExitApp
     }
 }
+
+FileGetSize logfileSize, %logfile%, M
+If (logfileSize > 5) ; megabytes
+    FileMove %logfile%, %logfile%.bak, 1
+
+If (!InStr(FileExist(A_ScriptDir "\Arc"), "D")) {
+    FileMove %arcDir%, %arcDir%.bak, 1
+} Else {
+    FileGetTime timeArcCreation, %arcDir%, C
+    ageArcCreation -= %timeArcCreation%, Days
+    If (ageArcCreation > 365) {
+	Loop Files, %arcDir%-bak.*, D
+	    FileRemoveDir %A_LoopFileFullPath%, 1
+	FileMoveDir %arcDir%, %arcDir%-bak.%A_Now%, R
+    }
+}
+FileCreateDir %arcDir%
 
 If %0%
 {
@@ -116,9 +133,11 @@ DispatchSingleFile(pathFileToSend) {
 	Loop Files, %A_Temp%\pdk*, D
 	    FileRemoveDir %A_LoopFileFullPath%, 1
     } Else {
-	FileDelete %pathFileToSend%
-	FileDelete %pathNote%
 	TrayTip Отправка удалась, %trayMsgText% %note% [%nameExtToSend%] успешна, 5, 1
+	;FileDelete %pathFileToSend%
+	;FileDelete %pathNote%
+	FileMove %pathFileToSend%, %arcDir%, 1
+	FileMove %pathNote%, %arcDir%, 1
     }
 }
 
@@ -196,8 +215,11 @@ DeliverOneEmail(EmailFileName) {
     }
     
     TrayTip Письмо отправлено, Тема: %Subject%`nКому: %HeaderTo%, 5, 1
-    FileDelete %EmailFileName%
-    FileRemoveDir %dirAttachments%, 1
+    ;FileDelete %EmailFileName%
+    ;FileRemoveDir %dirAttachments%, 1
+    FileMove %EmailFileName%, %arcDir%, 1
+    Loop Files, %dirAttachments%, D
+	FileMoveDir %A_LoopFileLongPath%, %arcDir%\%A_LoopFileName%, 1
 }
 
 StartsWith(longstr, shortstr) {
