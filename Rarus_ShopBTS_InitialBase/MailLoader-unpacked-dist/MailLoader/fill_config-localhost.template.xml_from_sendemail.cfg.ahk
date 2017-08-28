@@ -11,7 +11,9 @@ ExtFormsDir=d:\1S\Rarus\ShopBTS\ExtForms
 configxml=%1%
 If (!configxml)
     EnvGet configxml, configxml
-If (!configxml)
+If (configxml)
+    configxml := Trim(configxml, """")
+Else
     configxml=%A_ScriptDir%\config-localhost.xml
 sendemailcfg=%2%
 If (!sendemailcfg)
