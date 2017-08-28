@@ -14,21 +14,23 @@ SET "MonDir=d:\Users\Public\Documents\Рарус"
 
 IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
 SET "GNUPGHOME=%~dp0gnupg"
+SET configxml="%~dp0config-localhost.xml"
 
 SET "maxLogSize=1048576"
 
 SET uud32winexe="%~dp0uud32win.exe"
 SET popclientexe="%~dp0popclient.exe"
 
-DEL /F "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\getmail.lastrun.*.log"
-
-rem IF NOT DEFINED exe7z SET "exe7z=%~dp0..\bin\7za.exe"
-IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "d:\Distributives\config\_Scripts\find7zexe.cmd"
+DEL /F "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\getmail.lastrun.*.log" 2>NUL
 
 SET "updateInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\install.cmd"
 SET "updateDist=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\dist.7z"
 SET "verFile=%~dpn0_dist_ver.txt"
+
+IF NOT DEFINED configDir CALL :GetConfigDir
+rem IF NOT DEFINED exe7z SET "exe7z=%~dp0..\bin\7za.exe"
 )
+IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "%configDir%_Scripts\find7zexe.cmd"
 (
     FOR %%A IN ("%verFile%") DO FOR /F %%B IN ("%%~tA") DO SET "dateVerCheck=%%~tA"
     IF NOT "%dateVerCheck%"=="%DATE%" (
@@ -48,7 +50,10 @@ SET "verFile=%~dpn0_dist_ver.txt"
     IF NOT EXIST "%RecvBakDir%" MKDIR "%RecvBakDir%"
     IF NOT EXIST "%MonDir%" MKDIR "%MonDir%"
     IF EXIST "%MonDir%" IF NOT EXIST "%MonDir%\*.*" FOR %%A IN ("%MonDir%") DO MOVE "%%~A" "%%~dpnA-%RANDOM%%%~xA" ||EXIT /B
-
+    
+    FOR %%A IN (%configxml%) DO IF NOT EXIST %%A (SET "RecheckConfigXML=1") ELSE FOR %%B IN ("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg") DO ECHO %%A: %%~tA / %%B: %%~tB & IF NOT "%%~tA"=="%%~tB" SET "RecheckConfigXML=1"
+    IF DEFINED RecheckConfigXML CALL :RecheckConfigXML
+    IF NOT EXIST %configxml% ECHO %DATE% %TIME% %configxml% не существует!& EXIT /B
     ECHO %DATE% %TIME% Проверка или завершение повисшего popclient.exe
     %SystemRoot%\System32\taskkill.exe /F /IM popclient.exe && EXIT /B
     REM Если ошибки нет, popclient.exe был убит. В этом случае продолжает работать пакетный файл, который запустил только что прибитый popclient.exe, значит этот процесс [который убил] надо завершить.
@@ -58,9 +63,9 @@ SET "verFile=%~dpn0_dist_ver.txt"
 (
     ECHO %DATE% %TIME% Запуск popclient.exe, см. лог в POPTrace.txt
     ECHO %DATE% %TIME%>>"%~dp0POPTrace.txt"
-    rem start нужен, чтобы cmd.exe не задавал глупый вопрос, прервать ли выполнение пакетного файла, когда popclient.exe будет убит
-    CIPHER /E "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\config-localhost.xml"
-    START "" /B /WAIT %popclientexe% -configfile "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\config-localhost.xml"
+    rem start нужен, чтобы cmd.exe не задавал глупый вопрос, прервать ли выполнение пакетного файла, если popclient.exe будет убит через TASKKILL
+    CIPHER /E %configxml%
+    START "" /B /WAIT %popclientexe% -configfile %configxml%
 )
 IF EXIST "%RecvDir%\*.txt" (
     ECHO %DATE% %TIME% Извлечение вложений из писем "%RecvDir%\*.txt"
@@ -129,5 +134,25 @@ IF EXIST "%AttDir%\*.7z" (
     (
 	ECHO %distVer%
     ) >"%verFile%"
+EXIT /B
+)
+:RecheckConfigXML
+IF NOT DEFINED configDir CALL :GetConfigDir
+IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
+(
+    %AutohotkeyExe% /ErrorStdOut "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk"
+    EXIT /B
+)
+:GetConfigDir
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+CALL :GetDir configDir "%DefaultsSource%"
+(
+rem IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
+rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
+EXIT /B
+)
+:GetDir
+(
+SET "%~1=%~dp2"
 EXIT /B
 )
