@@ -5,7 +5,7 @@
 Loop %0%
 {
     outFName := %A_Index%
-    out := FileOpen(outFName . ".tmp", "w")
+    out := FileOpen(outFName . ".tmp", "w", "UTF-16")
     skipSection := 0
     Loop Read, %1%
     {
