@@ -3,7 +3,14 @@
 
 XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0, moreHeaders:="") {
     global debug
-    static useObjName
+    static useObjName:=""
+    ;Error at line 13 in #include file "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Post.ahk".
+
+    ;Line Text: local xhr := ComObjCreate(useObjName)
+    ;Error: Local variables must not be declared in this function.
+
+    ;The program will exit.
+    ;local i, objName, hName, hVal, k, v
     
     If (IsObject(debug)) {
 	FileAppend Отправка на адрес %URL% запроса %POSTDATA%`n, **
