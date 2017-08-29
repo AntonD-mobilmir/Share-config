@@ -112,7 +112,10 @@ If (IsObject(sendemailcfg)) {
     ;}
     AddLog("ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix, "Запуск")
     RunWait "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
-    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    statusShopBTS_Add := ErrorLevel
+    If (!statusShopBTS_Add)
+	FileReadLine verShopBTS_Add, d:\1S\Rarus\ShopBTS\ExtForms\post\ShopBTS_Add_ver.txt, 1
+    SetLastRowStatus(errShopBTS_Add ? errShopBTS_Add : verShopBTS_Add,!errShopBTS_Add)
 }
 
 userFoldersChk := AddLog("Проверка доступности папок пользователя")
@@ -207,6 +210,15 @@ If (ReRunAsAdmin) {
     AddLog("Перезапуск от имени администратора…")
     Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
+}
+
+If (IsObject(sendemailcfg)) {
+    AddLog("MailLoader\install.cmd", "Запуск")
+    RunWait %comspec% /C "%ShopBTS_InitialBaseDir%\MailLoader\install.cmd",,Min UseErrorLevel
+    errMailLoader := ErrorLevel
+    If (!errMailLoader)
+	FileReadLine verGetMail, D:\1S\Rarus\MailLoader\getmail_dist_ver.txt, 1
+    SetLastRowStatus(errMailLoader ? errMailLoader : verGetMail,!errMailLoader)
 }
 
 If (FileExist(scriptInventoryReport)) {
