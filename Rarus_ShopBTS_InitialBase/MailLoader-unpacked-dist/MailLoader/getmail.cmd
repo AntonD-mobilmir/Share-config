@@ -26,25 +26,30 @@ DEL /F "d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\getmail.lastrun.*.log" 2>NUL
 SET "updateInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\install.cmd"
 SET "updateDist=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\dist.7z"
 SET "verFile=%~dpn0_dist_ver.txt"
+SET "verCheckFile=%~dpn0_dist_ver.check.log"
 
 IF NOT DEFINED configDir CALL :GetConfigDir
 rem IF NOT DEFINED exe7z SET "exe7z=%~dp0..\bin\7za.exe"
 )
-IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "%configDir%_Scripts\find7zexe.cmd"
 (
-    FOR %%A IN ("%verFile%") DO FOR /F %%B IN ("%%~tA") DO SET "dateVerCheck=%%~tA"
+IF NOT DEFINED exe7z SET "PATH=%PATH%;%~dp0..\bin" & CALL "%configDir%_Scripts\find7zexe.cmd"
+FOR %%A IN ("%verFile%") DO FOR /F %%B IN ("%%~tA") DO SET "dateVerCheck=%%~tA"
+rem 02.05.2017 09:38 -- only compare date component
+)
+(
     IF NOT "%dateVerCheck%"=="%DATE%" (
 	IF EXIST "%updateDist%" FOR %%A IN ("%updateDist%") DO (
-	    SET "distVer=%%~tA"
-	    FOR /F "usebackq delims=" %%B IN ("%verFile%") DO IF NOT "%%~tA"=="%%~B" SET "runUpdate=1"
-	)
-	IF DEFINED runUpdate (
-	    SET "RunInteractiveInstalls=0"
-	    CALL "%updateInstallScript%"
-	    EXIT /B
+	    FOR /F "usebackq delims=" %%B IN ("%verFile%") DO (
+		IF NOT "%%~tA"=="%%~B" (ECHO Starting "%updateInstallScript%">>"%verCheckFile%") & SET "RunInteractiveInstalls=0" & ( CALL "%updateInstallScript%" > "%~dp0autoupdate.log" 2>&1 ) & EXIT /B
+		REM Only first line
+		(ECHO update checked %DATE% %TIME%)>"%verCheckFile%"
+		GOTO :ExitForUpdateCheck
+	    )
 	)
     )
-
+)
+:ExitForUpdateCheck
+(
     IF NOT EXIST "%SignedFilesDir%" MKDIR "%SignedFilesDir%"
     IF NOT EXIST "%RecvDir%" MKDIR "%RecvDir%"
     IF NOT EXIST "%RecvBakDir%" MKDIR "%RecvBakDir%"
@@ -128,13 +133,6 @@ IF EXIST "%AttDir%\*.7z" (
     IF "%~x1"==".7z" (
 	%exe7z% x -aoa -o%2 -- %1
     ) ELSE EXIT /B 1
-)
-:WriteoutDistVer
-(
-    (
-	ECHO %distVer%
-    ) >"%verFile%"
-EXIT /B
 )
 :RecheckConfigXML
 IF NOT DEFINED configDir CALL :GetConfigDir
