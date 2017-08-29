@@ -70,3 +70,47 @@ IF NOT DEFINED APPDATA (
 )
 EXIT /B
 )
+:findlatest <path>
+(
+    CALL :InitRemembering
+    FOR %%A IN (%*) DO CALL :RememberIfLatest latestFile "%%A"
+EXIT /B
+)
+:InitRemembering
+(
+    SET "latestDate=0000000000:00"
+EXIT /B
+)
+:RememberIfLatest <varName> <path>
+(
+    SETLOCAL
+    SET "currentFDate=%~t2"
+)
+(
+@rem     01.12.2011 21:29, so reverse date to get correct comparison
+    SET "currentFDate=%currentFDate:~6,4%%currentFDate:~3,2%%currentFDate:~0,2%%currentFDate:~11%"
+)
+(
+    ENDLOCAL
+    IF "%currentFDate%" GEQ "%latestDate%" (
+	SET "%~1=%~2"
+	SET "latestDate=%currentFDate%"
+    )
+EXIT /B
+)
+:ReadRegHostname <var>
+(
+FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "%~1=%%~J"
+EXIT /B
+)
+:ReadRegNVHostname <var>
+(
+FOR /f "usebackq tokens=3*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname"`) DO SET "%~1=%%~J"
+EXIT /B
+)
+:IsOS64Bit
+(
+IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" EXIT /B 0
+IF DEFINED PROCESSOR_ARCHITEW6432 EXIT /B 0
+EXIT /B 1
+)
