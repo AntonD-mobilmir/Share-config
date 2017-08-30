@@ -2,74 +2,21 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 XMLHTTP_PostForm(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef moreHeaders:=0) {
-    global debug
-    static useObjName:=""
-    ;Error at line 13 in #include file "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Post.ahk".
-
-    ;Line Text: local xhr := ComObjCreate(useObjName)
-    ;Error: Local variables must not be declared in this function.
-
-    ;The program will exit.
-    ;local i, objName, hName, hVal, k, v
-    
-    If (IsObject(debug)) {
-	FileAppend Отправка на адрес %URL% запроса %POSTDATA%`n, **
-    }
-    If (useObjName) {
-	xhr := ComObjCreate(useObjName)
-    } Else {
-	objNames := [ "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP", "Microsoft.XMLHTTP" ]
-	For i, objName in objNames {
-	    ;xhr=XMLHttpRequest
-	    xhr := ComObjCreate(objName) ; https://msdn.microsoft.com/en-us/library/ms535874.aspx
-	    If (IsObject(xhr)) {
-		useObjName := objName
-		break
-	    }
-	}
-    }
-    ;xhr.open(bstrMethod, bstrUrl, varAsync, varUser, varPassword);
-    xhr.open("POST", URL, false)
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-    
-    If (IsObject(moreHeaders))
-	For hName, hVal in moreHeaders
-	    xhr.setRequestHeader(hName, hVal)
-    
-    Try {
-	xhr.send(POSTDATA)
-	If (IsObject(response))
-	    response := {status: xhr.status, headers: xhr.getAllResponseHeaders, responseText: xhr.responseText}
-	Else
-	    response := xhr.responseText
-	If (IsObject(debug)) {
-	    debug.Headers := xhr.getAllResponseHeaders
-	    debug.Response := xhr.responseText
-	    debug.Status := xhr.status	;can be 200, 404 etc., including proxy responses
-	    
-	    FileAppend % "`tСтатус: " . debug.Status . "`n"
-		       . "`tЗаголовки ответа: " . debug.Headers . "`n", **
-	}
-	return xhr.Status >= 200 && xhr.Status < 300
-    } catch e {
-	If (IsObject(debug)) {
-	    debug.What:=e.What
-	    debug.Message:=e.Message
-	    debug.Extra:=e.Extra
-	}
-	return
-    } Finally {
-	xhr := ""
-	If (IsObject(debug)) {
-	    ;http://www.autohotkey.com/board/topic/56987-com-object-reference-autohotkey-l/#entry358974
-	    ;static document
-	    ;Gui Add, ActiveX, w750 h550 vdocument, % "MSHTML:" . debug.Response
-	    ;Gui Show
-	    For k,v in debug
-		FileAppend %k%: %v%`n, **
-	}
-    }
+    ;wrapper fol older scripts
+    return XMLHTTP_Post(URL, POSTDATA, response, moreHeaders)
 }
+
+XMLHTTP_Post(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef reqmoreHeaders:=0) {
+    If (reqmoreHeaders.HasKey("Content-Type")) {
+	moreHeaders := reqmoreHeaders
+    } Else {
+	moreHeaders := reqmoreHeaders.Clone()
+	moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
+    }
+    return XMLHTTP_Request("POST", URL, POSTDATA, response, moreHeaders)
+}
+
+#include %A_LineFile%\..\XMLHTTP_Request.ahk
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     tries:=20
