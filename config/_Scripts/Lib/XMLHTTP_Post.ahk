@@ -1,7 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-XMLHTTP_PostForm(URL, POSTDATA, ByRef response:=0, moreHeaders:="") {
+XMLHTTP_PostForm(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef moreHeaders:=0) {
     global debug
     static useObjName:=""
     ;Error at line 13 in #include file "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Post.ahk".
