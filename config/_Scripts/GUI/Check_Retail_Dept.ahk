@@ -369,7 +369,6 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
 	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",, Min UseErrorLevel
-	MsgBox SetupLocalDownloader.cmd finished
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
