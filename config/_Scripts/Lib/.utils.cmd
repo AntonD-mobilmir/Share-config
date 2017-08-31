@@ -92,7 +92,7 @@ EXIT /B
 )
 (
     ENDLOCAL
-    IF "%currentFDate%" GEQ "%latestDate%" (
+    IF "%currentFDate%" GTR "%latestDate%" (
 	SET "%~1=%~2"
 	SET "latestDate=%currentFDate%"
     )
