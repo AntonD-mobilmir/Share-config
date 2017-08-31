@@ -94,6 +94,14 @@ EXIT /B
 )
 :SchTask <xml>
 (
+SET "updatedTaskXML="
+CALL "%configDir%_Scripts\Lib\.utils.cmd" InitRemembering
+CALL "%configDir%_Scripts\Lib\.utils.cmd" RememberIfLatest currentTask "%System32%\Tasks\mobilmir.ru\%~n1"
+CALL "%configDir%_Scripts\Lib\.utils.cmd" RememberIfLatest updatedTaskXML "%System32%\Tasks\mobilmir.ru\%~n1"
+IF NOT DEFINED updatedTaskXML EXIT /B
+)
+(
+ECHO %updatedTaskXML%
 rem rem %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~n1" /F
 rem ECHO.|%System32%\SCHTASKS.exe /Create /F /TN "mobilmir.ru\%~n1" /XML %* || EXIT /B
 rem %System32%\SCHTASKS.exe /Run /TN "mobilmir.ru\%~n1"
