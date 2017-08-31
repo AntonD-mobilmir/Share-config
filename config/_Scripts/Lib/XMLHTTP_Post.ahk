@@ -7,11 +7,15 @@ XMLHTTP_PostForm(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef moreHeaders
 }
 
 XMLHTTP_Post(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef reqmoreHeaders:=0) {
-    If (reqmoreHeaders.HasKey("Content-Type")) {
-	moreHeaders := reqmoreHeaders
+    If (IsObject(moreHeaders)) {
+	If (reqmoreHeaders.HasKey("Content-Type")) {
+	    moreHeaders := reqmoreHeaders
+	} Else {
+	    moreHeaders := reqmoreHeaders.Clone()
+	    moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
+	}
     } Else {
-	moreHeaders := reqmoreHeaders.Clone()
-	moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
+	moreHeaders := {"Content-Type": "application/x-www-form-urlencoded"}
     }
     return XMLHTTP_Request("POST", URL, POSTDATA, response, moreHeaders)
 }
@@ -21,7 +25,6 @@ XMLHTTP_Post(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef reqmoreHeaders:
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     tries:=20
     retryDelay:=1000
-    global debug
     Loop %0%
     {
 	arg:=%A_Index%
@@ -35,14 +38,14 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 		} Else If (argkv1 = "retryDelay") {
 		    retryDelay := argkv2
 		} Else {
-		    EchoWrongArg(arg)
+		    XMLHTTP_EchoWrongArg(arg)
 		}
 	    } Else {
 		If (arg="debug") {
 		    debug := Object()
 		    FileAppend Включен режим отладки`n, **
 		} Else {
-		    EchoWrongArg(arg)
+		    XMLHTTP_EchoWrongArg(arg)
 		}
 	    }
 	} Else If (!URL) {
@@ -50,7 +53,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 	} Else If (!POSTDATA) {
 	    POSTDATA:=arg
 	} Else {
-	    EchoWrongArg(arg)
+	    XMLHTTP_EchoWrongArg(arg)
 	}
     }
     Loop %tries%
@@ -63,6 +66,6 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     ExitApp response.status
 }
 
-EchoWrongArg(arg) {
+XMLHTTP_EchoWrongArg(arg) {
     FileAppend Неправильный аргумент: %arg%`n, **
 }
