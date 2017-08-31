@@ -26,10 +26,12 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
 	    xhr := ComObjCreate(objName) ; https://msdn.microsoft.com/en-us/library/ms535874.aspx
 	    If (IsObject(xhr)) {
 		useObjName := objName
-		FileAppend Done!`n, **
+		If (IsObject(debug))
+		    FileAppend Done!`n, **
 		break
 	    }
-	    FileAppend nope`n, **
+	    If (IsObject(debug))
+		FileAppend nope`n, **
 	}
 	If (!useObjName)
 	    Throw "Не удалось создать объект XMLHTTP"
@@ -52,9 +54,6 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
 	    debug.Headers := xhr.getAllResponseHeaders
 	    debug.Response := xhr.responseText
 	    debug.Status := xhr.status	;can be 200, 404 etc., including proxy responses
-	    
-	    FileAppend % "`tСтатус: " . debug.Status . "`n"
-		       . "`tЗаголовки ответа: " . debug.Headers . "`n", **
 	}
 	return xhr.Status >= 200 && xhr.Status < 300
     } catch e {
