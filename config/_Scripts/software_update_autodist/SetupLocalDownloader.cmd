@@ -96,8 +96,8 @@ ECHO Y|%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$" /DELETE
 
 CALL :updateSysUtils
 
-START "Copying download-scripts" /MIN %comspec% /C "%~dp0..\CopyDistributives_Downloaders.cmd"
 CALL :checkProxy
+START "Copying download-scripts" /MIN %comspec% /C "%~dp0..\CopyDistributives_Downloaders.cmd"
 
 IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z") DO (
     (ECHO %%~tI)>"%InstDest%\ver.flag"
@@ -107,10 +107,13 @@ IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z") DO (
 ECHO Готово.
 ECHO.
 ECHO Отправка информации в форму...
+
 CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
 IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 )
 (
+ECHO MailUserId=%MailUserId%
+ECHO instVersion=%instVersion%
 START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfEDfrPvAJ4BuhfT4BNqAXiJOKjR767C4p0M3k6N2Ft0BI1LQ/formResponse" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
 
 EXIT /B
@@ -170,7 +173,7 @@ EXIT /B
     IF "%http_proxy%"=="http://127.0.0.1:3128/" EXIT /B
 )
 (
-    "%~dp0..\_Scripts\SetProxy.ahk" ""
+    %AutohotkeyExe% "%~dp0..\SetProxy.ahk" ""
     EXIT /B
 )
 :getconfigDir
