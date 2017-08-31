@@ -12,17 +12,23 @@ TrelloAPI1(ByRef method, ByRef req, ByRef response, ByRef data:="") {
     static APIkey:=0, authToken:=0
     While (!(APIkey && authToken)) {
 	EnvGet LocalAppData,LOCALAPPDATA
-	FileRead APIkey, %LocalAppData%\mobilmir.ru\Trello-ahk\APIkey.txt
+	secretsDir = %LocalAppData%\mobilmir.ru\Trello-ahk\%A_ScriptName%
+	FileCreateDir %secretsDir%
+
+	FileRead APIkey, %secretsDir%\APIkey.txt
 	If (APIkey) {
-	    FileRead authToken, %LocalAppData%\mobilmir.ru\Trello-ahk\authtoken.txt
+	    FileRead authToken, %secretsDir%\authtoken.txt
 	    ; get auth token (user auth): https://trello.com/1/authorize?expiration=never&scope=read,write,account&response_type=token&name=AutoHotkey%20Script%2016-05-16&key=<API_key>
 	    If (!authToken) {
+		FileCreateDir %secretsDir%
 		Run % "https://trello.com/1/authorize?expiration=never&scope=read,write,account&response_type=token&name=AutoHotkey%20Script%2016-05-16&key=" APIkey
-		MsgBox Получите токен доступа для скрипта и запишите в %LocalAppData%\mobilmir.ru\Trello-ahk\authtoken.txt
+		Run notepad.exe %secretsDir%\authtoken.txt
+		MsgBox Получите токен доступа для скрипта и запишите в "%secretsDir%\authtoken.txt"
 	    }
 	} Else {
 	    Run https://trello.com/app-key
-	    MsgBox Получите ключ API со страницы https://trello.com/app-key и запишите в %LocalAppData%\mobilmir.ru\Trello-ahk\APIkey.txt
+	    Run notepad.exe %secretsDir%\APIkey.txt
+	    MsgBox Получите ключ API со страницы https://trello.com/app-key и запишите в "%secretsDir%\APIkey.txt"
 	    ;Please keep your API Secret safe. Because your API Key is public for any client-side applications, we do not currently offer a way to reset it.
 	}
     }
