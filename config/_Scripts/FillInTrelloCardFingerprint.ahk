@@ -42,9 +42,8 @@ FileAppend %A_Now% Запись в Trello информации о компьют
 If (FileExist(fileID)) {
     FileReadLine cardID, %fileID%, 2
     card := Object()
-    If (!TrelloAPI1("GET", "/cards/" cardID, card)) {
+    If (!TrelloAPI1("GET", "/cards/" cardID, card))
 	ShowError("Ошибка при получении карточки с ID " cardID " из Trello.`n", JSON.Dump(card), A_LastError, 1)
-    }
 } else {
     Loop
     {
@@ -122,8 +121,17 @@ If (matchMAC) {
     {
 	If (!InStr(card.desc, A_LoopField)) {
 	    FileAppend `tВ карточке не найдена строка %A_LoopField% из отпечатка.`n, %logFile%
+	    
+	    ;static blockCheckRegexp
+	    If (!blockCheckRegexp) {
+		For s in GetWMIQueryParametersforFingerprint() {
+		    blockCheckRegexp .= (A_Index == 1 ? "" : "|") s
+		}
+		blockCheckRegexp := "(\n+|^)``````\n(?P<text>((" . blockCheckRegexp . "):.+\n)+)``````(\n+|$)"
+	    }
+	    
 	    ; if any absent, get block ````nCPU: …`nSystem: …`n``` , diff it with textfp and save the diff as comment, then replace the description
-	    If (startCardDescFP := RegexMatch(card.desc, "(\n+|^)``````\n(?P<text>((System|MB|CPU|NIC):.+\n)+)``````(\n+|$)", cardDescFP)) {
+	    If (startCardDescFP := RegexMatch(card.desc, blockCheckRegexp, cardDescFP)) {
 		newDesc := Trim(SubStr(card.desc, 1, startCardDescFP - 1) "`n" SubStr(card.desc, startCardDescFP + StrLen(cardDescFP)), "`n`r")
 
 		commentText =
@@ -159,12 +167,12 @@ ExtractHostnameFromCardName(ByRef cardTitle, ByRef mTVID:="") {
     ;DNS names allowed chars: only A-Za-z0-9- and unicode
     ;DNS names disallowed chars: «,~:!@#$%^&'.){}_ », first char is alplanum
 
-    If (   RegexMatch(cardTitle, "i)(?<!aka)(?<!\\\\)\\\\(?P<Hostname>[a-z\d][a-z\d-]+[a-z\d])([\s.].*\((?P<TVID>\d{3} ?\d{3} ?\d{3})\)?|$)", m)
-        ;|| RegexMatch(cardTitle, "i)(?<!aka)(?<!\\\\)\\\\(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.]\((?P<TVID>\d{3} ?\d{3} ?\d{3})\)|$)", m)
-        || RegexMatch(cardTitle, "i)(?<!aka)(?<!\\\\)\\\\(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.].*\((?P<TVID>\d{3} ?\d{3} ?\d{3})\)?|$)", m)
-        || RegexMatch(cardTitle, "i)^(?P<Hostname>[a-z\d][a-z\d-]+[a-z\d])([\s.].*\((?P<TVID>\d{3} ?\d{3} ?\d{3})\)?|$)", m)
-        ;|| RegexMatch(cardTitle, "i)^(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.]\((?P<TVID>d{9})\)|$)", m)
-        || RegexMatch(cardTitle, "i)^(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.].*\((?P<TVID>\d{3} ?\d{3} ?\d{3})\)?|$)", m))
+    If (   RegexMatch(cardTitle, "i)(?<!aka)(?<!\\\\)\\\\(?P<Hostname>[a-z\d][a-z\d-]+[a-z\d])([\s.].*\((?P<TVID>\d{3}\W?\d{3}\W?\d{3})\)?|$)", m)
+        ;|| RegexMatch(cardTitle, "i)(?<!aka)(?<!\\\\)\\\\(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.]\((?P<TVID>\d{3}\W?\d{3}\W?\d{3})\)|$)", m)
+        || RegexMatch(cardTitle, "i)(?<!aka)(?<!\\\\)\\\\(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.].*\((?P<TVID>\d{3}\W?\d{3}\W?\d{3})\)?|$)", m)
+        || RegexMatch(cardTitle, "i)^(?P<Hostname>[a-z\d][a-z\d-]+[a-z\d])([\s.].*\((?P<TVID>\d{3}\W?\d{3}\W?\d{3})\)?|$)", m)
+        ;|| RegexMatch(cardTitle, "i)^(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.]\((?P<TVID>\d{3}\W?\d{3}\W?\d{3})\)|$)", m)
+        || RegexMatch(cardTitle, "i)^(?P<Hostname>[^\\\/:*?<>|.""]{1,15})([\s.].*\((?P<TVID>\d{3}\W?\d{3}\W?\d{3})\)?|$)", m))
 	return mHostname
     return
 }
