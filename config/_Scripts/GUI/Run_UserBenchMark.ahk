@@ -11,13 +11,13 @@
 #NoEnv
 #InstallKeybdHook
 #InstallMouseHook
-;#SingleInstance ignore - breaks /WaitAndPostURL
+;#SingleInstance ignore - breaks /WaitAndPostResults
 #SingleInstance force
 If A_OSVersion in WIN_2003,WIN_XP,WIN_2000
     ExitApp 1
 
 Arg1 = %1%
-If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="-WaitAndPostURL.lnk") {
+If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFromBrowser.lnk") {
     OnClipboardChange("ClipHook")
     SetTitleMatchMode 2
     actnList := "_;^f;_;Copy results{Esc};{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
@@ -31,10 +31,8 @@ If (Arg1="/WaitAndPostURL" || Arg1="-WaitAndPostURL" || Arg1="-WaitAndPostURL.ln
     Loop
     {
 	;MsgBox ResultsURL: %ResultsURL%`nA_Index: %A_Index%
-	If (ResultsURL && (A_Index > 100 || IsObject(perfResultsObj)) ) {
-	    statusHTTP := PostURL(ResultsURL, perfResultsObj)
-	    If (statusHTTP>=200 && statusHTTP<300)
-		break
+	If (ResultsURL && (IsObject(perfResultsObj) || A_Index > 100) ) {
+	    ExitApp !PostResults(ResultsURL, perfResultsObj)
 	} Else {
 	    IfWinExist Performance Results - UserBenchmark
 	    {
@@ -113,7 +111,7 @@ If (!A_IsAdmin) {
     ExitApp
 }
 
-UBMURL := "http://www.userbenchmark.com/resources/download/UserBenchMark.zip"
+UBMzipURL := "http://www.userbenchmark.com/resources/download/UserBenchMark.zip"
 TempDir := A_Temp . "\UserBenchMark-DL"
 archiveName := TempDir . "\UserBenchMark.zip"
 exeName := TempDir . "\UserBenchMark.exe"
@@ -135,28 +133,28 @@ While (!FileExist(exeName)) {
 	    break
 	}
 
-	Notify("Скачивается " . UBMURL)
-	UrlDownloadToFile %UBMURL%, %archiveName%
+	Notify("Скачивается " . UBMzipURL)
+	UrlDownloadToFile %UBMzipURL%, %archiveName%
 	If (FileExist(archiveName))
 	    break
 	
 	; If a new browser is installed, Win8+ will show app selection window instead of launching default one
 	; because of that, launching specific browser is much more safe
 	If (A_OSVersion != "WIN_7" && browserexe := FindBrowserExe())
-	    runUBMDL := browserexe . A_Space . UBMURL
+	    runUBMDL := browserexe . A_Space . UBMzipURL
 	Else
-	    runUBMDL := UBMURL
+	    runUBMDL := UBMzipURL
 	Run %runUBMDL%
 	If (browserexe) {
 	    MsgBox Нажмите OK`, затем Выберите браузер по умолчанию (поставьте галочку)`, иначе UserBenchmark не сможет открыть страницу результатов.
 	    Run http://
 	}
 	
-	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMURL% запущен браузер. Пауза %delay% секунд., %delay%
+	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMzipURL% запущен браузер. Пауза %delay% секунд., %delay%
 	delay := delay * 2
 	
 	If (A_Index>1) {
-	    MsgBox 22, %A_ScriptName%, %UBMURL% не скачался., 300
+	    MsgBox 22, %A_ScriptName%, %UBMzipURL% не скачался., 300
 	    IfMsgBox Continue
 		break
 	    IfMsgBox Cancel
@@ -221,7 +219,7 @@ Loop Parse, drivers
 }
 
 FileAppend %A_Now% Запуск ожидания прявления результатов в отдельном процессе…`n,*,CP866
-Run %ScriptRunCommand% /WaitAndPostURL, %A_ScriptDir%
+Run %ScriptRunCommand% /PostURLFromBrowser, %A_ScriptDir%
 
 ExitApp
 
@@ -324,54 +322,64 @@ ParsePerfResults(txt) {
 	return
 }
 
-PostURL(ResultsURL, perfResultsObj:="") {
-    static URL:="https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse"
-    ;Results posted to https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo
+PostResults(ByRef ResultsURL, perfResultsObj:="") {
+    static stageTitle := "Запись результатов в таблицу"
+	 , geoLocation := 0
+	 , Hostname
 
-    ;debug=1
-    stageTitle := "Отправка результатов в таблицу"
-    stageDetails := "Запись ссылки " . ResultsURL . (IsObject(perfResultsObj) ? " и текста результатов" ) . " в таблицу https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo"
-    Notify(stageTitle . "…")
-    getURL("http://freegeoip.net/json/", , reqStatus, geoLocation)
-    RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
-;    RegRead Domain, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
+    If (!Hostname)
+	RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
+    ;RegRead Domain, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
+
+    Notify(stageTitle . "`nПроверка дубликатов…")
+    If (InStr(res := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vSCtCE_IBuSaHQcTs0pNZEGq2PbbiTotNr1Br75Lrhu9Y-SfdDCuB7gTRrSLNixNxmlB_z2GU-uxhjh/pub?gid=178521167&single=true&output=tsv")
+	    , "`n" ResultsURL A_Tab Hostname)) {
+	Progress Off    
+	MsgBox 0x124, %stageTitle%, Эта ссылка уже есть в таблице. Отправить повторно?, 300
+	IfMsgBox No
+	    return
+	IfMsgBox Timeout
+	    return
+    }
+
+    Notify(stageTitle . "`nПолучение GeoIP…")
+    If (!geoLocation) {
+	;API The HTTP API takes GET requests in the following schema:
+	;freegeoip.net/{format}/{IP_or_hostname}
+	;Supported formats are: csv, xml, json and jsonp. If no IP or hostname is provided, then your own IP is looked up.
+	;Examples: CSV freegeoip.net/csv/8.8.8.8	XML freegeoip.net/xml/4.2.2.2	JSON freegeoip.net/json/github.com
+	XMLHTTP_Request("GET", "http://freegeoip.net/json/", , geoLocation)
+    }
     
     POSTDATA :="entry.781637524="  . UriEncode(Hostname)
 	    . "&entry.1905065751=" . UriEncode(A_UserName)
 	    . "&entry.157476182="  . UriEncode(Trim(geoLocation, " `t`n`r"))
 	    . "&entry.1781068882=" . UriEncode(ResultsURL)
-    ;	    . "&=" . UriEncode()
-    ; 	    . "&draftResponse=%5B%2C%2C%227394410598969454764%22%5D%0D%0A&pageHistory=0&fbzx=7394410598969454764"
-    If (IsObject(perfResultsObj)) {
-	POSTDATA .= "&entry.1510085348=" . UriEncode(perfResultsObj.Desktop)
+	    . ( IsObject(perfResultsObj)
+		? ( "&entry.1510085348=" . UriEncode(perfResultsObj.Desktop)
 		  . "&entry.223703596="  . UriEncode(perfResultsObj.CPU)
 		  . "&entry.1405465926=" . UriEncode(perfResultsObj.CPUModel)
 		  . "&entry.1620286468=" . UriEncode(perfResultsObj.HDD)
 		  . "&entry.1701865591=" . UriEncode(perfResultsObj.HDDModel)
 		  . "&entry.854695461="  . UriEncode(perfResultsObj.SSD)
 		  . "&entry.1010033023=" . UriEncode(perfResultsObj.SSDModel)
-		  . "&entry.685726891="  . UriEncode(Trim(perfResultsObj.ResultsText, " `t`n`r"))
-    }
-    
+		  . "&entry.685726891="  . UriEncode(Trim(perfResultsObj.ResultsText, " `t`n`r")) )
+		  : "" )
+
+    Notify(stageTitle . "`nОтправка формы…")
+    stageDetails := "Запись ссылки " . ResultsURL . (IsObject(perfResultsObj) ? " и текста результатов" ) . " в таблицу результатов"
+    ;Results posted to https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo
     Menu Tray, Tip, %stageDetails%`n
     FileAppend %A_Now% %stageDetails%`n,*,CP866
     
-    Loop
-    {
-	success := (   sendHTTPPOSTRequest(URL,POSTDATA,ReadProxy("HKEY_LOCAL_MACHINE"), statusHTTP)
-			    || sendHTTPPOSTRequest(URL,POSTDATA,ReadProxy("HKEY_CURRENT_USER"), statusHTTP)
-			    || sendHTTPPOSTRequest(URL,POSTDATA,"192.168.127.1:3128", statusHTTP) 
-			    || sendHTTPPOSTRequest(URL,POSTDATA,,statusHTTP) )
-	If (success) {
-	    break
-	} Else {
-	    MsgBox 53, %stageTitle%, При отправке произошла ошибка`, HTTP-код %statusHTTP%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
-	    IfMsgBox Cancel
-		break
-	}
+    While (!XMLHTTP_Post("https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse", POSTDATA)) {
+	Progress Off
+	MsgBox 53, %stageTitle%, При отправке произошла ошибка`, HTTP-код %statusHTTP%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
+	IfMsgBox Cancel
+	    return
     }
-
-    return statusHTTP
+    
+    return 1
 }
 
 ResetProgress() {
@@ -384,138 +392,13 @@ Notify(txt, appendlog := 1) {
     Menu Tray, Tip, %txt%
     Progress Show
     Progress 0,, %txt%
-;    SplashTextOn 200,15,%A_ScriptName%,%txt%
-;    WinSet, AlwaysOnTop, Off, % "ahk_pid " . DllCall("GetCurrentProcessId")
     If (appendlog)
 	FileAppend %A_Now% %txt%`n,*,CP866
-}
-
-;tryPOSTWithProxies(URL, POSTDATA, ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
-;    return ( sendHTTPPOSTRequest(URL, POSTDATA, ReadProxy("HKEY_LOCAL_MACHINE"), aStatus, aResponse, aResponseHeaders)
-;	  || sendHTTPPOSTRequest(URL, POSTDATA, ReadProxy("HKEY_CURRENT_USER"), aStatus, aResponse, aResponseHeaders)
-;	  || sendHTTPPOSTRequest(URL, POSTDATA, "192.168.1.1:3128", aStatus, aResponse, aResponseHeaders)
-;	  || sendHTTPPOSTRequest(URL, POSTDATA, "", aStatus, aResponse, aResponseHeaders) )
-;}
-
-getURL(URL, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
-    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebRequest.Open("GET", URL, false)
-    If (proxy!="")
-	WebRequest.SetProxy(2,proxy)
-    Try {
-	WebRequest.Send()
-	aResponseHeaders := WebRequest.GetAllResponseHeaders
-	aResponse := WebRequest.ResponseText
-	aStatus:=WebRequest.Status	;can be 200, 404 etc., including proxy responses
-    } catch e {
-	global err
-	err:=e
-    }
-    WebRequest := ""
-    If proxy
-	proxyText := %A_Space%(over proxy %proxy%)
-    FileAppend GET %URL%%proxyText%`n%aStatus%`n%aResponseHeaders%`n%aResponse%,*,CP866
-}
-
-sendHTTPPOSTRequest(URL, POSTDATA, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
-    global debug
-
-    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebRequest.Open("POST", URL, false)
-    WebRequest.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-    If (proxy!="")
-	WebRequest.SetProxy(2,proxy)
-    Try {
-	WebRequest.Send(POSTDATA)
-	aResponseHeaders := WebRequest.GetAllResponseHeaders
-	aResponse := WebRequest.ResponseText
-	aStatus:=WebRequest.Status	;can be 200, 404 etc., including proxy responses
-    } catch e {
-	err:=e
-    }
-    WebRequest := ""
-    FileAppend POST %URL%`n%aStatus%`n%aResponseHeaders%`n%aResponse%,*,CP866
-    
-    If (debug==1) {
-	;http://www.autohotkey.com/board/topic/56987-com-object-reference-autohotkey-l/#entry358974
-;	static document
-;	Gui Add, ActiveX, w750 h550 vdocument, MSHTML:%aResponse%
-;	Gui Show
-	
-	MsgText := "Over proxy=" . proxy
-	    . "`nStatus=" . aStatus
-	    . "`nerror:`nWhat=" . err.What
-	    . "`nMessage=" . err.Message
-	    . "`nExtra=" . err.Extra
-	    . "`n`nResponse Headers: " . aResponseHeaders
-
-	MsgBox %MsgText%
-    }
-    
-    If err
-	return 0
-    Else
-	return aStatus
-}
-
-ReadProxy(ProxySettingsRegRoot="HKEY_CURRENT_USER") {
-    static ProxySettingsIEKey:="Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-    RegRead ProxyEnable, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyEnable
-    If ProxyEnable
-	RegRead ProxyServer, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyServer
-    return ProxyServer
 }
 
 ;GuiClose:
 ;GuiEscape:
 ;    ExitApp
-
-;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/
-; modified from jackieku's code (http://www.autohotkey.com/forum/post-310959.html#310959)
-UriEncode(Uri, Enc = "UTF-8")
-{
-	StrPutVar(Uri, Var, Enc)
-	f := A_FormatInteger
-	SetFormat, IntegerFast, H
-	Loop
-	{
-		Code := NumGet(Var, A_Index - 1, "UChar")
-		If (!Code)
-			Break
-		If (Code >= 0x30 && Code <= 0x39 ; 0-9
-			|| Code >= 0x41 && Code <= 0x5A ; A-Z
-			|| Code >= 0x61 && Code <= 0x7A) ; a-z
-			Res .= Chr(Code)
-		Else
-			Res .= "%" . SubStr(Code + 0x100, -1)
-	}
-	SetFormat, IntegerFast, %f%
-	Return, Res
-}
-
-UriDecode(Uri, Enc = "UTF-8")
-{
-	Pos := 1
-	Loop
-	{
-		Pos := RegExMatch(Uri, "i)(?:%[\da-f]{2})+", Code, Pos++)
-		If (Pos = 0)
-			Break
-		VarSetCapacity(Var, StrLen(Code) // 3, 0)
-		StringTrimLeft, Code, Code, 1
-		Loop, Parse, Code, `%
-			NumPut("0x" . A_LoopField, Var, A_Index - 1, "UChar")
-		StringReplace, Uri, Uri, `%%Code%, % StrGet(&Var, Enc), All
-	}
-	Return, Uri
-}
-
-StrPutVar(Str, ByRef Var, Enc = "")
-{
-	Len := StrPut(Str, Enc) * (Enc = "UTF-16" || Enc = "CP1200" ? 2 : 1)
-	VarSetCapacity(Var, Len, 0)
-	Return, StrPut(Str, &Var, Enc)
-}
 
 WaitCPUIdle() {
     SetFormat FloatFast, 3.2
@@ -557,6 +440,9 @@ GetIdleTime()    ;idle time fraction
     DllCall("GetSystemTimes", "int64P", newIdleTime, "int64P", newKrnlTime, "int64P", newUserTime)
     Return (newIdleTime-oldIdleTime)/(newKrnlTime-oldKrnlTime + newUserTime-oldUserTime)
 }
+
+#include %A_LineFile%\..\..\Lib\XMLHTTP_Request.ahk
+#include %A_LineFile%\..\..\Lib\PostGoogleForm.ahk
 
 GetKnownFolder(FolderName) { ;http://www.autohotkey.com/forum/viewtopic.php?t=68194 
     If !RegExMatch(folderdata(),"im`a)^" . foldername . ".+$",line) 
@@ -717,4 +603,3 @@ FillGroups() {
 ;ОК
 ;Could not initialize Direct3D 10. This application requires a Direct3D 10 class
 ;device (hardware or reference rasterizer) running on Windows Vista (or later).
-
