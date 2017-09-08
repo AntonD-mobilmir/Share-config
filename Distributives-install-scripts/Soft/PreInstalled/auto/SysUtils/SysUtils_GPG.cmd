@@ -9,5 +9,5 @@ SET "PATH=%PATH%;%pathString%"
 
 IF "%SysUtilsDelaySettings%"=="1" EXIT /B
 REM Adding DLLs and CMDs to %PATH%
-"%utilsdir%pathman.exe" /as "%pathString%"
+"%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%pathString%"
 )

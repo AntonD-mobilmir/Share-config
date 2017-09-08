@@ -11,7 +11,7 @@ IF NOT DEFINED filteredPathString GOTO :SkipAddingPath
 IF "%filteredPathString:~0,1%"==";" SET "filteredPathString=%filteredPathString:~1%"
 (
 SET "PATH=%PATH%;%filteredPathString%"
-START "Pathman in started in background for case when it hangs" /MIN "%utilsdir%pathman.exe" /as "%filteredPathString%"
+START "Pathman in started in background for case when it hangs" /MIN "%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%filteredPathString%"
 )
 :SkipAddingPath
 (
