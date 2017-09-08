@@ -1,34 +1,30 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-TrelloAPI1(ByRef method, ByRef req, ByRef response, ByRef data:="") {
+TrelloAPI1(ByRef method, ByRef req, ByRef jsonresp, jsondata:="") {
     ;req is as in documentation https://developers.trello.com/advanced-reference/member#get-1-members-idmember-or-username-boards
     ;
     ;example:	
     ; req:	/members/me/boards
     ; URL:	https://api.trello.com/1/members/me/boards?key=[application_key]&token=[optional_auth_token]
     
-    APIkey:=0
-    authToken:=GetTrelloAuthToken(APIkey)
+    authToken:=GetTrelloAuthToken(APIkey:="")
     
-    If (IsObject(data))
-	jsondata := JSON.Dump(data)
-    Else
-	jsondata := data
-    retv := XMLHTTP_Request(method, "https://api.trello.com/1" req (InStr(req, "?") ? "&" : "?") "key=" APIkey "&token=" authToken, jsondata, jsonresp:="")
-    If (IsObject(response))
-	response := JSON.Load(jsonresp)
-    Else
-	response := jsonresp
-    return retv
+    If (IsObject(jsondata))
+	jsondata := JSON.Dump(jsondata)
+    returnObject := IsObject(jsonresp)
+    xhr := XMLHTTP_Request(method, "https://api.trello.com/1" req (InStr(req, "?") ? "&" : "?") "key=" APIkey "&token=" authToken, jsondata, jsonresp:="")
+    If (xhr && returnObject)
+	return JSON.Load(jsonresp)
+    return xhr
 }
 
-GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1) {
-    static APIkey := 0, authToken := 0
+GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope := "read,write,account", appName := "") {
+    static APIkey := 0, authToken := 0, storedAppName := ""
     
     If (reqAPIkey) {
 	If (APIkey!=reqAPIkey)
-	    authToken := 0
+	    authToken := ""
 	APIkey := reqAPIkey
     }
     
@@ -38,8 +34,13 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1) {
     }
     
     While (!(APIkey && authToken)) {
+	If (appName=="")
+	    If (storedAppName == "")
+		appName := A_ScriptName
+	    Else
+		appName := storedAppName
 	EnvGet LocalAppData,LOCALAPPDATA
-	secretsDir = %LocalAppData%\mobilmir.ru\Trello-ahk\%A_ScriptName%
+	secretsDir = %LocalAppData%\mobilmir.ru\Trello-ahk\%appName%
 	
 	APIkeytxt = %secretsDir%\APIkey.txt
 	FileRead APIkey, %APIkeytxt%
@@ -50,7 +51,7 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1) {
 	    If (!authToken) {
 		If (!interactively)
 		    Throw Exception("Trello Auth Token not available",, authtokentxt)
-		Run % "https://trello.com/1/authorize?expiration=never&scope=read,write,account&response_type=token&name=AutoHotkey%20Script%2016-05-16&key=" APIkey
+		Run % "https://trello.com/1/authorize?expiration=never&scope=" scope "&response_type=token&name=" UriEncode(appName) "&key=" APIkey
 		Run notepad.exe %authtokentxt%
 		MsgBox Получите токен доступа для скрипта и запишите в "%authtokentxt%"
 	    }
@@ -64,7 +65,11 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1) {
 	    ;Please keep your API Secret safe. Because your API Key is public for any client-side applications, we do not currently offer a way to reset it.
 	}
     }
+    
+    reqAPIkey := APIkey
+    return authToken
 }
 
 #include %A_LineFile%\..\JSON.ahk
 #include %A_LineFile%\..\XMLHTTP_Request.ahk
+#include %A_LineFile%\..\URIEncodeDecode.ahk
