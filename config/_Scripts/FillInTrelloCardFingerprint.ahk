@@ -41,25 +41,21 @@ FileAppend %A_Now% Запись в Trello информации о компьют
 
 If (FileExist(fileID)) {
     FileReadLine cardID, %fileID%, 2
-    card := Object()
-    If (!TrelloAPI1("GET", "/cards/" cardID, card))
-	ShowError("Ошибка при получении карточки с ID " cardID " из Trello.`n", JSON.Dump(card), A_LastError, 1)
+    If (!(card := TrelloAPI1("GET", "/cards/" cardID, jsoncard := Object())))
+	ShowError("Ошибка при получении карточки с ID " cardID " из Trello.`n", jsoncard, A_LastError, 1)
 } else {
+    If (debug) {
+	;TrelloAPI1("GET", "/boards/" . boardID . "/cards", jsoncards)
+	;FileMove cards.json, cards.json.bak, 1
+	;FileAppend %jsoncards%, cards.json
+	FileRead jsoncards, cards.json
+	cards := JSON.Load(jsoncards)
+    }
     Loop
     {
 	errText =
-	cards := Object()
 	matches := Object()
-	;--debug--
-	If (debug || TrelloAPI1("GET", "/boards/" . boardID . "/cards", cards)) {
-	    If (debug) {
-		;TrelloAPI1("GET", "/boards/" . boardID . "/cards", jsoncards)
-		;FileMove cards.json, cards.json.bak, 1
-		;FileAppend %jsoncards%, cards.json
-		FileRead jsoncards, cards.json
-		cards := JSON.Load(jsoncards)
-	    }
-	    
+	If (IsObject(cards) || TrelloAPI1("GET", "/boards/" . boardID . "/cards", jsoncards := Object())) {
 	    For k,card in cards {
 		cardHostname := ExtractHostnameFromCardName(card.name, cardTVID)
 		If (hostnameAlts.HasKey(cardHostname))
@@ -100,6 +96,7 @@ If (FileExist(fileID)) {
 
 	If (errText) {
 	    ShowError(errText "`n" reportMatches, "`nИсправьте доску учета компьютеров.")
+	    cards := ""
 	} Else
 	    break
     }
