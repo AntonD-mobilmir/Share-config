@@ -35,6 +35,7 @@ FileCreateDir %confDir%
 
 If (!IsObject(FileOpen(GNUPGHOME "\lock.tmp", "w"))) { ; 
     FileCopyDir %GNUPGHOME%, %tempDir%\gnupg, 1
+    FileAppend Cannot write to GNUPGHOME ("%GNUPGHOME%")`, copying keyring to TEMP ("%TEMP%")`n, *, CP1
     GNUPGHOME = %tempDir%\gnupg
 }
 FileDelete GNUPGHOME "\lock.tmp"
@@ -45,6 +46,7 @@ If (A_IsAdmin)
     UpdateScript(A_ScriptFullPath, 48, CommonScriptsURL, CommonGPGFName)
 ;UpdateScript("D:\*", 48, CommonScriptsURL, CommonGPGFName)
 
+FileAppend tempDir: %tempDir%`nconfDir: %confDir%`nGNUPGHOME: %GNUPGHOME%`ntimeout: %timeout%`ntries: %tries%`n, *, CP1
 clURL = %2%
 If (StartsWith(clURL, "http")) {
     checkPeriod = %3%
@@ -75,10 +77,10 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
     static curlexe := "", wgetexe := "", exe7z := ""
 	 , gpgexe  := findexe("gpg.exe", "c:\SysUtils\gnupg\pub")
 	 , nextMethod:=2
-    If (!checkPeriod)
+    If (checkPeriod=="")
 	checkPeriod := 24 ; Hours
     
-    SplitPath dstFullPath, dstFName, dstDir,,, drvltr ; drvltr is either d: or \\hostname (no ending backslash)
+    SplitPath dstFullPath, dstFName, dstDir, dstExt,, drvltr ; drvltr is either d: or \\hostname (no ending backslash)
     If (StartsWith(drvltr, "\\Srv0"))
 	return 0
     If (gpgFName) {
@@ -89,19 +91,22 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	gpgFName := dstFName ".gpg"
 	verifiedFName := dstFName
     }
+    FileAppend dstFullPath: %dstFullPath%`ncheckPeriod: %checkPeriod%`nURL: %URL%`ngpgFName: %gpgFName%`nverifiedFName: %verifiedFName%`n, *, CP1
     
-    runLog = %confDir%\%verifiedFName%.UpdateRunning.log
     endLog = %confDir%\%verifiedFName%.Update.log
+    runLog = %confDir%\%verifiedFName%.UpdateRunning.log
     
     FileGetTime ctime, %endLog%, C
     FileGetTime ctimeUpdRun, %runLog%, C
     If (ctimeUpdRun > ctime)
 	ctime := ctimeUpdRun
-    checkAge=
-    checkAge -= ctime, Hours
-    If (checkAge >= 0 && checkAge < checkPeriod) {
-	FileAppend %A_Now% Last check %checkAge% hours ago`, min %checkPeriod% h needed`n, %runLog%
-	return 1
+    If (ctime) {
+	checkAge=
+	checkAge -= ctime, Hours
+	If (checkAge >= 0 && checkAge < checkPeriod) {
+	    FileAppend %A_Now% Last check %checkAge% hours ago`, min %checkPeriod% h needed`n, %runLog%
+	    return 1
+	}
     }
     FileGetSize runLogSize, %runLog%
     If (runLogSize > 1048576)
@@ -152,7 +157,9 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	} Until gpglog
 	FileAppend %gpglog%`nErrorLevel: %gpgErrLevel%`n, %runLog%
 	;MsgBox gpgErrLevel: %gpgErrLevel%`ngpglog:`n%gpglog%
-	If (!gpgErrLevel && RegexMatch(gpglog, "m`a)^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+) .+ key ID (?P<keyID>\w+)\s+gpg: Good signature from ", r)) {
+	If (!gpgErrLevel
+	    && ( dstExt="mab"
+	      || RegexMatch(gpglog, "m`a)^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+) .+ key ID (?P<keyID>\w+)\s+gpg: Good signature from ", r))) {
 	    ;gpg: Signature made 08/09/17 19:26:49 Russia TZ 2 Standard Time using DSA key ID E91EA97A
 	    ;gpg: Good signature from "Антон Дербенев (Цифроград-Ставрополь) <anton.derbenev@mobilmir.ru>" [ultimate]
 	    FileSetTime SubStr("2000", 1, 4-StrLen(rYY)) . Format("{:02u}{:02u}{:02u}{:02u}{:02u}{:02u}", rYY, rMM, rDD, rHour, rMin, rSec), %tempDir%\%verifiedFName%
@@ -167,7 +174,8 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 		}
 
 		archSubdir := SubStr(dstDir, StrLen(drvltr) + 2) ; 2 for next character after backslash
-		FileAppend %A_Now% Unpacking "%archSubdir%\%dstFName%" from "%verifiedFName%"…
+		FileAppend %A_Now% Unpacking "%archSubdir%\%dstFName%" from "%verifiedFName%"…, *, CP1
+		FileAppend %A_Now% Unpacking "%archSubdir%\%dstFName%" from "%verifiedFName%"…, %runLog%
 		cmdl7z = "%exe7z%" x -y -o"%drvltr%" -- "%tempDir%\%verifiedFName%" "%archSubdir%\%dstFName%" 
 		RunWait %comspec% /C "%cmdl7z% >>"%runLog%" 2>&1", %tempDir%, Hide UseErrorLevel, childPID
 		childPID := 0
