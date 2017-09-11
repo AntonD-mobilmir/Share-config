@@ -317,19 +317,34 @@ class JSON
 			static quot := Chr(34), bashq := "\" . quot
 
 			if (string != "") {
-				  string := StrReplace(string,  "\",  "\\")
-				; , string := StrReplace(string,  "/",  "\/") ; optional in ECMAScript
-				, string := StrReplace(string, quot, bashq)
-				, string := StrReplace(string, "`b",  "\b")
-				, string := StrReplace(string, "`f",  "\f")
-				, string := StrReplace(string, "`n",  "\n")
-				, string := StrReplace(string, "`r",  "\r")
-				, string := StrReplace(string, "`t",  "\t")
 				; LogicDaemon mod 11:07 11.09.2017: stop replacing unicode with \uxxxx.
+				; look for "string" at http://json.org/
+				static escapeChars := {"""": "\""", "\": "\\", "`b": "\b", "`f": "\f", "`n": "\n", "`r": "\r", "`t": "\t"}
+				; also https://stackoverflow.com/a/7597014
+				
+				m := ""
+				VarSetCapacity(m, VarSetCapacity(string)) ; *2 for unicode
+				Loop Parse, string
+				{
+				    If escapeChars.HasKey(A_LoopField)
+					m .= escapeChars[A_LoopField]
+				    Else If ((cc := Ord(A_LoopField)) < 0x20)
+					m .= Format("\u{1:04x}", Ord(cc))
+				    Else
+					m .= A_LoopField
+				}
+				string := m
+				;  string := StrReplace(string,  "\",  "\\")
+				; , string := StrReplace(string,  "/",  "\/") ; optional in ECMAScript
+				;, string := StrReplace(string, quot, bashq)
+				;, string := StrReplace(string, "`b",  "\b")
+				;, string := StrReplace(string, "`f",  "\f")
+				;, string := StrReplace(string, "`n",  "\n")
+				;, string := StrReplace(string, "`r",  "\r")
+				;, string := StrReplace(string, "`t",  "\t")
 				; prev - static rx_escapable := A_AhkVersion<"2" ? "O)[^\x20-\x7e]" : "[^\x20-\x7e]"
-				static rx_escapable := ( A_AhkVersion<"2" ? "O)" : "" ) "[^\x20-]"
-				while RegExMatch(string, rx_escapable, m)
-					string := StrReplace(string, m.Value, Format("\u{1:04x}", Ord(m.Value)))
+				;	while RegExMatch(string, rx_escapable, m)
+				;		string := StrReplace(string, m.Value, Format("\u{1:04x}", Ord(m.Value)))
 			}
 
 			return quot . string . quot
