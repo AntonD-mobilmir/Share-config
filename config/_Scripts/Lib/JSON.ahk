@@ -325,8 +325,9 @@ class JSON
 				, string := StrReplace(string, "`n",  "\n")
 				, string := StrReplace(string, "`r",  "\r")
 				, string := StrReplace(string, "`t",  "\t")
-
-				static rx_escapable := A_AhkVersion<"2" ? "O)[^\x20-\x7e]" : "[^\x20-\x7e]"
+				; LogicDaemon mod 11:07 11.09.2017: stop replacing unicode with \uxxxx.
+				; prev - static rx_escapable := A_AhkVersion<"2" ? "O)[^\x20-\x7e]" : "[^\x20-\x7e]"
+				static rx_escapable := ( A_AhkVersion<"2" ? "O)" : "" ) "[^\x20-]"
 				while RegExMatch(string, rx_escapable, m)
 					string := StrReplace(string, m.Value, Format("\u{1:04x}", Ord(m.Value)))
 			}
