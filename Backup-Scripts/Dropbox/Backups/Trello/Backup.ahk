@@ -1,38 +1,62 @@
-﻿;by LogicDaemon <www.logicdaemon.ru>
+﻿;Командная строка:
+;Backup.ahk [ключи]
+;    ключи (в любом порядке):
+;	/org	не запрашивать доски пользователя для добавления в список резервного копирования
+;	/me	не запрашивать доски организации для добавления в список резервного копирования
+;	    по умолчанию запрашиваются и те, и те, но каждая доска будет скопирована только один раз;
+;	    если указать оба ключа, резервное копирование не будет выполняться
+;	путь	папка, куда сохранять резервные копии, список досок и журнал. Должна существовать или должен быть указан путь с "\", иначе скрипт будет считать, что это доп. параметры запроса.
+;	доп. параметры запроса	см. https://developers.trello.com/v1.0/reference#boards-nested-resource. Например, boards=open
+
+;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 FileEncoding UTF-8
-log = %A_ScriptFullPath%.log
 GetTrelloAuthToken(,, "read", "mobilmir.ru Trello Backup AutoHotkey Script")
 ;TrelloAPI1(method, req, response, data)
 
+SetWorkingDir %A_ScriptDir%
+
 queryOrgsBoards := queryMyBoards := 1
-filter := ""
+destDir := filter := ""
 Loop %0%
 {
     argv := %A_Index%
     If (argv = "/org")
-	queryMyBoards := 0
+	queryOrgsBoards := -1, queryMyBoards--
     If (argv = "/my" || argv = "/me")
-	queryOrgsBoards := 0
-    Else If (!filter)
+	queryMyBoards := -1, queryOrgsBoards--
+    Else If (Instr(FileExist(argv), "D"))
+	destDir := argv
+    Else If (InStr(argv, "\")) {
+	destDir := argv
+	FileCreateDir %destDir%
+    } Else If (!filter)
 	filter := "?filter=" argv
     Else Throw Exception("Excess argument",, "(arg no. " A_Index ") " argv)
 }
 
+If (StrLen(destDir) && SubStr(destDir, 0) != "\")
+    destDir .= "\"
+
+log = %destDir%%A_ScriptName%.log
+FileGetSize logSize, %log%, M
+If (logSize > 1)
+    FileMove %log%, %log%.bak, 1
 FormatTime today,, yyyy-MM-dd
-batchdir := today
-While FileExist(batchdir)
-    batchdir := today . Format("#{:.2i}", A_Index)
-FileCreateDir %batchdir%
-FileAppend `n[·] %A_Now%`tStaring backup to %batchdir%`n, %log%
+RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
+batchDir := destDir A_UserName "@" Hostname "\" today
+While FileExist(batchDir)
+    batchDir := A_UserName "\" today . Format("#{:.2i}", A_Index)
+FileCreateDir %batchDir%
+FileAppend `n[·] %A_Now%`tStaring backup for %A_UserName% to %batchDir%`n, %log%
 
 If (queryOrgsBoards) {
     FileAppend [→] %A_Now%`tGET /members/me/organizations`n, %log%
-    For i,org in TrelloAPI1("GET", "/members/me/organizations", jsonOrgs := Object()) {
+    orgsBoardsBatch := ""
+    For i,org in TrelloAPI1("GET", "/members/me/organizations", jsonOrgs := Object())
 	QueueBackupBoards("/organizations/" org.id "/boards" filter)
-    }
-    TransactWrite(batchdir "\organizations.json", jsonOrgs)
+    TransactWrite(batchDir "\organizations.json", jsonOrgs)
 }
 
 If (queryMyBoards)
@@ -41,8 +65,11 @@ If (queryMyBoards)
 ExitApp QueueBackupBoards()
 
 QueueBackupBoards(ByRef query := "") {
-    global log, batchdir
-    static backupBoards := {}, oAllBoards := ""
+    global log, batchDir, destDir
+    static backupBoards := {}, oAllBoards := "", boardFields := ""
+    If (boardFields=="")
+	For i, v in GetBoardFields()
+	    boardFields .= (A_Index > 1 ? "," : "") . v
     
     If (oAllBoards=="") {
 	FileRead jsonOldBoards, boards.json
@@ -56,33 +83,42 @@ QueueBackupBoards(ByRef query := "") {
     }
     
     If (query) {
-	If (curBoards := TrelloAPI1("GET", query, jsonBoards := Object())) {
+	If (curBoards := TrelloAPI1("GET", tmpFullQuery := query . (InStr(query, "?") ? "&" : "?") . "board_fields=" boardFields , jsonBoards := Object())) {
 	    For i,board in curBoards {
 		If (board.dateLastActivity != oAllBoards[board.id].dateLastActivity) {
 		    oAllBoards[board.id] := board
 		    backupBoards[board.id] := ""
 		}
 	    }
-	    FileAppend [→] %A_Now%`tFound %i% boards in %query%`n, %log%
+	    FileAppend [→] %A_Now%`tFound %i% boards via %query%`n, %log%
 	} Else {
-	    Fail("GET " query, jsonBoards)
+	    Fail("GET " tmpFullQuery, jsonBoards)
 	}
-	WriteoutBatch(batchdir "\boards*.json", jsonBoards)
-	WriteoutBatch(batchdir "\boards*.txt", BoardsFormatTextReport(curBoards)[1])
+	WriteoutBatch(batchDir "\boards*.json", jsonBoards)
+	WriteoutBatch(batchDir "\boards*.txt", BoardsFormatTextReport(curBoards))
     } Else {
-	WriteoutBatch(batchdir "\*.json", oAllBoards)
+	WriteoutBatch(batchDir "\*.json", oAllBoards)
 	
 	backupListHasContents := 0
 	For boardid in backupBoards {
 	    backupListHasContents := 1
-	    WriteoutBatch(batchdir "\*.json", BatchRequest("/boards/" boardid "/cards/"))
-	    WriteoutBatch(batchdir "\*.json", BatchRequest("/boards/" boardid "/actions/"))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid)))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/actions/")))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/checklists/")))
+	    ;Routes do not exist: /1/boards/577f529fbf5d7ba0ec804c7a/tags/ – WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/tags/"))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/labels/")))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/lists/")))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/members/")))
+	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/plugins?filter=enabled")))
 	}
-	WriteoutBatch(batchdir "\*.json", BatchRequest())
-	TransactWrite(batchdir "\boards.txt", BoardsFormatTextReport(oAllBoards, backupBoards)[1])
+	WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest()))
 	
-	TransactWrite("boards.json", JSON.Dump(oAllBoards))
-	TransactWrite("boards.txt", BoardsFormatTextReport(oAllBoards)[1])
+	; backup Checklists
+	
+	TransactWrite(batchDir "\boards.txt", BoardsFormatTextReport(oAllBoards, backupBoards))
+	
+	TransactWrite(destDir "boards.json", JSON.Dump(oAllBoards))
+	TransactWrite(destDir "boards.txt", BoardsFormatTextReport(oAllBoards))
     }
     return backupListHasContents
 }
@@ -95,6 +131,15 @@ WriteoutBatch(ByRef dest, ByRef contents) {
 	    ia[key] := 0
 	return TransactWrite(StrReplace(dest, "*", Format("{:.4i}", ++ia[key])), contents)
     }
+}
+
+ObjToNEJson(objOrVal) {
+    If (IsObject(objOrVal)) {
+	txt := ""
+	For i,v in objOrVal
+	    txt .= (A_Index > 1 ? ", " : "") . """" i """: " . ObjToNEJson(v)
+	return "{" txt "}"
+    } Else return objOrVal
 }
 
 BatchRequest(ByRef req := "") {
@@ -114,18 +159,17 @@ BatchRequest(ByRef req := "") {
 	} Else {
 	    Fail(A_ThisFunc, urls " → " resp)
 	}
-	return "{""urls"":""" urls """ , ""response"": " resp "}", urls := ""
+	return {urls: urls, response: resp}, urls := ""
     }
 }
 
-BoardsFormatTextReport(ByRef ObjBoards, ByRef BackupBoards := "") {
-    static TxtAttribs := ["shortUrl", "closed", "name", "starred", "id", "dateLastActivity", "idOrganization"]
-    For i,v in TxtAttribs
+BoardsFormatTextReport(ByRef ObjBoards, ByRef BoardsToInclude := "") {
+    For i,v in GetBoardFields()
 	out .= v "`t"
     For i, objBoard in ObjBoards {
-	If (!IsObject(BackupBoards) || BackupBoards.HasKey(objBoard.id)) {
+	If (!IsObject(BoardsToInclude) || BoardsToInclude.HasKey(objBoard.id)) {
 	    out .= "`n"
-	    For j,v in TxtAttribs
+	    For j,v in GetBoardFields()
 		out .= objBoard[v] "`t"
 	}
     }
@@ -133,14 +177,23 @@ BoardsFormatTextReport(ByRef ObjBoards, ByRef BackupBoards := "") {
     return [out]
 }
 
+GetBoardFields() {
+    static BoardFields := ["shortUrl", "closed", "name", "starred", "id", "dateLastActivity", "idOrganization"]
+    return BoardFields
+}
+
 TransactWrite(ByRef path, ByRef contents) {
     global log
     If (file := FileOpen(path ".tmp", "w")) {
-	file.Write(contents)
+	If (IsObject(contents)) {
+	    For k,v in contents
+		file.Write(v)
+	} Else
+	    file.Write(contents)
 	file.Close()
 	FileMove %path%.tmp, %path%, 1
 	If (ErrorLevel)
-	    FileAppend [!] Failed renaming "%path%.tmp" → "%path%"`n, %log%
+	    FileAppend [!] %A_Now%`tFailed renaming "%path%.tmp" → "%path%"`n, %log%
 	Else
 	    FileAppend [↓] %A_Now%`tWrote %path%`n, %log%
     } Else {
@@ -220,4 +273,5 @@ TEA(ByRef y,ByRef z, k0,k1,k2,k3, n = 32) { ; n = #Rounds
    }
 }
 
-#include %A_LineFile%\..\..\..\Backups\profiles$\Share\config\_Scripts\Lib\TrelloAPI1.ahk
+;#include *i %A_ScriptDir%\..\..\Backups\profiles$\Share\config\_Scripts\Lib\JSON.ahk
+#include *i \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\TrelloAPI1.ahk
