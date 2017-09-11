@@ -23,9 +23,9 @@ Loop %0%
 {
     argv := %A_Index%
     If (argv = "/org")
-	queryOrgsBoards := -1, queryMyBoards--
+	queryOrgsBoards := -1
     If (argv = "/my" || argv = "/me")
-	queryMyBoards := -1, queryOrgsBoards--
+	queryMyBoards := -1
     Else If (Instr(FileExist(argv), "D"))
 	destDir := argv
     Else If (InStr(argv, "\")) {
@@ -51,7 +51,7 @@ While FileExist(batchDir)
 FileCreateDir %batchDir%
 FileAppend `n[·] %A_Now%`tStaring backup for %A_UserName% to %batchDir%`n, %log%
 
-If (queryOrgsBoards) {
+If (queryOrgsBoards + queryMyBoards) {
     FileAppend [→] %A_Now%`tGET /members/me/organizations`n, %log%
     orgsBoardsBatch := ""
     For i,org in TrelloAPI1("GET", "/members/me/organizations", jsonOrgs := Object())
@@ -59,7 +59,7 @@ If (queryOrgsBoards) {
     TransactWrite(batchDir "\organizations.json", jsonOrgs)
 }
 
-If (queryMyBoards)
+If (queryMyBoards + queryOrgsBoards)
     QueueBackupBoards("/members/me/boards" filter)
 
 ExitApp QueueBackupBoards()
