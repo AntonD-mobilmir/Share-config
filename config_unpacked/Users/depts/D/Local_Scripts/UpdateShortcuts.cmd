@@ -5,35 +5,65 @@ SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-
-IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
-IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
+    
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
+    IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
+    
+    IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+    FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+    IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
+    
+    SET "scriptConfDir=%LOCALAPPDATA%\mobilmir.ru\%~n0"
 )
-CALL :GetDir configDir "%DefaultsSource%"
 (
-IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
-IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
-rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
+    CALL :GetDir configDir "%DefaultsSource%"
+    IF NOT EXIST "%scriptConfDir%" MKDIR "%scriptConfDir%"
+    FOR "usebackq delims=" %%A IN ("%scriptConfDir%\lastUnpacked.txt") DO IF DEFINED lastShortcutsTime (SET "lastShortcuts_64bitTime=%%~A") ELSE SET "lastShortcutsTime=%%~A"
+)
+(
+    IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
+    rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 )
 (
     %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
-    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
+    FOR %%A IN ("%configDir%Users\depts\Shortcuts.7z") DO IF NOT "%lastShortcutsTime%"=="%%~tA" SET "ShortcutsTime=%%~tA"
+    IF DEFINED OS64bit (
+	%AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
+	FOR %%A IN ("%configDir%Users\depts\Shortcuts_64bit.7z") DO IF NOT "%lastShortcuts_64bitTime%"=="%%~tA" SET "Shortcuts_64bitTime=%%~tA"
+    )
     
-    RD /S /Q "%~dp0Shortcuts" || CALL :SaveErrorLevel cleaning up old Shortcuts
-    %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts.7z" || CALL :SaveErrorLevel unpacking Shortcuts.7z
-    IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%~dp0Shortcuts" -- "%configDir%Users\depts\Shortcuts_64bit.7z" || CALL :SaveErrorLevel unpacking Shortcuts_64bit.7z
-    
-    FOR %%A IN ("%configDir%Users\depts\Shortcuts.7z") DO SET "ShortcutsTime=%%~tA"
-    FOR %%A IN ("%configDir%Users\depts\Shortcuts_64bit.7z") DO SET "Shortcuts_64bitTime=%%~tA"
-    CALL :PostForm
+    IF NOT DEFINED ShortcutsTime IF NOT DEFINED Shortcuts_64bitTime (
+	ECHO Даты архивов не изменились, выход
+	EXIT /B
+    )
 
+    IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
+    
+    CALL :unpack7zs "%~dp0Shortcuts.new"
+    FOR /F "usebackq delims=" %%A IN (`DIR /B /A-D "%~dp0Shortcuts\*.*"`) DO IF NOT EXIST "%~dp0Shortcuts.new\%%~A" ECHO.|DEL /F "%~dp0Shortcuts\%%~A"
+    REM Файлов в подпапках может не быть новых архивах, проверить в пакетном файле это будет сложно
+    FOR /F "usebackq delims=" %%A IN (`DIR /B /AD "%~dp0Shortcuts\*.*"`) DO RD /S /Q "%~dp0Shortcuts\%%~A"
+    RD /S /Q "%~dp0Shortcuts.new"
+    CALL :unpack7zs "%~dp0Shortcuts"
+    
+    CALL :RecordNewTimes
+    
     %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%~f0"
     EXIT /B
 )
-:PostForm
+:unpack7zs <dest>
 (
-    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeNftB3Rwx9ztsZn6FD3mHbAOR87-nxPMaeSle80obZAIR3TQ/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%"
+    %exe7z% x -aoa -o%1 -- "%configDir%Users\depts\Shortcuts.7z" >"%scriptConfDir%\unpack-Shortcuts.7z.log" 2>&1 || CALL :SaveErrorLevel unpacking Shortcuts.7z to %1
+    IF DEFINED Shortcuts_64bitTime %exe7z% x -aoa -o%1 -- "%configDir%Users\depts\Shortcuts_64bit.7z" >"%scriptConfDir%\unpack-Shortcuts_64bit.7z.log" 2>&1 || CALL :SaveErrorLevel unpacking Shortcuts_64bit.7z
+EXIT /B
+)
+:RecordNewTimes
+(
+    (
+    ECHO %ShortcutsTime%
+    ECHO %Shortcuts_64bitTime%
+    )>"%scriptConfDir%\lastUnpacked.txt"
+    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeNftB3Rwx9ztsZn6FD3mHbAOR87-nxPMaeSle80obZAIR3TQ/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%" "entry.1400183939=%USERNAME%"
 EXIT /B
 )
 :GetDir
