@@ -7,7 +7,7 @@ XMLHTTP_PostForm(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef moreHeaders
 }
 
 XMLHTTP_Post(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef reqmoreHeaders:=0) {
-    If (IsObject(moreHeaders)) {
+    If (IsObject(reqmoreHeaders)) {
 	If (reqmoreHeaders.HasKey("Content-Type")) {
 	    moreHeaders := reqmoreHeaders
 	} Else {

@@ -22,8 +22,12 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
     ;The program will exit.
     ;local i, objName, hName, hVal, k, v
     
-    If (IsObject(debug))
-	FileAppend % method " " URL . (POSTDATA ? " ← " POSTDATA : "") "`n", **
+    If (IsObject(debug)) {
+	If (moreHeaders)
+	    For i, v in moreHeaders
+		txtHeaders .= "`t" i ": " v "`n"
+	FileAppend % method " " URL . (POSTDATA ? " ← " POSTDATA : "") ( moreHeaders ? "`n`tHeaders:`n" txtHeaders : "") "`n", **
+    }
     If (useObjName) {
 	xhr := ComObjCreate(useObjName)
     } Else {
