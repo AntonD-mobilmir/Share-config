@@ -333,7 +333,7 @@ class JSON
 				    Else
 					m .= A_LoopField
 				}
-				string := m
+				
 				;  string := StrReplace(string,  "\",  "\\")
 				; , string := StrReplace(string,  "/",  "\/") ; optional in ECMAScript
 				;, string := StrReplace(string, quot, bashq)
@@ -347,7 +347,7 @@ class JSON
 				;		string := StrReplace(string, m.Value, Format("\u{1:04x}", Ord(m.Value)))
 			}
 
-			return quot . string . quot
+			return quot . m . quot
 		}
 	}
 
