@@ -25,11 +25,10 @@ GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
 		;MsgBox query: %query%`nA_LoopField: %A_LoopField%`, v: %v%
 		fplo[A_LoopField] := v
 		If (textfp!=0 && v && v!="To be filled by O.E.M." && v!="Base Board Serial Number" && v!="Base Board") {
-		    If A_LoopField not in Name,Vendor,Version,Manufacturer,Product,Model,Caption,Description
-			fieldCaption := ( fpline ? ", " : "" ) . A_LoopField . ": "
+		    If A_LoopField in Name,Vendor,Version,Manufacturer,Product,Model,Caption,Description
+			fpline .= ( fpline ? " " : "") . v
 		    Else
-			fieldCaption := " "
-		    fpline .= fieldCaption . v
+			fpline .= ( fpline ? ", " : "" ) . A_LoopField . ": " . v
 		}
 	    }
 	    fpo[parmName].Push(fplo)
@@ -92,15 +91,15 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     
     fpo := GetFingerprint(textfp)
     
-    If (outjson)
-	TransactWriteout(JSON.Dump(fpo), outjson)
-    
     If (outtxt)
-	TransactWriteout(textfp, outtxt, encoding, append)
+	GetFingerprintTransactWriteout(textfp, outtxt, encoding, append)
+    
+    If (outjson)
+	GetFingerprintTransactWriteout(JSON.Dump(fpo), outjson)
     ExitApp
 }
 
-TransactWriteout(ByRef text, ByRef fname := "*", encoding := "UTF-8", append := 0) {
+GetFingerprintTransactWriteout(ByRef text, ByRef fname := "*", encoding := "UTF-8", append := 0) {
     If (SubStr(fname, 1, 1)=="*") {
 	append := 1
 	If (SubStr(text, 0) != "`n")
