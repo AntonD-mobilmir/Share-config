@@ -10,7 +10,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
     
     IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-    FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+    FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
     
     SET "scriptConfDir=%LOCALAPPDATA%\mobilmir.ru\%~n0"
@@ -18,7 +18,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 (
     CALL :GetDir configDir "%DefaultsSource%"
     IF NOT EXIST "%scriptConfDir%" MKDIR "%scriptConfDir%"
-    FOR "usebackq delims=" %%A IN ("%scriptConfDir%\lastUnpacked.txt") DO IF DEFINED lastShortcutsTime (SET "lastShortcuts_64bitTime=%%~A") ELSE SET "lastShortcutsTime=%%~A"
+    FOR /F "usebackq delims=" %%A IN ("%scriptConfDir%\lastUnpacked.txt") DO IF DEFINED lastShortcutsTime (SET "lastShortcuts_64bitTime=%%~A") ELSE SET "lastShortcutsTime=%%~A"
 )
 (
     IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
