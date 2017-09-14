@@ -58,10 +58,10 @@ REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
 START "Registring components in %dir1SBin%" /WAIT /I /D "%dir1SBin%" %comspec% /C "%dir1SBin%\register_all_components.cmd"
 
 IF NOT EXIST "%rarusConfigbaseDir%" (
-    %exe7z% x -r -y -o"%rarusConfigbaseDir%" -- "%ShopBTS_InitialBase_archive%"||PAUSE
-    %exe7z% x -r -y -o"%rarusConfigbaseDir%" -- "%srcpath%D_1S_Rarus_ShopBTS\ShopBTS_Add.7z"||PAUSE
     %exe7z% x -r -y -o"%rarusConfigbaseDir%" -- "%srcpath%D_1S_Rarus_ShopBTS\ShopBTS_Add_DLLs.7z"||PAUSE
     %exe7z% x -r -y -o"%rarusConfigbaseDir%" -- "%srcpath%D_1S_Rarus_ShopBTS\ShopBTS_Add_Utils.7z"||PAUSE
+    %exe7z% x -r -y -o"%rarusConfigbaseDir%" -- "%srcpath%D_1S_Rarus_ShopBTS\ShopBTS_Add.7z"||PAUSE
+    %exe7z% x -r -y -o"%rarusConfigbaseDir%" -- "%ShopBTS_InitialBase_archive%"||PAUSE
     START "Registring components in %rarusConfigbaseDir%" /MIN /I /D "%rarusConfigbaseDir%" %comspec% /C "%rarusConfigbaseDir%\register_all_components.cmd"
     PING 127.0.0.1 -n 15>NUL
     %exe7z% x -r -y -o"%rarusConfigbaseDir%\Exchange" -- "%srcpath%Exchange.7z"
