@@ -119,8 +119,8 @@ IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF NOT "%Inst1S%"=="1" GOTO :Skip1SAndRelated
 )
 :r1SAndRelated
+SET "RarusInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
 (
-    SET "RarusInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
     IF NOT EXIST "%RarusInstallScript%" (
 	ECHO Дистрибутив Рарус недоступен по стандартному пути [%RarusInstallScript%]. Укажите полный путь к файлу ShopBTS_InitialBase\_install_ask_parm.cmd
 	SET /P RarusInstallScript=^>
