@@ -8,17 +8,18 @@ FileEncoding UTF-8
 ;usage:
 ;to update separately signed script:
 ;    scriptUpdater.ahk destFullPath URL [CheckPeriod]
-;to update common script:
+;to update a SharedLocal script:
 ;    scriptUpdater.ahk destMask [CheckPeriod] [destMask [CheckPeriod] …]
 
 ; Ссылки на подпапки в dropbox непредсказуемы (обычный путь не допишешь), поэтому выкладывать папку / делать к ней доступ нет смысла
-; вместо этого, если URL не указан, скрипт должен быть в архиве https://www.dropbox.com/s/an5nvf0hrofva7r/ScriptUpdater.7z.gpg?dl=1
+; вместо этого, если URL не указан, скрипт должен быть в архиве https://www.dropbox.com/s/an5nvf0hrofva7r/SharedLocal.7z.gpg?dl=1
 
-CommonScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" . (CommonGPGFName := "ScriptUpdater.7z.gpg") . "?dl=1"
-GNUPGHOME = D:\Local_Scripts\ScriptUpdater\gnupg
-If (!InStr(FileExist(GNUPGHOME), "D"))
-    GNUPGHOME = %A_AppDataCommon%\mobilmir.ru\ScriptUpdater\gnupg
-global childPID
+GNUPGHOME := A_ScriptDir "\gnupg"
+;GNUPGHOME = D:\Local_Scripts\ScriptUpdater\gnupg
+;If (!InStr(FileExist(GNUPGHOME), "D"))
+;    GNUPGHOME = %A_AppDataCommon%\mobilmir.ru\ScriptUpdater\gnupg
+global childPID := 0
+OnExit("KillChild")
 
 FileGetSize secringSize, %GNUPGHOME%\secring.gpg
 If (ErrorLevel || !secringSize)
@@ -43,11 +44,6 @@ If (!IsObject(FileOpen(GNUPGHOME "\lock.tmp", "w"))) { ;
 FileDelete GNUPGHOME "\lock.tmp"
 EnvSet GNUPGHOME, %GNUPGHOME%
 
-; самообновление
-If (A_IsAdmin)
-    UpdateScript(A_ScriptFullPath, 48, CommonScriptsURL, CommonGPGFName)
-;UpdateScript("D:\*", 48, CommonScriptsURL, CommonGPGFName)
-
 FileAppend tempDir: %tempDir%`nconfDir: %confDir%`nGNUPGHOME: %GNUPGHOME%`ntimeout: %timeout%`ntries: %tries%`n, *, CP1
 clURL = %2%
 If (StartsWith(clURL, "http")) {
@@ -55,6 +51,7 @@ If (StartsWith(clURL, "http")) {
     destPath = %1%
     ExitApp UpdateScript(destPath, checkPeriod, clURL)
 } Else {
+    SharedLocalScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" . (SharedLocalGPGFName := "SharedLocal.7z.gpg") . "?dl=1"
     checkPeriod=
     Loop %0%
     {
@@ -63,14 +60,19 @@ If (StartsWith(clURL, "http")) {
 	    continue
 	}
 	
-	nexti := A_Index+1
-	If checkPeriod is Integer
-	    checkPeriod := %nexti%
+	ni := A_Index+1
+	If %ni% is Integer
+	    checkPeriod := %ni%
 	
 	Loop Files, % %A_Index%
-	    UpdateScript(A_LoopFileLongPath, checkPeriod, CommonScriptsURL, CommonGPGFName)
+	    UpdateScript(A_LoopFileLongPath, checkPeriod, SharedLocalScriptsURL, SharedLocalGPGFName)
     }
 }
+
+; самообновление – через autoupdate.cmd
+;If (A_IsAdmin)
+;    UpdateScript(A_ScriptFullPath, 48, "https://www.dropbox.com/s/y6xpm8xgcovkffg/ScriptUpdater.7z.gpg?dl=1", "ScriptUpdater.7z.gpg")
+;UpdateScript("D:\*", 48, SharedLocalScriptsURL, SharedLocalGPGFName)
 
 ExitApp
 
@@ -83,7 +85,7 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	checkPeriod := 24 ; Hours
     
     SplitPath dstFullPath, dstFName, dstDir, dstExt,, drvltr ; drvltr is either d: or \\hostname (no ending backslash)
-    If (StartsWith(drvltr, "\\Srv0"))
+    If (StartsWith(drvltr, "\\"))
 	return 0
     If (gpgFName) {
 	SplitPath gpgFName, , , , verifiedFName
@@ -112,7 +114,7 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
     }
     FileGetSize runLogSize, %runLog%
     If (runLogSize > 1048576)
-	FileDelete %runLog%
+	FileMove %runLog%, %runLog%.bak, 1
     FileAppend %A_Now% Downloading %URL% to update "%dstFullPath%" due to last check %checkAge% hours ago…`n, %runLog%
     ;FileSetTime,, %endLog%, C
     
@@ -141,6 +143,7 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	FileDelete %tempDir%\%verifiedFName%
 	; --never-lock unsupported
 	cmdlgpg = "%gpgexe%" --homedir "%GNUPGHOME%" --batch -o "%verifiedFName%" -d "%gpgFName%"
+	FileAppend %A_Now% > %cmdlgpg%`n, *, CP1
 	FileAppend %A_Now% > %cmdlgpg%`n, %runLog%
 	RunWait %comspec% /C "%cmdlgpg% 2>"%gpgFName%.log"", %tempDir%, Hide, childPID
 	gpgErrLevel := ErrorLevel, childPID := 0
@@ -169,16 +172,19 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	    
 	    If (tryUnpack) {
 		If (!exe7z) {
-		    Try
-			exe7z:=find7zexe()
-		    Catch
-			exe7z:=find7zaexe()
+		    EnvGet exe7z, exe7z
+		    exe7z := Trim(exe7z, """")
+		    If (!FileExist(exe7z)) {
+			Try
+			    exe7z:=find7zexe()
+			Catch
+			    exe7z:=find7zaexe()
+		    }
 		}
 
-		archSubdir := SubStr(dstDir, StrLen(drvltr) + 2) ; 2 for next character after backslash
-		FileAppend %A_Now% Unpacking "%archSubdir%\%dstFName%" from "%verifiedFName%"…, *, CP1
-		FileAppend %A_Now% Unpacking "%archSubdir%\%dstFName%" from "%verifiedFName%"…, %runLog%
-		cmdl7z = "%exe7z%" x -y -o"%drvltr%" -- "%tempDir%\%verifiedFName%" "%archSubdir%\%dstFName%" 
+		cmdl7z = "%exe7z%" x -y -o"%dstDir%" -- "%tempDir%\%verifiedFName%" "%dstFName%" 
+		FileAppend %A_Now% > %cmdl7z%`n, *, CP1
+		FileAppend %A_Now% > %cmdl7z%`t…, %runLog%
 		RunWait %comspec% /C "%cmdl7z% >>"%runLog%" 2>&1", %tempDir%, Hide UseErrorLevel, childPID
 		childPID := 0
 		;ErrorLevel Meaning 
@@ -193,12 +199,12 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 		    return 1
 	    }
 	    
-	    FileAppend %A_Now% Moving "%verifiedFName%" to "%dstFullPath%" … , %runLog%
+	    FileAppend %A_Now% Moving "%verifiedFName%" to "%dstFullPath%"… , %runLog%
 	    FileMove %tempDir%\%verifiedFName%, %dstFullPath%, 1
 	    return !CheckErrorLevel(runLog, endLog)
 	}
     }
-
+    
     return 0
 }
 
@@ -219,4 +225,63 @@ CheckErrorLevel(runLog, endLog:="", e:="") {
     return e
 }
 
-#include %A_LineFile%\..\Lib\find7zexe.ahk
+KillChild() {
+    If (childPID)
+	Process Close, %childPID%
+}
+
+find7zexe(exename="7z.exe", paths*) {
+    ;key, value, flag "this is path to exe (only use directory)"
+    regPaths := [["HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command",,1]
+		,["HKEY_CURRENT_USER\Software\7-Zip", "Path"]
+		,["HKEY_LOCAL_MACHINE\Software\7-Zip", "Path"]
+		,["HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe", "Path"]
+		,["HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe",,1]
+		,["HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip", "InstallLocation"]
+		,["HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip", "UninstallString", 1] ]
+    
+    bakRegView := A_RegView
+    For i,regpath in regPaths
+    {
+	SetRegView 64
+	RegRead currpath, % regpath[1], % regpath[2]
+	SetRegView %bakRegView%
+	If (regpath[3]) 
+	    SplitPath currpath,,currpath
+	Try return Check7zDir(exename, Trim(currpath,""""))
+    }
+    
+    findexefunc=findexe
+    If(IsFunc(findexefunc)) {
+	EnvGet ProgramFilesx86,ProgramFiles(x86)
+	EnvGet SystemDrive,SystemDrive
+	Try return %findexefunc%(exename, ProgramFiles . "\7-Zip", ProgramFilesx86 . "\7-Zip", SystemDrive . "\Program Files\7-Zip", SystemDrive . "\Arc\7-Zip")
+	Try return %findexefunc%("7za.exe", SystemDrive . "\Arc\7-Zip")
+    }
+    
+    For i,path in paths {
+	Loop Files, %path%, D
+	{
+	    fullpath=%A_LoopFileLongPath%\%exename%
+	    IfExist %fullpath%
+		return fullpath
+	}
+    }
+    
+    Throw exename " not found"
+}
+
+Check7zDir(exename,dir7z) {
+    If(SubStr(dir7z,0)=="\")
+	dir7z:=SubStr(dir7z,1,-1)
+    If (!FileExist(exe7z := dir7z "\" exename))
+	Throw exename " not found in " dir7z
+    return exe7z
+}
+
+find7zaexe(paths:="") {
+    If(paths=="")
+	paths := []
+    paths.push("\Distributives\Soft\PreInstalled\utils", "D:\Distributives\Soft\PreInstalled\utils","W:\Distributives\Soft\PreInstalled\utils", "\\localhost\Distributives\Soft\PreInstalled\utils", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils","\\192.168.1.80\Distributives\Soft\PreInstalled\utils")
+    return find7zexe("7za.exe",paths*)
+}
