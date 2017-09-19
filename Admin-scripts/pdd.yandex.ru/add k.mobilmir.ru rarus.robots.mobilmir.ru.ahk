@@ -5,8 +5,8 @@
 ;#Warn LocalSameAsGlobal, OutputDebug
 
 ;arguments variants:
-;addMailbox.ahk <login>
-;addMailbox.ahk <logins-list-file>
+;addRetailTechAccounts.ahk <login> <FirstName>
+;addRetailTechAccounts.ahk <logins-list-file>
 
 ;logins-list-file format:
 ;Login	FirstName
