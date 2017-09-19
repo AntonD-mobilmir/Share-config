@@ -14,12 +14,13 @@ ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
 reqdConfigName		:= "Apps_dept.7z"
 ServerPath		:= "\\Srv0.office0.mobilmir"
 ServerDistPath		:= ServerPath . "\Distributives"
-pathSrvConfigUpdater	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\update local config.cmd"
+configDirSrv0		:= "\\Srv0.office0.mobilmir\profiles$\Share\config"
+pathSrvConfigUpdater	:= configDirSrv0 "\update local config.cmd"
 maxAgeSavedInvReport	:= 1
 tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
 scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
-serverScriptPath	:= "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\GUI\" . A_ScriptName
+serverScriptPath	:= configDirSrv0 "\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 
 FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
@@ -159,7 +160,6 @@ If (AppXSupported && (A_UserName="Продавец" || A_UserName="Пользо�
 ;"C:\Program Files (x86)\KKMSuite\KKMWatcher.exe"
 FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
 
-bakRegView:=A_RegView
 regViews := [32]
 If (A_Is64bitOS)
     regViews.Push(64)
@@ -186,7 +186,7 @@ For i,regview in regViews {
 	break
     }
 }
-SetRegView %bakRegView%
+SetRegView Default
 
 If (!A_IsAdmin) {
     RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
@@ -364,7 +364,7 @@ If (IsObject(softUpdScripts)) {
 }
 If (IsObject(softUpdScripts)) { ; если обновлять скрипты software_update не надо, объект будет удален в блоке выше
     If (!IsObject(distSoftUpdScripts))
-	distSoftUpdScripts := CheckPath("\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
+	distSoftUpdScripts := CheckPath(configDirSrv0 "\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
     If (IsObject(distSoftUpdScripts)) {
 	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
@@ -403,10 +403,11 @@ If (IsObject(instCriacxocx)){
     AddLog("CRIACX.ocx","отсутствует",1)
 }
 
-tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
-AddLog("Обновление настроек TeamViewer 5", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
-RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
+RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn")
+;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
+;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
+;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
+;SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
 If (FileExist("c:\squid\sbin\squid.exe")) {
     FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
@@ -558,27 +559,30 @@ CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", 
     }
 }
 
-RunFromConfigDir(ByRef subPath, ByRef comment:="", ByRef interpreter:=0, ByRef s:="") {
-    global DefaultConfigDir
+RunFromConfigDir(ByRef subPath, ByRef logLineText:="", ByRef args:="") {
+    global DefaultConfigDir, configDirSrv0
     
-    runSc := LatestExisting(DefaultConfigDir . "\" . subPath, "\\Srv0.office0.mobilmir\profiles$\Share\config\" . subPath)
-    runScPath := runSc.Path
+    runSc := LatestExisting(DefaultConfigDir "\" subPath, configDirSrv0 "\" subPath)
+    return RunScript(runSc.Path, logLineText, args)
+}
 
-    If (interpreter==0) {
-	SplitPath runScPath, , , ext
-	If (ext="ahk")
-	    interpreter = "%A_AhkPath%"
-	Else If (ext="cmd" || ext = "bat")
-	    interpreter = %Comspec% /C
-	Else
-	    Throw Exception("Для этого расширения файла не определен интерпретатор",, ext)
-    }
+RunScript(Byref runScPath, ByRef logLineText:="", ByRef args:="") {
+    SplitPath runScPath, , , ext
+    If (ext="exe") {
+	
+    } Else If (ext="ahk") {
+	interpreter := """" A_AhkPath """ "
+    } Else If (ext="cmd" || ext = "bat") {
+	interpreter = %Comspec% /C "
+	suffix = "
+    } Else
+	Throw Exception("Для этого расширения файла не определен интерпретатор",, ext)
     
     If (comment)
-	l := AddLog(comment)
+	l := AddLog(logLineText)
     Else
 	l := AddLog(AbbreviatePath(runScPath))
-    RunWait %interpreter% "%runScPath%", %A_Temp%, Min UseErrorLevel
+    RunWait %interpreter%"%runScPath%" %args%%suffix%, %A_Temp%, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     
     return l
@@ -702,11 +706,9 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
 }
 
 LatestExisting(paths*) {
-    for index,path in paths {
-	If (FileExist(path) && newFound := FindLatest(path,, latestTime)) {
+    for index,path in paths
+	If (FileExist(path) && newFound := FindLatest(path,, latestTime))
 	    curFound := newFound
-	}
-    }
     
     return curFound
 }
