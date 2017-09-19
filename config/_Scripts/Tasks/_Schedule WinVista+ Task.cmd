@@ -44,7 +44,7 @@ EXIT /B
 )
 :ScheduleSingleTask <TaskName> <XML>
 (
-    %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~1" /F
+    REM %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~1" /F
     ECHO.|%System32%\SCHTASKS.exe /Create /TN "mobilmir.ru\%~1" /XML %2 %AddArgs% /F
     IF ERRORLEVEL 1 GOTO :SetError
     REM Everyone=*S-1-1-0
