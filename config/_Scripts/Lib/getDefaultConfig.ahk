@@ -9,14 +9,21 @@ getDefaultConfigFileName(defCfg := -1) {
 }
 
 getDefaultConfigDir(defCfg := -1) {
-    If (defCfg==-1)
+    If (defCfg==-1) {
+        EnvGet configDir, configDir
+	If (configDir)
+	    return RTrim(configDir, "\")
 	defCfg := getDefaultConfig()
+    }
     SplitPath defCfg,,OutDir
     return OutDir
 }
 
 getDefaultConfig(batchPath := -1) {
     If (batchPath == -1) {
+	EnvGet DefaultsSource, DefaultsSource
+	If (DefaultsSource)
+	    return DefaultsSource
 	Try {
 	    return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
 	}
