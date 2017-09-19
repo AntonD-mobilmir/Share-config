@@ -16,6 +16,8 @@ FileEncoding UTF-8
 
 CommonScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" . (CommonGPGFName := "ScriptUpdater.7z.gpg") . "?dl=1"
 GNUPGHOME = D:\Local_Scripts\ScriptUpdater\gnupg
+If (!InStr(FileExist(GNUPGHOME), "D"))
+    GNUPGHOME = %A_AppDataCommon%\mobilmir.ru\ScriptUpdater\gnupg
 global childPID
 
 FileGetSize secringSize, %GNUPGHOME%\secring.gpg
