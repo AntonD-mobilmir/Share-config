@@ -1,5 +1,6 @@
 ﻿#NoEnv
 #SingleInstance off
+#NoTrayIcon
 ;#Warn
 ;ToDo: off only for debugging --
 #ErrorStdOut
