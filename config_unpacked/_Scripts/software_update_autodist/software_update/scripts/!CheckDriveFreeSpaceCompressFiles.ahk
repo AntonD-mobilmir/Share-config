@@ -44,7 +44,7 @@ If (CheckAndLogFreeSpace(A_WinDir) < FreeSpaceLowMarginMB) {
 }
 
 If (CheckAndLogFreeSpace(A_ProgramFiles) < FreeSpaceLowMarginMB) {
-    RunWait %comspec% /C "\\192.168.1.80\profiles$\Share\config\_Scripts\cleanup\BleachBit-auto.cmd"
+    ; – закрывает explorer.exe и перезапускает от администратора – RunWait %comspec% /C "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\cleanup\BleachBit-auto.cmd"
     
     CallCompact(A_ProgramFiles . "\K-Lite Codec Pack")
     CallCompact(A_ProgramFiles . "\Adobe","*.api *.dll")
