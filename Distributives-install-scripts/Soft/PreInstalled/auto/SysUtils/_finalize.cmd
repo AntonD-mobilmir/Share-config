@@ -11,7 +11,7 @@ IF NOT DEFINED filteredPathString GOTO :SkipAddingPath
 IF "%filteredPathString:~0,1%"==";" SET "filteredPathString=%filteredPathString:~1%"
 (
 SET "PATH=%PATH%;%filteredPathString%"
-START "Pathman in started in background for case when it hangs" /MIN "%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%filteredPathString%"
+"%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%filteredPathString%"
 )
 :SkipAddingPath
 (
@@ -32,14 +32,6 @@ EXIT /B
 :CheckInPathAlready
 (
     SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
-    SET "InPathAlready=0"
-    SET "PATH=%PATH%;"
-)
-(
-    SET "mPATH=!PATH:%~1;=!"
-    IF NOT "%PATH%"=="!mPATH!" SET "InPathAlready=1"
-)
-(
-    ENDLOCAL 
-    EXIT /B %InPathAlready%
+    IF "%PATH%;"=="!PATH:%~1;=!" EXIT /B 0
+    EXIT /B 1
 )
