@@ -6,7 +6,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-SET "dirDest=D:\1S\Rarus\MailLoader\"
+SET "dirDest=D:\1S\Rarus\MailLoader"
 SET "sidCREATOR_OWNER=S-1-3-0"
 SET "ErrorOccured="
 
@@ -22,8 +22,8 @@ FOR %%A IN ("%~dp0dist.7z") DO SET "timeDist=%%~tA"
 FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
 )
 (
-    SET "verFile=%dirDest%getmail_dist_ver.txt"
-    SET "verCheckFile=%dirDest%getmail_dist_ver.check.log"
+    SET "verFile=%dirDest%\getmail_dist_ver.txt"
+    SET "verCheckFile=%dirDest%\getmail_dist_ver.check.log"
     CALL :GetDir configDir "%DefaultsSource%"
 )
 (
@@ -57,19 +57,19 @@ FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
     )
 )
 (
-%SystemRoot%\System32\icacls.exe "D:\1S\Rarus\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
+%SystemRoot%\System32\icacls.exe "%dirDest%" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
 %SystemRoot%\System32\icacls.exe "D:\1S\Rarus\ShopBTS\ExtForms\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
 
 IF NOT "%verPrevStunnel%"=="%verStunnel%" (
     %System32%\schtasks.exe /End /TN "mobilmir.ru\stunnel"
     %System32%\taskkill.exe /F /IM tstunnel.exe
-    MOVE /Y "%dirDest%stunnel" "%dirDest%stunnel.bak" && RD /S /Q "%dirDest%stunnel.bak"
+    MOVE /Y "%dirDest%\stunnel" "%dirDest%\stunnel.bak" && RD /S /Q "%dirDest%\stunnel.bak"
     rem installer does not allow setting destination - "%distStunnel%" /S
-    %exe7z% x -aoa -o"%dirDest%stunnel" -x!bin/openssl.exe -x!bin/stunnel.exe -x!*/*.pdb -x!$PLUGINSDIR -x!uninstall.exe "%distStunnel%" || %ErrorCmd%
+    %exe7z% x -aoa -o"%dirDest%\stunnel" -x!bin/openssl.exe -x!bin/stunnel.exe -x!*/*.pdb -x!$PLUGINSDIR -x!uninstall.exe "%distStunnel%" || %ErrorCmd%
     rem /grant "*%sidCREATOR_OWNER%:(OI)(CI)F"
 )
 
-IF NOT "%timePrevDistBin%"=="%timeDistBin%" %exe7z% x -y -aoa -o"D:\1S\Rarus\MailLoader" -- "%~dp0dist-bin.7z" || %ErrorCmd%
+IF NOT "%timePrevDistBin%"=="%timeDistBin%" %exe7z% x -y -aoa -o"%dirDest%" -- "%~dp0dist-bin.7z" || %ErrorCmd%
 rem IF NOT "%timePrevDist%"=="%timeDist%"
 %exe7z% x -y -aoa -o"D:\1S\Rarus" -- "%~dp0dist.7z" || %ErrorCmd%
 (
@@ -81,12 +81,12 @@ DEL "%verCheckFile%"
 
 rem %AutohotkeyExe% "%~dp0fill_config-localhost.template.xml_from_sendemail.cfg.ahk" || IF ERRORLEVEL 2 %ErrorCmd%
 
-CALL :SchTask "%dirDest%Tasks\stunnel.xml" /RU "" /NP || %ErrorCmd%
-rem CALL :SchTask "%dirDest%Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || %ErrorCmd%
+CALL :SchTask "%dirDest%\Tasks\stunnel.xml" /RU "" /NP || %ErrorCmd%
+rem CALL :SchTask "%dirDest%\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%USERNAME%" /NP || %ErrorCmd%
 rem /NP не использовать, т.к. файл настроек шифруется от имени пользователя, запустившего getmail.cmd
-IF NOT "%RunInteractiveInstalls%"=="0" CALL :SchTask "%dirDest%Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% || %ErrorCmd%
+IF NOT "%RunInteractiveInstalls%"=="0" CALL :SchTask "%dirDest%\Tasks\getmail.cmd - Rarus Mail Loader.xml" /RU "%schedUserName%" %schtaskPassSw% || %ErrorCmd%
 
-CALL "%dirDest%genGpgKeyring.cmd" || IF ERRORLEVEL 2 %ErrorCmd%
+CALL "%dirDest%\genGpgKeyring.cmd" || IF ERRORLEVEL 2 %ErrorCmd%
 
 IF NOT DEFINED ErrorOccured START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSe0zAvOtFvJ9hizWP6OMiGBKuQQHl90OvgywGP6vgWs9X_Yjg/formResponse" "entry.1309300051=%MailUserId%" "entry.859988755=%Hostname%" "entry.76258453=%timeDist%" "entry.607706370=%timeDistBin%" "entry.1684829717=%verStunnel%"
 
@@ -97,7 +97,7 @@ EXIT /B
 SET "updatedTaskXML="
 CALL "%configDir%_Scripts\Lib\.utils.cmd" InitRemembering
 CALL "%configDir%_Scripts\Lib\.utils.cmd" RememberIfLatest currentTask "%System32%\Tasks\mobilmir.ru\%~n1"
-CALL "%configDir%_Scripts\Lib\.utils.cmd" RememberIfLatest updatedTaskXML "%System32%\Tasks\mobilmir.ru\%~n1"
+CALL "%configDir%_Scripts\Lib\.utils.cmd" RememberIfLatest updatedTaskXML "%dirDest%\Tasks\%~n1.xml"
 IF NOT DEFINED updatedTaskXML EXIT /B
 )
 (
