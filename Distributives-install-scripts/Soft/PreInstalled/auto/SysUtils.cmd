@@ -15,5 +15,5 @@ rem not needed on new windowses -- IF NOT EXIST "%APPDATA%" "%SysUtilsDir%\ResKi
 
 REM GTK+ post-install script works only if gtk-libraries are in path
 REM This is done least because of problem with this when using 64-bit OS because of brackets (x86) in %path%
-CALL "%SysUtilsDir%\libs\GTK+\gtk2-runtime\gtk-postinstall.bat"
+IF EXIST "%SysUtilsDir%\libs\GTK+\gtk2-runtime\gtk-postinstall.bat" CALL "%SysUtilsDir%\libs\GTK+\gtk2-runtime\gtk-postinstall.bat"
 )

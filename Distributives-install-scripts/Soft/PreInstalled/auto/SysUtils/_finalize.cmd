@@ -3,21 +3,16 @@ REM part of script-set to install preinstalled and working-without-install softw
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-SET "AddToAppPathsAHK=%ProgramData%\mobilmir.ru\Common_Scripts\AddToAppPaths.ahk"
-REM skip initial semicolon
-IF DEFINED pathString CALL :FilterPaths
-IF NOT DEFINED filteredPathString GOTO :SkipAddingPath
+    IF DEFINED pathString (
+	"%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%pathString%"
+	CALL :FilterPaths
+	IF DEFINED filteredPathString CALL :AddEnvPath
+    )
+EXIT /B
 )
-IF "%filteredPathString:~0,1%"==";" SET "filteredPathString=%filteredPathString:~1%"
+:AddEnvPath
 (
 SET "PATH=%PATH%;%filteredPathString%"
-"%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%filteredPathString%"
-)
-:SkipAddingPath
-(
-rem Adding EXEs to App Paths
-IF NOT EXIST "%AddToAppPathsAHK%" CALL "%~dp0Common_Scripts.cmd"
-FOR /R "%SysUtilsDir%" %%I IN (.) DO IF EXIST "%%~fI\*.exe" "%utilsdir%AutoHotkey.exe" /ErrorStdOut "%AddToAppPathsAHK%" "%%~fI\*.exe"
 EXIT /B
 )
 :FilterPaths

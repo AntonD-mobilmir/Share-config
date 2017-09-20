@@ -13,6 +13,6 @@ SET "SysUtilsDir=%SystemDrive%\SysUtils"
 )
 (
 IF NOT DEFINED utilsdir SET "utilsdir=%srcpath%..\..\utils\"
-SET "pathString=%ProgramData%\mobilmir.ru;%ProgramData%\mobilmir.ru\Common_Scripts;%SysUtilsDir%\libs;%SysUtilsDir%;%SysUtilsDir%\libs\GTK+\lib;%SysUtilsDir%\libs\OpenSSL\bin;%SysUtilsDir%\libs\OpenSSL;%SysUtilsDir%\SysInternals;%SysUtilsDir%\gnupg;%SysUtilsDir%\ResKit;%SysUtilsDir%\Support Tools;%SysUtilsDir%\UnxUtils;%SysUtilsDir%\UnxUtils\Uri;%SysUtilsDir%\UnxUtils\lbrisar;%SysUtilsDir%\Piriform;%SysUtilsDir%\uwe-sieber.de;%SysUtilsDir%\kliu;%SysUtilsDir%\gnupg\pub"
+SET "pathString=%ProgramData%\mobilmir.ru;%ProgramData%\mobilmir.ru\Common_Scripts;%SysUtilsDir%\libs;%SysUtilsDir%;%SysUtilsDir%\libs\GTK+\lib;%SysUtilsDir%\libs\OpenSSL\bin;%SysUtilsDir%\libs\OpenSSL;%SysUtilsDir%\SysInternals;%SysUtilsDir%\gnupg;%SysUtilsDir%\ResKit;%SysUtilsDir%\Support Tools;%SysUtilsDir%\UnxUtils;%SysUtilsDir%\UnxUtils\Uri;%SysUtilsDir%\UnxUtils\lbrisar;%SysUtilsDir%\kliu;%SysUtilsDir%\gnupg\pub"
 EXIT /B
 )
