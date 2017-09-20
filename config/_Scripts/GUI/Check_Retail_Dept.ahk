@@ -321,7 +321,7 @@ If (IsObject(instCriacxocx)) {
 
 AddLog("Журналы скриптов обновления")
 suSettingsScript=%A_AppDataCommon%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
-hostSUScripts:=ReadSetVarFromBatchFile(suSettingsScript, "SUSHost")
+Try hostSUScripts:=ReadSetVarFromBatchFile(suSettingsScript, "SUSHost")
 If (hostSUScripts) {
     SetLastRowStatus(hostSUScripts, 0)
     cmdCheckLocalUpdater := FirstExisting(A_ScriptDir . "\..\..\_Scripts\software_update_autodist\CheckLocalUpdater.cmd")
@@ -383,6 +383,7 @@ If (!(gpgexist := FileExist("C:\SysUtils\gnupg")) || !(IsObject(softUpdScripts) 
 ;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
 
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
+;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 	
 If (IsObject(instCriacxocx)){
