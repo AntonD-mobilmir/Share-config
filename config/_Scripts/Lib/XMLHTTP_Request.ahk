@@ -62,7 +62,7 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
 	xhr.send(POSTDATA)
 	If (IsObject(response))
 	    response := {status: xhr.status, headers: xhr.getAllResponseHeaders, responseText: xhr.responseText}
-	Else
+	Else If (IsByRef(response))
 	    response := xhr.responseText
 	If (IsObject(debug)) {
 	    debug.Headers := xhr.getAllResponseHeaders
