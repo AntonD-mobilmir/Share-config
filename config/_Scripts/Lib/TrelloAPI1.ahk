@@ -19,7 +19,8 @@ TrelloAPI1(ByRef method, ByRef req, ByRef jsonresp, jsondata:="") {
     return xhr
 }
 
-GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope := "read,write,account", appName := "") {
+;max scope := "read,write,account"
+GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope := "read,write", appName := "") {
     static APIkey := 0, authToken := 0, storedAppName := ""
     
     If (reqAPIkey) {
@@ -40,6 +41,8 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope
 	    Else
 		appName := storedAppName
 	EnvGet LocalAppData,LOCALAPPDATA
+	If (!LocalAppData)
+	    LocalAppData := GetKnownFolder("LocalAppData")
 	secretsDir = %LocalAppData%\mobilmir.ru\Trello-ahk\%appName%
 	
 	APIkeytxt = %secretsDir%\APIkey.txt
