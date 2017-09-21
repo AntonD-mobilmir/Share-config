@@ -6,6 +6,19 @@
 
 ;d:\Users\LogicDaemon\Dropbox\Backups\TeamViewer
 
+write := -1
+verbosity := 2
+EnvGet RunInteractiveInstalls,RunInteractiveInstalls
+If (RunInteractiveInstalls != "")
+    verbosity := RunInteractiveInstalls
+arg1 = %1%
+If (arg = "/q" || arg = "/quiet" || arg = "/s" || arg = "/silent")
+    verbosity := 0
+Else If (arg = "/warn")
+    verbosity := 1
+Else If (arg = "/verbose")
+    verbosity := 2
+
 ListOldPasswds := {"F574177FCCEC51367FBDE604C9D7D8BAC00F32131DC7EFC8D33885495010A90526BF392D7177FB520E2B2BB2303A0616": "."	; 2016-08-24 Apps_dept
 		  ,"F2AD0177D24744298C530F4F05EE62B2D3AD5A77FD9DF84C535ACD8ECF54ACD3201D31B03EADCFF4B0E37A8E7C7795D0": "."	; 2016-08-24 Apps_office
 		  ,"4012F58BE8D40F6C2295C3B108EC3AEE1C428441D85540FB940A5DE55277416A94E0E6CEE9AFAAAAA0033361C3D91D71": "."	; 2016-08-24 Apps_roaming
@@ -32,34 +45,43 @@ RegRead curpwd, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPassw
 If (curpwd) {
     md5ofpwd := MD5(curpwd)
     FileAppend Из реестра прочитан зашифрованный пароль TeamViewer %curpwd%`, его MD5: %md5ofpwd%`n,*, cp1
+
+    If (ListOldPasswds.HasKey(curpwd)) {
+	switchKey := ListOldPasswds[curpwd]
+    } Else If (OldPassHashes.HasKey(md5ofpwd)) {
+	switchKey := OldPassHashes[md5ofpwd]
+    } Else {
+	ShowMsg(einf := "Установленный в данный момент пароль не опознан. Изменения не вносятся.", 0x10)
+	write := ""
+    }
 } Else {
-    ShowMsg("В реестре нет пароля TeamViewer, или он недоступен для чтения.")
-    ExitApp 1
+    ShowMsg(einf := "В реестре нет пароля TeamViewer, или он недоступен для чтения.", 0x40)
+    write := ""
 }
 
-If ListOldPasswds.HasKey(curpwd) {
-    switchKey := ListOldPasswds[curpwd]
-} Else If (OldPassHashes.HasKey(md5ofpwd)) {
-    switchKey := OldPassHashes[md5ofpwd]
-} Else {
-    ShowMsg("Установленный в данный момент пароль не опознан. Изменения не вносятся.",0x10)
-    ExitApp 1
+If (write) {
+    If (switchKey=="") {
+	ShowMsg(einf := "Для текущего пароля ничего делать не требуется.", 0x40)
+	write := "0"
+    } Else If (switchKey==".") {
+	einf := WriteRegSettings(write := "")
+    } Else If (switchKey=="!") {
+	einf := WriteRegSettings(write := "")
+	ShowMsg(einf := "Был установлен пароль TeamViewer, который надо менять сразу после установки. Сейчас импортирован пароль из " einf ", но если известно, кто настраивал TeamViewer, сообщите ему, что он не прав.", 0x30)
+	write := "! " write
+    } Else {
+	einf := WriteRegSettings(write := switchKey)
+    }
 }
-    
-If (switchKey=="") {
-    ShowMsg("Для текущего пароля ничего делать не требуется.")
-} Else If (switchKey==".") {
-    WriteRegSettings()
-} Else If (switchKey=="!") {
-    WriteRegSettings()
-    ShowMsg("Был установлен пароль TeamViewer, который надо менять сразу после установки. Сейчас импортирован стандартный пароль, но если известно, кто настраивал TeamViewer, сообщите ему, что он не прав.", 0x30)
-} Else {
-    WriteRegSettings(switchKey)
+
+If (write) {
+    configDir := getDefaultConfigDir()
+    Run "%A_AhkPath%" "%configDir%\_Scripts\Lib\RetailStatusReport.ahk" "%A_ScriptName%" "%write%" "%einf%"
 }
 
 ExitApp
 
-WriteRegSettings(defaultsPath := "") {
+WriteRegSettings(ByRef defaultsPath := "") {
     If (!defaultsPath)
 	defaultsPath := getDefaultConfig()
     
@@ -73,41 +95,36 @@ WriteRegSettings(defaultsPath := "") {
 	   ; 2017-09-13 "TeamViewer_host.defaults.reg": "6C15BFFBE803522724BCA99EEF7EE07BA626CAAAE67EDED2B5B25A1E5FE61F87403EA59EB64B27C15504B1E9C47DC5F5"
 	   ; 2017-09-13 "TeamViewer5HostUnattended_egs":"F0BA0A56A7DDCD6D3D4F00649A9066908057A79AB2F204B73237A765D1887DB15E9606C44E57F570B5155610D773B272"
     
-    newPass := ListNewPasswds[defArcName]
-    If (newPass) {
+    If (ListNewPasswds.HasKey(defArcName)) {
 	If (!A_IsAdmin) {
-	    EnvGet RunInteractiveInstalls,RunInteractiveInstalls
-	    If (RunInteractiveInstalls!="0") {
-		ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-		Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
+	    If (verbosity) {
+		Run % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
 		ExitApp
 	    } Else {
-		ShowMsg("Скрипт запущен без прав администратора в не-интерактивном режиме. ")
+		return 0, ShowMsg("Скрипт запущен без прав администратора в не-интерактивном режиме. ", 0x10)
+		return 0
 	    }
 	}
-
-	RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, %newPass%
+	
+	RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, % ListNewPasswds[defArcName]
 	If (ErrorLevel) {
-	    ShowMsg("Ошибка записи нового пароля.", 0x10)
+	    defaultsPath := ErrorLevel
+	    return ShowMsg("Ошибка записи нового пароля.", 0x10)
 	} Else {
-	    ShowMsg("Пароль заменён на пароль из конфигурации " . defArcName)
+	    defaultsPath := defArcName
+	    return ShowMsg("Пароль заменён на пароль из конфигурации " . defArcName)
 	}
     } Else {
-	ShowMsg("Не найден пароль для конфигурации " . defaultsPath, 0x10)
+	return ShowMsg("Не найден пароль для конфигурации " . defaultsPath, 0x10)
     }
 }
 
-ShowMsg(text, type:=0) {
-    static envGot
-    If (!envGot) {
-	EnvGet RunInteractiveInstalls,RunInteractiveInstalls
-	envGot:=1
-    }
-    
+ShowMsg(ByRef text, type:=0) {
+    global verbosity
     FileAppend %text%`n,*,cp1
-    If (RunInteractiveInstalls!="0") {
-	MsgBox % type, %A_ScriptName%, %text%, 60
-    }
+    If (verbosity == 2 || verbosity && (type && type & 0x70 != 0x40))
+	MsgBox % type, %A_ScriptName%, %text%, 300
+    return text
 }
 
 ; \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
@@ -119,14 +136,21 @@ getDefaultConfigFileName(defCfg := -1) {
 }
 
 getDefaultConfigDir(defCfg := -1) {
-    If (defCfg==-1)
+    If (defCfg==-1) {
+        EnvGet configDir, configDir
+	If (configDir)
+	    return RTrim(configDir, "\")
 	defCfg := getDefaultConfig()
+    }
     SplitPath defCfg,,OutDir
     return OutDir
 }
 
 getDefaultConfig(batchPath := -1) {
     If (batchPath == -1) {
+	EnvGet DefaultsSource, DefaultsSource
+	If (DefaultsSource)
+	    return DefaultsSource
 	Try {
 	    return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
 	}
