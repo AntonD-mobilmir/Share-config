@@ -14,6 +14,14 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
     
     SET "scriptConfDir=%LOCALAPPDATA%\mobilmir.ru\%~n0"
+
+:GetScriptUpdaterDirAgain
+    FOR /F "usebackq delims=" %%A IN ("%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt") DO SET "ScriptUpdaterDir=%%~A"
+    IF NOT DEFINED ScriptUpdaterDir (
+	%SystemRoot%\System32\fltmc.exe >nul 2>&1 || (ECHO Чтобы установить ScriptUpdater, нужны права администратора & EXIT /B)
+	CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd"
+	GOTO :GetScriptUpdaterDirAgain
+    )
 )
 (
     CALL :GetDir configDir "%DefaultsSource%"
@@ -25,10 +33,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 )
 (
-    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
+    %AutohotkeyExe% "%ScriptUpdaterDir%\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
     FOR %%A IN ("%configDir%Users\depts\Shortcuts.7z") DO IF NOT "%lastShortcutsTime%"=="%%~tA" SET "ShortcutsTime=%%~tA"
     IF DEFINED OS64bit (
-	%AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
+	%AutohotkeyExe% "%ScriptUpdaterDir%\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
 	FOR %%A IN ("%configDir%Users\depts\Shortcuts_64bit.7z") DO IF NOT "%lastShortcuts_64bitTime%"=="%%~tA" SET "Shortcuts_64bitTime=%%~tA"
     )
     
@@ -48,7 +56,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     
     CALL :RecordNewTimes
     
-    %AutohotkeyExe% "%configDir%\_Scripts\scriptUpdater.ahk" /ErrorStdOut "%~f0"
+    %AutohotkeyExe% "%ScriptUpdaterDir%\scriptUpdater.ahk" /ErrorStdOut "%~f0"
     EXIT /B
 )
 :unpack7zs <dest>
