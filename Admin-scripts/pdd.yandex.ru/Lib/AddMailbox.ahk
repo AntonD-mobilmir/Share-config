@@ -15,10 +15,16 @@ AddMailbox(ByRef domain, ByRef login, ByRef password, ByRef firstName:="", ByRef
 	     . "&login="    . login
 	     . "&password=" . password
     
-    resa := YandexPddRequest("/api2/admin/email/add", domain, POSTDATA, response)
+    resa := YandexPddRequest("/api2/admin/email/add", domain, POSTDATA, jsonRespAdd)
     
-    rese := EditMailbox(domain, login, {iname: firstName, fname: lastName, hintq: "q", hinta: GenPass()}, responseEdit)
-    response := Trim(response, "`n`r`t ") "`t" Trim(responseEdit, "`n`r`t ")
+    respAdd := JSON.Load(jsonRespAdd)
+    If (respAdd.uid)
+	rese := EditMailbox(domain, respAdd.uid, {iname: firstName, fname: lastName, hintq: "q", hinta: GenPass()}, jsonRespEdit)
+    Else
+	rese := EditMailbox(domain, "", {login: login, iname: firstName, fname: lastName, hintq: "q", hinta: GenPass()}, jsonRespEdit)
+    ;does not find the account if login is numeric -- rese := EditMailbox(domain, login, {iname: firstName, fname: lastName, hintq: "q", hinta: GenPass()}, jsonRespEdit)
+    If (IsByRef(response))
+	response := Trim(jsonRespAdd, "`n`r`t ") "`t" Trim(jsonRespEdit, "`n`r`t ")
     return resa && rese
 }
 

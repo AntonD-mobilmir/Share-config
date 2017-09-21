@@ -15,6 +15,7 @@ YandexPddRequest(ByRef URL, ByRef domain, ByRef qPOSTDATA, ByRef response:="") {
 	    If (PddToken)
 		break
 	    Run https://pddimp.yandex.ru/api2/admin/get_token
+	    Run notepad.exe %tokenTxtFName%
 	    MsgBox Получите токен в открывшемся сайте`, запишите его в файл "%tokenTxtFName%" и нажмите OK.
 	}
 	If (!PddToken)
