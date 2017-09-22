@@ -200,8 +200,9 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 		    return 1
 	    }
 	    
-	    FileAppend %A_Now% Moving "%verifiedFName%" to "%dstFullPath%"… , %runLog%
-	    FileMove %tempDir%\%verifiedFName%, %dstFullPath%, 1
+	    FileAppend %A_Now% Copying "%verifiedFName%" to "%dstFullPath%"… , %runLog%
+	    FileCopy %tempDir%\%verifiedFName%, %dstFullPath%.tmp, 1
+	    FileMove %dstFullPath%.tmp, %dstFullPath%, 1
 	    return !CheckErrorLevel(runLog, endLog)
 	}
     }
