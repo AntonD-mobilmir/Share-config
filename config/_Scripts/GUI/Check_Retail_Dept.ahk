@@ -17,7 +17,7 @@ ServerDistPath		:= ServerPath . "\Distributives"
 configDirSrv0		:= "\\Srv0.office0.mobilmir\profiles$\Share\config"
 pathSrvConfigUpdater	:= configDirSrv0 "\update local config.cmd"
 maxAgeSavedInvReport	:= 1
-tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
+;tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
 scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= configDirSrv0 "\_Scripts\GUI\" . A_ScriptName
@@ -404,7 +404,7 @@ If (IsObject(instCriacxocx)){
     AddLog("CRIACX.ocx","отсутствует",1)
 }
 
-RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn")
+RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn", 0)
 ;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
 ;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
 ;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
@@ -567,7 +567,7 @@ RunFromConfigDir(ByRef subPath, ByRef logLineText:="", ByRef args:="") {
     return RunScript(runSc.Path, logLineText, args)
 }
 
-RunScript(Byref runScPath, ByRef logLineText:="", ByRef args:="") {
+RunScript(Byref runScPath, ByRef logLineText:="", ByRef args:="", wait := 1) {
     SplitPath runScPath, , , ext
     If (ext="exe") {
 	
@@ -583,7 +583,10 @@ RunScript(Byref runScPath, ByRef logLineText:="", ByRef args:="") {
 	l := AddLog(logLineText)
     Else
 	l := AddLog(AbbreviatePath(runScPath))
-    RunWait %interpreter%"%runScPath%" %args%%suffix%, %A_Temp%, Min UseErrorLevel
+    If (wait)
+	RunWait %interpreter%"%runScPath%" %args%%suffix%, %A_Temp%, Min UseErrorLevel
+    Else
+	Run %interpreter%"%runScPath%" %args%%suffix%, %A_Temp%, Min UseErrorLevel
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
     
     return l
