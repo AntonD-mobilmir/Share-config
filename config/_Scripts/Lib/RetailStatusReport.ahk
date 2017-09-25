@@ -28,6 +28,7 @@ RetailStatusReport(ByRef st:="", ByRef einf:="", ByRef mdl:="") {
 }
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
+    ;RetailStatusReport.ahk <Module> <Status> <Extended info …>
     FileEncoding UTF-8
 
     Loop %0%

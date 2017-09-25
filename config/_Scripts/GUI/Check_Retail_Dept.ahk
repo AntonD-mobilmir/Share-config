@@ -385,6 +385,7 @@ If (!(gpgexist := FileExist("C:\SysUtils\gnupg")) || !(IsObject(softUpdScripts) 
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
+RunFromConfigDir("_Scripts\Tasks\AddressBook_download.cmd")
 	
 If (IsObject(instCriacxocx)){
     If (timecriacxcab) {
