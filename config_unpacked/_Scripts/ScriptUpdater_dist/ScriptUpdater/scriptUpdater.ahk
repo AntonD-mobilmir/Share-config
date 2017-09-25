@@ -22,10 +22,11 @@ GNUPGHOME := A_ScriptDir "\gnupg"
 global childPID := 0
 OnExit("KillChild")
 
-FileGetSize secringSize, %GNUPGHOME%\secring.gpg
-If (ErrorLevel || !secringSize)
-    Throw Exception("Secring not generated yet")
-
+If (!FileExist(GNUPGHOME "\private-keys-v1.d\*.key")) {
+    FileGetSize secringSize, %GNUPGHOME%\secring.gpg
+    If (ErrorLevel || !secringSize)
+	Throw Exception("Secring not generated yet")
+}
 timeout := 15 ; seconds
 tries := 15
 
@@ -80,7 +81,7 @@ ExitApp
 UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
     global tempDir, confDir, GNUPGHOME, timeout, tries
     static curlexe := "", wgetexe := "", exe7z := ""
-	 , gpgexe  := findexe("gpg.exe", "c:\SysUtils\gnupg\pub")
+	 , gpgexe  := findexe("gpg.exe", "c:\SysUtils\gnupg", "c:\SysUtils\gnupg\pub")
 	 , nextMethod:=2
     If (checkPeriod=="")
 	checkPeriod := 24 ; Hours
@@ -143,10 +144,10 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	
 	FileDelete %tempDir%\%verifiedFName%
 	; --never-lock unsupported
-	cmdlgpg = "%gpgexe%" --homedir "%GNUPGHOME%" --batch -o "%verifiedFName%" -d "%gpgFName%"
+	cmdlgpg = "%gpgexe%" --homedir "%GNUPGHOME%" --batch --pinentry-mode loopback -o "%verifiedFName%" -d "%gpgFName%"
 	FileAppend %A_Now% > %cmdlgpg%`n, *, CP1
 	FileAppend %A_Now% > %cmdlgpg%`n, %runLog%
-	RunWait %comspec% /C "%cmdlgpg% 2>"%gpgFName%.log"", %tempDir%, Hide, childPID
+	RunWait %comspec% /C "ECHO.|%cmdlgpg% 2>"%gpgFName%.log"", %tempDir%, Hide, childPID
 	gpgErrLevel := ErrorLevel, childPID := 0
 	Loop 15
 	{
@@ -202,7 +203,8 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	    
 	    FileAppend %A_Now% Copying "%verifiedFName%" to "%dstFullPath%"… , %runLog%
 	    FileCopy %tempDir%\%verifiedFName%, %dstFullPath%.tmp, 1
-	    FileMove %dstFullPath%.tmp, %dstFullPath%, 1
+	    If (!ErrorLevel)
+		FileMove %dstFullPath%.tmp, %dstFullPath%, 1
 	    return !CheckErrorLevel(runLog, endLog)
 	}
     }

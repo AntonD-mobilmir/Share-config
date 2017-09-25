@@ -14,10 +14,10 @@ FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\Curren
     rem Check if admin (XP and higher)
     %SystemRoot%\System32\fltmc.exe >nul 2>&1
     IF ERRORLEVEL 1 (
-	rem Not admin
-	SET "schPassSw=/IT"
+	rem Not admin, /RL LIMITED is in the task template
+	SET "schtasksOptions=/IT"
 	SET "abDir=%LOCALAPPDATA%\mobilmir.ru\AddressBook"
-	SET "taskTemplate=AddressBook_download.xml"
+	SET "taskTemplate=AddressBook_download_LOCALAPPDATA.xml"
 	IF NOT DEFINED ScriptUpdaterDir (
 	    CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" "%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater"
 	    SET "ScriptUpdaterDir=%%LOCALAPPDATA%%\mobilmir.ru\ScriptUpdater"
@@ -27,11 +27,12 @@ FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\Curren
 	    )
 	)
     ) ELSE (
-	SET "schPassSw=/NP"
+	rem /NP всегда при создании задачи, а при изменении указывать нельзя
+	SET "schtasksOptions=/RL HIGHEST"
 	IF EXIST "D:\Mail\Thunderbird" (
 	    SET "abDir=D:\Mail\Thunderbird\AddressBook"
 	) ELSE SET "abDir=%ProgramData%\mobilmir.ru\AddressBook"
-	SET "taskTemplate=AddressBook_download_admin.xml"
+	SET "taskTemplate=AddressBook_download.xml"
 	IF NOT DEFINED ScriptUpdaterDir CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" & GOTO :Restart
     )
     
@@ -39,20 +40,21 @@ FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\Curren
 )
 (
     MKDIR "%abDir%"
-    SET "AutohotkeyExe=%AutohotkeyExe:"='%"
+    SET "rcAutohotkeyExe=%AutohotkeyExe:"='%"
 )
-SET "runcmd=%AutohotkeyExe% '%ScriptUpdaterDir%\scriptUpdater.ahk' '%abDir%\business_contacts.mab' 'https://www.dropbox.com/s/0icvtif93c0dnap/business_contacts.mab.gpg?dl=1' 0"
+SET "runcmd=%rcAutohotkeyExe% '%ScriptUpdaterDir%\scriptUpdater.ahk' '%abDir%\business_contacts.mab' 'https://www.dropbox.com/s/0icvtif93c0dnap/business_contacts.mab.gpg?dl=1' 0"
 CALL :strlen lenruncmd "%runcmd%"
 IF %lenruncmd% GTR 261 (
     XCOPY "%~dp0AddressBook_download.ahk" "%ProgramData%\mobilmir.ru\AddressBook_download.ahk" /Y
     IF ERRORLEVEL 1 (
 	XCOPY "%~dp0AddressBook_download.ahk" "%LOCALAPPDATA%\mobilmir.ru\AddressBook_download.ahk" /Y
-	SET "runcmd=%AutohotkeyExe% '%LOCALAPPDATA%\mobilmir.ru\AddressBook_download.ahk'"
-    ) ELSE SET "runcmd=%AutohotkeyExe% '%ProgramData%\mobilmir.ru\AddressBook_download.ahk'"
+	SET "runcmd=%rcAutohotkeyExe% '%LOCALAPPDATA%\mobilmir.ru\AddressBook_download.ahk'"
+    ) ELSE SET "runcmd=%rcAutohotkeyExe% '%ProgramData%\mobilmir.ru\AddressBook_download.ahk'"
 )
-:sctasksAgain
+:schtasksAgain
 (
-    %SystemRoot%\System32\schtasks.exe /Create /TN "mobilmir.ru\AddressBook_download" /XML "%~dp0optional\%taskTemplate%" /RU "%USERNAME%" %schPassSw% /F || GOTO :Failschtask
+    FOR %%A IN ("%~dp0optional\%taskTemplate%") DO SET "taskTemplateTime=%%~tA"
+    ECHO.|%SystemRoot%\System32\schtasks.exe /Create /TN "mobilmir.ru\AddressBook_download" /XML "%~dp0optional\%taskTemplate%" /RU "%USERNAME%" /NP /F || GOTO :Failschtask
     %SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\AddressBook_download" /TR "%runcmd%" || GOTO :Failschtask
     
     MKDIR "%ProgramData%\mobilmir.ru"
@@ -64,6 +66,21 @@ IF %lenruncmd% GTR 261 (
 	( ECHO %abDir%
 	)>"%LOCALAPPDATA%\mobilmir.ru\addressbookdir.txt"
     ) ELSE DEL "%LOCALAPPDATA%\mobilmir.ru\addressbookdir.txt"
+    %SystemRoot%\System32\schtasks.exe /Run /TN "mobilmir.ru\AddressBook_download"
+    
+    SET /A waitCount=30
+    SET timeCurrentMAB=нет
+    ECHO Ожидание загрузки адресной книги
+)
+:waitAB
+(
+    SET /A waitCount-=1
+    PING 127.0.0.1 -n 2 >NUL 2>&1
+    IF NOT EXIST "%abDir%\business_contacts.mab" IF %waitCount% GTR 0 GOTO :waitAB
+    FOR %%A IN ("%abDir%\business_contacts.mab") DO SET "timeCurrentMAB=%%~tA"
+)
+(
+    START "" %AutohotkeyExe% %~dp0..\Lib\RetailStatusReport.ahk "%taskTemplate%" "%taskTemplateTime%" "Текущая адресная книга: %timeCurrentMAB%" "Команда в задаче планировщика: %runcmd%"
 EXIT /B
 )
 :Failschtask <label>
@@ -73,7 +90,7 @@ EXIT /B
     ECHO [пусто = нет, либо введите имя пользователя для добавления задачи в планировщик]
     SET /P "USERNAME=> "
     IF NOT DEFINED USERNAME EXIT /B
-GOTO :sctasksAgain
+GOTO :schtasksAgain
 )
 :strlen <resultVar> <stringVar>
 (   
