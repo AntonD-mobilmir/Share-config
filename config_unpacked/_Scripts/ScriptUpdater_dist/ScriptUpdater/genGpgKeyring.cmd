@@ -62,13 +62,13 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 :FindGPGexe
 (
 rem IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-rem CALL :GetDir ConfigDir "%DefaultsSource%"
+rem CALL :GetDir configDir "%DefaultsSource%"
 SET findExeTestExecutionOptions=--homedir "%GNUPGHOME%" --batch --help
 SET "pathAppendSubpath=..\..\libs"
-IF NOT DEFINED gpgexe CALL "%~dp0..\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
-rem IF NOT DEFINED gpgexe CALL "%ConfigDir%_Scripts\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
-rem IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
-rem IF NOT DEFINED SetACLexe CALL "%ConfigDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
+IF NOT DEFINED gpgexe IF EXIST "%SystemDrive%\SysUtils\gnupg\gpg.exe" ( SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe" ) ELSE CALL "%~dp0..\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
+
+rem IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
+rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 EXIT /B
 )
 :GetDir
