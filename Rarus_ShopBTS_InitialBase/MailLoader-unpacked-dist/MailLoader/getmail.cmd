@@ -12,7 +12,7 @@ SET "RecvBakDir=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\received.bak"
 SET "AttDir=d:\1S\Rarus\ShopBTS\ExtForms\MailLoader\attachments"
 SET "MonDir=d:\Users\Public\Documents\Рарус"
 
-IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
+IF NOT DEFINED gpgexe IF EXIST "%SystemDrive%\SysUtils\gnupg\gpg.exe" ( SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe" ) ELSE SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
 SET "GNUPGHOME=%~dp0gnupg"
 SET configxml="%~dp0config-localhost.xml"
 

@@ -12,10 +12,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     SET "GNUPGHOME=%~dp0gnupg"
     FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 
-    IF NOT DEFINED gpgexe IF EXIST "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe" (
+    IF NOT DEFINED gpgexe (
 	SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
-	SET gpgexe="%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
-    ) ELSE CALL :FindGPGexe || EXIT /B
+	IF EXIST "%SystemDrive%\SysUtils\gnupg\gpg.exe" ( SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe" ) ELSE CALL :FindGPGexe || EXIT /B
+    )
     rem IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
     
     %SystemRoot%\System32\fltmc.exe >nul 2>&1

@@ -6,12 +6,9 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-rem instgpg is back in PreInstalled\auto since 2017-07-24
-rem IF EXIST "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe" SET "instgpg=1"
 MOVE /Y "%SystemDrive%\SysUtils" "%SystemDrive%\Windows\Temp\SysUtils_%DATE%_%RANDOM%"
 ECHO Running %~dp0prepare.cmd ...
 START "Installing PreInstalled" /MIN /WAIT %comspec% /C "%~dp0prepare.cmd"
-rem IF DEFINED instgpg START "Installing GnuPG" /MIN %comspec% /C "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\PreInstalled\manual\SysUtils_GPG.cmd"
 
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 )
