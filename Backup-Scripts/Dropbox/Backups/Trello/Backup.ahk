@@ -74,7 +74,7 @@ QueueBackupBoards(ByRef query := "") {
     If (oAllBoards=="") {
 	FileRead jsonOldBoards, boards.json
 	If (jsonOldBoards) {
-	    FileAppend [→] %A_Now%`tLoaded old board list from boards.json`n, %log%
+	    FileAppend [←] %A_Now%`tLoaded old board list from boards.json`n, %log%
 	    oAllBoards := JSON.Load(jsonOldBoards)
 	} Else {
 	    FileAppend [.] %A_Now%`tOld board list (boards.json) is empty`n, %log%
@@ -90,7 +90,7 @@ QueueBackupBoards(ByRef query := "") {
 		    backupBoards[board.id] := ""
 		}
 	    }
-	    FileAppend [→] %A_Now%`tFound %i% boards via %query%`n, %log%
+	    FileAppend [🔍] %A_Now%`tFound %i% boards via %query%`n, %log%
 	} Else {
 	    Fail("GET " tmpFullQuery, jsonBoards)
 	}
