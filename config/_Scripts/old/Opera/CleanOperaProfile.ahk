@@ -1,9 +1,6 @@
 ﻿;скрипт сброса профиля Opera (Local и Roaming, кроме нескольких файлов, с сохранением [Personal Info])
 #NoEnv
 
-#Include <IniFilesUnicode>
-#Include <SHGetFolderPath>
-
 LocalAppData := GetKnownFolder("LocalAppData")
 LocalAppDataLow := GetKnownFolder("LocalAppDataLow")
 

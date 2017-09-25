@@ -4,9 +4,6 @@
 
 #NoEnv
 
-#Include <IniFilesUnicode>
-#Include <SHGetFolderPath>
-
 LocalAppData := GetKnownFolder("LocalAppData")
 LocalAppDataLow := GetKnownFolder("LocalAppDataLow")
 

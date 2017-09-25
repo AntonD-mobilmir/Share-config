@@ -3,7 +3,6 @@
 global LocalAppData
 EnvGet LocalAppData,LOCALAPPDATA
 
-#include <SHGetFolderPath>
 global DLDir=GetKnownFolder("Downloads")
 If Not DLDir
     DLDir = %A_MyDocuments%\Downloads
