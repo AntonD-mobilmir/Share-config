@@ -45,3 +45,6 @@ UnxUtils\Uri\which.exe
 UnxUtils\which.exe
 UnxUtils\whoami.exe
 xln.exe
+md5sum.exe
+sha1sum.exe
+sha256sum.exe
