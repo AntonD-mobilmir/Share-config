@@ -20,6 +20,7 @@ acclist := {}
 
 listpath=%1%
 If (FileExist(listpath)) {
+    logPath = %listpath%.log
     Loop Read, %listpath%
     {
 	If (RegExMatch(A_LoopReadLine, "^(?P<email>(?P<login>[^ @\t]+)(@(?P<domain>[^ \t]+))?)(\t((?P<FirstName>[^\t]+)\t(?P<LastName>[^\t]+)?)?(?P<leftovers>.*))?$", m)) {
@@ -39,6 +40,7 @@ If (FileExist(listpath)) {
 	}
     }
 } Else {
+    logPath = %A_ScriptName%.log
     reqFieldsSeq := ["login", "domain", "FirstName", "LastName"]
     argC = %0%
     argN := 1
@@ -72,7 +74,7 @@ If (FileExist(listpath)) {
 
 For accID, acc in acclist {
     If (!AddMailbox(acc.domain, acc.login, pass := GenPass(), acc.FirstName, acc.LastName, response))
-	FileAppend "<!>:", %A_ScriptName%.log
+	FileAppend "<!>:", %logPath%
     FileAppend % acc.login "@" acc.domain A_Tab pass A_Tab acc.FirstName A_Tab acc.LastName A_Tab response "`n", %A_ScriptName%.log
 }
 ExitApp
