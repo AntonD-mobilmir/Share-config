@@ -238,14 +238,14 @@ If (FileExist(scriptInventoryReport)) {
 
 CheckUpdateDefaultConfigName(reqdConfigName)
 
-If (A_OSVersion=="WIN_7") {
-    netshexe := findexe("netsh.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
-    AddLog("Отключение Teredo")
-    RunWait %netshexe% interface ipv6 set teredo disable,,Min UseErrorLevel
-    err1netsh:=ErrorLevel
-    RunWait %netshexe% interface teredo set state disable,,Min UseErrorLevel
-    SetLastRowStatus("ipv6 STD: " . err1netsh . " / TSSD: " . ErrorLevel,!(err1netsh || ErrorLevel))
-}
+;If (A_OSVersion=="WIN_7") {
+;    netshexe := findexe("netsh.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
+;    AddLog("Отключение Teredo")
+;    RunWait %netshexe% interface ipv6 set teredo disable,,Min UseErrorLevel
+;    err1netsh:=ErrorLevel
+;    RunWait %netshexe% interface teredo set state disable,,Min UseErrorLevel
+;    SetLastRowStatus("ipv6 STD: " . err1netsh . " / TSSD: " . ErrorLevel,!(err1netsh || ErrorLevel))
+;}
 
 ; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
 EnvGet SystemDrive, SystemDrive

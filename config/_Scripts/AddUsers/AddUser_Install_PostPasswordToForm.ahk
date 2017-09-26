@@ -2,8 +2,10 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 ;global debug:=Object()
-RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
-RegRead Domain, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
+RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
+RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
+If (!Domain)
+    RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, DhcpDomain
 
 URL:="https://docs.google.com/a/mobilmir.ru/forms/d/1eBHS2d49-qtD096mYZDK_wIXwjS1WyImFi-_kYWUkhY/formResponse"
 UserName=%1%
@@ -14,7 +16,7 @@ Status=%3%
 Random postID, 0, 0xFFFF
 postID := A_Now . "#" . Format("{:04x}", postID)
 
-If (!Domain || !(Domain ~= "^(office0.mobilmir|officeVPN.mobilmir)$"))
+If (Domain != "office0.mobilmir" && Domain != "officeVPN.mobilmir")
     Hostname .= "." . Domain
 POSTDATA := { "entry.1427319477" : Hostname
 	    , "entry.1727019064" : UserName

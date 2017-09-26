@@ -11,7 +11,7 @@ IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
     SET "InstallUsername=Install"
     SET "PasswdPart1=0000%RANDOM%"
     SET "PasswdPart2=0000%RANDOM%"
-    SET "lastTriedPass=-"
+    SET "lastTriedPass=*"
 
     CALL "%~dp0..\FindAutoHotkeyExe.cmd"
     IF EXIST "C:\Users\Install\Install-pwd.txt" (
