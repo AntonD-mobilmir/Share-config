@@ -8,6 +8,11 @@
 ;	путь	папка, куда сохранять резервные копии, список досок и журнал. Должна существовать или должен быть указан путь с "\", иначе скрипт будет считать, что это доп. параметры запроса.
 ;	доп. параметры запроса	см. https://developers.trello.com/v1.0/reference#boards-nested-resource. Например, boards=open
 
+; arrow mnemonics:
+; 	trello  
+; 	  ↓↑
+; 	script ← → disk
+
 ;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
@@ -52,7 +57,7 @@ FileCreateDir %batchDir%
 FileAppend `n[·] %A_Now%`tStaring backup for %A_UserName% to %batchDir%`n, %log%
 
 If (queryOrgsBoards + queryMyBoards) {
-    FileAppend [→] %A_Now%`tGET /members/me/organizations`n, %log%
+    FileAppend [↓] %A_Now%`tGET /members/me/organizations`n, %log%
     orgsBoardsBatch := ""
     For i,org in TrelloAPI1("GET", "/members/me/organizations", jsonOrgs := Object())
 	QueueBackupBoards("/organizations/" org.id "/boards" filter)
@@ -154,10 +159,10 @@ BatchRequest(ByRef req := "") {
     
     If (urls) {
 	If (TrelloAPI1("GET", "/batch/?urls=" urls, resp)) {
-	    FileAppend [→] %A_Now%`tGET /batch/?urls=%urls%`n, %log%
+	    FileAppend [↓] %A_Now%`tGET /batch/?urls=%urls%`n, %log%
 	    leftRequests := TrelloRequestsPerBatch
 	} Else {
-	    Fail(A_ThisFunc, urls " → " resp)
+	    Fail(A_ThisFunc, "[↑] " urls " [↓] " resp)
 	}
 	return {urls: urls, response: resp}, urls := ""
     }
@@ -193,9 +198,9 @@ TransactWrite(ByRef path, ByRef contents) {
 	file.Close()
 	FileMove %path%.tmp, %path%, 1
 	If (ErrorLevel)
-	    FileAppend [!] %A_Now%`tFailed renaming "%path%.tmp" → "%path%"`n, %log%
+	    FileAppend [!] %A_Now%`tFailed renaming "%path%.tmp" to "%path%"`n, %log%
 	Else
-	    FileAppend [↓] %A_Now%`tWrote %path%`n, %log%
+	    FileAppend [→] %A_Now%`tWrote %path%`n, %log%
     } Else {
 	Fail("Cannot open file", path ".tmp")
 	return 0
