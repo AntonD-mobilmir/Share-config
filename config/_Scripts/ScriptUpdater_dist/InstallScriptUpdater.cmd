@@ -34,7 +34,11 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     
     CALL "%~dp0..\Tasks\_Schedule WinVista+ Task.cmd" "%~dp0Tasks.7z" "%schTaskName%" "%taskXML%"
     IF DEFINED ModifyTask %SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\%schTaskName%" /TR "%comspec% /C ''%dest%\autoupdate.cmd' >'%TEMP%\ScriptUpdater-autoupdate.log' 2>&1'"
-    
+)
+(
+    ENDLOCAL
+    SET "mailUserId=%MailUserId%"
+    SET "mailDomain=%MailDomain%"
     EXIT /B
 )
 :DestOnCmdl
