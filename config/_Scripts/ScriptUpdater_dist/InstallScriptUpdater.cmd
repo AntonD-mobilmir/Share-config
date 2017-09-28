@@ -22,15 +22,15 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || EXIT /B
 )
 (
-    MKDIR "%ProgramData%\mobilmir.ru" 2>NUL
-    ( ECHO %dest%
-    )>"%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt"
-    
-    %exe7z% x -aoa -o"%dest%" -- "%~dp0ScriptUpdater.7z"
+    %exe7z% x -aoa -o"%dest%" -- "%~dp0ScriptUpdater.7z" || EXIT /B
     SET "GenKeyring=1"
     FOR %%A IN ("%dest%\gnupg\secring.gpg") DO IF EXIST "%%~A" IF NOT "%%~zA"=="0" SET "GenKeyring="
     FOR /D %%A IN ("%dest%\gnupg\private-keys-v*") DO FOR %%B IN ("%%~A\*.key") DO IF NOT "%%~zB"=="0" SET "GenKeyring="
-    IF DEFINED GenKeyring CALL "%dest%\genGpgKeyring.cmd"
+    IF DEFINED GenKeyring CALL "%dest%\genGpgKeyring.cmd" || EXIT /B
+
+    MKDIR "%ProgramData%\mobilmir.ru" 2>NUL
+    ( ECHO %dest%
+    )>"%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt"
     
     CALL "%~dp0..\Tasks\_Schedule WinVista+ Task.cmd" "%~dp0Tasks.7z" "%schTaskName%" "%taskXML%"
     IF DEFINED ModifyTask %SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\%schTaskName%" /TR "%comspec% /C ''%dest%\autoupdate.cmd' >'%TEMP%\ScriptUpdater-autoupdate.log' 2>&1'"
