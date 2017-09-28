@@ -65,7 +65,10 @@ rem  does not work with gpg2.2+ https://bbs.archlinux.org/viewtopic.php?id=20805
     rem %gpgexe% --no-default-keyring --keyring "%srcpath%keyring.gpg" --edit-key 0xE91EA97A trust sign tsign save quit
     %gpgexe% --homedir "%GNUPGHOME%" --batch --import-ownertrust "%GNUPGHOME%\trust.asc"
     %gpgexe% --homedir "%GNUPGHOME%" --batch --list-keys --fingerprint
-    EXIT /B
+    ENDLOCAL
+    SET "mailUserId=%MailUserId%"
+    SET "mailDomain=%MailDomain%"
+EXIT /B
 ) >> "%outDir%%MailUserId%@%MailDomain%.gen.log" 2>&1 
 :FindGPGexe
 (
