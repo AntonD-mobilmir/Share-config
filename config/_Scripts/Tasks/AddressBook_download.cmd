@@ -6,8 +6,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
-
+    FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 :Restart
     FOR /F "usebackq delims=" %%A IN ("%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt") DO SET "ScriptUpdaterDir=%%~A"
     
@@ -15,25 +14,28 @@ FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\Curren
     %SystemRoot%\System32\fltmc.exe >nul 2>&1
     IF ERRORLEVEL 1 (
 	rem Not admin, /RL LIMITED is in the task template
-	SET "schtasksOptions=/IT"
-	SET "abDir=%LOCALAPPDATA%\mobilmir.ru\AddressBook"
 	SET "taskTemplate=AddressBook_download_LOCALAPPDATA.xml"
+	SET "schtasksOptions=/IT"
+	SET "schedUserName=%USERNAME%"
+	SET "abDir=%LOCALAPPDATA%\mobilmir.ru\AddressBook"
 	IF NOT DEFINED ScriptUpdaterDir (
-	    CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" "%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater"
+	    CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" "%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater" || PAUSE
 	    SET "ScriptUpdaterDir=%%LOCALAPPDATA%%\mobilmir.ru\ScriptUpdater"
-	    IF NOT EXIST "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%Hostname%@rarus.robots.mobilmir.ru.asc" (
-		ECHO ScriptUpdater установлен в LOCALAPPDATA. Убедитесь, что ключи gpg скопировались в \\Srv0.office0.mobilmir\profiles$\Share\gpg, иначе ничего работать не будет
-		PAUSE
-	    )
 	)
     ) ELSE (
-	rem /NP всегда при создании задачи, а при изменении указывать нельзя
-	SET "schtasksOptions=/RL HIGHEST"
-	IF EXIST "D:\Mail\Thunderbird" (
-	    SET "abDir=D:\Mail\Thunderbird\AddressBook"
-	) ELSE SET "abDir=%ProgramData%\mobilmir.ru\AddressBook"
 	SET "taskTemplate=AddressBook_download.xml"
-	IF NOT DEFINED ScriptUpdaterDir CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" & GOTO :Restart
+	rem --in XML-- SET "schtasksOptions=/RL HIGHEST"
+	IF EXIST "D:\Mail\Thunderbird" (
+	    CALL "%~dp0..\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
+	    rem schedUserName schedUserPwd
+	    SET "abDir=D:\Mail\Thunderbird\AddressBook"
+	) ELSE (
+	    SET "abDir=%ProgramData%\mobilmir.ru\AddressBook"
+	)
+	IF NOT DEFINED ScriptUpdaterDir (
+	    CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" || PAUSE
+	    GOTO :Restart
+	)
     )
     
     CALL "%~dp0..\FindAutoHotkeyExe.cmd"
@@ -54,8 +56,14 @@ IF %lenruncmd% GTR 261 (
 :schtasksAgain
 (
     FOR %%A IN ("%~dp0optional\%taskTemplate%") DO SET "taskTemplateTime=%%~tA"
-    ECHO.|%SystemRoot%\System32\schtasks.exe /Create /TN "mobilmir.ru\AddressBook_download" /XML "%~dp0optional\%taskTemplate%" /RU "%USERNAME%" /NP /F || GOTO :Failschtask
-    %SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\AddressBook_download" /TR "%runcmd%" || GOTO :Failschtask
+    IF DEFINED schedUserPwd (
+	%SystemRoot%\System32\schtasks.exe /Create /TN "mobilmir.ru\AddressBook_download" /XML "%~dp0optional\%taskTemplate%" /RU "%schedUserName%" /RP "%schedUserPwd%" %schtasksOptions% /F || GOTO :Failschtask
+	%SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\AddressBook_download" /RU "%schedUserName%" /RP "%schedUserPwd%" %schtasksOptions% /TR "%runcmd%" || GOTO :Failschtask
+    ) ELSE (
+	rem /NP при создании задачи, если USERNAME==schedUserName а при изменении указывать нельзя
+	ECHO.|%SystemRoot%\System32\schtasks.exe /Create /TN "mobilmir.ru\AddressBook_download" /XML "%~dp0optional\%taskTemplate%" /RU "%schedUserName%" %schtasksOptions% /F || GOTO :Failschtask
+	%SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\AddressBook_download" %schtasksOptions% /TR "%runcmd%" || GOTO :Failschtask
+    )
     
     MKDIR "%ProgramData%\mobilmir.ru"
     ( ECHO %abDir%
@@ -78,9 +86,15 @@ IF %lenruncmd% GTR 261 (
     PING 127.0.0.1 -n 2 >NUL 2>&1
     IF NOT EXIST "%abDir%\business_contacts.mab" IF %waitCount% GTR 0 GOTO :waitAB
     FOR %%A IN ("%abDir%\business_contacts.mab") DO SET "timeCurrentMAB=%%~tA"
+
+    IF DEFINED MailUserId IF DEFINED MailDomain IF NOT EXIST "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" (
+	ECHO Файла "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" не существует.
+	ECHO ScriptUpdater установлен, но, пока адресная книга не загружена с открытым ключом для этого компьютера, обновление адресной книги работать не будет!
+	SET KeyNotFound="Файл не найден: \\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc"
+    )
 )
 (
-    START "" %AutohotkeyExe% %~dp0..\Lib\RetailStatusReport.ahk "%taskTemplate%" "%taskTemplateTime%" "Текущая адресная книга: %timeCurrentMAB%" "Команда в задаче планировщика: %runcmd%"
+    START "" %AutohotkeyExe% %~dp0..\Lib\RetailStatusReport.ahk "%taskTemplate%" "%taskTemplateTime%" "Текущая адресная книга: %timeCurrentMAB%" "Команда в задаче планировщика: %runcmd%" %KeyNotFound%
 EXIT /B
 )
 :Failschtask <label>
@@ -88,8 +102,9 @@ EXIT /B
     ECHO Ошибка %ERRORLEVEL% при добавлении/изменени задачи.
     ECHO Повторить?
     ECHO [пусто = нет, либо введите имя пользователя для добавления задачи в планировщик]
-    SET /P "USERNAME=> "
-    IF NOT DEFINED USERNAME EXIT /B
+    SET /P "schedUserName=> "
+    IF NOT DEFINED schedUserName EXIT /B
+    SET "schedUserPwd="
 GOTO :schtasksAgain
 )
 :strlen <resultVar> <stringVar>
