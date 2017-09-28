@@ -386,8 +386,39 @@ RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "За
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 RunFromConfigDir("_Scripts\Tasks\AddressBook_download.cmd")
+RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$ /DELETE,,Min UseErrorLevel
+If (!ErrorLevel) {
+    abDir = D:\Mail\Thunderbird\AddressBook
+    AddLog("Настройка доступа к " abDir, "Настройка \\…\AddressBook$")
+    RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$="%abDir%" /GRANT:Everyone`,READ,,Min UseErrorLevel
+    If (ErrorLevel)
+	RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$="%abDir%" /GRANT:Все`,READ,,Min UseErrorLevel
+    If (ErrorLevel)
+	RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$="%abDir%",,Min UseErrorLevel
+    If (ErrorLevel)
+	SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
+    Else {
+	SetLastRowStatus("Настройка ACL")
+	sidEveryone=S-1-1-0
+	;sidAuthenticatedUsers=S-1-5-11
+	;sidUsers=S-1-5-32-545
+	sidSYSTEM=S-1-5-18
+	;sidCreatorOwner=S-1-3-0
+	sidAdministrators=S-1-5-32-544
+	;Administrators=S-1-5-32-544
+	;SYSTEM=S-1-5-18
+	;sidBackupOperators=S-1-5-32-551
+	;sidCREATOROWNER=S-1-3-0
+	RunWait %A_WinDir%\System32\takeown.exe /A /R /D Y /F "%abDir%",,Min UseErrorLevel
+	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /reset /T /C /L,,Min UseErrorLevel
+	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /inheritance:r /C /L,,Min UseErrorLevel
+	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /setowner "*%sidAdministrators%" /T /C /L,,Min UseErrorLevel
+	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /grant "*%sidAdministrators%:(OI)(CI)F" /grant "*%sidSYSTEM%:(OI)(CI)F" /grant "*%sidEveryone%:(OI)(CI)R" /C /L,,Min UseErrorLevel
+	SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
+    }
+}
 	
-If (IsObject(instCriacxocx)){
+If (IsObject(instCriacxocx)) {
     If (timecriacxcab) {
 	FileGetTime criacxocxTimeNew, % instCriacxocx.path
 	criacxocxTimeDiff:=criacxocxTimeNew
@@ -580,7 +611,7 @@ RunScript(Byref runScPath, ByRef logLineText:="", ByRef args:="", wait := 1) {
     } Else
 	Throw Exception("Для этого расширения файла не определен интерпретатор",, ext)
     
-    If (comment)
+    If (logLineText)
 	l := AddLog(logLineText)
     Else
 	l := AddLog(AbbreviatePath(runScPath))
