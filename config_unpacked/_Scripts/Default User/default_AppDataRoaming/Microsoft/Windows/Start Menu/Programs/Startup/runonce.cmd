@@ -31,7 +31,7 @@ CALL :FirstExisting DefaultUserRegistrySettings "\\Srv0.office0.mobilmir\profile
 	IF DEFINED exe7z %exe7z% x -o"%RegTmpDir%" -- "%DefaultUserRegistrySettings%"
 	FOR /R %%I IN ("%RegTmpDir%\*.reg") DO REG IMPORT "%%~fI"
 	RD /S /Q "%RegTmpDir%"
-	DEL "%DefaultUserRegistrySettings%"
+	IF NOT "%DefaultUserRegistrySettings:~0,2%"=="\\" DEL "%DefaultUserRegistrySettings%"
     )
     IF DEFINED RemoveAllAppX (
 	CALL "%ConfigDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon
