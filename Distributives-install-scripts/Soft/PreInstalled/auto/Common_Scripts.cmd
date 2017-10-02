@@ -17,7 +17,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     )
 )
 (
-    "%utilsdir%7za.exe" x -r -aoa "%%~dpn0.7z" -o"%ProgramData%\mobilmir.ru\Common_Scripts" || %ErrorCmd%
+    "%utilsdir%7za.exe" x -r -aoa "%~dpn0.7z" -o"%ProgramData%\mobilmir.ru\Common_Scripts" || %ErrorCmd%
     %windir%\System32\compact.exe /C /EXE:LZX /S:"%ProgramData%\mobilmir.ru\Common_Scripts" /I /Q || %windir%\System32\compact.exe /C /S:"%ProgramData%\mobilmir.ru\Common_Scripts" /I /Q
     rem "%utilsdir%xln.exe" -n "%ProgramData%\mobilmir.ru\Common_Scripts" "%SystemDrive%\Common_Scripts"
     
