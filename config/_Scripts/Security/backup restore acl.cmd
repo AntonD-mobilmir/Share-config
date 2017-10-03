@@ -11,7 +11,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	EXIT /B 2
     )
     
-    IF "%~2"=="" CALL :restoreACL "" %2 & EXIT /B
+    IF "%~2"=="" CALL :restoreACL "" %1 & EXIT /B
     IF "%~1"=="/R" GOTO :restoreACL
     IF "%~1"=="-" GOTO :restoreACL
     IF "%~1"=="" GOTO :restoreACL
