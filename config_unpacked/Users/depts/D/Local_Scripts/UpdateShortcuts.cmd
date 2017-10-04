@@ -18,9 +18,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 :GetScriptUpdaterDirAgain
     FOR /F "usebackq delims=" %%A IN ("%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt") DO SET "ScriptUpdaterDir=%%~A"
     IF NOT DEFINED ScriptUpdaterDir (
-	%SystemRoot%\System32\fltmc.exe >nul 2>&1 || (ECHO Чтобы установить ScriptUpdater, нужны права администратора & EXIT /B)
-	CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd"
-	GOTO :GetScriptUpdaterDirAgain
+	rem %SystemRoot%\System32\fltmc.exe >nul 2>&1 || (ECHO Чтобы установить ScriptUpdater, нужны права администратора & EXIT /B)
+	rem CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd"
+	rem GOTO :GetScriptUpdaterDirAgain
+	EXIT /B 1
     )
 )
 (
