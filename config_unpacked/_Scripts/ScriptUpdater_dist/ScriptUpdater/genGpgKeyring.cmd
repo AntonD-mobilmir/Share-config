@@ -70,16 +70,25 @@ rem  does not work with gpg2.2+ https://bbs.archlinux.org/viewtopic.php?id=20805
     SET "mailDomain=%MailDomain%"
 EXIT /B
 ) >> "%outDir%%MailUserId%@%MailDomain%.gen.log" 2>&1 
-:FindGPGexe
-(
-rem IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-rem CALL :GetDir configDir "%DefaultsSource%"
-SET findExeTestExecutionOptions=--homedir "%GNUPGHOME%" --batch --help
-SET "pathAppendSubpath=..\libs"
-IF NOT DEFINED gpgexe IF EXIST "%SystemDrive%\SysUtils\gnupg\gpg.exe" ( SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe" ) ELSE CALL "%~dp0..\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe"
-
 rem IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
 rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
+:FindGPGexe
+(
+SET findExeTestExecutionOptions=--homedir "%GNUPGHOME%" --batch --help
+SET "pathAppendSubpath=..\libs"
+IF NOT DEFINED gpgexe IF EXIST "%SystemDrive%\SysUtils\gnupg\gpg.exe" ( SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe" ) ELSE CALL :FindGPGexe
+EXIT /B
+)
+:FindGPGexe
+IF NOT DEFINED configDir CALL :GetConfigDir
+(
+CALL "%configDir%_Scripts\find_exe.cmd" gpgexe "%SystemDrive%\SysUtils\gnupg\pub\gpg.exe" "%ProgramFiles%\GnuPG\bin\gpg.exe" "%ProgramFiles(x86)%\GnuPG\bin\gpg.exe" "%ProgramFiles%\gnupg\pub\gpg.exe" "%ProgramFiles(x86)%\gnupg\pub\gpg.exe" "%LOCALAPPDATA%\Programs\SysUtils\gnupg\gpg.exe" "%LOCALAPPDATA%\Programs\SysUtils\gnupg\pub\gpg.exe" "%LOCALAPPDATA%\Programs\gnupg\gpg.exe" "%LOCALAPPDATA%\Programs\gnupg\bin\gpg.exe" "%LOCALAPPDATA%\Programs\gnupg\pub\gpg.exe"
+EXIT /B
+)
+:GetConfigDir
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+(
+CALL :GetDir configDir "%DefaultsSource%"
 EXIT /B
 )
 :GetDir
