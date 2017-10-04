@@ -15,8 +15,14 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
+IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
+IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
+
 REM Setting defaults
-IF NOT DEFINED exe7z SET exe7z="%~dp07zG.exe"
+IF NOT DEFINED exe7z (
+    IF DEFINED OS64Bit IF EXIST "%~dp064\7zG.exe" ( SET exe7z="%~dp064\7zG.exe" ) ELSE IF EXIST "%~dp064\7z.exe" ( SET exe7z="%~dp064\7z.exe" )
+    IF NOT DEFINED exe7z IF EXIST "%~dp07zG.exe" ( SET exe7z="%~dp07zG.exe" ) ELSE IF EXIST "%~dp07z.exe" ( SET exe7z="%~dp07z.exe" ) ELSE SET exe7z="7z.exe"
+)
 IF NOT DEFINED leaveSmallestOnly SET "leaveSmallestOnly=1"
 IF NOT DEFINED deleteAfter SET "deleteAfter=0"
 IF NOT DEFINED smallestNoSuffix SET "smallestNoSuffix=0"

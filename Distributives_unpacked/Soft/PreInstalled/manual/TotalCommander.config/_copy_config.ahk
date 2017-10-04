@@ -46,7 +46,11 @@ FileCopyDir %A_ScriptDir%\APPDATA.DEF,%A_APPDATA%,%overwriteConfig%
 IfExist %A_APPDATA%\GHISLER\wincmd.key
     Run %SysNative%\cipher.exe /E "%A_APPDATA%\GHISLER\wincmd.key",,Min
 IfExist %A_APPDATA%\GHISLER\pci.db
+{
     Run %SysNative%\compact.exe /C /EXE:LZX "%A_APPDATA%\GHISLER\pci.db",,Min
+    If (ErrorLevel)
+	Run %SysNative%\compact.exe /C "%A_APPDATA%\GHISLER\pci.db",,Min
+}
 
 RegDelete HKEY_CURRENT_USER\Software\Ghisler\Total Commander
 RegDelete HKEY_LOCAL_MACHINE\Software\Ghisler\Total Commander

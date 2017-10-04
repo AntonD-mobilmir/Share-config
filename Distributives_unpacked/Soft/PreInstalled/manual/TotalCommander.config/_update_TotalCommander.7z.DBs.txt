@@ -1,0 +1,2 @@
+APPDATA.DEF\GHISLER\pci.db
+PlugIns\wdx\TrID_Identifier\TrID\triddefs.trd

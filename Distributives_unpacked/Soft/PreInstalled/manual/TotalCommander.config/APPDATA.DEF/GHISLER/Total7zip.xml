@@ -22,6 +22,7 @@
 			<ext val="odt" />
 			<ext val="xlsx" />
 			<ext val="xpi" />
+			<ext val="z01" />
 			<ext val="zip" />
 			<ext val="zipx" />
 		</format>
@@ -50,6 +51,7 @@
 		<format description="7z" guid="{23170F69-40C1-278A-1000-000110070000}">
 			<ext val="7z" />
 			<ext val="bak" />
+			<ext val="curr" />
 			<ext val="exe" />
 			<ext val="lzma2" />
 			<ext val="ok" />
@@ -192,6 +194,7 @@
 		<format description="Xar" guid="{23170F69-40C1-278A-1000-000110E10000}">
 			<ext val="pkg" />
 			<ext val="xar" />
+			<ext val="xip" />
 		</format>
 		<format description="Mub" guid="{23170F69-40C1-278A-1000-000110E20000}">
 			<ext val="mub" />

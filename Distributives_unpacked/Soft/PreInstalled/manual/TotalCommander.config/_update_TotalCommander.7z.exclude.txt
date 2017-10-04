@@ -1,6 +1,8 @@
 AutoHotkey.exe
-notepad2.exe
+notepad2-*.*
+Notepad2.exe
 notepad2.ini.bak
+Notepad2.txt
 PlugIns\wcx\CopyTree\Language
 PlugIns\wcx\Total7zip\7z.dll 
 PlugIns\wcx\Total7zip\7z.sfx 
@@ -10,10 +12,11 @@ PlugIns\wcx\Total7zip\7-zip.chm
 PlugIns\wcx\Total7zip\Lang
 PlugIns\wcx\Total7zip\License.txt
 PlugIns\wcx\zpaq\non-SSE2
+PlugIns\wdx\TrID_Identifier\TrID\*.zip
 PlugIns\wlx\OOoViewer
-Total Updater
 TCUNIN64.EXE
 TCUNIN64.WUL
 TCUNINST.EXE
 TCUNINST.WUL
+Total Updater
 WCUNINST.WUL
