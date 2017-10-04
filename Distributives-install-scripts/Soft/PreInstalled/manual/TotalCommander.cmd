@@ -27,6 +27,7 @@ IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
     SET exe7z="%utilsdir%7za.exe"
     REM exe7z will be redefined in next CALL
     FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%dist7zDir%\7z*.exe"`) DO CALL :Unpack7ZipDist "%dist7zDir%\%%~N"
+    IF NOT DEFINED Unpacked32bit7Zip MKDIR "%TCDir%\PlugIns\wcx\Total7zip" >NUL & COPY /B %exe7z% "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe" && SET exe7z="%TCDir%\PlugIns\wcx\Total7zip\7zg.exe"
 )
 (
     %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.7z"
