@@ -27,10 +27,16 @@ IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
     SET exe7z="%utilsdir%7za.exe"
     REM exe7z will be redefined in next CALL
     FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%dist7zDir%\7z*.exe"`) DO CALL :Unpack7ZipDist "%dist7zDir%\%%~N"
-    IF NOT DEFINED Unpacked32bit7Zip MKDIR "%TCDir%\PlugIns\wcx\Total7zip" >NUL & COPY /B %exe7z% "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe" && SET exe7z="%TCDir%\PlugIns\wcx\Total7zip\7zg.exe"
+)
+IF NOT DEFINED exe7zlocal (
+    MKDIR "%TCDir%\PlugIns\wcx\Total7zip" >NUL
+    ECHO N|COPY /B %exe7z% "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe"
+    SET exe7z="%TCDir%\PlugIns\wcx\Total7zip\7zg.exe"
+    SET "exe7zlocal=2"
 )
 (
     %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.7z"
+    IF "%exe7zlocal%"=="2" "%TCDir%\xln.exe" "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe" "%TCDir%\PlugIns\wcx\Total7zip\7z.exe" || (ECHO N|COPY /B "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe" "%TCDir%\PlugIns\wcx\Total7zip\7z.exe")    
     %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.Plugins.7z"
     IF DEFINED OS64Bit (
 	%exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.64bit.7z"
@@ -54,9 +60,9 @@ IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
     %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.config.7z"
     REM Autohotkey.exe копируется в %TCDir% выше
     IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" "%TCDir%\Autohotkey.exe" "%TCDir%\_copy_config.ahk"
-
+    
     FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%distzpaqDir%\zpaq*.zip"`) DO CALL :Unpackzpaq "%distzpaqDir%\%%~N" && EXIT /B
-    @ECHO 7-Zip not unpacked!
+    @ECHO zpaq not unpacked!
 EXIT /B
 )
 :Unpack7ZipDist
@@ -75,8 +81,18 @@ EXIT /B
 )
 (
     IF NOT DEFINED %flagVar% %exe7z% x -r -aoa -o"%TCDir%\PlugIns\wcx\Total7zip%outSubdir%" -- %1 Lang\* 7z.dll 7z.sfx 7zg.exe 7z.exe && SET "%flagVar%=1"
-    IF EXIST "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7z.exe" SET exe7z="%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7z.exe"
+    IF NOT DEFINED exe7zlocal CALL :FindFirstExisting exe7z "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7z.exe" "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7zg.exe" && SET "exe7zlocal=1"
     EXIT /B
+)
+:FindFirstExisting var <path> <path...>
+(
+    IF "%~2"=="" EXIT /B 1
+    IF EXIST %2 (
+	SET %~1="%~2"
+	EXIT /B
+    )
+    SHIFT /2
+    GOTO :FindFirstExisting
 )
 :Unpackzpaq
 (
