@@ -372,13 +372,14 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
-If (!(gpgexist := FileExist("C:\SysUtils\gnupg")) || !(IsObject(softUpdScripts) && IsObject(distSoftUpdScripts))) { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
-    If (FileExist(Distributives "\rSync_DistributivesFromSrv0.cmd")) {
+If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts) && IsObject(distSoftUpdScripts))) { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
+    If (SubStr(Distributives, 1, 2) != "\\" && FileExist(Distributives "\rSync_DistributivesFromSrv0.cmd") && FileExist(Distributives "\Soft\PreInstalled\auto\SysUtils\*")) {
 	AddLog("rSync_DistributivesFromSrv0.cmd PreInstalled")
 	RunWait %comspec% /C ""%Distributives%\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
 	SetLastRowStatus(ErrorLevel, !ErrorLevel)
     }
-    CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="D")
+    ;				  archSubpath, 				  scriptSubpath,					  title:="",	 flagMask:="",				    loopOptn:="")
+    CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
 }
 ;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
 
@@ -560,7 +561,7 @@ ButtonCancel:
     }
     ExitApp
 
-CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", ByRef flagMask:="", loopOptn:="") {
+CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
     global ServerDistPath, Distributives
     latestFlagTime:=0
 
@@ -571,7 +572,7 @@ CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", 
     FindLatest(ServerDistPath "\" archSubpath,, mtimeSrv0)
     
     If (flagMask)
-	FindLatest(flagMask, loopOptn, latestFlagTime)
+	FindLatest(flagMask, optnLoopFlag, latestFlagTime)
     
     If (latestFlagTime) {
 	timeDiff := mtimeSrv0
