@@ -1,6 +1,6 @@
 #NoEnv
 SetFormat IntegerFast, D
-FreeSpaceLowMarginMB := 3072
+FreeSpaceLowMarginMB := 5120 ; KB4038782 отказывалось устанавливаться, когда на системном диске было свободно меньше 4 гигабайт
 CBSlogMaxSizeMB := 512
 
 ;to get extensions:
