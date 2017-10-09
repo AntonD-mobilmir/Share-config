@@ -14,3 +14,4 @@ HardlinkOrReparse.cmd
 MultiDiff.ahk
 NoClose.ini
 notepad2.ini
+PlugIns\wdx\TrID_Identifier\TrID

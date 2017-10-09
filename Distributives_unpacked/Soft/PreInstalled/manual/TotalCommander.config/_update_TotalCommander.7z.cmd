@@ -7,15 +7,11 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
     CALL "%~dp0PlugIns\wcx\Total7zip\7z_get_switches.cmd"
+    IF EXIST "%~dp0PlugIns\wcx\Total7zip\7z.exe" (SET exe7z="%~dp0PlugIns\wcx\Total7zip\7z.exe") ELSE SET exe7z="%~dp0PlugIns\wcx\Total7zip\7zg.exe"
 
     SET "dstDir=x:\Distributives\Soft\PreInstalled\manual"
     SET "tmpDir=%TEMP%\PreInstalled-tc-new"
     SET "bakDir=%TEMP%\PreInstalled-tc-backup"
-    SET "arcname=TotalCommander.7z"
-    SET "arcname64bit=TotalCommander.64bit.7z"
-    SET "arcnamePlugins=TotalCommander.Plugins.7z"
-    SET "arcnamePlugins64bit=TotalCommander.Plugins64bit.7z"
-    SET "arcnameConfig=TotalCommander.config.7z"
 
     PUSHD "%~dp0\PlugIns\wdx\TrID_Identifier\TrID" && (
 	CALL update.cmd
@@ -45,7 +41,7 @@ rem new block to let %excludes% update
 )
 (
 rem everything else without all previous
-"%~dp0PlugIns\wcx\Total7zip\7zg.exe" u -uq0 -r %z7zswitchesLZMA2BCJ2% %excludes% -- "%tmpDir%\TotalCommander.7z"
+%exe7z% u -uq0 -r %z7zswitchesLZMA2BCJ2% %excludes% -- "%tmpDir%\TotalCommander.7z"
 
 MKDIR "%bakDir%"
 FOR %%A IN ("%tmpDir%\*.*") DO FC /B /LB1 /A "%%~A" "%dstDir%\%%~nxA" > NUL || (MOVE /Y "%dstDir%\%%~nxA" "%bakDir%\%%~nxA" & MOVE "%%~A" "%dstDir%\%%~nxA")
@@ -55,7 +51,7 @@ EXIT /B
 
 :PackAddExcl <listName>
 (
-    "%~dp0PlugIns\wcx\Total7zip\7zg.exe" u -uq0 -r %z7zswitchesLZMA2BCJ2% %excludes% -i@"%~n0.%~1.txt" -- "%tmpDir%\TotalCommander.%~1.7z"
+    %exe7z% u -uq0 -r %z7zswitchesLZMA2BCJ2% %excludes% -i@"%~n0.%~1.txt" -- "%tmpDir%\TotalCommander.%~1.7z"
     SET excludes=%excludes% -x@"%~n0.%~1.txt"
 EXIT /B
 )

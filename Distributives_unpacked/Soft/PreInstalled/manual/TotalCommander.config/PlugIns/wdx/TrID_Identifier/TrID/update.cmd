@@ -3,6 +3,8 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
 
+IF NOT DEFINED exe7z IF EXIST "%~dp0..\..\..\wcx\Total7zip\7z.exe" (SET exe7z="%~dp0..\..\..\wcx\Total7zip\7z.exe") ELSE SET exe7z="%~dp0..\..\..\wcx\Total7zip\7zg.exe"
+
 MKDIR "%TEMP%\%~nx0.tmp"
 PUSHD "%TEMP%\%~nx0.tmp" && (
     wget -N http://goo.gl/aJVb http://goo.gl/Bnw1
@@ -10,7 +12,7 @@ PUSHD "%TEMP%\%~nx0.tmp" && (
     CALL :UpdateFile triddefs.zip triddefs.trd
     POPD
 )
-RD /S /Q "%TEMP%\%~nx0.tmp"
+rem RD /S /Q "%TEMP%\%~nx0.tmp"
 EXIT /B
 )
 :UpdateFile <arcPath> <mask>
