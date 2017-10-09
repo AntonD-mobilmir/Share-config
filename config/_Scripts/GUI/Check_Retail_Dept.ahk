@@ -21,7 +21,11 @@ maxAgeSavedInvReport	:= 1
 scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= configDirSrv0 "\_Scripts\GUI\" . A_ScriptName
-ShopBTS_InitialBaseDir	:= FirstExisting("%A_ScriptDir%\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
+ShopBTS_InitialBaseDir	:= FirstExisting(A_ScriptDir "\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
+
+regsvr32exe		:= FirstExisting(A_WinDir "\SysWOW64\regsvr32.exe", A_WinDir "\System32\regsvr32.exe")
+If (!regsvr32exe)
+    regsvr32exe		:= "regsvr32.exe"
 
 FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
 If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc)) {
@@ -313,10 +317,17 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     EnvSet Inst1S,1
 }
 
-instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 2)
-If (IsObject(instCriacxocx)) {
-    FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
-    timecriacxcab -= instCriacxocx.mtime, Days
+If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 0))) {
+    ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
+    ;timecriacxcab -= instCriacxocx.mtime, Days
+    ;https://redbooth.com/a/#!/projects/59756/tasks/32400133
+    AddLog("Удаление" instCriacxocx.path, "regsvr32 /u")
+    RunWait % """" regsvr32exe """ /s /u """ instCriacxocx.path """"
+    SetLastRowStatus("Удаление… | regsvr32 err: " regsvr32err := ErrorLevel)
+    FileDelete % instCriacxocx.path
+    SetLastRowStatus("ocx " (ErrorLevel ? "не " : "") "удалён! regsvr32 err: " regsvr32err, !ErrorLevel)
+    
+    RunFromConfigDir("_Scripts\cleanup\Apps\clean dealer.beeline.ru dir.ahk")
 }
 
 AddLog("Журналы скриптов обновления")
@@ -737,7 +748,7 @@ CheckPath(path, logTime:=1, checkboxIfExist:=1) {
 	line := AddLog(AbbreviatePath(path), logTime, checkboxIfExist & (exist!=""))
     }
     If (exist)
-	return {"path":path, "attr":exist, "mtime":mtime, "line":line}
+	return {path: path, attr: exist, mtime: mtime, line: line}
     Else
 	return
 }
