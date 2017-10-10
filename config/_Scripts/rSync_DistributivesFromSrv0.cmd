@@ -6,11 +6,10 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-SET "DistributivesHost=192.168.1.80"
+SET "DistributivesHost=Srv0.office0.mobilmir"
 SET "syncFlagMasks=.sync*"
 SET "DstDir=%~d0\Distributives"
-IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
-IF NOT EXIST %SystemDrive%\SysUtils\cygwin\rsync.exe %exe7z% x -y -o%SystemDrive%\SysUtils -- "\\%DistributivesHost%\Distributives\Soft\PreInstalled\auto\SysUtils\SysUtils_rsync.7z"
+IF NOT EXIST %SystemDrive%\SysUtils\cygwin\rsync.exe CALL :unpackRsync
 
 SET "compressMode=-z --compress-level=9"
 route print | find "          0.0.0.0          0.0.0.0      192.168.1.1" /C && SET "compressMode="
@@ -62,6 +61,26 @@ IF EXIST ".sync.excludes" SET rulefiles=%rulefiles% --exclude-from=.sync.exclude
 ( 
 %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" .
 POPD
+EXIT /B
+)
+:unpackRsync
+IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd" || CALL :callFind7zexe
+(
+%exe7z% x -y -o%SystemDrive%\SysUtils -- "\\%DistributivesHost%\Distributives\Soft\PreInstalled\auto\SysUtils\SysUtils_rsync.7z"
+EXIT /B
+)
+:callFind7zexe
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+CALL :GetDir configDir "%DefaultsSource%"
+(
+IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
+rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
+rem IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
+EXIT /B
+)
+:GetDir
+(
+SET "%~1=%~dp2"
 EXIT /B
 )
 :getSubString <outvar> <begin,end> <inputvar>
