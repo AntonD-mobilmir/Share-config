@@ -81,22 +81,30 @@ AddLog("Свободно на R:", MBGB(dfr), dfr > 1536)
 FileGetTime timestampRunningScript, %A_ScriptFullPath%
 runningScript := AddLog("Работающий скрипт", TimeFormat(timestampRunningScript))
 
-AddLog("Скрипт на Srv0")
-FileGetTime timestampServerScript, %serverScriptPath%
-SetLastRowStatus(TimeFormat(timestampServerScript))
+Loop Files, %serverScriptPath%
+{
+    If (A_LoopFileLongPath = A_ScriptFullPath) {
+	SetLastRowStatus("запущен с Srv0")
+    } Else {
+	AddLog("Скрипт на Srv0")
+	FileGetTime timestampServerScript, %serverScriptPath%
+	SetLastRowStatus(TimeFormat(timestampServerScript))
 
-If (timestampServerScript =! timestampRunningScript) {
-    SetLastRowStatus("Не совпадает", 0)
-    Loop
-    {
-	MsgBox 0x4, %A_ScriptName%, Скрипт на сервере новее`, чем работающий. Запустить с сервера?`n`nНа сервере: "%serverScriptPath%":%timestampServerScript%`nРаботает:"%A_ScriptFullPath%":%timestampRunningScript%`n`n(автоматический перезапуск через 60 секунд), 60
-	IfMsgBox No
-	    break
-	Run "%A_AhkPath%" "%serverScriptPath%"
-	ExitApp
+	If (timestampServerScript =! timestampRunningScript) {
+	    SetLastRowStatus("Не совпадает", 0)
+	    Loop
+	    {
+		MsgBox 0x4, %A_ScriptName%, Скрипт на сервере новее`, чем работающий. Запустить с сервера?`n`nНа сервере: "%serverScriptPath%":%timestampServerScript%`nРаботает:"%A_ScriptFullPath%":%timestampRunningScript%`n`n(автоматический перезапуск через 60 секунд), 60
+		IfMsgBox No
+		    break
+		Run "%A_AhkPath%" "%serverScriptPath%"
+		ExitApp
+	    }
+	} Else {
+	    SetRowStatus(runningScript)
+	}
     }
-} Else {
-    SetRowStatus(runningScript)
+    break
 }
 
 EnvGet UserProfile,UserProfile
@@ -321,7 +329,7 @@ If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\
     ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     ;timecriacxcab -= instCriacxocx.mtime, Days
     ;https://redbooth.com/a/#!/projects/59756/tasks/32400133
-    AddLog("Удаление" instCriacxocx.path, "regsvr32 /u")
+    AddLog("Удаление " instCriacxocx.path, "regsvr32 /u")
     RunWait % """" regsvr32exe """ /s /u """ instCriacxocx.path """"
     SetLastRowStatus("Удаление… | regsvr32 err: " regsvr32err := ErrorLevel)
     FileDelete % instCriacxocx.path
@@ -389,8 +397,8 @@ If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdSc
 	RunWait %comspec% /C ""%Distributives%\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
 	SetLastRowStatus(ErrorLevel, !ErrorLevel)
     }
-    ;				  archSubpath, 				  scriptSubpath,					  title:="",	 flagMask:="",				    loopOptn:="")
-    CheckArchiveRunNewestOrLocal("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
+    ;				  distSubpath, 				  scriptSubpath,					  title:="",	 flagMask:="",				    loopOptn:="")
+    RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
 }
 ;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
 
@@ -458,29 +466,11 @@ If (FileExist("c:\squid\sbin\squid.exe")) {
     FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
     AddLog("squid.conf", mtimeSquidConf, 1)
     
-    squidDistArcSubpath	:= "\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\SquidNT\squid.2.7.7z"
-    squidInstScript	:= "\Soft FOSS\Network\VPN, Tunnels, Gateways and proxies\SquidNT\install.cmd"
-    squidDistArc		:= LatestExisting(Distributives . squidDistArcSubpath, ServerDistPath . squidDistArcSubpath)
-    squidDistArcNewerThanConf := squidDistArc.mtime
-    squidDistArcNewerThanConf -= mtimeSquidConf, Days
-    If (squidDistArcNewerThanConf) { ; since date-diff result always rounded down, mtimeSquidConf will be non-0 only when time diff is >1 day
-	netexe := findexe("net.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
-	SetLastRowStatus("Остановка", 0)
-	RunWait "%netexe%" stop squid,,Min UseErrorLevel
-	SetLastRowStatus("Обновление", 0)
-	squidDistArcPath := squidDistArc.Path
-	SplitPath squidDistArcPath,,squidDistDir
-	RunWait %comspec% /C "TITLE Установка squid & "%squidDistDir%\install.cmd"",, Min UseErrorLevel
-	If (ErrorLevel) {
-	    squidDistArcNewerThanConf:="Ошибка " . ErrorLevel
-	} Else {
-	    FileGetTime mtimeUpdatedSquidConf, c:\squid\etc\squid.conf
-	    squidDistArcNewerThanConf := squidDistArc.mtime
-	    squidDistArcNewerThanConf -= mtimeSquidConf, Days
-	}
-    }
-    If (!dontUpdateSquidStatus)
-	SetLastRowStatus("архив на " . squidDistArcNewerThanConf . " дн. новее конф.", !squidDistArcNewerThanConf)
+    RunWait c:\squid\sbin\squid.exe -r, c:\squid\sbin, Min UseErrorLevel
+    If (ErrorLevel)
+	SetLastRowStatus("Ошибка " ErrorLevel " при удалении", 0)
+    Else
+	SetLastRowStatus("Удален")
 }
 
 backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
@@ -500,6 +490,9 @@ If (IsObject(backup_1S_baseTask)) {
 	}
     }
 }
+
+cleanupAdobeReadercmd=Soft\Office Text Publishing\PDF\Adobe Reader\RemoveUnneededAutorunAndServices.cmd
+RunScriptFromNewestDistDir(cleanupAdobeReadercmd, cleanupAdobeReadercmd, "Удаление лишней службы Adobe Reader")
 
 If (removeAppXPID)
     WaitProcessEnd(removeAppXPID, "Ожидание завершения скрипта удаления AppX")
@@ -572,15 +565,15 @@ ButtonCancel:
     }
     ExitApp
 
-CheckArchiveRunNewestOrLocal(ByRef archSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
+RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
     global ServerDistPath, Distributives
     latestFlagTime:=0
 
     If (!title)
-	title := AbbreviatePath(flagMask ? flagMask : archSubpath)
+	title := AbbreviatePath(flagMask ? flagMask : distSubpath)
     AddLog(title, "Проверка")
-    FindLatest(Distributives "\" archSubpath,, mtimelocal)
-    FindLatest(ServerDistPath "\" archSubpath,, mtimeSrv0)
+    FindLatest(Distributives "\" distSubpath,, mtimelocal)
+    FindLatest(ServerDistPath "\" distSubpath,, mtimeSrv0)
     
     If (flagMask)
 	FindLatest(flagMask, optnLoopFlag, latestFlagTime)
@@ -816,7 +809,11 @@ SetRowStatus(ByRef roworobj, status:="", check:=1) {
 TimeFormat(ByRef time) {
     age=
     age -= time, Days ; ago from now
-    FormatTime ft, %status%, yyyy-MM-dd HH:mm (%age% 'дн.')
+    If (age)
+	age = %age% дн.
+    Else
+	age = сегодня
+    FormatTime ft, %status%, yyyy-MM-dd HH:mm '(%age%)'
     return ft
 }
 
