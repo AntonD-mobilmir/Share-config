@@ -21,7 +21,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     ECHO %DATE% %TIME% Сохранение резервной копии ACL для %1
     %SetACLexe% -on %1 -ot file -rec cont_obj -actn list -lst "f:sddl;w:d,o,g" -bckp "%~2.tmp" -ignoreerr||EXIT /B
     REN "%~2.tmp" "*."||EXIT /B
-    START "Compacting %~nx2" /MIN /LOW %SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX %2 >NUL 2>&1
+    START "Compacting %~nx2" /MIN /LOW %comspec% /C "%SystemRoot%\System32\COMPACT.exe /C /F /EXE:LZX %2 || %SystemRoot%\System32\COMPACT.exe /C /F %2"
     EXIT /B 0
 )
 :restoreACL <backup>
