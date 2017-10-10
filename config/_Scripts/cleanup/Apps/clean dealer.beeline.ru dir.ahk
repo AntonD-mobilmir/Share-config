@@ -24,6 +24,7 @@ cleanupDealerBeelineDir(dir) {
     Loop %Dir%, 2
     {
 	SetWorkingDir %A_LoopFileFullPath%
+	; Remove scripts and resources
 	FileDelete beeline DOL2 fix dirs.ahk
 	FileDelete beeline DOL2.ahk
 	FileDelete beeline DOL2.stub.ahk
@@ -35,26 +36,40 @@ cleanupDealerBeelineDir(dir) {
 	FileDelete update_dealer_beeline_activex in windir.cmd
 	FileDelete update_dealer_beeline_activex.cmd
 	FileDelete сделать ярлык для Билайн Дилер Он-Лайн.ahk
+	FileDelete 32-bit CU.reg
+	FileDelete 32-bit LM.reg
+	
+	FileRemoveDir reg, 1
+	; unregister ActiveX component and remove bin
 	If (FileExist("bin\criacx.ocx"))
 	    RunWait %A_WinDir%\System32\regsvr32.exe /q /u bin\criacx.ocx
 	FileRemoveDir bin, 1
-	FileRemoveDir reg, 1
+
+	; Remove logs and static data
+	FileDelete beeline DOL2 fix dirs.ahk.log
+	FileDelete beeline DOL2.ahk.log
+	FileDelete beeline DOL2.ahk.log.bak
+	FileDelete delete ext stats.reg
+
+	FileRemoveDir DOL2\LOGS, 1
 	;FileRemoveDir DOL2\DATA\ARCH
 	
-	; Remove logs and static data
 	Loop *, 2
 	{
 	    FileRemoveDir %A_LoopFileFullPath%\LOG, 1
 	    FileRemoveDir %A_LoopFileFullPath%\DATA\HELP, 1
+	    FileDelete %A_LoopFileFullPath%\%A_LoopFileName%.reg
+	    FileDelete %A_LoopFileFullPath%\%A_LoopFileName%.cmd
 	}
 	
 	; Remove empty dirs
 	Loop *, 2, 1
 	{
 	    curPath:=A_LoopFileFullPath
-	    While curPath
-	    {
+	    While (curPath) {
 		FileRemoveDir %curPath%
+		If (ErrorLevel)
+		    break
 		SplitPath curPath, , curPath
 	    }
 	}
