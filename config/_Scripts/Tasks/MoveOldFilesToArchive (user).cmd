@@ -7,8 +7,10 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
 IF EXIST "%SystemRoot%\SysNative\cmd.exe" (SET "System32=%SystemRoot%\SysNative") ELSE SET "System32=%SystemRoot%\System32"
-SET AddArgs=/RU "%USERNAME%" /IT
-CALL :ScheduleSingleTask "Move Files To Archive (%USERNAME%)" "%~dp0Move Files To Archive.xml"
+SET AddArgs=/RU "%~1" /IT
+CALL :ScheduleSingleTask "MoveOldFilesToArchive (%~1)" "%~dp0Tasks\MoveOldFilesToArchive (user).xml"
+SET AddArgs=/RU "" /NP
+CALL :ScheduleSingleTask "MoveOldFilesToArchive PackArchive" "%~dp0Tasks\MoveOldFilesToArchive PackArchive.xml"
 EXIT /B
 )
 :ScheduleSingleTask <TaskName> <XML>

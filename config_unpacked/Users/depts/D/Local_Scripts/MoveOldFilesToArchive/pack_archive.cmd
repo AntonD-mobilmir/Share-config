@@ -13,7 +13,7 @@ CALL :Findzpaq || EXIT /B
 rem || CALL :Find7z
 
 SET "datey=%DATE:~-4,4%"
-SET "exclusionszpaq=-not *:*:$DATA -not *.mp? -not *.avi -not *.mkv"
+SET "exclusionszpaq=-not *:*:$DATA -not *.mp? -not *.avi -not *.mkv -not *.exe -not *.dll -not *.nm7 -not *.apk"
 
 FOR /D %%A IN ("D:\Users\*.*") DO CALL :PackFromDir "%%~A\.Archive-Pack"
 EXIT /B
@@ -22,11 +22,10 @@ EXIT /B
 (
     IF NOT EXIST %1 EXIT /B
     SET "packDestDir=R:%~p1"
-    MKDIR "R:%~p1"
 )
 (
-    START "zpaq a" /B /WAIT /LOW %zpaqexe% a "%packDestDir%%datey%.zpaq" "\\?\%USERPROFILE%\.Archive-Pack\*" -m1 %exclusionszpaq% >>"%packDestDir%zpaq.log" 2>&1
-    IF NOT ERRORLEVEL 1 RD /S /Q "%USERPROFILE%\.Archive-Pack"
+    IF NOT EXIST "%packDestDir%" MKDIR "%packDestDir%"
+    START "zpaq a" /B /WAIT /LOW %zpaqexe% a "%packDestDir%%datey%.zpaq" "\\?\%~1\*" -m1 %exclusionszpaq% >>"%packDestDir%zpaq.log" 2>&1 && RD /S /Q "\\?\%~1"
     EXIT /B
 )
 :Findzpaq
