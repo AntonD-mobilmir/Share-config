@@ -88,8 +88,8 @@ If (!skipCreatingProfile) {
 	    appendprefsjs := appendPrefsJsHndl.Read(), appendPrefsJsHndl.Close()
 
 	    If (RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) {
-		StringReplace appendprefsjs, appendprefsjs, {$HostnameMatch1$}, %HostNameDeptPrefix%, 1
-		prefsjs .= "`r`n" . appendprefsjs
+		StringReplace appendprefsjs, appendprefsjs, {$HostNameDeptPrefix$}, %HostnameMatch1%, 1
+		prefsjs .= "`n" . appendprefsjs
 	    }
 	}
     }
