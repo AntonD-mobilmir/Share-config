@@ -19,11 +19,12 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "UIDCreatorOwner=S-1-3-0;s:y"
     SET "UIDAdministrators=S-1-5-32-544;s:y"
     
-    SET "now=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%_%TIME::=%"
     SET "tgt=%~f1"
+    SET "TimeS=%TIME:~0,-3%"
 )
-    IF "%tgt:~-1%"=="\" SET "tgt=%tgt:~0,-1%"
-    SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
+SET "now=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%_%TimeS::=%"
+IF "%tgt:~-1%"=="\" SET "tgt=%tgt:~0,-1%"
+SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
 (
     IF NOT EXIST "%ACLBackupDir%" (
 	MKDIR "%ACLBackupDir%"
