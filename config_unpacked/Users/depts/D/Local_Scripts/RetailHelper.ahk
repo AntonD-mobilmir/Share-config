@@ -58,6 +58,11 @@ Periodic:
 	} Else {
 	    rarusPID := getFirstPid("1cv7s.exe", "1cv7.exe")
 	}
+	
+	; ToDo: не проверять, если не установлен
+	Process Exist, MFSCANUTILITY.exe
+	If (ErrorLevel)
+	    Run "%A_AhkPath%" "%A_ScriptDir%\Reset ACL after Canon MF Scan Utility.ahk"
     }
     
 ;Гифтоман
