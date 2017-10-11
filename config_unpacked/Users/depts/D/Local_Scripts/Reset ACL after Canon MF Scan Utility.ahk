@@ -3,6 +3,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 #SingleInstance ignore
+SetTitleMatchMode 3
 FileEncoding UTF-8
 
 If (!(tgtBase := FindScanDest()))
@@ -12,17 +13,20 @@ tgt=%tgtBase%\%A_YYYY%_%A_MM%_%A_DD%
 
 mfscanexe=MFSCANUTILITY.exe
 
-GroupAdd mfprogress, Идет сканирование ahk_class #32770 ahk_exe %mfscanexe%
-GroupAdd mfprogress, Завершение сканирования ahk_class #32770 ahk_exe %mfscanexe%
-GroupAdd mfprogress, Canon MF Scan Utility ahk_class #32770 ahk_exe %mfscanexe%, Обработка...
-GroupAdd mfprogress, Canon MF Scan Utility ahk_class #32770 ahk_exe %mfscanexe%, Подождите.
-GroupAdd mfprogress, ScanGear ahk_class #32770 ahk_exe %mfscanexe%
+GroupAdd mfprogress, Идет сканирование ahk_exe %mfscanexe%
+GroupAdd mfprogress, Завершение сканирования ahk_exe %mfscanexe%
+GroupAdd mfprogress, Canon MF Scan Utility ahk_exe %mfscanexe%, Обработка...
+;,,,&Параметры...
+GroupAdd mfprogress, Canon MF Scan Utility ahk_exe %mfscanexe%, Подождите.
+GroupAdd mfprogress, ScanGear ahk_exe %mfscanexe%
 
 While WinExist("ahk_exe " mfscanexe) {
-    WinWait ahk_group %mfprogress%,,15
-    WinWaitClose
-    ResetACL()
-    reset := 1
+    WinWait ahk_group mfprogress,,3
+    If (!ErrorLevel) {
+	WinWaitClose
+	ResetACL()
+	reset := 1
+    }
 }
 If (!reset)
     ResetACL()
@@ -36,7 +40,7 @@ ResetACL() {
 	return
     If (!SystemRoot)
 	EnvGet SystemRoot, SystemRoot
-    RunWait %SystemRoot%\System32\icacls.exe . /reset /T /C /L, %tgt%, Min
+    RunWait %SystemRoot%\System32\icacls.exe "%tgt%" /reset /T /C /L, %tgt%, Min
     return
 }
 
