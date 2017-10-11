@@ -78,29 +78,3 @@ For accID, acc in acclist {
     FileAppend % acc.login "@" acc.domain A_Tab pass A_Tab acc.FirstName A_Tab acc.LastName A_Tab response "`n", %A_ScriptName%.log
 }
 ExitApp
-
-AddRetailDept(ByRef login, ByRef firstName, ByRef leftovers:="") {
-    static domains	:= {"k.mobilmir.ru": "(Обмен Рарус)", "rarus.robots.mobilmir.ru": "(Уведомления из Рарус)"}
-	 , lists	:= ["all@k.mobilmir.ru"]
-
-    resp1 := resp2 := ""
-    For domain, lastName in domains {
-	password := GenPass()
-	AddMailbox(domain, login, password, firstName, lastName, resp2)
-	FileAppend % login . A_Tab . password . A_Tab . firstName . leftovers . A_Tab . resp2 . "`n", %domain%.txt
-	
-	resp1 .= login "@" domain " → " resp2 "`n`n"
-    }
-    For i, listAddr in lists {
-	If (atPos := InStr(listAddr, "@")) {
-	    domain := SubStr(listAddr, atPos + 1)
-	    maillist := SubStr(listAddr, 1, atPos - 1)
-	}
-	AddToList(domain, maillist, login, resp2)
-	resp2 := Trim(resp2, "`n`r`t ")
-	FileAppend %login%`t%resp2%`n, %listAddr%.txt
-
-	resp1 .= "[+] " listAddr " → " resp2 "`n`n"
-    }
-    return resp1
-}
