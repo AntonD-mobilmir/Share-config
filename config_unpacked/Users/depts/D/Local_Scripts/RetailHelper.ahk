@@ -14,6 +14,11 @@ rebootOfferDelay := 60 * 60 * 1000 ; 1h in ms
 maxIdleForMsgbox := timerPeriod := 3000 ; ms
 startDay := A_DD
 wintitle1s=ahk_exe 1cv7s.exe
+EnvGet lProgramFiles, ProgramFiles(x86)
+If (!lProgramFiles)
+    lProgramFiles := A_ProgramFiles
+If (FileExist(lProgramFiles "\Canon\MF Scan Utility\MFSCANUTILITY.exe"))
+    checkCanonMFScan := -1 ; PID скрипта исправления ACL. Скрипт будет запущен при обнаружении MFSCANUTILITY.exe, если процесса с таким PID нет.
 
 timeTillEndOfDay := A_YYYY . A_MM . A_DD
 timeTillEndOfDay += 1, Days
@@ -30,7 +35,7 @@ SetTimer Periodic, %timerPeriod%
 
 ; Разрешение запуска PepperFlash из папки настроек Chrome пользователя
 EnvGet LocalAppData,LOCALAPPDATA
-RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C,%A_Temp%,Min UseErrorLevel
+RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C, %A_Temp%, Min UseErrorLevel
 
 Exit
 
@@ -59,10 +64,14 @@ Periodic:
 	    rarusPID := getFirstPid("1cv7s.exe", "1cv7.exe")
 	}
 	
-	; ToDo: не проверять, если не установлен
-	Process Exist, MFSCANUTILITY.exe
-	If (ErrorLevel)
-	    Run "%A_AhkPath%" "%A_ScriptDir%\Reset ACL after Canon MF Scan Utility.ahk"
+	If (checkCanonMFScan) {
+	    Process Exist, MFSCANUTILITY.exe
+	    If (ErrorLevel) { ; если утилита запущена
+		Process Exist, %checkCanonMFScan%
+		If (!ErrorLevel) ; а скрипт – не запущен
+		    Run "%A_AhkPath%" "%A_ScriptDir%\Reset ACL after Canon MF Scan Utility.ahk",,,checkCanonMFScan
+	    }
+	}
     }
     
 ;Гифтоман
