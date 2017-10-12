@@ -9,10 +9,18 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
 rem Init
 IF NOT DEFINED ErrorCmd SET "ErrorCmd=PAUSE"
-FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+IF NOT DEFINED GNUPGHOME (
+    SET "RemoveGPGHomeTemp=1"
+    SET "GNUPGHOME=%TEMP%\gnupg"
+    MKDIR "%TEMP%\gnupg"
+)
+FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain"`) DO SET "Domain=%%~J"
+IF NOT DEFINED Domain FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DhcpDomain"`) DO SET "Domain=%%~J"
 rem Read file, and for each line add corresponding user
-FOR /F "usebackq eol=; tokens=1,2,3* delims=	" %%I IN ("%~dpn0_list.txt") DO CALL :SetupAdmin "%%~I" "%%~J" "%%~K" "%%~L"
-IF NOT "%RunInteractiveInstalls%"=="1" START "" control.exe userpasswords2
+FOR /F "usebackq eol=; tokens=1,2,3,4* delims=	" %%I IN ("%~dpn0.txt") DO CALL :SetupAdmin "%%~I" "%%~J" "%%~K" "%%~L"
+IF DEFINED RemoveGPGHomeTemp RD /S /Q "%TEMP%\gnupg"
+IF NOT "%RunInteractiveInstalls%"=="0" START "" %SystemRoot%\System32\control.exe userpasswords2
 EXIT /B
 )
 :SetupAdmin
@@ -23,8 +31,8 @@ EXIT /B
 	SET "flags=%%~B"
     )
     SET "FullName=%~2"
-    SET "SaveDir=%~3"
-    SET "URL=%~4"
+    SET "gpgUserID=%~3"
+    SET "SaveDir=%~4"
 )
 (
     rem Check user existence
@@ -39,50 +47,69 @@ EXIT /B
     IF NOT DEFINED flag_f CALL :AskCreateUser || EXIT /B
     IF DEFINED flag_p (
 	NET USER %NewUsername% /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /FULLNAME:"%FullName%"
-	wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
+	%SystemRoot%\System32\wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
 	GOTO :setupgroups
     )
     
+    IF DEFINED gpgUserID IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
+
+    IF DEFINED SaveDir IF EXIST "%SaveDir%" SET "dirPlainOut=%SaveDir%\%Hostname%"
+    IF NOT DEFINED dirPlainOut SET "dirPlainOut=%TEMP%\%~n0.e"
+    IF NOT DEFINED dirGPGout SET "dirGPGout=%TEMP%\%~n0.tmp"
+    IF DEFINED URL IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+
     REM IF NOT DEFINED flag_p
-    
-	IF DEFINED SaveDir SET "OutDir=%SaveDir%\%Hostname%"
-	IF NOT DEFINED OutDir SET "OutDir=%TEMP%"
-	IF DEFINED URL IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
-	
-	rem Generate new password
-	SET "PasswdPart1=0000%RANDOM%"
-	SET "PasswdPart2=0000%RANDOM%"
-	SET "PasswdPart3=0000%RANDOM%"
-	rem if password is longer than 14 chars, NET USER /ADD asks stupid question
+    rem Generate new password
+    SET "PasswdPart1=0000%RANDOM%"
+    SET "PasswdPart2=0000%RANDOM%"
+    SET "PasswdPart3=0000%RANDOM%"
+    rem if password is longer than 14 chars, NET USER /ADD asks stupid question
 )
-	SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
-    (
-	SET "UserAddError="
-	rem Create new user
-	MKDIR "%OutDir%" 2>NUL
-	(
-	    rem Write password to file
-	    ECHO %Hostname%\%NewUsername%	%pwd%
-	    NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:YES /FULLNAME:"%FullName%" || CALL :SetUserAddError
-	)>>"%OutDir%\%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt" 2>&1
+(
+    SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
+    SET "PasswdPart1="
+    SET "PasswdPart2="
+    SET "PasswdPart3="
+    
+    SET "outPlainFName=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt"
+    IF NOT EXIST "%dirPlainOut%" MKDIR "%dirPlainOut%"
+    IF NOT "%dirPlainOut:~0,2%"=="\\" %SystemRoot%\System32\cipher.exe /E "%dirPlainOut%"
+    IF DEFINED gpgUserID (
+	RD /S /Q "%dirGPGout%" 2>NUL
+	MKDIR "%dirGPGout%"
+	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
+	SET gpgServerCopy="\\Srv0.office0.mobilmir\profiles$\Administrators\%NewUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
     )
+)
+(
+    SET "UserAddError="
+    rem Create new user
     (
-	rem Post password in background
-	rem separate scope from writing to file because UserAddError is set in previous scope
-	IF DEFINED URL START "" %AutoHotkeyExe% "%~dp0..\Lib\XMLHTTP_POST.ahk" "%URL%" "Host=%Hostname%" "UserName=%NewUsername%" "Pwd=%pwd%" "UserAddError=%UserAddError%"
+	rem Write password to file
+	ECHO %Hostname%\%NewUsername%	%pwd%
+	NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:YES /FULLNAME:"%FullName%" || CALL :SetUserAddError
+    )>>"%dirPlainOut%\%outPlainFName%" 2>&1
+    
+    IF DEFINED gpgexe (
+	%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%"
+	START "Copying gpg-encrypted password to Srv0" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
+	START "" %AutoHotkeyExe% "%~dp0Add_Admins_PostPasswordToForm.ahk" "%NewUsername%" %gpgencOut%
     )
-    REM END IF [DEFINED flag_p]
+)
 :setupgroups
 (
+REM END IF [DEFINED flag_p]
     rem Add to admin group. Its name differs depending on Windows language.
     (
-	NET LOCALGROUP Administrators %NewUsername% /Add
-	NET LOCALGROUP Администраторы %NewUsername% /Add
-	NET LOCALGROUP Users %NewUsername% /Delete
-	NET LOCALGROUP Пользователи %NewUsername% /Delete
+	NET LOCALGROUP Administrators "%NewUsername%" /Add
+	NET LOCALGROUP Администраторы "%NewUsername%" /Add
+	NET LOCALGROUP Users "%NewUsername%" /Delete
+	NET LOCALGROUP Пользователи "%NewUsername%" /Delete
     ) >NUL 2>&1
     ENDLOCAL
-    SET AutoHotkeyExe=%AutoHotkeyExe%
+    IF NOT [%AutoHotkeyExe%]==[] SET AutoHotkeyExe=%AutoHotkeyExe%
+    IF NOT [%gpgexe%]==[] SET gpgexe=%gpgexe%
+    IF NOT [%exe7z%]==[] SET exe7z=%exe7z%
 EXIT /B
 )
 :GetValue <targetvarname> <sourcevarname>

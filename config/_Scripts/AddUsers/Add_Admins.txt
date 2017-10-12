@@ -1,0 +1,9 @@
+;Encoding:CP866
+;Флаги:
+;f - создавать без вопросов
+;p - пользователь без пароля
+;r - создавать (и запрашивать создание) только если в системе нет пользователей "Продавец" и "Пользователь"
+;UserName/flags	Full Name	gpgUSER-ID	writeout-dir
+Anton.Derbenev/f	Дербенев Антон Леонидович	535A11463B4577A5B3D38421861A68CCE91EA97A	\\Srv1S-B.office0.mobilmir\Users\LogicDaemon\Documents\Accounts\AdminPasswords\Incoming	
+Karina.Razuvaeva	Разуваева Карина Владимировна	B28F3A61BD82291F1F5391820F8FA3D03EB7AB7D
+Пользователь/rp	Услуги в рознице
