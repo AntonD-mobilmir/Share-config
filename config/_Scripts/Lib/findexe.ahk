@@ -72,20 +72,6 @@ GetPathForFile(file, paths*) {
     Throw
 }
 
-RemoveParameters(runStr) {
-    QuotedFlag=0
-    Loop Parse, runStr, %A_Space%
-    {
-	AppPathOnly .= A_LoopField
-	IfInString A_LoopField, "
-	    QuotedFlag:=!QuotedFlag
-	If Not QuotedFlag
-	    break
-	AppPathOnly .= A_Space
-    }
-    return Trim(AppPathOnly, """")
-}
-
 GetAppPathFromRegShellKey(exename, regsubKeyShell) {
     regsubKey=%regsubKeyShell%\shell
     Loop Reg, %regsubKey%, K
@@ -98,6 +84,20 @@ GetAppPathFromRegShellKey(exename, regsubKeyShell) {
 		return regpath
     }
     Throw
+}
+
+RemoveParameters(runStr) {
+    QuotedFlag=0
+    Loop Parse, runStr, %A_Space%
+    {
+	AppPathOnly .= A_LoopField
+	IfInString A_LoopField, "
+	    QuotedFlag:=!QuotedFlag
+	If Not QuotedFlag
+	    break
+	AppPathOnly .= A_Space
+    }
+    return Trim(AppPathOnly, """")
 }
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion

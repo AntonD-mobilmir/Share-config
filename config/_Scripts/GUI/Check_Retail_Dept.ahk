@@ -3,6 +3,8 @@
 #NoEnv
 #SingleInstance force
 
+; ToDo: чтение файла настройки скрипта отправки уведомлений и проверка адреса сервера (должен быть Яндекс, а не Google)
+
 ProxySettingsRegRoot	 = HKEY_CURRENT_USER
 ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
 EnvironmentRegKey	 = Environment
@@ -333,6 +335,9 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     EnvSet Inst1S,1
 }
 
+AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
+RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F
+SetLastRowStatus(ErrorLevel,!ErrorLevel)
 If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 0))) {
     ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     ;timecriacxcab -= instCriacxocx.mtime, Days
