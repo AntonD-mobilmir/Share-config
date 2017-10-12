@@ -10,7 +10,7 @@ If (argv="/debug")
     debug=1
 FileReadLine ScriptUpdaterDir, %A_AppDataCommon%\mobilmir.ru\ScriptUpdaterDir.txt, 1
 If (!ScriptUpdaterDir)
-    Throw Exception("ScriptUpdater не найден",, "%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt")
+    Throw Exception("ScriptUpdater не найден",, A_AppDataCommon "\mobilmir.ru\ScriptUpdaterDir.txt")
 
 FileReadLine abDir, %A_AppDataCommon%\mobilmir.ru\addressbookdir.txt, 1
 

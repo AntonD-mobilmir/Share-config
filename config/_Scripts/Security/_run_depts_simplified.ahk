@@ -29,7 +29,7 @@ FileReadLine avg, %avgTFName%, 1
 If (avg) {
     ticksETA := startTicks + avg + timeMargin
 } Else {
-    leftTime = (время неизвестно)
+    leftTime = (оставшееся время неизвестно)
 }
 
 Progress A M R%startTicks%-%ticksETA% FS8, %A_Space%`n`n`n`n`n`n`n`n, Настройка параметров доступа к ФС`n`nНе выключайте компьютер`, пока работает этот скрипт`, т.к. это может вызвать сбои.
