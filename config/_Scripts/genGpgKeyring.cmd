@@ -58,6 +58,9 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     rem %SystemRoot%\System32\fltmc.exe >nul 2>&1 || IF ERRORLEVEL 1 - not admin
     
     IF NOT EXIST "%dirExportOpenKey%" MKDIR "%dirExportOpenKey%"
+    
+    IF NOT EXIST "%GNUPGHOME%" MKDIR "%GNUPGHOME%"
+    XCOPY "%~dpn0" "%GNUPGHOME%" /E /I /G /H /K /Y /B
 
 rem https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
 rem     ECHO Passphrase:
@@ -83,14 +86,35 @@ rem  does not work with gpg2.2+ https://bbs.archlinux.org/viewtopic.php?id=20805
 	EXIT /B 2
     )
     rem cannot be done in batch mode -- %gpgexe% --homedir "%GNUPGHOME%" --batch --armor --gen-revoke "%MailUserId%@%MailDomain%" > "%dirExportOpenKey%%MailUserId%@%MailDomain%.rev"
-    FOR %%A IN ("%GNUPGHOME%\key*.asc") DO %gpgexe% --homedir "%GNUPGHOME%" --batch --import "%%~A"
     rem %gpgexe% --homedir "%GNUPGHOME%" --batch --import "%GNUPGHOME%\0xE91EA97A.asc"
     rem %gpgexe% --no-default-keyring --keyring "%srcpath%keyring.gpg" --edit-key 0xE91EA97A trust sign tsign save quit
+    
+    FOR %%A IN ("%~dp0genGpgKeyring\key*.asc") DO %gpgexe% --homedir "%GNUPGHOME%" --batch --import "%%~A"
+)
+(
+    SET nextLineIsFP=
+    SET lastLineFP=
+    rem --fingerprint is similar but with spaces in fingerprint
+    rem without `"..."` quotes, %comspec% says: The filename, directory name, or volume label syntax is incorrect.
+    FOR /F "usebackq tokens=1*" %%A IN (`"%gpgexe% --homedir "%GNUPGHOME%" --batch --list-keys"`) DO @(
+	IF DEFINED lastLineFP (
+	    %comspec% /A /C "ECHO # %%B"
+	    %comspec% /A /C "ECHO %%lastLineFP%%:6:"
+	    SET lastLineFP=
+	) ELSE IF DEFINED nextLineIsFP (
+	    rem %comspec% /A /C "ECHO %%A%%B:6:"
+	    SET nextLineIsFP=
+	    SET "lastLineFP=%%A%%B"
+	) ELSE IF "%%~A"=="pub" (
+	    SET "nextLineIsFP=1"
+	)
+    ) >>"%GNUPGHOME%\trust.asc"
     %gpgexe% --homedir "%GNUPGHOME%" --batch --import-ownertrust "%GNUPGHOME%\trust.asc"
-    %gpgexe% --homedir "%GNUPGHOME%" --batch --list-keys --fingerprint
+    %SystemRoot%\System32\taskkill.exe /F /IM gpg-agent.exe
     ENDLOCAL
     SET "mailUserId=%MailUserId%"
     SET "mailDomain=%MailDomain%"
+    SET "dirExportOpenKey=%dirExportOpenKey%"
 EXIT /B
 ) >> "%dirExportOpenKey%%MailUserId%@%MailDomain%.gen.log" 2>&1 
 REM EXIT /B is in line above
