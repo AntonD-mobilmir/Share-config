@@ -18,8 +18,6 @@ PUSHD "%TEMP%\%~n0.tmp" && (
     rem XCOPY "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\scriptUpdater.ahk" "Distributives\config\_Scripts\" /I
     %exe7z% x "\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\D.7z" "Local_Scripts\*"
     
-    REM следующую строку можно удалить 19.10.2017, т.к. везде, где авто-обновление работает, скрипт уже должен будет обновиться
-    %exe7z% x -o"Local_Scripts\ScriptUpdater" "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\ScriptUpdater_dist\ScriptUpdater.7z"
     %exe7z% a SharedLocal.7z
     
     COPY \\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\dist.7z MailLoader-dist.7z
