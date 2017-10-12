@@ -3,10 +3,11 @@
 #NoEnv
 #SingleInstance force
 
-ProxySettingsRegRoot	= HKEY_CURRENT_USER
-ProxySettingsIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
-EnvironmentRegKey	= Environment
-ProxyOverride		= <local>
+ProxySettingsRegRoot	 = HKEY_CURRENT_USER
+ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
+EnvironmentRegKey	 = Environment
+ProxyOverride		 = <local>
+minFreeSpace		:= 1024 * 5 ; мегабайт
 
 arg1=%1%
 ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
@@ -71,12 +72,19 @@ global DefaultConfigDir := chkDefConfigDir.path
 xlnexe := findexe("xln.exe", "C:\SysUtils")
 If (xlnexe)
     AddLog("xln.exe: " . xlnexe, , 1)
-DriveSpaceFree dfc, C:\
-AddLog("Свободно на C:", MBGB(dfc), dfc > 1536)
-DriveSpaceFree dfd, D:\
-AddLog("Свободно на D:", MBGB(dfd), dfd > 1536)
-DriveSpaceFree dfr, R:\
-AddLog("Свободно на R:", MBGB(dfr), dfr > 1536)
+DriveGet drives, List, FIXED
+For i, d in ["C", "D", "R"]
+    If (!InStr(drives, d))
+	missingLetters .= d
+If (missingLetters)
+    AddLog("Некоторых стандартных букв дисков нет нет в системе", missingLetters)
+Loop Parse, drives
+{
+    DriveGet dlabel, Label, %A_LoopField%:
+    DriveGet dsize, Capacity, %A_LoopField%:\
+    DriveSpaceFree df, %A_LoopField%:\
+    AddLog("Свободно на " A_LoopField ": [" dlabel "]", MBGB(df) " / " MBGB(dsize) " (" (100 * df // dsize) " %)", df > minFreeSpace)
+}
 
 FileGetTime timestampRunningScript, %A_ScriptFullPath%
 runningScript := AddLog("Работающий скрипт", TimeFormat(timestampRunningScript))
