@@ -49,9 +49,14 @@ EnvSet GNUPGHOME, %GNUPGHOME%
 FileAppend tempDir: %tempDir%`nconfDir: %confDir%`nGNUPGHOME: %GNUPGHOME%`ntimeout: %timeout%`ntries: %tries%`n, *, CP1
 clURL = %2%
 If (StartsWith(clURL, "http")) {
-    checkPeriod = %3%
     destPath = %1%
-    ExitApp UpdateScript(destPath, checkPeriod, clURL)
+    checkPeriod = %3%
+    gpgFName = %4%
+    If (gpgFName=="" && (InStr(destPath, "*") || InStr(destPath, "?"))) { ; if destPath is not mask, UpdateScript will use destPath filename to generate GPG filename
+	RegexMatch(clURL, "/([^/?#]+)([#?].+)$", m)
+	gpgFName := m1
+    }
+    ExitApp UpdateScript(destPath, checkPeriod, clURL, gpgFName)
 } Else {
     SharedLocalScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" . (SharedLocalGPGFName := "SharedLocal.7z.gpg") . "?dl=1"
     checkPeriod=
@@ -153,12 +158,12 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	{
 	    gpglog=
 	    Try {
-		FileRead gpglog, *P866 %tempDir%\%gpgFName%.log
+		FileRead gpglog, *P1 %tempDir%\%gpgFName%.log
 		If (!gpglog)
 		    gpglog := "(file """ tempDir "\" gpgFName ".log"" is empty)"
 	    } Catch e {
 		FileAppend % A_Now " Error " e.Message "(" e.Extra ") reading " gpgFName ".log, retrying…`n", %runLog%
-		RunWait %A_WinDir%\system32\taskkill.exe /F /PID %childPID% /T,,Min UseErrorLevel
+		RunWait %A_WinDir%\system32\taskkill.exe /F /PID %childPID% /T,,Hide UseErrorLevel
 		Sleep 1000
 	    }
 	} Until gpglog
@@ -166,9 +171,17 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	;MsgBox gpgErrLevel: %gpgErrLevel%`ngpglog:`n%gpglog%
 	If (!gpgErrLevel
 	    && ( dstExt="mab"
-	      || RegexMatch(gpglog, "m`a)^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+) .+ key ID (?P<keyID>\w+)\s+gpg: Good signature from ", r))) {
+	      || RegexMatch(gpglog, "m`a)^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+).+\s\s?.+using (?P<KeyType>\w+) key (?P<keyID>[A-Z0-9]+).+\s\s?gpg: Good signature from .+ \[ultimate\]", r)
+	      || RegexMatch(gpglog, "^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+).+using (?P<KeyType>\w+) key ID (?P<keyID>\w+)\s+gpg: Good signature from .+ \[ultimate\]", r) )) {
+	    ; old GPG:
 	    ;gpg: Signature made 08/09/17 19:26:49 Russia TZ 2 Standard Time using DSA key ID E91EA97A
 	    ;gpg: Good signature from "Антон Дербенев (Цифроград-Ставрополь) <anton.derbenev@mobilmir.ru>" [ultimate]
+	    ; 
+	    ; new GPG:					   ↓ ANSI encoding ("зима")
+	    ;gpg: Signature made 10/12/17 16:07:40 RTZ 2 (чшьр)
+	    ;gpg:                using DSA key 535A11463B4577A5B3D38421861A68CCE91EA97A
+	    ;gpg: Good signature from "Антон Дербенев (Цифроград-Ставрополь) <anton.derbenev@mobilmir.ru>" [ultimate]
+	    ;				↑ DOS encoding
 	    FileSetTime SubStr("2000", 1, 4-StrLen(rYY)) . Format("{:02u}{:02u}{:02u}{:02u}{:02u}{:02u}", rYY, rMM, rDD, rHour, rMin, rSec), %tempDir%\%verifiedFName%
 	    nextMethod := A_Index + 1 ; чтобы текущий метод оказался первым при следующем вызове UpdateScript
 	    
@@ -230,6 +243,12 @@ CheckErrorLevel(runLog, endLog:="", e:="") {
 }
 
 KillChild() {
+    Process WaitClose, gpg-agent.exe, 3
+    If (ErrorLevel) {
+	GroupAdd gpgagent, ahk_exe gpg-agent.exe
+	WinKill ahk_group gpgagent
+	Process Close, gpg-agent.exe
+    }
     If (childPID)
 	Process Close, %childPID%
 }
@@ -288,4 +307,103 @@ find7zaexe(paths:="") {
 	paths := []
     paths.push("\Distributives\Soft\PreInstalled\utils", "D:\Distributives\Soft\PreInstalled\utils","W:\Distributives\Soft\PreInstalled\utils", "\\localhost\Distributives\Soft\PreInstalled\utils", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils","\\192.168.1.80\Distributives\Soft\PreInstalled\utils")
     return find7zexe("7za.exe",paths*)
+}
+
+findexe(exe, paths*) {
+    ; exe is name only or full path
+    ; paths are additional full paths, dirs or path-masks to check for
+    ; first check if executable is in %PATH%
+
+    Loop Files, %exe%
+	return A_LoopFileLongPath
+    
+    SplitPath exe, exename, , exeext
+    If (exeext=="") {
+	exe .= ".exe"
+	exename .= ".exe"
+    }
+    
+    Try return GetPathForFile(exe, paths*)
+    
+    Try {
+	RegRead AppPath, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%exename%
+	IfExist %AppPath%
+	    return AppPath
+    }
+    
+    Try {
+	RegRead AppPath, HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\%exename%
+	IfExist %AppPath%
+	    return AppPath
+    }
+    
+    EnvGet Path,PATH
+    Try return GetPathForFile(exe, StrSplit(Path,";")*)
+    
+    EnvGet utilsdir,utilsdir
+    If (utilsdir)
+	Try return GetPathForFile(exe, utilsdir)
+    
+    ;Look for registered apps
+    Try return GetAppPathFromRegShellKey(exename, "HKEY_CLASSES_ROOT\Applications\" . exename)
+    Loop Reg, HKEY_CLASSES_ROOT\, K
+    {
+	Try return GetAppPathFromRegShellKey(exename, "HKEY_CLASSES_ROOT\" . A_LoopRegName)
+    }
+    
+    Try return GetPathForFile(exe, A_LineFile . "..\..\..\..\..\..\Distributives\Soft\PreInstalled\utils" ; Srv0 only
+				 , A_LineFile . "..\..\..\..\Programs" ; Srv0 only
+				 , A_LineFile . "..\..\..\..\Soft\PreInstalled\utils" ; in retail, when config and soft are in D:\Distributives
+				 , A_LineFile . "..\..\..\..\..\Distributives\Soft\PreInstalled\utils" ; in retail, for case when config is in some other dir
+				 , "\Distributives\Soft\PreInstalled\utils" ; same
+				 , "\\localhost\Distributives\Soft\PreInstalled\utils" ; sometimes Distributives are somewhere else but available on net
+				 , "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils" ; almost last resort, only works in office0
+				 , "\\Srv0.office0.mobilmir\profiles$\Share\Programs" ) ; last resort, only works in office0
+
+    EnvGet SystemDrive,SystemDrive
+    Loop Files, %SystemDrive%\SysUtils\%exename%, R
+	return A_LoopFileLongPath
+    
+    Throw { Message: "Requested execuable not found", What: A_ThisFunc, Extra: exe }
+}
+
+GetPathForFile(file, paths*) {
+    For i,path in paths {
+	Loop Files, %path%, D
+	{
+	    fullpath=%A_LoopFileLongPath%\%file%
+	    IfExist %fullpath%
+		return fullpath
+	}
+    }
+    
+    Throw
+}
+
+GetAppPathFromRegShellKey(exename, regsubKeyShell) {
+    regsubKey=%regsubKeyShell%\shell
+    Loop Reg, %regsubKey%, K
+    {
+	RegRead regAppRun, %regsubKey%\%A_LoopRegName%\Command
+	regpath := RemoveParameters(regAppRun)
+	SplitPath regpath, regexe
+	If (exename=regexe)
+	    IfExist %regpath%
+		return regpath
+    }
+    Throw
+}
+
+RemoveParameters(runStr) {
+    QuotedFlag=0
+    Loop Parse, runStr, %A_Space%
+    {
+	AppPathOnly .= A_LoopField
+	IfInString A_LoopField, "
+	    QuotedFlag:=!QuotedFlag
+	If Not QuotedFlag
+	    break
+	AppPathOnly .= A_Space
+    }
+    return Trim(AppPathOnly, """")
 }
