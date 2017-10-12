@@ -40,6 +40,8 @@ IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application D
     IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || EXIT /B
     
     FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+    
+    CALL "%~dp0..\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
 )
 (
     IF NOT DEFINED taskScriptUpdaterDir SET "taskScriptUpdaterDir=%ScriptUpdaterDir%"
@@ -56,8 +58,8 @@ IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application D
     ( ECHO %ScriptUpdaterDir%
     )>"%txtScriptUpdaterDir%\ScriptUpdaterDir.txt"
     
-    CALL "%~dp0..\Tasks\_Schedule WinVista+ Task.cmd" "%~dp0Tasks.7z" "%schTaskName%" "%taskXML%"
-    IF DEFINED ModifyTask %SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\%schTaskName%" /TR "%comspec% /C ''%ScriptUpdaterDir%\autoupdate.cmd' >'%TEMP%\ScriptUpdater-autoupdate.log' 2>&1'"
+    CALL "%~dp0..\Tasks\_Schedule WinVista+ Task.cmd" "%~dp0Tasks.7z" "%schTaskName%" "%taskXML%" /RU "%schedUserName%" /RP "%schedUserPwd%"
+    IF DEFINED ModifyTask %SystemRoot%\System32\schtasks.exe /Change /TN "mobilmir.ru\%schTaskName%" /TR "%comspec% /RU "%schedUserName%" /RP "%schedUserPwd%" /C ''%ScriptUpdaterDir%\autoupdate.cmd' >'%TEMP%\ScriptUpdater-autoupdate.log' 2>&1'"
 
     EXIT /B
 )
