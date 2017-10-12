@@ -76,12 +76,12 @@ IF %lenruncmd% GTR 261 (
     ) ELSE DEL "%LOCALAPPDATA%\mobilmir.ru\addressbookdir.txt"
     %SystemRoot%\System32\schtasks.exe /Run /TN "mobilmir.ru\AddressBook_download"
     
-    SET /A waitCount=30
-    SET timeCurrentMAB=нет
+    SET /A "waitCount=30"
+    SET "timeCurrentMAB=нет"
     ECHO Ожидание загрузки адресной книги
 )
 :waitAB
-(
+@(
     SET /A waitCount-=1
     PING 127.0.0.1 -n 2 >NUL 2>&1
     IF NOT EXIST "%abDir%\business_contacts.mab" IF %waitCount% GTR 0 GOTO :waitAB

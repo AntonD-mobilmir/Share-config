@@ -17,8 +17,11 @@ SET passwdexe="%~dp0..\..\..\Programs\passwd.exe"
 rem SET passwdexe="\\Srv0.office0.mobilmir\profiles$\Share\Programs\passwd.exe"
 )
 SET "PassFileDir=%PROGRAMDATA%\mobilmir.ru"
-(
+@(
 SET "newuserpwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%.%PasswdPart3:~-4%"
+SET "PasswdPart1="
+SET "PasswdPart2="
+SET "PasswdPart3="
 IF NOT EXIST "%PassFileDir%" MKDIR "%PassFileDir%"
 SET "PassFilePath=%PassFileDir%\admin-task-scheduler-pwd.txt"
 
@@ -33,7 +36,7 @@ rem Check user existence
 "%SystemRoot%\System32\NET.exe" USER "%ManagedUserName%">NUL && GOTO :ExistingUser
 )
 :CreateNewUser
-(
+@(
     DEL /F /A "%PassFilePath%"
     ECHO %ManagedUserName%	%newuserpwd%	%DATE% %TIME% Adding new user>"%PassFilePath%"
     "%SystemRoot%\System32\NET.exe" USER "%ManagedUserName%" "%newuserpwd%" /ADD >>"%PassFilePath%" 2>&1
@@ -51,7 +54,7 @@ rem Check user existence
 GOTO :SetVarsAndExit
 )
 :ExistingUser
-(
+@(
     IF NOT DEFINED OldPwd GOTO :ExistingUserResetPwd
     IF "%LeaveExistingPwd%"=="1" (
 	ENDLOCAL
@@ -68,14 +71,14 @@ GOTO :SetVarsAndExit
 )
     ECHO error %ERRORLEVEL% changing password, will try to reset>>"%PassFilePath%"
 :ExistingUserResetPwd
-(
+@(
     DEL /F /A "%PassFilePath%"
     ECHO "%ManagedUserName%"	%newuserpwd%	%DATE% %TIME% Resetting password>"%PassFilePath%"
     "%SystemRoot%\System32\NET.exe" USER "%ManagedUserName%" %newuserpwd%>>"%PassFilePath%" 2>&1
 GOTO :SetVarsAndExit
 )
 :SetVarsAndExit
-(
+@(
     "%SystemRoot%\System32\CIPHER.exe" /E "%PassFilePath%"
     ENDLOCAL
     SET "schedUserPwd=%newuserpwd%"

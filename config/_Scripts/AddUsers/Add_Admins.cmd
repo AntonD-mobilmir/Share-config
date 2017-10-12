@@ -34,7 +34,7 @@ EXIT /B
     SET "gpgUserID=%~3"
     SET "SaveDir=%~4"
 )
-(
+@(
     rem Check user existence
     NET USER "%NewUsername%" >NUL 2>&1 && EXIT /B
     IF DEFINED %NewUsername%_flags CALL :GetValue flags "%NewUsername%_flags"
@@ -65,7 +65,7 @@ EXIT /B
     SET "PasswdPart3=0000%RANDOM%"
     rem if password is longer than 14 chars, NET USER /ADD asks stupid question
 )
-(
+@(
     SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
     SET "PasswdPart1="
     SET "PasswdPart2="
@@ -81,7 +81,7 @@ EXIT /B
 	SET gpgServerCopy="\\Srv0.office0.mobilmir\profiles$\Administrators\%NewUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
     )
 )
-(
+@(
     SET "UserAddError="
     rem Create new user
     (
