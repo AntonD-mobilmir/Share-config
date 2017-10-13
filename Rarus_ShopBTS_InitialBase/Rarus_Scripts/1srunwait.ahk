@@ -315,7 +315,7 @@ MailWarning(mailtitle, mailtext:="") {
 	FileCopy r:\Rarus_backup.log,%outgoingEmailAttDir%
 	FileCopy r:\rarus-backup-start.log,%outgoingEmailAttDir%
     }
-    FileAppend rarus-nobackups-warning@status.mobilmir.ru`n%deptID% (%A_ComputerName%): %mailtitle%`n%mailtext%,%outgoingEmailFile%,CP1251
+    FileAppend rarus-nobackups-warning@rarus.robots.mobilmir.ru`n%deptID% (%A_ComputerName%): %mailtitle%`n%mailtext%,%outgoingEmailFile%,CP1251
     
     Run "%A_AhkPath%" "d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk",d:\1S\Rarus\ShopBTS\ExtForms\post
 }

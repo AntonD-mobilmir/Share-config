@@ -152,7 +152,6 @@ DeliverOneEmail(EmailFileName) {
     LinePrefixesToOptions := {"Reply-To:": {1: "-o reply-to="}}
 
     static smtpServer, smtpLogin, smtpPassword, encodedFrom
-	 ;, encodedFrom:="=?UTF-8?B?0J7Qv9C+0LLQtdGJ0LXQvdC40Y8gMdChLdCg0LDRgNGD0YEgKNCw0LLRgtC+0LzQsNGC0LjRh9C10YHQutCw0Y8g0L7RgtC/0YDQsNCy0LrQsCk=?= <rarus-emails@status.mobilmir.ru>"
     If (!smtpServer) {
 	Loop Read, %A_ScriptDir%\DispatchFiles-NotificationsAccount.pwd
 	{
@@ -170,12 +169,7 @@ DeliverOneEmail(EmailFileName) {
     If (!(smtpServer && smtpLogin && smtpPassword))
 	Throw Exception("Отправка уведомлений из 1С-Рарус не работает, немедленно свяжитесь со службой ИТ!", "Из файла DispatchFiles-NotificationsAccount.pwd не прочитались сервер или реквизиты учётной записи")
     
-    If (EndsWith(smtpLogin, "@status.mobilmir.ru")) {
-	; not static, can be changed based on following file contents
-	;rarus-emails-replies@status.mobilmir.ru
-	;replyToHeader = -o "rarus-emails-replies_status-mobilmir-ru@googlegroups.com"
-	replyToHeader = -o "replies@rarus.robots.mobilmir.ru"
-    }
+    replyToHeader = -o "replies@rarus.robots.mobilmir.ru"
     bccHeader=-bcc "rarus-emails-bcc2_status-mobilmir-ru@googlegroups.com"
 	
     tempDir := SetupTemp()

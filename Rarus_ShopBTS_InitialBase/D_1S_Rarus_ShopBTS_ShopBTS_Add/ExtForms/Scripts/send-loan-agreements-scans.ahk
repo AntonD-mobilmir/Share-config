@@ -54,7 +54,7 @@ Try MailUserId := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_S
 If (MailUserId) {
     replyTo := MailUserId . "@mobilmir.ru"
 } Else {
-    replyTo := "it-task-office@status.mobilmir.ru"
+    replyTo := "replies@rarus.robots.mobilmir.ru"
     FileReadLine MailUserId, %A_ScriptDir%\..\post\sendemail.cfg, 1
 }
 
@@ -307,7 +307,6 @@ SendEmail() {
 	    Список файлов:
 	    %filesList%
 	),%outMsgPath%.tmp, UTF-8
-	;старое Кому: loan-agreements@status.mobilmir.ru
 	FileMove %outMsgPath%.tmp, %outMsgPath%.txt, 1
 	exitOK := 1
 	TrayTip %mainTitle%, Сформировано письмо с %itmc% файлами. Будет отправлено через стандатный механизм отправки уведомлений 1С-Рарус.
