@@ -48,7 +48,11 @@ EXIT /B
     IF "%~x1"==".rar" GOTO :CompareArcs
     
     rem C:\SysUtils\UnxUtils\diff.exe -bqdNTs %1 %2 || 
-    "C:\Program Files (x86)\KDiff3\kdiff3.exe" %1 %2
+    IF NOT EXIST %1 (
+	ECHO %1 not exist
+    ) ELSE IF NOT EXIST %2 (
+	ECHO %2 not exist
+    ) ELSE "C:\Program Files (x86)\KDiff3\kdiff3.exe" %1 %2
     EXIT /B
 :CompareArcs
     RD /S /Q "%~1.new"
