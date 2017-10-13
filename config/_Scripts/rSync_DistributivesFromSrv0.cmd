@@ -60,6 +60,7 @@ IF EXIST ".sync.excludes" SET rulefiles=%rulefiles% --exclude-from=.sync.exclude
 )   
 ( 
 %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" .
+%SystemRoot%\System32\icacls.exe "%argDestDir%" /reset /T /C /Q
 POPD
 EXIT /B
 )
