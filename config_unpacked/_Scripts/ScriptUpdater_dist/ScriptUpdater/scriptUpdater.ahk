@@ -171,8 +171,11 @@ UpdateScript(dstFullPath, checkPeriod, URL, gpgFName := "") {
 	;MsgBox gpgErrLevel: %gpgErrLevel%`ngpglog:`n%gpglog%
 	If (!gpgErrLevel
 	    && ( dstExt="mab"
-	      || RegexMatch(gpglog, "m`a)^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+).+\s\s?.+using (?P<KeyType>\w+) key (?P<keyID>[A-Z0-9]+).+\s\s?gpg: Good signature from .+ \[ultimate\]", r)
-	      || RegexMatch(gpglog, "^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+).+using (?P<KeyType>\w+) key ID (?P<keyID>\w+)\s+gpg: Good signature from .+ \[ultimate\]", r) )) {
+	      || RegexMatch(gpglog, "m`a)^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+).+\s\s?.+using (?P<KeyType>\w+) key (?P<keyID>[A-Z0-9]+).+\s\s?gpg: Good signature from .+ \[(?P<trust>\w+)\]", r)
+	      || RegexMatch(gpglog, "^gpg: Signature made (?P<MM>\d+)/(?P<DD>\d+)/(?P<YY>\d+) (?P<Hour>\d+):(?P<Min>\d+):(?P<Sec>\d+).+using (?P<KeyType>\w+) key ID (?P<keyID>\w+)\s+gpg: Good signature from .+ \[(?P<trust>\w+)\]", r)
+	      || RegexMatch(gpglog, "m`a)Good signature from .+ \[(?P<trust>\w+)\]", r) )) {
+	    If  (rtrust = "unknown")
+		Throw Exception("Trust level: " rtrust,, r)
 	    ; old GPG:
 	    ;gpg: Signature made 08/09/17 19:26:49 Russia TZ 2 Standard Time using DSA key ID E91EA97A
 	    ;gpg: Good signature from "Антон Дербенев (Цифроград-Ставрополь) <anton.derbenev@mobilmir.ru>" [ultimate]
