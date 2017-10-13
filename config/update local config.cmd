@@ -55,6 +55,7 @@ EXIT /B
 )
 (
     %SystemDrive%\SysUtils\cygwin\rsync.exe -v --inplace -t --modify-window=3601 -m -y -8 -h --progress -r --delete %args% "%src%" "%cygDst%"
+    %SystemRoot%\System32\icacls.exe %2 /reset /T /C /Q
     
     ENDLOCAL
 EXIT /B
