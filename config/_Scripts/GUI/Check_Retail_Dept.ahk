@@ -3,8 +3,6 @@
 #NoEnv
 #SingleInstance force
 
-; ToDo: чтение файла настройки скрипта отправки уведомлений и проверка адреса сервера (должен быть Яндекс, а не Google)
-
 ProxySettingsRegRoot	 = HKEY_CURRENT_USER
 ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
 EnvironmentRegKey	 = Environment
@@ -127,8 +125,7 @@ If (FileExist(UserProfile . "\fullprofile.*.sddl")) {
 	SetLastRowStatus()
 }
 
-sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg")
-If (IsObject(sendemailcfg)) {
+If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg"))) {
     ;If (!A_IsAdmin) {
     ;    ShopBTS_AddInstArg:=" /install"
     ;    ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
@@ -139,6 +136,13 @@ If (IsObject(sendemailcfg)) {
     If (!statusShopBTS_Add)
 	FileReadLine verShopBTS_Add, d:\1S\Rarus\ShopBTS\ExtForms\post\ShopBTS_Add_ver.txt, 1
     SetLastRowStatus(errShopBTS_Add ? errShopBTS_Add : verShopBTS_Add,!errShopBTS_Add)
+    
+    rarusnotifcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd")
+    FileReadLine rarusnotifsmtpsrvr, % rarusnotifcfg.path, 1
+    SetLastRowStatus(rarusnotifsmtpsrvr, rarusnotifsmtpsrvr=="smtp.yandex.ru:587")
+    
+    ;неправильно: smtp.googlemail.com:587
+    ;правильно: smtp.yandex.ru:587
 }
 
 userFoldersChk := AddLog("Проверка доступности папок пользователя")
@@ -233,6 +237,9 @@ If (ReRunAsAdmin) {
     Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
 }
+
+FileDelete C:\ScriptUpdaterDir.txt
+FileDelete D:\ScriptUpdaterDir.txt
 
 If (IsObject(sendemailcfg)) {
     AddLog("MailLoader\install.cmd", "Запуск")
@@ -417,6 +424,10 @@ If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdSc
 
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
+AddLog("Удаление задачи планировщика mobilmir\AddressBook…")
+RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F
+SetLastRowStatus(ErrorLevel,!ErrorLevel)
+
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 RunFromConfigDir("_Scripts\Tasks\AddressBook_download.cmd")
 RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$ /DELETE,,Min UseErrorLevel
@@ -484,6 +495,8 @@ If (FileExist("c:\squid\sbin\squid.exe")) {
 	SetLastRowStatus("Ошибка " ErrorLevel " при удалении", 0)
     Else
 	SetLastRowStatus("Удален")
+    
+    Run "%A_AhkPath%" "%A_ScriptDir%\..\SetProxy.ahk" ""
 }
 
 backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
