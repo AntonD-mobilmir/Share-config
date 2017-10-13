@@ -1,0 +1,14 @@
+*.dll
+*.dpl
+*.bpl
+*.spl
+*.ocx
+*.EXE
+*.reg
+*.inc
+*.lic
+*.pdf
+*.bat
+*.als
+*.rus
+*.cmd
