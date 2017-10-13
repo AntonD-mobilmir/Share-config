@@ -3,6 +3,8 @@
 #NoEnv
 #SingleInstance force
 
+;EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+
 ProxySettingsRegRoot	 = HKEY_CURRENT_USER
 ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
 EnvironmentRegKey	 = Environment
@@ -145,6 +147,39 @@ If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendem
     ;правильно: smtp.yandex.ru:587
 }
 
+AddLog("Прокси")
+RegRead proxyCUEnable, HKEY_CURRENT_USER\%ProxySettingsIEKey%, ProxyEnable
+If (proxyCUEnable) {
+    RegRead proxyCUServer, HKEY_CURRENT_USER\%ProxySettingsIEKey%, ProxyServer
+    proxystatus .= "CU: " proxyLMServer
+}
+RegRead proxyLMEnable, HKEY_LOCAL_MACHINE\%ProxySettingsIEKey%, ProxyEnable
+If (proxyLMEnable) {
+    RegRead proxyLMServer, HKEY_LOCAL_MACHINE\%ProxySettingsIEKey%, ProxyServer
+    proxystatus .= ", LM: " proxyLMServer
+}
+envProxyKeys := {"HKEY_CURRENT_USER\Environment": "CU", "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment": "LM"}
+envProxyValNames := {"http_proxy": "p", "https_proxy": "ps"}
+For Key, KeyName in envProxyKeys
+    For ValName, ValDisp in envProxyValNames {
+	RegRead proxyVal, %Key%, %ValName%
+	If (proxyVal)
+	    proxystatus .= ", " KeyName ":" ValDisp "=" proxyLMServer
+    }
+RegRead envCUHttp_proxy, HKEY_CURRENT_USER\Environment, 
+RegRead envCUHttps_proxy, HKEY_CURRENT_USER\Environment, 
+RegRead envLMHttp_proxy, , http_proxy
+RegRead envLMHttps_proxy, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment, https_proxy
+If (proxystatus := Trim(proxystatus, ", ")) {
+    SetLastRowStatus(proxystatus,0)
+    RunWait "%A_AhkPath%" "%A_ScriptDir%\..\SetProxy.ahk" ""
+    If (ErrorLevel)
+	SetLastRowStatus(proxystatus,0)
+    Else
+	SetLastRowStatus("был:" proxystatus)
+} Else
+    SetLastRowStatus("Не включен")
+
 userFoldersChk := AddLog("Проверка доступности папок пользователя")
 Loop Reg, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
 {
@@ -240,6 +275,18 @@ If (ReRunAsAdmin) {
 
 FileDelete C:\ScriptUpdaterDir.txt
 FileDelete D:\ScriptUpdaterDir.txt
+
+For i,regview in regViews {
+    SetRegView %regview%
+    RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
+    If (unCR) {
+	AddLog("Удаление Crystal Reports")
+;	RunWait %unCR% /qn
+	RunWait %unCR% /passive
+	SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    }
+}
+SetRegView Default
 
 If (IsObject(sendemailcfg)) {
     AddLog("MailLoader\install.cmd", "Запуск")
@@ -495,8 +542,6 @@ If (FileExist("c:\squid\sbin\squid.exe")) {
 	SetLastRowStatus("Ошибка " ErrorLevel " при удалении", 0)
     Else
 	SetLastRowStatus("Удален")
-    
-    Run "%A_AhkPath%" "%A_ScriptDir%\..\SetProxy.ahk" ""
 }
 
 backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
