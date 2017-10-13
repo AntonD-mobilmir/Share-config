@@ -139,12 +139,59 @@ If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendem
 	FileReadLine verShopBTS_Add, d:\1S\Rarus\ShopBTS\ExtForms\post\ShopBTS_Add_ver.txt, 1
     SetLastRowStatus(errShopBTS_Add ? errShopBTS_Add : verShopBTS_Add,!errShopBTS_Add)
     
-    rarusnotifcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd")
-    FileReadLine rarusnotifsmtpsrvr, % rarusnotifcfg.path, 1
-    SetLastRowStatus(rarusnotifsmtpsrvr, rarusnotifsmtpsrvr=="smtp.yandex.ru:587")
-    
-    ;неправильно: smtp.googlemail.com:587
-    ;правильно: smtp.yandex.ru:587
+    If (IsObject(rarusnotifcfgFile := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd"))) {
+	rarusnotifcfg := []
+	;currentConfigFieldNames := ["server", "login", "password"]
+	Loop Read, % rarusnotifcfgFile.path
+	    rarusnotifcfg.Push(A_LoopReadLine)
+	rarusnotifsmtpsrvr := rarusnotifcfg[1]
+	SetLastRowStatus(rarusnotifsmtpsrvr, rarusnotifsmtpsrvrOK := (rarusnotifsmtpsrvr=="smtp.yandex.ru:587"))
+	If (rarusnotifsmtpsrvrOK) {
+	    rarusnotifLogin := SubStr(rarusnotifcfg[2], InStr(rarusnotifcfg[2], "@")+1)
+	} Else {
+	    rarusnotifLogin := SubStr(A_ComputerName, InStr(A_ComputerName, "-") + 1)
+	    rarusnotifMiscfg := "сервер"
+	}
+	FileRead allPass, \\IT-Head.office0.mobilmir\d$\Users\LogicDaemon\Google Drive\IT\Ограниченный доступ\Аккаунты почтовых ящиков для 1С-Рарус\rarus.robots.mobilmir.ru.txt
+	If (allPass) {
+	    Loop Parse, allPass, `n, `r
+	    {
+		found:=""
+		Loop Parse, A_LoopReadLine, `t
+		{
+		    If (A_Index==1) {
+			If (found := A_LoopField = rarusnotifLogin)
+			    rarusnotifLogin := A_LoopField
+		    } Else If (A_Index==2 && found) {
+			rarusnotifPass := A_LoopField
+			break
+		    } Else
+			break
+		}
+		
+		If (found)
+		    break
+	    }
+	    
+	    If (found) {
+		If (rarusnotifPass == rarusnotifcfg[3])
+		    SetLastRowStatus()
+		Else
+		    rarusnotifMiscfg .= ", пароль"
+	    } Else {
+		rarusnotifMiscfgFatal := "Логин не найден в файле учетных записей"
+	    }
+	} Else If (!rarusnotifsmtpsrvrOK) {
+	    rarusnotifMiscfgFatal := "Указан неправильный сервер отправки уведомлений из 1С-Рарус!"
+	}
+	
+	If (rarusnotifMiscfgFatal) {
+	    SetLastRowStatus(rarusnotifMiscfgFatal, 0)
+	} Else {
+	    SetLastRowStatus("Конфигурация не совпадает: " Trim(rarusnotifMiscfg, ", "), 0)
+	    Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.Fill_DispatchFiles-NotificationsAccount.pwd.ahk"
+	}
+    }
 }
 
 AddLog("Прокси")
@@ -458,7 +505,7 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
-If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts) && IsObject(distSoftUpdScripts))) { ; если запускалось обновление software_update, обновление PreInstalled запустится оттуда; иначе надо обновить PreInstalled отдельно
+If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) {
     If (SubStr(Distributives, 1, 2) != "\\" && FileExist(Distributives "\rSync_DistributivesFromSrv0.cmd") && FileExist(Distributives "\Soft\PreInstalled\auto\SysUtils\*")) {
 	AddLog("rSync_DistributivesFromSrv0.cmd PreInstalled")
 	RunWait %comspec% /C ""%Distributives%\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
