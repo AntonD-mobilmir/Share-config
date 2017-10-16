@@ -72,8 +72,6 @@ chkDefConfigDir := CheckPath(getDefaultConfigDir())
 global DefaultConfigDir := chkDefConfigDir.path
 
 xlnexe := findexe("xln.exe", "C:\SysUtils")
-If (xlnexe)
-    AddLog("xln.exe: " . xlnexe, , 1)
 DriveGet drives, List, FIXED
 For i, d in ["C", "D", "R"]
     If (!InStr(drives, d))
@@ -133,31 +131,32 @@ If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendem
     ;    ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
     ;}
     AddLog("ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix, "Запуск")
-    RunWait "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,,UseErrorLevel
+    RunWait "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,, Min UseErrorLevel
     statusShopBTS_Add := ErrorLevel
     If (!statusShopBTS_Add)
 	FileReadLine verShopBTS_Add, d:\1S\Rarus\ShopBTS\ExtForms\post\ShopBTS_Add_ver.txt, 1
     SetLastRowStatus(errShopBTS_Add ? errShopBTS_Add : verShopBTS_Add,!errShopBTS_Add)
     
-    If (IsObject(rarusnotifcfgFile := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd"))) {
-	rarusnotifcfg := []
+    If (FileExist(rarusnotifcfgFile := "d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd")) {
+	AddLog("DispatchFiles-NotificationsAccount.pwd")
+	rarusnotifCurcfg := []
 	;currentConfigFieldNames := ["server", "login", "password"]
-	Loop Read, % rarusnotifcfgFile.path
-	    rarusnotifcfg.Push(A_LoopReadLine)
-	rarusnotifsmtpsrvr := rarusnotifcfg[1]
+	Loop Read, %rarusnotifcfgFile%
+	    rarusnotifCurcfg.Push(A_LoopReadLine)
+	rarusnotifsmtpsrvr := rarusnotifCurcfg[1]
 	SetLastRowStatus(rarusnotifsmtpsrvr, rarusnotifsmtpsrvrOK := (rarusnotifsmtpsrvr=="smtp.yandex.ru:587"))
 	If (rarusnotifsmtpsrvrOK) {
-	    rarusnotifLogin := SubStr(rarusnotifcfg[2], InStr(rarusnotifcfg[2], "@")+1)
+	    rarusnotifLogin := SubStr(rarusnotifCurcfg[2], 1, InStr(rarusnotifCurcfg[2], "@") - 1)
 	} Else {
-	    rarusnotifLogin := SubStr(A_ComputerName, InStr(A_ComputerName, "-") + 1)
-	    rarusnotifMiscfg := "сервер"
+	    rarusnotifLogin := SubStr(A_ComputerName, 1, InStr(A_ComputerName, "-") - 1)
+	    rarusnotifMiscfg := rarusnotifsmtpsrvr
 	}
 	FileRead allPass, \\IT-Head.office0.mobilmir\d$\Users\LogicDaemon\Google Drive\IT\Ограниченный доступ\Аккаунты почтовых ящиков для 1С-Рарус\rarus.robots.mobilmir.ru.txt
 	If (allPass) {
 	    Loop Parse, allPass, `n, `r
 	    {
 		found:=""
-		Loop Parse, A_LoopReadLine, `t
+		Loop Parse, A_LoopField, `t
 		{
 		    If (A_Index==1) {
 			If (found := A_LoopField = rarusnotifLogin)
@@ -172,25 +171,27 @@ If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendem
 		If (found)
 		    break
 	    }
+	    allPass=
 	    
 	    If (found) {
-		If (rarusnotifPass == rarusnotifcfg[3])
+		If (rarusnotifPass == rarusnotifCurcfg[3])
 		    SetLastRowStatus()
 		Else
 		    rarusnotifMiscfg .= ", пароль"
 	    } Else {
-		rarusnotifMiscfgFatal := "Логин не найден в файле учетных записей"
+		rarusnotifMiscfgFatal := "Логин " rarusnotifLogin " не найден в файле учетных записей"
 	    }
 	} Else If (!rarusnotifsmtpsrvrOK) {
-	    rarusnotifMiscfgFatal := "Указан неправильный сервер отправки уведомлений из 1С-Рарус!"
+	    rarusnotifMiscfgFatal := "Неправильный сервер/нет доступа к списку"
 	}
 	
 	If (rarusnotifMiscfgFatal) {
 	    SetLastRowStatus(rarusnotifMiscfgFatal, 0)
-	} Else {
-	    SetLastRowStatus("Конфигурация не совпадает: " Trim(rarusnotifMiscfg, ", "), 0)
+	} Else If (rarusnotifMiscfg && rarusnotifMiscfg := Trim(rarusnotifMiscfg, ", ")) {
+	    SetLastRowStatus("не совпадает: " rarusnotifMiscfg, 0)
 	    Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.Fill_DispatchFiles-NotificationsAccount.pwd.ahk"
-	}
+	} Else
+	    SetLastRowStatus(rarusnotifLogin)
     }
 }
 
@@ -219,7 +220,7 @@ RegRead envLMHttp_proxy, , http_proxy
 RegRead envLMHttps_proxy, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment, https_proxy
 If (proxystatus := Trim(proxystatus, ", ")) {
     SetLastRowStatus(proxystatus,0)
-    RunWait "%A_AhkPath%" "%A_ScriptDir%\..\SetProxy.ahk" ""
+    RunWait "%A_AhkPath%" "%A_ScriptDir%\..\SetProxy.ahk" "",, Min UseErrorLevel
     If (ErrorLevel)
 	SetLastRowStatus(proxystatus,0)
     Else
@@ -243,7 +244,7 @@ If (userFoldersChk) {
     MsgBox 4, %A_ScriptName%, Некоторые папки пользователя недоступны. Из-за этого могут также не работать библиотеки.`n`nСбросить пути к папкам пользователя на стандартные?
     IfMsgBox Yes
     {
-	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\..\_Scripts\MoveUserProfile\reset HKCU folders.ahk"
+	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\..\_Scripts\MoveUserProfile\reset HKCU folders.ahk",, Min UseErrorLevel
 	keepOpen += !!ErrorLevel
     }
 }
@@ -327,9 +328,9 @@ For i,regview in regViews {
     SetRegView %regview%
     RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
     If (unCR) {
-	AddLog("Удаление Crystal Reports")
-;	RunWait %unCR% /qn
-	RunWait %unCR% /passive
+	AddLog("Запуск удаления Crystal Reports")
+;	RunWait %unCR% /qn /norestart,, Min UseErrorLevel
+	Run %unCR% /passive /norestart,, Min UseErrorLevel
 	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     }
 }
@@ -437,14 +438,14 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
 }
 
 AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
-RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F
+RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
 If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 0))) {
     ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     ;timecriacxcab -= instCriacxocx.mtime, Days
     ;https://redbooth.com/a/#!/projects/59756/tasks/32400133
     AddLog("Удаление " instCriacxocx.path, "regsvr32 /u")
-    RunWait % """" regsvr32exe """ /s /u """ instCriacxocx.path """"
+    RunWait % """" regsvr32exe """ /s /u """ instCriacxocx.path """",,Min UseErrorLevel
     SetLastRowStatus("Удаление… | regsvr32 err: " regsvr32err := ErrorLevel)
     FileDelete % instCriacxocx.path
     SetLastRowStatus("ocx " (ErrorLevel ? "не " : "") "удалён! regsvr32 err: " regsvr32err, !ErrorLevel)
@@ -519,7 +520,7 @@ If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdSc
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
 AddLog("Удаление задачи планировщика mobilmir\AddressBook…")
-RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F
+RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F,, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
@@ -580,15 +581,24 @@ RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_Team
 ;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
 ;SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
-If (FileExist("c:\squid\sbin\squid.exe")) {
+If (FileExist("c:\squid")) {
     FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
-    AddLog("squid.conf", mtimeSquidConf, 1)
+    AddLog("Удаление squid", mtimeSquidConf, 1)
     
     RunWait c:\squid\sbin\squid.exe -r, c:\squid\sbin, Min UseErrorLevel
     If (ErrorLevel)
-	SetLastRowStatus("Ошибка " ErrorLevel " при удалении", 0)
-    Else
-	SetLastRowStatus("Удален")
+	SetLastRowStatus("Ошибка " ErrorLevel " при удалении службы", 0)
+    Else {
+	SetLastRowStatus("Служба удалена")
+	FileRemoveDir c:\squid, 1
+	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
+	FileRemoveDir d:\squid, 1
+	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
+	If (squidFolderRmvErr)
+	    SetLastRowStatus("Папка осталась")
+	Else
+	    SetLastRowStatus("Папка удалена")
+    }
 }
 
 backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
