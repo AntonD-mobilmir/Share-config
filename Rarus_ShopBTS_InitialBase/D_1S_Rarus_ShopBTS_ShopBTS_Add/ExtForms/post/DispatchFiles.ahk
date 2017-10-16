@@ -120,14 +120,16 @@ DispatchSingleFile(pathFileToSend) {
     SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -60000 * 10
+    sendemailerr=
     RunWait %sendemailexe% -f "%emailUserName%" -t "gl@k.mobilmir.ru" -u "%encSubj%" -s "smtp.k.mobilmir.ru:587" -xu "%emailUserName%" -xp "%emailPassword%" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -m "%EmailBody%" -a "%pathFileToSend%",%A_Temp%,Hide UseErrorLevel, pidSendEmail
+    sendemailerr := ErrorLevel
     SetTimer killSendEmail, Off
-    If (ErrorLevel || killedSendEmail) {
+    If (sendemailerr || killedSendEmail) {
 	CheckTrayIcon(trayMsgText "`n" note " (""" nameExtToSend """) неудачна", "Ошибка при попытке отправки выгрузки", 30, 0x23)
 	If (killedSendEmail) {
 	    ReturnError:=-1
 	} Else {
-	    ReturnError:=ErrorLevel
+	    ReturnError:=sendemailerr
 	}
 	FileRemoveDir %A_Temp%\perl, 1
 	Loop Files, %A_Temp%\pdk*, D
