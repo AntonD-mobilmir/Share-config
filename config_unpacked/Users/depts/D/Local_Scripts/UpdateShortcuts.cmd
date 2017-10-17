@@ -68,6 +68,10 @@ EXIT /B
 )
 :RecordNewTimes
 (
+    IF NOT DEFINED ShortcutsTime SET "ShortcutsTime=%lastShortcutsTime%"
+    IF NOT DEFINED Shortcuts_64bitTime SET "Shortcuts_64bitTime=%lastShortcuts_64bitTime%"
+)
+(
     (
     ECHO %ShortcutsTime%
     ECHO %Shortcuts_64bitTime%
