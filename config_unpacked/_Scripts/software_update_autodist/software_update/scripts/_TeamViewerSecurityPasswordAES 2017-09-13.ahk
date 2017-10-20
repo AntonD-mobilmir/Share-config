@@ -11,13 +11,28 @@ verbosity := 2
 EnvGet RunInteractiveInstalls,RunInteractiveInstalls
 If (RunInteractiveInstalls != "")
     verbosity := RunInteractiveInstalls
-arg1 = %1%
-If (arg = "/q" || arg = "/quiet" || arg = "/s" || arg = "/silent")
-    verbosity := 0
-Else If (arg = "/warn")
-    verbosity := 1
-Else If (arg = "/verbose")
-    verbosity := 2
+Loop %0%
+{
+    If (skipArgs--)
+	continue
+    arg1 := %A_Index%
+    If (arg = "/q" || arg = "/quiet" || arg = "/s" || arg = "/silent")
+	verbosity := 0
+    Else If (arg = "/warn")
+	verbosity := 1
+    Else If (arg = "/verbose")
+	verbosity := 2
+    Else If (arg = "/log") {
+	skipArgs := 1
+	logPathArgN := A_Index+1
+	logPath := %logPathArgN%
+    }
+}
+
+If (!logPath) {
+    logPath := *
+    FileEncoding CP866
+}
 
 ListOldPasswds := {"F574177FCCEC51367FBDE604C9D7D8BAC00F32131DC7EFC8D33885495010A90526BF392D7177FB520E2B2BB2303A0616": "."	; 2016-08-24 Apps_dept
 		  ,"F2AD0177D24744298C530F4F05EE62B2D3AD5A77FD9DF84C535ACD8ECF54ACD3201D31B03EADCFF4B0E37A8E7C7795D0": "."	; 2016-08-24 Apps_office
@@ -44,7 +59,7 @@ SetRegView 32
 RegRead curpwd, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES
 If (curpwd) {
     md5ofpwd := MD5(curpwd)
-    FileAppend Из реестра прочитан зашифрованный пароль TeamViewer %curpwd%`, его MD5: %md5ofpwd%`n,*, cp1
+    FileAppend Из реестра прочитан зашифрованный пароль TeamViewer %curpwd%`, его MD5: %md5ofpwd%`n, %logPath%
 
     If (ListOldPasswds.HasKey(curpwd)) {
 	switchKey := ListOldPasswds[curpwd]
@@ -62,27 +77,31 @@ If (curpwd) {
 If (write) {
     If (switchKey=="") {
 	ShowMsg(einf := "Для текущего пароля ничего делать не требуется.", 0x40)
-	write := "0"
+	write := 0
     } Else If (switchKey==".") {
-	einf := WriteRegSettings(write := "")
+	writeOk := WriteRegSettings(write := "", einf := "")
     } Else If (switchKey=="!") {
-	einf := WriteRegSettings(write := "")
-	ShowMsg(einf := "Был установлен пароль TeamViewer, который надо менять сразу после установки. Сейчас импортирован пароль из " einf ", но если известно, кто настраивал TeamViewer, сообщите ему, что он не прав.", 0x30)
+	writeOk := WriteRegSettings(write := "", einf := "")
+	ShowMsg(einf := "Был установлен пароль TeamViewer, который надо менять сразу после установки. Сейчас импортирован пароль из " write ", но если известно, кто настраивал TeamViewer, сообщите ему, что он не прав.", 0x30)
 	write := "! " write
     } Else {
-	einf := WriteRegSettings(write := switchKey)
+	writeOk := WriteRegSettings(write := switchKey, einf := "")
     }
 }
 
 If (write) {
+    If (writeOk)
+	status=OK
+    Else
+	status=Err
     configDir := getDefaultConfigDir()
-    Run "%A_AhkPath%" "%configDir%\_Scripts\Lib\RetailStatusReport.ahk" "%A_ScriptName%" "%write%" "%einf%"
+    Run "%A_AhkPath%" "%configDir%\_Scripts\Lib\RetailStatusReport.ahk" "%A_ScriptName%" "%status% (%write%)" "%einf%"
 }
 
-ExitApp
+ExitApp !writeOk
 
-WriteRegSettings(ByRef defaultsPath := "") {
-    If (!defaultsPath)
+WriteRegSettings(ByRef defaultsPath, ByRef einf) {
+    If (defaultsPath == "")
 	defaultsPath := getDefaultConfig()
     
     ;SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
@@ -100,31 +119,25 @@ WriteRegSettings(ByRef defaultsPath := "") {
 	    If (verbosity) {
 		Run % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
 		ExitApp
-	    } Else {
-		return 0, ShowMsg("Скрипт запущен без прав администратора в не-интерактивном режиме. ", 0x10)
-		return 0
-	    }
+	    } Else
+		return 0, ShowMsg(einf := "Скрипт запущен без прав администратора в не-интерактивном режиме. ", 0x10)
 	}
 	
 	RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, % ListNewPasswds[defArcName]
-	If (ErrorLevel) {
-	    defaultsPath := ErrorLevel
-	    return ShowMsg("Ошибка записи нового пароля.", 0x10)
-	} Else {
-	    defaultsPath := defArcName
-	    return ShowMsg("Пароль заменён на пароль из конфигурации " . defArcName)
-	}
+	If (ErrorLevel)
+	    return 0, ShowMsg(einf := "Ошибка " A_LastError ? A_LastError : ErrorLevel " при записи нового пароля.", 0x10)
+	Else
+	    return 1, ShowMsg(einf := "Пароль заменён на пароль из конфигурации " . defArcName)
     } Else {
-	return ShowMsg("Не найден пароль для конфигурации " . defaultsPath, 0x10)
+	return 0, ShowMsg(einf := "Не найден пароль для конфигурации " . defaultsPath, 0x10)
     }
 }
 
 ShowMsg(ByRef text, type:=0) {
-    global verbosity
-    FileAppend %text%`n,*,cp1
-    If (verbosity == 2 || verbosity && (type && type & 0x70 != 0x40))
+    global verbosity, logPath
+    FileAppend %text%`n, %logPath%
+    If (verbosity == 2 || verbosity && type && (type & 0x70 != 0x40))
 	MsgBox % type, %A_ScriptName%, %text%, 300
-    return text
 }
 
 ; \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
