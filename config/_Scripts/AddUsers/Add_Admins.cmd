@@ -51,12 +51,15 @@ EXIT /B
 	GOTO :setupgroups
     )
     
-    IF DEFINED gpgUserID IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
+    IF DEFINED SaveDir IF EXIST "%SaveDir%" (
+	SET "dirPlainOut=%SaveDir%\%Hostname%"
+    ) ELSE SET "dirPlainOut=%TEMP%\%~n0.e"
 
-    IF DEFINED SaveDir IF EXIST "%SaveDir%" SET "dirPlainOut=%SaveDir%\%Hostname%"
-    IF NOT DEFINED dirPlainOut SET "dirPlainOut=%TEMP%\%~n0.e"
-    IF NOT DEFINED dirGPGout SET "dirGPGout=%TEMP%\%~n0.tmp"
-    IF DEFINED URL IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+    IF DEFINED gpgUserID (
+	IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
+	IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+	IF NOT DEFINED dirGPGout SET "dirGPGout=%TEMP%\%~n0.tmp"
+    )
 
     REM IF NOT DEFINED flag_p
     rem Generate new password
