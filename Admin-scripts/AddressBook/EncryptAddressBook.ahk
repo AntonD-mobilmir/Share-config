@@ -33,6 +33,8 @@ SetTimer ShowCMDWindow, -3000
 RunWait "%gpgexe%" --homedir "%GNUPGHOME%" --trust-model always %rcptList% -e business_contacts.mab, %tmp%, Hide, cmdPID
 FileCopy %tmp%\business_contacts.mab.gpg, %UserProfile%\Dropbox\it.mobilmir.ru Team Folder\pub\*.*, 1
 
+FileRemoveDir %tmp%, 1
+
 ExitApp
 
 Status(msg, title := "") {
