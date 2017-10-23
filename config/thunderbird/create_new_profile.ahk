@@ -1,6 +1,7 @@
 ﻿;usage variants:
-;create_new_profile.ahk [MailUserId[@MailDomain] [any_path]]
-;create_new_profile.ahk [path_with_a_backslash_in_it [MailUserId[@MailDomain]]
+;create_new_profile.ahk [path_with_a_backslash_in_it [MailUserId[@MailDomain] ["Sender Name"]]
+;create_new_profile.ahk [MailUserId[@MailDomain] path_with_a_backslash_in_it ["Sender Name"]]
+;create_new_profile.ahk [MailUserId[@MailDomain] ["Sender Name"] [any_path]]
 ;
 ;path_with_a_backslash_in_it must contain a "\"
 ;any_path - not necessarily
@@ -16,6 +17,9 @@
 #SingleInstance off
 EnvGet SystemDrive, SystemDrive
 EnvGet UserProfile, UserProfile
+MailUserId=
+mailProfileDir=
+mailFullName=
 
 Try {
     defaultConfig := getDefaultConfigFileName()
@@ -25,15 +29,23 @@ Try {
 Loop %0%
 {
     argv := %A_Index%
-    If (!MailUserId && posOfTheAtChar := InStr(argv,"@")) {
-	StringLeft MailUserId, argv, posOfTheAtChar - 1
-	StringMid MailDomain, argv, posOfTheAtChar + 1
-    } Else If (!MailUserId && !InStr(argv,"\")) {
-	MailUserId := argv
-    } Else If (!mailProfileDir) {
+    If (mailProfileDir=="" && InStr(argv,"\")) {
 	mailProfileDir := argv
     } Else {
-	Throw Exception("Лишний аргумент в командной строке", A_Index, argv)
+	If (!MailUserId) {
+	    If (posOfTheAtChar := InStr(argv,"@")) {
+		StringLeft MailUserId, argv, posOfTheAtChar - 1
+		StringMid MailDomain, argv, posOfTheAtChar + 1
+	    } Else {
+		MailUserId := argv
+	    }
+	} Else If (!mailFullName) {
+	    mailFullName := argv
+	} Else If (!mailProfileDir) {
+	    mailProfileDir := argv
+	} Else {
+	    Throw Exception("Лишний аргумент в командной строке", A_Index, argv)
+	}
     }
 }
 
@@ -46,7 +58,7 @@ mailAddress := MailUserId . "@" . MailDomain
 If (!mailProfileDir)
     mailProfileDir=%UserProfile%\Mail\Thunderbird\profile
 
-;MsgBox,,%A_ScriptName% Debug, MailUserId = "%MailUserId%"`nMailDomain = "%MailDomain%"`nmailProfileDir = "%mailProfileDir%"
+;MsgBox,,%A_ScriptName% Debug, MailUserId = "%MailUserId%"`nMailDomain = "%MailDomain%"`nmailFullName = "%mailFullName%"`nmailProfileDir = "%mailProfileDir%"
 
 If (FileExist(mailProfileDir . "\prefs.js")) {
     MsgBox 35,, "%mailProfileDir%" уже существует.`nВсё равно копировать шаблон и генерировать ключ?`n(если нет`, просто будет записан путь к профилю в [Profile0] в profiles.ini)
@@ -93,9 +105,16 @@ If (!skipCreatingProfile) {
 	    }
 	}
     }
-
+    
+    ;prefsjs := RegExReplace(prefsjs, "\{\$\w+\$\}", )
     StringReplace prefsjs, prefsjs, {$MailUserId$}, %MailUserId%, 1
     StringReplace prefsjs, prefsjs, {$MailDomain$}, %MailDomain%, 1
+    If (mailFullName) {
+	searchStr := "//user_pref(""mail.identity.id1.fullName"", ""{$MailFullName$}"");"
+	newStr := "user_pref(""mail.identity.id1.fullName"", """ mailFullName """);"
+	StringReplace prefsjs, prefsjs, %searchStr%, %newStr%, 1
+	;//user_pref("mail.identity.id1.fullName", "{$MailFullName$}");
+    }
     prefsJsHndl := FileOpen(mailProfileDir "\prefs.js", "w-", "UTF-8"), prefsJsHndl.Write(prefsjs), prefsJsHndl.Close()
 
     RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%mailProfileDir%\extensions"
