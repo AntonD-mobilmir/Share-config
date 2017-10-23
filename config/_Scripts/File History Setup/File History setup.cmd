@@ -25,5 +25,5 @@ rem MKDIR "%remoteconfigpath%"
 rem XCOPY "%localconfigpath%\config?.xml" "%remoteconfigpath%" /E /I /H /Y
 
 rem as admin:
-powershell.exe -Command "Start-Process -FilePath \"%comspec%\" -ArgumentList \"/C `\"`\"%~dp0File History setup admin.cmd`\" `\"%localconfigpath%`\"`\"\" -Verb RunAs"
+rem powershell.exe -Command "Start-Process -FilePath \"%comspec%\" -ArgumentList \"/C `\"`\"%~dp0File History setup admin.cmd`\" `\"%localconfigpath%`\"`\"\" -Verb RunAs"
 )
