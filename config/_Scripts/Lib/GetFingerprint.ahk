@@ -26,9 +26,9 @@ GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
 		fplo[A_LoopField] := v
 		If (textfp!=0 && v && v!="To be filled by O.E.M." && v!="Base Board Serial Number" && v!="Base Board") {
 		    If A_LoopField in Name,Vendor,Version,Manufacturer,Product,Model,Caption,Description
-			fpline .= ( fpline ? " " : "") . v
+			fpline .= " " . v
 		    Else
-			fpline .= ( fpline ? ", " : "" ) . A_LoopField . ": " . v
+			fpline .= ( fpline ? ", " : " " ) . A_LoopField . ": " . v
 		}
 	    }
 	    fpo[parmName].Push(fplo)
@@ -41,13 +41,6 @@ GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
 	    multilineField := 0
 	}
     }
-    ;CPU: AuthenticAMD AMD E1-1200 APU with Radeon(tm) HD Graphics AMD64 Family 20 Model 2 Stepping 0, ProcessorId: 178BFBFF00500F20, SocketDesignation: Socket FT1
-    ;MB: LENOVO Lenovo G585 Основная плата 31900004WIN8 STD SGL, SerialNumber: CB22755629
-    ;NIC: [00000001] Realtek PCIe FE Family Controller, MACAddress: 20:89:84:96:90:6E
-    ;NIC: [00000002] Qualcomm Atheros AR9485WB-EG Wireless Network Adapter, MACAddress: 24:FD:52:25:49:DC
-    ;NIC: [00000003] Microsoft Wi-Fi Direct Virtual Adapter, MACAddress: 16:FD:52:25:49:DC
-    ;NIC: [00000004] Bluetooth Device (Personal Area Network), MACAddress: 24:FD:52:25:AB:7A
-    ;System: LENOVO 20137 Lenovo G585, IdentifyingNumber: 3145505702862, UUID: AC956B92-BDB3-E211-A30C-20898496906E
     
     return fpo
 }
