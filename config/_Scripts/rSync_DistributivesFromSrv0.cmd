@@ -1,6 +1,7 @@
 @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
@@ -9,14 +10,24 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 SET "DistributivesHost=Srv0.office0.mobilmir"
 SET "syncFlagMasks=.sync*"
 SET "DstDir=%~d0\Distributives"
+
+IF NOT DEFINED ErrorCmd (
+    IF "%RunInteractiveInstalls%"=="0" (
+	SET "ErrorCmd=ECHO  & PING -n 30 127.0.0.1 >NUL & EXIT /B"
+    ) ELSE (
+	SET "ErrorCmd=PAUSE & EXIT /B"
+    )
+)
+
 IF NOT EXIST %SystemDrive%\SysUtils\cygwin\rsync.exe CALL :unpackRsync
 
 SET "compressMode=-z --compress-level=9"
 route print | find "          0.0.0.0          0.0.0.0      192.168.1.1" /C && SET "compressMode="
 )
 (
+ECHO args: %*
+ECHO compressMode: %compressMode%
 SET "SrcBaseURI=rsync://%DistributivesHost%/Distributives"
-rem IF NOT "%~2"=="" CALL :strlen lenBaseDir %2
 IF NOT "%~1"=="" (
     CALL :rsyncDistributives %1
     EXIT /B
@@ -30,39 +41,66 @@ EXIT /B
 rem %1 - local destination path without driveletter
 rem source is determined with SrcBaseURI and part of destination:
 rem %SrcBaseURI%\local_destination_without_?:\Distributives_prefix
-
-IF .%lastCallSrc% == .%1 EXIT /B
-SET lastCallSrc=%1
-
 SET "argDestDir=%~1"
 )
 IF "%argDestDir:~-1%"=="\" SET "argDestDir=%argDestDir:~,-1%"
-rem Can't replace with %a:=y% because there's colon after drive letter :(
-rem FOR /F "usebackq delims=" %%A IN (`ECHO %%argDestDir:%DstBaseDir%^=%%`) DO SET relDestPath=%%A
+(
+    IF "%lastCallSrc%" == "%argDestDir%" (
+	ECHO %DATE% %TIME% Repeating call for "%argDestDir%", skipping
+	EXIT /B
+    )
+    ECHO %DATE% %TIME% local dest: %argDestDir%
+    SET "lastCallSrc=%argDestDir%"
 
-rem IF DEFINED lenBaseDir CALL :getSubString relDestPath %lenBaseDir% argDestDir
-IF NOT DEFINED lenBaseDir CALL :getRelPath relDestPath "%argDestDir%"
+    CALL :getRelPath relDestPath "%argDestDir%"
+    IF "%argDestDir:~0,2%"=="\\" ( SET "icaclsDestDir=%argDestDir%" ) ELSE SET "icaclsDestDir=\\?\%argDestDir%"
 )
 (
-FOR /F "usebackq delims=" %%A IN (`%SystemDrive%\SysUtils\cygwin\cygpath.exe "%SrcBaseURI%\%relDestPath%\."`) DO SET cygpathRsyncSrc=%%A
-IF ERRORLEVEL 1 PAUSE & EXIT /B
-IF NOT DEFINED cygpathRsyncSrc PAUSE & EXIT /B
-
-SET rulefiles=
-SET recursion=-r
+    SET "cygpathRsyncSrc="
+    ECHO %DATE% %TIME% Converting "%SrcBaseURI%\%relDestPath%\." to cygpath...
+    FOR /F "usebackq delims=" %%A IN (`%SystemDrive%\SysUtils\cygwin\cygpath.exe "%SrcBaseURI%\%relDestPath%\."`) DO SET "cygpathRsyncSrc=%%~A"
+    IF ERRORLEVEL 1 GOTO :CygpathError
+    IF NOT DEFINED cygpathRsyncSrc GOTO :CygpathError
+    SET "rulefiles="
+    SET "recursion=-r"
 )
 PUSHD %1 || EXIT /B
 (
-IF "%CD%"=="%SystemRoot%" @ECHO  & PAUSE & EXIT
-@rem TODO: includes still don't work
-IF EXIST ".sync.includes" SET rulefiles=%rulefiles% --include-from=.sync.includes
-IF EXIST ".sync.excludes" SET rulefiles=%rulefiles% --exclude-from=.sync.excludes
-)   
-( 
-%SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" .
-%SystemRoot%\System32\icacls.exe "%argDestDir%" /reset /T /C /Q
-POPD
-EXIT /B
+    IF "%CD%"=="%SystemRoot%" @ECHO %DATE% %TIME% PUSHD ended up in SystemRoot & PAUSE & %ErrorCmd%
+    IF "%CD:~1,9%"==":\Windows" @ECHO %DATE% %TIME% PUSHD ended up in a Windows dir & PAUSE & %ErrorCmd%
+    IF "%CD:~1,9%"==":\" @ECHO %DATE% %TIME% PUSHD ended up in a drive root & PAUSE & %ErrorCmd%
+    @rem TODO: includes still don't work
+    IF EXIST ".sync.includes" SET rulefiles=%rulefiles% --include-from=.sync.includes
+    IF EXIST ".sync.excludes" SET rulefiles=%rulefiles% --exclude-from=.sync.excludes
+)
+(
+    CALL :ResetACL "%icaclsDestDir%" || (ECHO Resetting ownership & %SystemRoot%\System32\takeown.exe /F "%icaclsDestDir%" /D Y /R & CALL :ResetACL "%icaclsDestDir%")
+    SET "rsyncError="
+    ECHO %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" .
+    %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" . || CALL :SetRsyncError
+    POPD
+    CALL :ResetACL "%icaclsDestDir%"
+IF NOT DEFINED rsyncError EXIT /B
+)
+EXIT /B %rsyncError%
+:ResetACL <path>
+(
+    ECHO %DATE% %TIME% Resetting ACL for "%icaclsDestDir%"
+    %SystemRoot%\System32\icacls.exe "%icaclsDestDir%" /reset /T /C /Q
+    EXIT /B
+)
+:SetRsyncError
+(
+    SET "rsyncError=%ERRORLEVEL%"
+    ECHO %DATE% %TIME% rsync returned error %ERRORLEVEL%
+    EXIT /B %ERRORLEVEL%
+)
+:CygpathError
+(
+    ECHO %DATE% %TIME% cygpath returned error %ERRORLEVEL%
+    IF DEFINED cygpathRsyncSrc ECHO Converted path: "%cygpathRsyncSrc%"
+    %ErrorCmd% %ERRORLEVEL%
+    EXIT /B %ERRORLEVEL%
 )
 :unpackRsync
 IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd" || CALL :callFind7zexe
