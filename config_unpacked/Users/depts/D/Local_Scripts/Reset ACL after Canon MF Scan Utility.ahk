@@ -40,7 +40,7 @@ ResetACL() {
 	return
     If (!SystemRoot)
 	EnvGet SystemRoot, SystemRoot
-    RunWait %SystemRoot%\System32\icacls.exe "%tgt%" /reset /T /C /L, %tgt%, Min
+    RunWait %SystemRoot%\System32\icacls.exe "%tgt%" /reset /T /C /Q, %tgt%, Hide
     return
 }
 
