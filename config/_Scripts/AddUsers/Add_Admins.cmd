@@ -1,7 +1,7 @@
 @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-ECHO OFF
+rem ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
@@ -46,14 +46,15 @@ EXIT /B
     )
     IF NOT DEFINED flag_f CALL :AskCreateUser || EXIT /B
     IF DEFINED flag_p (
-	NET USER %NewUsername% /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /FULLNAME:"%FullName%"
-	%SystemRoot%\System32\wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
+	NET USER "%NewUsername%" /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /FULLNAME:"%FullName%"
+	%SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
 	GOTO :setupgroups
     )
     
     IF DEFINED SaveDir IF EXIST "%SaveDir%" (
 	SET "dirPlainOut=%SaveDir%\%Hostname%"
-    ) ELSE SET "dirPlainOut=%TEMP%\%~n0.e"
+    )
+    IF NOT DEFINED dirPlainOut SET "dirPlainOut=%TEMP%\%~n0.e"
 
     IF DEFINED gpgUserID (
 	IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
@@ -73,7 +74,7 @@ EXIT /B
     SET "PasswdPart1="
     SET "PasswdPart2="
     SET "PasswdPart3="
-    
+
     SET "outPlainFName=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt"
     IF NOT EXIST "%dirPlainOut%" MKDIR "%dirPlainOut%"
     IF NOT "%dirPlainOut:~0,2%"=="\\" %SystemRoot%\System32\cipher.exe /E "%dirPlainOut%"
