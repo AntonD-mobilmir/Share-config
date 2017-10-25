@@ -9,6 +9,6 @@ REM Check if there is a secret key yet
 FOR /F "usebackq tokens=1" %%A IN (`%gpgexe% --batch -K`) DO IF "%%~A"=="sec" EXIT /B
 
 REM otherwise, generate first secret key and import trusted keys
-CALL "%~dp0\genGpgKeyring.cmd"
+CALL "%~dp0genGpgKeyring.cmd"
 EXIT /B 0
 )
