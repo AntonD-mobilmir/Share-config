@@ -1,5 +1,6 @@
 ﻿;MsgBox % GetKnownFolder("DESKTOPDIRECTORY")
 ;MsgBox % GetKnownFolder("Downloads")
+; folderdata/GUID can be taken from https://msdn.microsoft.com/en-us/library/windows/desktop/dd378457.aspx
 
 GetKnownFolder(FolderName) { ;http://www.autohotkey.com/forum/viewtopic.php?t=68194 
     If !RegExMatch(folderdata(),"im`a)^" . foldername . ".+$",line) 
