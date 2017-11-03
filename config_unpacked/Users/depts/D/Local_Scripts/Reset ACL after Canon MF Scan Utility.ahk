@@ -6,8 +6,17 @@
 SetTitleMatchMode 3
 FileEncoding UTF-8
 
-If (!(tgtBase := FindScanDest()))
+global ScriptName:="Наблюдение за Canon MF Scan Utility и сброс настроек доступа к отсканированным файлам"
+    , ErrMsgs := {scanDirNotFound: "Не найдена папка сканированных документов. Выход."}
+
+ResetMinPeriod := 30000 ; ms
+
+If (!(tgtBase := FindScanDest())) {
+    TrayTip(ErrMsgs[scanDirNotFound])
+    Sleep 3000
     ExitApp 1
+}
+TrayTipAndHide("Настройки доступа будут сбрасываться для папки " tgt)
 
 tgt=%tgtBase%\%A_YYYY%_%A_MM%_%A_DD%
 
@@ -23,24 +32,56 @@ GroupAdd mfprogress, ScanGear ahk_exe %mfscanexe%
 While WinExist("ahk_exe " mfscanexe) {
     WinWait ahk_group mfprogress,,3
     If (!ErrorLevel) {
+	TrayTip("Обнаружено начало сканирования, ожидание завершения")
 	WinWaitClose
 	ResetACL()
 	reset := 1
     }
+    TrayTip("Обнаружено окно MF Scan Utility, ожидание начала сканирования")
 }
 If (!reset)
     ResetACL()
-
 ExitApp
 
+TrayTipAndHide(text, timeout := 3000) {
+    TrayTip(text)
+    SetTimer HideTrayIcon, % -Abs(timeout)
+}
+
+TrayTip(text:="", opt := 0x21) {
+    static lastText
+    If (lastText!=text) {
+	Menu Tray, Icon
+	Menu Tray, Tip, %text%
+	If (text) {
+	    TrayTip %ScriptName%, %text%, %opt%
+	} Else {
+	    TrayTip
+	    Menu Tray, NoIcon
+	    Menu Tray, Icon
+	}
+    }
+    lastText:=text
+}
+
+HideTrayIcon() {
+    TrayTip
+    Menu Tray, Tip, %ScriptName%
+    Menu Tray, NoIcon
+}
+
 ResetACL() {	
-    global tgt
-    static SystemRoot
+    global tgt, ResetMinPeriod
+    static SystemRoot, lastReset
     If (!InStr(FileExist(tgt), "D"))
 	return
     If (!SystemRoot)
 	EnvGet SystemRoot, SystemRoot
+    TrayTip("Сброс настроек доступа, чтобы файлы были доступны по сети")
+    Sleep ResetMinPeriod - (A_TickCount - lastReset)
     RunWait %SystemRoot%\System32\icacls.exe "%tgt%" /reset /T /C /Q, %tgt%, Hide
+    lastReset:=A_TickCount
+    TrayTip()
     return
 }
 
@@ -80,7 +121,7 @@ FindScanDest() {
     tryDirs.Push("D:\Users\Public\Pictures")
 
     For i, dir in tryDirs
-	If (InStr(FileExist(tgtBase := PublicPictures "\Сканированное"), "D"))
+	If (InStr(FileExist(tgtBase := dir "\Сканированное"), "D"))
 	    return tgtBase
 }
 
