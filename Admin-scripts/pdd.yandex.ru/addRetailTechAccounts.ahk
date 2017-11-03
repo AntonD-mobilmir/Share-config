@@ -36,8 +36,6 @@ If (FileExist(listpath)) {
 	InputBox firstName, %A_ScriptName%, firstName
 	If (ErrorLevel)
 	    Exitapp
-	If (!EndsWith(firstName, " " login "@"))
-	    firstName .= " " login "@"
     }
     MsgBox % AddRetailDept(login, firstName)
 }
@@ -46,6 +44,9 @@ ExitApp
 AddRetailDept(ByRef login, ByRef firstName, ByRef leftovers:="") {
     static domains	:= {"k.mobilmir.ru": "(Обмен Рарус)", "rarus.robots.mobilmir.ru": "(Уведомления из Рарус)"}
 	 , lists	:= ["all@k.mobilmir.ru"]
+
+    ;If (!EndsWith(firstName, " " login "@"))
+    ;    firstName .= " " login "@"
 
     resp1 := resp2 := ""
     For domain, lastName in domains {
