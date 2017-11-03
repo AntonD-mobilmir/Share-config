@@ -14,7 +14,7 @@ If (!MailUserId) {
 	GetSharedMailUserIdScript := A_AppDataCommon "\mobilmir.ru\_get_SharedMailUserId.cmd"
     
     If (FileExist(GetSharedMailUserIdScript))
-	MailUserId := ReadSetVarFromBatchFile(GetSharedMailUserIdScript, MailUserId)
+	MailUserId := ReadSetVarFromBatchFile(GetSharedMailUserIdScript, "MailUserId")
     
     If (!MailUserId && RegexMatch(A_ComputerName, "i)(.+)-[0-9k]"), m)
 	MailUserId := Format("{:Ls}", m1)
