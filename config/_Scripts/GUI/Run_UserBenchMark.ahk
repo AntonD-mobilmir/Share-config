@@ -4,10 +4,6 @@
 ;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-; Изменения:
-; 08.06.2015
-; 	[*] Ожидание простоя процессора теперь выполняется, пока 10 раз по секунде нагрузка не будет ниже 95% (до этого ожидался один 5-секундный период со средней нагрузкой меньше 90%, но этого оказалось недостаточно, очень часто после такого спада нагрузка резко возрастала)
-
 #NoEnv
 #InstallKeybdHook
 #InstallMouseHook

@@ -23,11 +23,12 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 (
     IF DEFINED script%num% (
-	SET "runscript=!script%num%!"
+	SET runscript="!script%num%!"
     ) ELSE SET "runscript=%num%"
 )
 (
     ENDLOCAL
-    "%runscript%"
+    %comspec% /C "%runscript%"
+    PAUSE
     EXIT /B
 )
