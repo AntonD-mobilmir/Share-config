@@ -1,8 +1,12 @@
 @(REM coding:OEM
 SETLOCAL ENABLEEXTENSIONS
 CALL "%~dp0_getGAMpath.cmd"
-SET "authpath=%GAMpath%\auth"
 SET "timeFNameSuffix=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%"
+)
+(
+IF EXIST "%~dp0auth" (
+    SET "authpath=%~dp0auth"
+) ELSE SET "authpath=%GAMpath%\auth"
 SET "origPtrPath=%GAMpath%\oauth2-origin.txt"
 )
 (
