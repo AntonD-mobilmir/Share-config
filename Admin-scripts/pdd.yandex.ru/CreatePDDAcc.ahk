@@ -9,7 +9,9 @@
 ;CreatePDDAcc.ahk <файл со списком учетных записей>
 ;
 ; формат файла со списком учетных записей:
-;login[@domain]	FirstName	LastName
+; login[@domain]	FirstName	LastName
+; ;комментарий
+; #комментарий
 ;
 ; Если домен не указан в строке, скрипт попытается использовать начало имени файла (до первого пробела) без расширения в качестве домена
 
@@ -23,6 +25,8 @@ If (FileExist(listpath)) {
     logPath = %listpath%.log
     Loop Read, %listpath%
     {
+	If (SubStr(LTrim(A_LoopReadLine),1,1) ~= "#|;") ; Если строка начинается с # или ;, это комментарий
+	    continue
 	If (RegExMatch(A_LoopReadLine, "^(?P<email>(?P<login>[^ @\t]+)(@(?P<domain>[^ \t]+))?)(\t((?P<FirstName>[^\t]+)\t(?P<LastName>[^\t]+)?)?(?P<leftovers>.*))?$", m)) {
 	    If (!mdomain) {
 		SplitPath listpath,,,,listNameNoExt
@@ -34,7 +38,7 @@ If (FileExist(listpath)) {
 	    }
 	    If acclist.HasKey(memail)
 		Throw Exception("Учетная запись указана повторно",, memail "`n" listpath " (" A_Index "):`n" A_LoopReadLine)
-	    acclist[memail] := {login: mlogin, domain: mdomain, FirstName: mFirstName, LastName: mLastName}
+	    acclist[memail] := {login: mlogin, domain: mdomain, FirstName: mFirstName, LastName: mLastName, comment: mleftovers}
 	} Else {
 	    Throw Exception("Не удалось разобрать строку",, listpath " (" A_Index "):`n" A_LoopReadLine)
 	}
@@ -75,6 +79,6 @@ If (FileExist(listpath)) {
 For accID, acc in acclist {
     If (!AddMailbox(acc.domain, acc.login, pass := GenPass(), acc.FirstName, acc.LastName, response))
 	FileAppend "<!>:", %logPath%
-    FileAppend % acc.login "@" acc.domain A_Tab pass A_Tab acc.FirstName A_Tab acc.LastName A_Tab response "`n", %A_ScriptName%.log
+    FileAppend % acc.login "@" acc.domain A_Tab pass A_Tab acc.FirstName A_Tab acc.LastName A_Tab acc.comment A_Tab response "`n", %logPath%
 }
 ExitApp
