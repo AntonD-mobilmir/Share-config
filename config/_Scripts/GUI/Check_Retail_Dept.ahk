@@ -437,21 +437,54 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     EnvSet Inst1S,1
 }
 
-AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
-RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,!ErrorLevel)
-If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 0))) {
-    ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
-    ;timecriacxcab -= instCriacxocx.mtime, Days
-    ;https://redbooth.com/a/#!/projects/59756/tasks/32400133
-    AddLog("Удаление " instCriacxocx.path, "regsvr32 /u")
-    RunWait % """" regsvr32exe """ /s /u """ instCriacxocx.path """",,Min UseErrorLevel
-    SetLastRowStatus("Удаление… | regsvr32 err: " regsvr32err := ErrorLevel)
-    FileDelete % instCriacxocx.path
-    SetLastRowStatus("ocx " (ErrorLevel ? "не " : "") "удалён! regsvr32 err: " regsvr32err, !ErrorLevel)
+tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
+tvPassChangeErr := RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
+Loop Read, %tvPassChangeLog%
+    SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
+
+;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
+;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
+;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
+;SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
+
+If (FileExist("c:\squid")) {
+    FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
+    AddLog("Удаление squid", mtimeSquidConf, 1)
     
-    RunFromConfigDir("_Scripts\cleanup\Apps\clean dealer.beeline.ru dir.ahk")
+    RunWait c:\squid\sbin\squid.exe -r, c:\squid\sbin, Min UseErrorLevel
+    If (ErrorLevel)
+	SetLastRowStatus("Ошибка " ErrorLevel " при удалении службы", 0)
+    Else {
+	SetLastRowStatus("Служба удалена")
+	FileRemoveDir c:\squid, 1
+	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
+	FileRemoveDir d:\squid, 1
+	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
+	If (squidFolderRmvErr)
+	    SetLastRowStatus("Папка осталась")
+	Else
+	    SetLastRowStatus("Папка удалена")
+    }
 }
+
+backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
+If (IsObject(backup_1S_baseTask)) {
+    AddLog("Задача резервного копирования 1С-Рарус", backup_1S_baseTask.mtime)
+    Loop 2
+    {
+	FileGetTime xmlmtime, %ShopBTS_InitialBaseDir%\Tasks\backup_1S_base.xml
+	xmlmtime -= % backup_1S_baseTask.mtime, Days
+	If (xmlmtime) {
+	    SetLastRowStatus("Обновление", 0)
+	    RunWait %comspec% /C "%ShopBTS_InitialBaseDir%\_shedule_backup1Sbase.cmd",,Min UseErrorLevel
+	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+	} Else {
+	    SetLastRowStatus()
+	    break
+	}
+    }
+}
+
 
 AddLog("Журналы скриптов обновления")
 suSettingsScript=%A_AppDataCommon%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
@@ -575,56 +608,24 @@ If (IsObject(instCriacxocx)) {
     AddLog("CRIACX.ocx","отсутствует",1)
 }
 
-tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
-tvPassChangeErr := RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
-Loop Read, %tvPassChangeLog%
-    SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
-
-;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
-;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
-;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
-;SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
-
-If (FileExist("c:\squid")) {
-    FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
-    AddLog("Удаление squid", mtimeSquidConf, 1)
-    
-    RunWait c:\squid\sbin\squid.exe -r, c:\squid\sbin, Min UseErrorLevel
-    If (ErrorLevel)
-	SetLastRowStatus("Ошибка " ErrorLevel " при удалении службы", 0)
-    Else {
-	SetLastRowStatus("Служба удалена")
-	FileRemoveDir c:\squid, 1
-	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
-	FileRemoveDir d:\squid, 1
-	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
-	If (squidFolderRmvErr)
-	    SetLastRowStatus("Папка осталась")
-	Else
-	    SetLastRowStatus("Папка удалена")
-    }
-}
-
-backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
-If (IsObject(backup_1S_baseTask)) {
-    AddLog("Задача резервного копирования 1С-Рарус", backup_1S_baseTask.mtime)
-    Loop 2
-    {
-	FileGetTime xmlmtime, %ShopBTS_InitialBaseDir%\Tasks\backup_1S_base.xml
-	xmlmtime -= % backup_1S_baseTask.mtime, Days
-	If (xmlmtime) {
-	    SetLastRowStatus("Обновление", 0)
-	    RunWait %comspec% /C "%ShopBTS_InitialBaseDir%\_shedule_backup1Sbase.cmd",,Min UseErrorLevel
-	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-	} Else {
-	    SetLastRowStatus()
-	    break
-	}
-    }
-}
-
 cleanupAdobeReadercmd=Soft\Office Text Publishing\PDF\Adobe Reader\RemoveUnneededAutorunAndServices.cmd
 RunScriptFromNewestDistDir(cleanupAdobeReadercmd, cleanupAdobeReadercmd, "Удаление лишней службы Adobe Reader")
+
+AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
+RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
+SetLastRowStatus(ErrorLevel,!ErrorLevel)
+If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 0))) {
+    ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
+    ;timecriacxcab -= instCriacxocx.mtime, Days
+    ;https://redbooth.com/a/#!/projects/59756/tasks/32400133
+    AddLog("Удаление " instCriacxocx.path, "regsvr32 /u")
+    RunWait % """" regsvr32exe """ /s /u """ instCriacxocx.path """",,Min UseErrorLevel
+    SetLastRowStatus("Удаление… | regsvr32 err: " regsvr32err := ErrorLevel)
+    FileDelete % instCriacxocx.path
+    SetLastRowStatus("ocx " (ErrorLevel ? "не " : "") "удалён! regsvr32 err: " regsvr32err, !ErrorLevel)
+    
+    RunFromConfigDir("_Scripts\cleanup\Apps\clean dealer.beeline.ru dir.ahk")
+}
 
 If (removeAppXPID)
     WaitProcessEnd(removeAppXPID, "Ожидание завершения скрипта удаления AppX")
