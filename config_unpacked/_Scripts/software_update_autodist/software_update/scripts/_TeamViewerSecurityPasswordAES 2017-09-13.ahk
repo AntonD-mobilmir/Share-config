@@ -15,18 +15,26 @@ Loop %0%
 {
     If (skipArgs--)
 	continue
-    arg1 := %A_Index%
-    If (arg = "/q" || arg = "/quiet" || arg = "/s" || arg = "/silent")
-	verbosity := 0
-    Else If (arg = "/warn")
-	verbosity := 1
-    Else If (arg = "/verbose")
-	verbosity := 2
-    Else If (arg = "/log") {
-	skipArgs := 1
-	logPathArgN := A_Index+1
-	logPath := %logPathArgN%
-    }
+    arg := %A_Index%
+    argFlag := SubStr(arg, 1,1)
+    If argFlag in /,-
+    {
+	swName := SubStr(arg, 2)
+	If swName in q,quiet,s,silent
+	    verbosity := 0
+	Else If (swName = "warn")
+	    verbosity := 1
+	Else If (swName = "verbose")
+	    verbosity := 2
+	Else If (swName = "log") {
+	    skipArgs := 1
+	    logPathargN := A_Index+1
+	    logPath := %logPathargN%
+	} Else
+	    Throw Exception("Неопознанная опция",,arg)
+    } Else
+	Throw Exception("Лишний параметр командной строки",,arg)
+    
 }
 
 If (!logPath) {
