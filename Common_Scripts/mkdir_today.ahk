@@ -10,30 +10,32 @@ If (A_WorkingDir==A_ScriptDir) {
     SetWorkingDir %dest%
 }
 
+argc=%0%
+opt := {}
+
 ;If var ; If var's contents are blank or 0, it is considered false. Otherwise, it is true.
-If %0%
+Loop %argc%  ; For each parameter:
 {
-    Loop %0%  ; For each parameter:
-    {
-	If ( SubStr(%A_Index%, 1, 1) == "/" ) {
-	    StringTrimLeft option, %A_Index%, 1
-	    SplitPos := InStr(option, "=")
-	    If SplitPos
-	    {
-		StringMid optvalue, option, % SplitPos+1
-		StringLeft option, option, % SplitPos-1
-	    } Else
-		optvalue=1
-	    opt_%option%=%optvalue%
-	} else {
-	    note .= %A_Index%
-	    If 0 > %A_Index%
-		note .= A_Space
-	}
+    If ( SubStr(%A_Index%, 1, 1) == "/" ) {
+	StringTrimLeft option, %A_Index%, 1
+	SplitPos := InStr(option, "=")
+	If SplitPos
+	{
+	    StringMid optvalue, option, % SplitPos+1
+	    StringLeft option, option, % SplitPos-1
+	} Else
+	    optvalue=1
+	opt[option]:=optvalue
+    } Else If (A_Index==1 && FileExist(%A_Index%)) {
+	SetWorkingDir % %A_Index%
+    } Else {
+	note .= %A_Index%
+	If 0 > %A_Index%
+	    note .= A_Space
     }
 }
 
-If ( !%0% Or opt_InputNote ) {
+If ( !argc || opt.InputNote ) {
     InputBox note, Комментарий, Комментарий к создаваемой папке.`n%opt_Prompt%
     If ErrorLevel
 	ExitApp
