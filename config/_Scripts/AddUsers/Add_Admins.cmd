@@ -59,7 +59,7 @@ EXIT /B
     IF DEFINED gpgUserID (
 	IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
 	IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
-	IF NOT DEFINED dirGPGout SET "dirGPGout=%TEMP%\%~n0.tmp"
+	IF NOT DEFINED dirGPGout SET "dirGPGout=%ProgramData%\mobilmir.ru\%~n0"
     )
 
     REM IF NOT DEFINED flag_p
@@ -79,7 +79,6 @@ EXIT /B
     IF NOT EXIST "%dirPlainOut%" MKDIR "%dirPlainOut%"
     IF NOT "%dirPlainOut:~0,2%"=="\\" %SystemRoot%\System32\cipher.exe /E "%dirPlainOut%"
     IF DEFINED gpgUserID (
-	RD /S /Q "%dirGPGout%" 2>NUL
 	MKDIR "%dirGPGout%"
 	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
 	SET gpgServerCopy="\\Srv0.office0.mobilmir\profiles$\Administrators\%NewUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
