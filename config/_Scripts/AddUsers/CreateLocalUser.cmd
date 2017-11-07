@@ -14,7 +14,8 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 (
     %SystemRoot%\System32\net.exe USER "%newUserName%" * /Add /FULLNAME:"%FullName%" /USERCOMMENT:"%Note%" || EXIT /B
     %SystemRoot%\System32\net.exe USER "%newUserName%" /LOGONPASSWORDCHG:NO
-    %SystemRoot%\System32\net.exe LOCALGROUP "Пользователи удаленного рабочего стола" "%USER%" /Add
+    %SystemRoot%\System32\net.exe LOCALGROUP "Пользователи удаленного рабочего стола" "%newUserName%" /Add
+    %SystemRoot%\System32\net.exe LOCALGROUP "Remote Desktop Users" "%newUserName%" /Add
 EXIT /B
 )
 
