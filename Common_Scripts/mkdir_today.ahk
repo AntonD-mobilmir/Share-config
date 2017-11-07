@@ -7,7 +7,6 @@ If (A_WorkingDir==A_ScriptDir) {
     FileSelectFolder dest,,3
     If ErrorLevel
 	Exit
-    SetWorkingDir %dest%
 }
 
 argc=%0%
@@ -26,12 +25,10 @@ Loop %argc%  ; For each parameter:
 	} Else
 	    optvalue=1
 	opt[option]:=optvalue
-    } Else If (A_Index==1 && FileExist(%A_Index%)) {
-	SetWorkingDir % %A_Index%
+    } Else If (A_Index==1 && InStr(%A_Index%, "\")) {
+	dest := %A_Index%
     } Else {
-	note .= %A_Index%
-	If 0 > %A_Index%
-	    note .= A_Space
+	note .= " " %A_Index%
     }
 }
 
@@ -41,13 +38,34 @@ If ( !argc || opt.InputNote ) {
 	ExitApp
 }
 
-If opt_YearSubdir
+If (opt.YearSubdir)
     FormatTime Today, , yyyy\yyyy-MM-dd
 Else
     FormatTime Today, , yyyy-MM-dd
-FileCreateDir %Today% %note%
-If opt_Clipboard
-    Clipboard = %A_WorkingDir%\%Today% %note%\
 
-If opt_ShowInFolder
+If (!dest)
+    dest := A_WorkingDir
+
+folderName := dest . (SubStr(dest, 0,1) == "\" ? "" : "\") . Today " " StripNonfilenameChars(Trim(note))
+
+If (opt["Clipboard"])
+    Clipboard = %folderName%
+
+FileCreateDir %folderName%
+If (ErrorLevel)
+    MsgBox Ошибка %A_LastError% при попытке создания папки "%folderName%"
+If (opt.ShowInFolder)
     Run explorer.exe /select`,"%Today% %note%"
+
+StripNonfilenameChars(ByRef c) {
+    n=
+    ;https://stackoverflow.com/a/31976060
+    Loop Parse, c,,<>:"/\|?*
+    {
+	If (Asc(A_LoopField) > 31)
+	    n .= A_LoopField
+	Else
+	    n .= "_"
+    }
+    return n
+}
