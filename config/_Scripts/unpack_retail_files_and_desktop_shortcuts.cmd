@@ -22,9 +22,6 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
     FOR %%I IN ("%~dp0..\Users\depts\?.7z") DO %exe7z% x -aoa -o"%%~nI:\" -- "%%~I"
     FOR /D %%I IN ("%~dp0..\Users\depts\?") DO IF EXIST "%%~nI:\*.*" XCOPY "%%~I\*.*" "%%~nI:\" /E /I /Q /G /H /R /K /O /Y /B /J
 
-    CALL "%~dp0ScriptUpdater_dist\InstallScriptUpdater.cmd" "D:\Local_Scripts\ScriptUpdater"
-    START "UpdateShortcuts.cmd" /MIN %comspec% /C "d:\Local_Scripts\UpdateShortcuts.cmd"
-
     ECHO N|%SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­" /Delete
     %SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public" /GRANT:"Everyone,CHANGE"
     %SystemRoot%\System32\net.exe SHARE "Ž¡¬¥­=d:\Users\Public" /GRANT:"‚á¥,CHANGE"
@@ -56,6 +53,7 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 	FOR %%A IN ("D:\dealer.beeline.ru\bin\criacx.cab") DO SET "criacxcabTime=%%~tA"
 	CALL :PostForm
     )
+    CALL "%~dp0ScriptUpdater_dist\InstallScriptUpdater.cmd" "D:\Local_Scripts\ScriptUpdater" && START "UpdateShortcuts.cmd" /MIN %comspec% /C "d:\Local_Scripts\UpdateShortcuts.cmd"
     EXIT /B
 )
 :PostForm
