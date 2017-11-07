@@ -58,15 +58,19 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     rem %SystemRoot%\System32\fltmc.exe >nul 2>&1 || IF ERRORLEVEL 1 - not admin
     
     IF NOT EXIST "%dirExportOpenKey%" MKDIR "%dirExportOpenKey%"
-    
     IF NOT EXIST "%GNUPGHOME%" MKDIR "%GNUPGHOME%"
     XCOPY "%~dpn0" "%GNUPGHOME%" /E /I /G /H /K /Y /B
 
-rem https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
-rem     ECHO Passphrase:
-rem gpg: -:8: missing argument
-rem  --pinentry-mode loopback
-rem  does not work with gpg2.2+ https://bbs.archlinux.org/viewtopic.php?id=208059
+    rem https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
+    rem     ECHO Passphrase:
+    rem gpg: -:8: missing argument
+    rem  --pinentry-mode loopback
+    rem  does not work with gpg2.2+ https://bbs.archlinux.org/viewtopic.php?id=208059
+)
+(
+    ECHO %DATE% %TIME% Staring GPG key generation
+    %comspec% /C "ECHO %DATE% %TIME% Staring GPG key generation>"%dirExportOpenKey%%MailUserId%@%MailDomain%.gen.log"" || EXIT /B
+    IF NOT EXIST "%dirExportOpenKey%%MailUserId%@%MailDomain%.gen.log" EXIT /B 2
 )
 @CHCP 65001 >NUL & (
     ECHO %%no-protection
