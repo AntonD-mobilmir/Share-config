@@ -24,7 +24,7 @@ IF NOT DEFINED LOCALAPPDATA SET "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
 (
 %exe7z% x -aoa -o"%LOCALAPPDATA%\Programs\SysUtils" -- "%SoftSourceDir%\PreInstalled\auto\SysUtils\SysUtils_ConEssentials.7z"
 %exe7z% x -aoa -o"%LOCALAPPDATA%\Programs\SysUtils" -- "%SoftSourceDir%\PreInstalled\auto\SysUtils\SysUtils_GPG.7z"
-%SystemRoot%\System32\icacls.exe "%LOCALAPPDATA%\Programs\SysUtils" /grant "*S-1-1-0:(IO)(CI)RX"
+%SystemRoot%\System32\icacls.exe "%LOCALAPPDATA%\Programs\SysUtils" /grant "*S-1-1-0:(OI)(CI)RX"
 
 REM findExeTestExecutionOptions and pathAppendSubpath should have stayed defined from findgpgexe call
 CALL "%~dp0find_exe.cmd" gpgexe "%LOCALAPPDATA%\Programs\SysUtils\gnupg\gpg.exe" "%LOCALAPPDATA%\Programs\SysUtils\gnupg\bin\gpg.exe" "%LOCALAPPDATA%\Programs\SysUtils\gnupg\pub\gpg.exe"
