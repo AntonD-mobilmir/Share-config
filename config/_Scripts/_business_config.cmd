@@ -4,9 +4,6 @@ ECHO %DATE% %TIME% Running %0
 START "Collecting inventory information" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 IF NOT DEFINED AutoHotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 
-rem Disable IE 11 upgrade due to Megafon SBMS incompatibility
-rem REG ADD "HKLM\SOFTWARE\Microsoft\Internet Explorer\Setup\11.0" /v DoNotAllowIE11 /t REG_DWORD /d 1 /f
-CALL "%~dp0DoNotAllowIE11 Install via Windows Update.cmd"
 SET "dismLockFile=%TEMP%\WindowsComponentsSetup.lock"
 )
 (
