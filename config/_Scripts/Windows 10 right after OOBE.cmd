@@ -7,9 +7,7 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
 CALL "%~dp0\Security\AppLocker - Deny promoted apps (Win10).cmd"
-CALL "%~dp0\cleanup\AppX\Remove All AppX Apps for current user.cmd"
-CALL "%~dp0\cleanup\AppX\Remove AppX Apps except allowed.cmd"
-
-CALL "%~dp0FindAutoHotkeyExe.cmd"
+CALL "%~dp0\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon
+CALL "%~dp0\cleanup\AppX\Remove AppX Apps except allowed.cmd" /quiet
+CALL "%~dp0FindAutoHotkeyExe.cmd" "%~dp0cleanup\uninstall\050 OneDrive.ahk"
 )
-%AutohotkeyExe% "%~dp0cleanup\uninstall\050 OneDrive.ahk"

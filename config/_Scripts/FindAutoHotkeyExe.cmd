@@ -4,18 +4,22 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "AutohotkeyExe="
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :CheckAutohotkeyExe %%I
     rem continuing if AutoHotkeyScript type isn't defined or specified path points to incorect location
-    IF NOT DEFINED AutohotkeyExe (
-	(CALL :CheckAutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" || CALL :CheckAutohotkeyExe "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe" || CALL :tryutilsdir) && EXIT /B
-	
-	REM without these options, autohotkey.exe starts AutoHotkey.ahk, opens help or says
-	rem 	Script file not found:
-	rem 	D:\Users\*\Documents\AutoHotkey.ahk
-	SET "findExeTestExecutionOptions=/ErrorStdOut ."
-	CALL "%~dp0find_exe.cmd" AutohotkeyExe AutoHotkey.exe
-	REM explicit backup not needed in same parethensis scope
-	SET "findExeTestExecutionOptions=%findExeTestExecutionOptions%"
-    )
+    IF NOT DEFINED AutohotkeyExe CALL :FindAutohotkeyExeViaFindExe
+    IF NOT "%~1"=="" IF DEFINED AutohotkeyExe GOTO :RunAhkScript
 EXIT /B
+)
+:FindAutohotkeyExeViaFindExe
+(
+    (CALL :CheckAutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" || CALL :CheckAutohotkeyExe "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe" || CALL :tryutilsdir) && EXIT /B
+    
+    REM without these options, autohotkey.exe starts AutoHotkey.ahk, opens help or says
+    rem 	Script file not found:
+    rem 	D:\Users\*\Documents\AutoHotkey.ahk
+    SET "findExeTestExecutionOptions=/ErrorStdOut ."
+    CALL "%~dp0find_exe.cmd" AutohotkeyExe AutoHotkey.exe
+    REM explicit backup not needed in same parethensis scope
+    SET "findExeTestExecutionOptions=%findExeTestExecutionOptions%"
+    EXIT /B
 )
 :CheckAutohotkeyExe <path>
 (
@@ -28,4 +32,9 @@ EXIT /B
 (
     CALL :CheckAutohotkeyExe "%utilsdir%AutoHotkey.exe"
 EXIT /B
+)
+:RunAhkScript
+(
+    %AutohotkeyExe% %*
+    EXIT /B
 )
