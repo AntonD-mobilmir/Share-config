@@ -37,6 +37,7 @@ BOOTNXT
 config.sys
 swapfile.sys
 hiberfil.sys
+bootTel.dat
 
 )
 
