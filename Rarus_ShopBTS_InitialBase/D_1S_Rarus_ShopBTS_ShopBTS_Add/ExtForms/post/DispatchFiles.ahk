@@ -117,9 +117,10 @@ DispatchSingleFile(pathFileToSend) {
 	MsgBox 5, Отправка выгрузок и уведомлений Рарус не работает, Не настроена отправка выгрзок по почте.`nПожалуйста`, сообщите об этом технической поддержке!`n`nЕсли подключть VPN`, выгрузки будут автоматически перемещены на сервер.
 	ExitApp
     }
+    FileAppend %A_Now% %trayMsgText%…`t, %logfile%
     SetupTemp()
     killedSendEmail := pidSendEmail := 0
-    SetTimer killSendEmail, % -60000 * 10
+    SetTimer killSendEmail, % -600000
     sendemailerr=
     RunWait %sendemailexe% -f "%emailUserName%" -t "gl@k.mobilmir.ru" -u "%encSubj%" -s "smtp.k.mobilmir.ru:587" -xu "%emailUserName%" -xp "%emailPassword%" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -m "%EmailBody%" -a "%pathFileToSend%",%A_Temp%,Hide UseErrorLevel, pidSendEmail
     sendemailerr := ErrorLevel
@@ -127,8 +128,10 @@ DispatchSingleFile(pathFileToSend) {
     If (sendemailerr || killedSendEmail) {
 	CheckTrayIcon(trayMsgText "`n" note " (""" nameExtToSend """) неудачна", "Ошибка при попытке отправки выгрузки", 30, 0x23)
 	If (killedSendEmail) {
+	    FileAppend sendemail.exe завершен по таймауту`n, %logfile%
 	    ReturnError:=-1
 	} Else {
+	    FileAppend sendemail.exe завершен с ошибкой %sendemailerr%`n, %logfile%
 	    ReturnError:=sendemailerr
 	}
 	FileRemoveDir %A_Temp%\perl, 1
@@ -144,6 +147,7 @@ DispatchSingleFile(pathFileToSend) {
 }
 
 DeliverOneEmail(EmailFileName) {
+    global killedSendEmail, pidSendEmail
     ;файлы в текстовом (CP1251) виде следующего формата:
     ;Любая строка до заголовка, начинающаяся с "Reply-To: " – обратный адрес
     ;первая строчка без названия заголовка - кому, можно несколько через запятую; кавычки, если есть, должны быть парными
@@ -171,7 +175,7 @@ DeliverOneEmail(EmailFileName) {
     If (!(smtpServer && smtpLogin && smtpPassword))
 	Throw Exception("Отправка уведомлений из 1С-Рарус не работает, немедленно свяжитесь со службой ИТ!", "Из файла DispatchFiles-NotificationsAccount.pwd не прочитались сервер или реквизиты учётной записи")
     
-    replyToHeader = -o "replies@rarus.robots.mobilmir.ru"
+    replyToHeader = -o reply-to="replies@rarus.robots.mobilmir.ru"
     bccHeader=-bcc "rarus-emails-bcc2_status-mobilmir-ru@googlegroups.com"
 	
     tempDir := SetupTemp()
@@ -225,15 +229,32 @@ DeliverOneEmail(EmailFileName) {
     fBody.Close()
     
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Отправка письма")
+    FileAppend %A_Now% Отправка письма "%plainSubj%" на %addrlistTo%…, %logfile%
     tempDir := SetupTemp()
-    RunWait %sendemailexe% -o message-file="%bodyFName%" -f "%encodedFrom%" -t "%addrlistTo%" %replyToHeader% -u "%encSubj%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 %bccHeader% -l "%logfile%" %Attachments%,,Hide UseErrorLevel
+    killedSendEmail := pidSendEmail := 0
+    SetTimer killSendEmail, % -600000
+    sendemailerr=
+    RunWait %sendemailexe% -o message-file="%bodyFName%" -f "%encodedFrom%" -t "%addrlistTo%" %replyToHeader% -u "%encSubj%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 %bccHeader% -l "%logfile%" %Attachments%,,Hide UseErrorLevel, pidSendEmail
     If (sendemailErr := ErrorLevel)
 	sendemailLastErr := A_LastError
+    SetTimer killSendEmail, Off
     FileDelete %bodyFName%
     
-    If (sendemailErr) {
+    If (sendemailerr || killedSendEmail) {
 	CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo "`nОшибка: " sendemailErr " / " sendemailLastErr, "Ошибка при отправке", 30, 0x23)
-	return sendemailErr
+
+	If (killedSendEmail) {
+	    FileAppend sendemail.exe завершен по таймауту`n, %logfile%
+	    ReturnError:=-1
+	} Else {
+	    FileAppend sendemail.exe завершен с ошибкой %sendemailerr%`n, %logfile%
+	    ReturnError:=sendemailerr
+	}
+	FileRemoveDir %A_Temp%\perl, 1
+	Loop Files, %A_Temp%\pdk*, D
+	    FileRemoveDir %A_LoopFileFullPath%, 1
+
+	return ReturnError
     }
     
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Письмо отправлено", 5, 0x31)
