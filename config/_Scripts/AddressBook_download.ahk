@@ -5,12 +5,18 @@
 #SingleInstance force
 FileEncoding UTF-8
 
+EnvGet LocalAppData,LOCALAPPDATA
+
 argv=%1%
 If (argv="/debug")
     debug=1
-FileReadLine ScriptUpdaterDir, %A_AppDataCommon%\mobilmir.ru\ScriptUpdaterDir.txt, 1
+For i,basedir in [A_AppDataCommon, LocalAppData]
+    If (FileExist(pathScriptUpdaterDirtxt := basedir "\mobilmir.ru\ScriptUpdaterDir.txt")) {
+	FileReadLine ScriptUpdaterDir, %pathScriptUpdaterDirtxt%, 1
+	break
+    }
 If (!ScriptUpdaterDir)
-    Throw Exception("ScriptUpdater не найден",, A_AppDataCommon "\mobilmir.ru\ScriptUpdaterDir.txt")
+    Throw Exception("ScriptUpdater не найден",, pathScriptUpdaterDirtxt)
 
 FileReadLine abDir, %A_AppDataCommon%\mobilmir.ru\addressbookdir.txt, 1
 
