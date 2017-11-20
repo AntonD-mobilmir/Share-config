@@ -17,8 +17,22 @@ AhkParm=
 If (!RunInteractiveInstalls)
     AhkParm=/ErrorStdOut
 
-DistributiveMask=%A_ScriptDir%\LibreOffice_*_Win_x86.msi
-HelpDistrMask=%A_ScriptDir%\LibreOffice_*_Win_x86_helppack_ru.msi
+If (A_Is64bitOS)
+    distsToTry := [["64", "64-bit"]] ; [distSuffix, distSubdir]
+Else
+    distsToTry := []
+
+distsToTry.Push(["86", "32-bit"], [])
+
+For i, distToTry in distsToTry {
+    distDir := FirstExisting(A_ScriptDir "\" distToTry[2], A_ScriptDir)
+    HelpDistrMask := distDir "\LibreOffice_*_Win_x" distToTry[1] "_helppack_ru.msi"
+    If (FileExist(DistributiveMask := distDir "\LibreOffice_*_Win_x" distToTry[1] ".msi"))
+	break
+}
+
+If (!DistributiveMask)
+    Throw Exception("Дистрибутив не найден")
 
 EnvGet LogPath,logmsi
 
@@ -49,14 +63,14 @@ TrayTip %textTrayTip%, Running Check and close running soffice.bin.ahk
 RunWait %A_AhkPath% /ErrorStdOut "%A_ScriptDir%\Check and close running soffice.bin.ahk"
 TrayTip
 
-TrayTip %textTrayTip%, Main MSI
+TrayTip %textTrayTip%, Main MSI (Distributive)
 ErrorsOccured := ErrorsOccured || InstallMSI(Distributive, QuietInstall . " COMPANYNAME=""группа компаний Цифроград"" ISCHECKFORPRODUCTUPDATE=0 REGISTER_ALL_MSO_TYPES=1 ADDLOCAL=ALL REMOVE=" . Remove . " AgreeToLicense=Yes")
 FileSetAttrib +H, %A_DesktopCommon%\LibreOffice *
 
 If (!ErrorsOccured) {
     If HelpDistr
     {
-	TrayTip %textTrayTip%, Offline Help MSI
+	TrayTip %textTrayTip%, Offline Help MSI (HelpDistr)
 	ErrorsOccured := ErrorsOccured || InstallMSI(HelpDistr, QuietInstall)
     }
     IfExist Install_Extensions.ahk
@@ -124,4 +138,12 @@ ReadListFromFile(filename) {
 	out .= "," . Trim(A_LoopReadLine," `t`n`r")
     }
     return SubStr(out, 2) ; skipping first comma
+}
+
+FirstExisting(paths*) {
+    for index,path in paths
+	If (FileExist(path))
+	    return path
+    
+    return
 }
