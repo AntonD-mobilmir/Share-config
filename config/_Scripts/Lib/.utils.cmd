@@ -114,3 +114,21 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" EXIT /B 0
 IF DEFINED PROCESSOR_ARCHITEW6432 EXIT /B 0
 EXIT /B 1
 )
+:strlen <resultVar> <stringVar>
+(   
+    rem https://stackoverflow.com/a/5841587
+    setlocal EnableDelayedExpansion
+    set "s=!%~2!#"
+    set "len=0"
+    for %%P in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
+        if "!s:~%%P,1!" NEQ "" ( 
+            set /a "len+=%%P"
+            set "s=!s:~%%P!"
+        )
+    )
+)
+( 
+    endlocal
+    set "%~1=%len%"
+    exit /b
+)
