@@ -539,15 +539,14 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
-If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) {
-    If (SubStr(Distributives, 1, 2) != "\\" && FileExist(Distributives "\rSync_DistributivesFromSrv0.cmd") && FileExist(Distributives "\Soft\PreInstalled\auto\SysUtils\*")) {
-	AddLog("rSync_DistributivesFromSrv0.cmd PreInstalled")
-	RunWait %comspec% /C ""%Distributives%\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
-	SetLastRowStatus(ErrorLevel, !ErrorLevel)
-    }
-    ;				  distSubpath, 				  scriptSubpath,					  title:="",	 flagMask:="",				    loopOptn:="")
-    RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
+If (SubStr(Distributives, 1, 2) != "\\" && FileExist(Distributives "\Soft\PreInstalled\auto\SysUtils\*.7z")) {
+    AddLog("rSync_DistributivesFromSrv0.cmd PreInstalled")
+    RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
+    SetLastRowStatus(ErrorLevel, !ErrorLevel)
 }
+If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts)))
+    RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
+    ;				  distSubpath, 				  scriptSubpath,					  title:="",	 flagMask:="",				    loopOptn:="")
 ;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
 
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
@@ -952,10 +951,8 @@ TimeFormat(ByRef time) {
 
 FirstExisting(paths*) {
     for index,path in paths
-    {
-	IfExist %path%
+	If (FileExist(path))
 	    return path
-    }
     
     return
 }
