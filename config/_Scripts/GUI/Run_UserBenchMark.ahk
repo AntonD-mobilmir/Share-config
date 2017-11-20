@@ -312,7 +312,7 @@ ParsePerfResults(txt) {
 	results.SSDModel := ssd1
     }
     
-    If (results.CPU && (results.HDD || results.SSD) )
+    If (results.CPU) ; бывает, HDD не поддается тестированию: http://www.userbenchmark.com/UserRun/5849147 -- && (results.HDD || results.SSD)
 	return results
     Else
 	return
