@@ -93,7 +93,7 @@ IF NOT "%runcmd:~262,1%"=="" (
 
     IF DEFINED MailUserId IF DEFINED MailDomain IF NOT EXIST "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" (
 	ECHO Файла "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" не существует.
-	ECHO ScriptUpdater установлен, но, пока адресная книга не загружена с открытым ключом для этого компьютера, обновление адресной книги работать не будет!
+	ECHO ScriptUpdater установлен, но, пока адресная книга, зашифрованная открытым ключом для этого компьютера, не выгружена в Dropbox, на этом компьютере она не расшифруется.
 	SET KeyNotFound="Файл не найден: \\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc"
     )
 )
