@@ -10,4 +10,12 @@ CALL "%~dp0\Security\AppLocker - Deny promoted apps (Win10).cmd"
 CALL "%~dp0\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon
 CALL "%~dp0\cleanup\AppX\Remove AppX Apps except allowed.cmd" /quiet
 CALL "%~dp0FindAutoHotkeyExe.cmd" "%~dp0cleanup\uninstall\050 OneDrive.ahk"
+
+CALL "%~dp0find7zexe.cmd"
+SET "xtmp=%TEMP%\%~n0"
+)
+(
+%exe7z% x -o"%xtmp%" "%~dp0..\Users\Default\AppData\Local\DefaultUserRegistrySettings.7z"
+FOR %%A IN ("%xtmp%\*.reg") DO REG IMPORT "%%~A"
+RD /S /Q "%xtmp%"
 )
