@@ -1,21 +1,23 @@
-@REM coding:OEM
-@ECHO OFF
-REM                                              by logicdaemon@gmail.com
-REM                                                        logicdaemon.ru
-REM
-REM This work by LogicDaemon is licensed under a Creative Commons Attribution 3.0 Unported License.
-REM http://creativecommons.org/licenses/by/3.0/
+@(REM coding:CP866
+REM by LogicDaemon <www.logicdaemon.ru>
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
+IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
 IF "%~1"=="" GOTO :help
-
+)
 :nextarg
-SET checksumsRoot=%~dp1
-FOR /R %%I IN (%1) DO CALL :WriteSums "%%~I"
-SHIFT
-IF NOT "%~1"=="" GOTO :nextarg
-
+(
+    SET "checksumsRoot=%~dp1"
+    FOR /R %%I IN ("%~1") DO CALL :WriteSums "%%~I"
+    IF NOT "%~2"=="" (
+	SHIFT
+	GOTO :nextarg
+    )
 EXIT /B
+)
 
 :WriteSums <filepath>
 (
@@ -24,10 +26,10 @@ EXIT /B
     IF "%~nx1"=="checksums.sha256" EXIT /B
 
     ECHO Writing checksums for %~nx1
-    SET TargetFileName=%~nx1
-    CALL :RunInParralel md5 c:\SysUtils\gnupg\md5sum.exe %*
-    CALL :RunInParralel sha1 c:\SysUtils\gnupg\sha1sum.exe %*
-    CALL :RunInParralel sha256 c:\SysUtils\gnupg\sha256sum.exe %*
+    SET "TargetFileName=%~nx1"
+    CALL :RunInParralel md5 %SystemDrive%\SysUtils\md5sum.exe %*
+    CALL :RunInParralel sha1 %SystemDrive%\SysUtils\sha1sum.exe %*
+    CALL :RunInParralel sha256 %SystemDrive%\SysUtils\sha256sum.exe %*
 )
 :wait
 (
@@ -36,7 +38,6 @@ EXIT /B
     ENDLOCAL
 )
 EXIT /B
-
 :RunInParralel <hash_name> <hash_executable> <params>
 (
     SETLOCAL
@@ -59,11 +60,13 @@ EXIT /B
     SET "runningflag_%hash_name%=%runningflag%"
 )
 EXIT /B
-
 :help
+(
     ECHO help to be written
 EXIT /B
-
+)
 :appendparams
-    SET params=%params% %*
+(
+    SET "params=%params% %*"
 EXIT /B
+)
