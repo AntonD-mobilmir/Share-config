@@ -27,23 +27,10 @@ If (MailUserId) {
     MailUserId := A_UserName
     If (!destPath)
 	destPath = %UserProfile%\Mail\Thunderbird\profile
-
-    ;https://autohotkey.com/board/topic/60968-wmi-tasks-com-with-ahk-l/
-    strComputer:="."
-    objWMIService := ComObjGet("winmgmts:{impersonationLevel=impersonate}!\\" . strComputer . "\root\cimv2")
-    ;For o in objWMIService.ExecQuery("Select Model,InterfaceType,SerialNumber From Win32_DiskDrive where InterfaceType<>'USB'")
-	;MsgBox % o.Model
-    For o in objWMIService.ExecQuery("Select FullName From Win32_UserAccount where Name='" A_UserName "'")
-	userFIO := o.FullName
-    objWMIService :=
     
-    If (userFIO) {
-	StringSplit sFIOpt, userFIO, %A_Space%
-	If (sFIOpt0 == 3) ; Фамилия Имя Отчество
-	    fullName = %sFIOpt2% %sFIOpt1%
-	Else
-	    fullName = (не удалось разобрать: %userFIO%)
-    }
+    fullName := WMIGetUserFullname(3)
+    If (!fullName)
+	fullName = (не удалось разобрать: %userFIO%)
 }
 
 Gui -Resize -MaximizeBox  

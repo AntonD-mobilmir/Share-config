@@ -104,6 +104,8 @@ If (!skipCreatingProfile) {
 		prefsjs .= "`n" . appendprefsjs
 	    }
 	}
+    } Else {
+	mailFullName := WMIGetUserFullname()
     }
     
     ;prefsjs := RegExReplace(prefsjs, "\{\$\w+\$\}", )
