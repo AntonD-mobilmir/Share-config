@@ -89,9 +89,12 @@ Loop
 		FileAppend %item%`n,%A_Temp%\excessFilesList.txt
 	    
 	    RunWait %comspec% /K "ECHO Чтобы удалить оставшиеся файлы и папки`, введите EXIT 222. При другом коде возврата будет выполнена повторная проверка.&ECHO Список обнаруженных файлов записан в "`%TEMP`%\excessFilesList.txt"", A_Temp
-	    If (ErrorLevel!=222)
+	    If (ErrorLevel==222) {
+		dest:=""
+	    } Else {
+		done:=0
 		continue
-	    dest:=""
+	    }
 	}
 	
 	; Перемещение или удаление
