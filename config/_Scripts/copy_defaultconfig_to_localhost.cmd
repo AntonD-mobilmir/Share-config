@@ -77,6 +77,7 @@ EXIT /B
     SET "srcConfigDir=%~dp1"
 )
 (	
+    IF /I "%srcConfigDir:~1,9%"=="%windir:~1,9%" ECHO  & PAUSE & EXIT /B
     SET "srcConfigDir=%srcConfigDir:~0,-1%"
 EXIT /B
 )
