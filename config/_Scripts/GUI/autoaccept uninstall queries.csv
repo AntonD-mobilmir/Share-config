@@ -1,63 +1,67 @@
-﻿;Заголовок окна,Текст в окне,Кнопка1,Кнопка2,…,,,,
+﻿;Заголовок окна,Текст в окне,Кнопка1,Кнопка2,…
 ahk_class #32770,Click Yes to restart,No,Н&ет
 ahk_class #32770,You must restart system,No,Н&ет
 ahk_class #32770,You must restart your system,No,Н&ет
-InstallShield Wizard$ ahk_class #32770,"No, I will restart my computer later.","No, I will restart my computer later.",Finish,,,,,
-InstallShield Wizard$ ahk_class #32770,Finish,"No, I will restart my computer later.",Finish,,,,,
-^Программа InstallShield Wizard заверш.+,,Нет,Готово,,,,,
-ahk_class #32770,.+ был успешно удален с компьютера\.,ОК,Готово,,,,,
-ahk_class #32770,.+ был успешно удалено с компьтюера\.,Готово,,,,,,
-Удаление ahk_class #32770,Приложение .+ удалено.,ОК,,,,,,
-Удаление ahk_class #32770,Удалить приложение,&Да,,,,,,
-Удаление программы .+ - Сохранить персональные настройки? ahk_class #32770,"Нажмите кнопку ""Да"", чтобы сохранить выбранные параметры и предпочтения, если хотите установить .+ позже. Нажмите кнопку ""Нет"", чтобы удалить их.",&Нет,,,,,,
-Question ahk_class #32770,Would you like to keep,&Нет,&No,,,,,
-ahk_class #32770,Сохранить ваши личные настройки для,Нет,,,,,,
-ASUS ahk_class #32770,Do you want keep settings,&No,,,,,,
-ahk_class #32770,^Do &not close applications. \(A Reboot may be required.\),Do &not close applications. \(A Reboot may be required.\),OK,,,,,
-Удаление,Завершение работы мастера удаления,&Готово,,,,,,
-^Acer Backup Manager$ ahk_class #32770,Вы хотите удалить файлы задания?,&Да,,,,,,
-^Беспроводной адапте,^Файл,ОК,,,,,,
-^Atheros Client Installation Program$,^Программ,Готово,,,,,,
-^Мастер удаления драйвера устройства$,&ОК,&ОК,,,,,,
-^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,П&ерезапустить позже,П&ерезапустить позже,,,,,,
-^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Удалить одну или несколько программ Windows Live,Удалить одну или несколько программ Windows Live,,,,,,
-^Удаление Adobe Shockwave Player ahk_class #32770,Закрыть,Закрыть,,,,,,
-^Удаление Adobe Flash Player ahk_class AdobeFlashPlayerInstaller,УСТАНОВКА,УСТАНОВКА,,,,,,
-^Установка Adobe AIR$ ahk_class ApolloRuntimeContentWindow,,X159 Y177,,,,,,
-InstallShield Wizard$ ahk_class #32770,YES: All data and settings will be removed with application.,YES: All data and settings will be removed with application.,Next >,,,,,
- - InstallShield Wizard$,Готово,Нет,Готово,,,,,
-Windows Live ahk_class LiveDialog,&Продолжить,&Удалить,&Продолжить,,,,,
-Windows Live ahk_class LiveDialog,Готово,&Закрыть,,,,,,
+InstallShield Wizard$ ahk_class #32770,"No, I will restart my computer later.","No, I will restart my computer later.",Finish
+InstallShield Wizard$ ahk_class #32770,Finish,"No, I will restart my computer later.",Finish
+^Программа InstallShield Wizard заверш.+,,Нет,Готово
+ahk_class #32770,.+ был успешно удален с компьютера\.,ОК,Готово
+ahk_class #32770,.+ был успешно удалено с компьтюера\.,Готово
+Удаление ahk_class #32770,Приложение .+ удалено.,ОК
+Удаление ahk_class #32770,Удалить приложение,&Да
+Удаление программы .+ - Сохранить персональные настройки? ahk_class #32770,"Нажмите кнопку ""Да"", чтобы сохранить выбранные параметры и предпочтения, если хотите установить .+ позже. Нажмите кнопку ""Нет"", чтобы удалить их.",&Нет
+Question ahk_class #32770,Would you like to keep,&Нет,&No
+ahk_class #32770,Сохранить ваши личные настройки для,Нет
+ASUS ahk_class #32770,Do you want keep settings,&No
+ahk_class #32770,^Do &not close applications. \(A Reboot may be required.\),Do &not close applications. \(A Reboot may be required.\),OK
+Удаление,Завершение работы мастера удаления,&Готово
+^Acer Backup Manager$ ahk_class #32770,Вы хотите удалить файлы задания?,&Да
+^Беспроводной адапте,^Файл,ОК
+^Atheros Client Installation Program$,^Программ,Готово
+^Мастер удаления драйвера устройства$,&ОК,&ОК
+^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,П&ерезапустить позже,П&ерезапустить позже
+^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Удалить одну или несколько программ Windows Live,Удалить одну или несколько программ Windows Live
+^Удаление Adobe Shockwave Player ahk_class #32770,Закрыть,Закрыть
+^Удаление Adobe Flash Player ahk_class AdobeFlashPlayerInstaller,УСТАНОВКА,УСТАНОВКА
+^Установка Adobe AIR$ ahk_class ApolloRuntimeContentWindow,,X159 Y177
+InstallShield Wizard$ ahk_class #32770,YES: All data and settings will be removed with application.,YES: All data and settings will be removed with application.,Next >
+ - InstallShield Wizard$,Готово,Нет,Готово
+Windows Live ahk_class LiveDialog,&Продолжить,&Удалить,&Продолжить
+Windows Live ahk_class LiveDialog,Готово,&Закрыть
 InstallShield Wizard$ ahk_class #32770,"Do you want to completely remove the selected application and all of its features?",Yes,Да
-", Do you want to completely remove",Do you want to completely remove,Remove,&Да,,,,,
-", Removal completed successfully.",Removal completed successfully.,Finish,,,,,,
-Question ahk_class #32770,This will remove ,&Да,,,,,,
-ahk_class #32770,Эта процедура удалит,&Да,,,,,,
-Uninstall Program for ahk_class #32770,Next,Button2,,,,,,
-Установщик Windows ahk_class #32770,Д&а,Д&а,,,,,,
-Удаление программ на вашем компьютере ahk_class #32770,OK,OK,,,,,,
-Подтвердите удаление файла ahk_class #32770,&Да,&Да,,,,,,
-^Подтверждение удаления файла$,,ОК,,,,,,
-,Удалить выбранное приложение и все его компоненты?,&Да,,,,,,
-Удаление ahk_class #32770,&Далее >,&Далее >,,,,,,
-Удаление ahk_class obj_Form,Удалить,obj_BUTTON2,,,,,,
-Удаление ahk_class #32770,Уд&алить,Уд&алить,,,,,,
-Деинсталляция ahk_class #32770,ОК,ОК,,,,,,
-Деинсталляция ahk_class #32770,&Да,&Да,,,,,,
-Uninstall ahk_class #32770,&Uninstall,&Uninstall,,,,,,
-Uninstall ahk_class #32770,Да,Да,,,,,,
-Uninstall ahk_class #32770,Finish,Finish,,,,,,
-Uninstall ahk_class #32770,ОК,ОК,; Russian letters,,,,,
-Uninstall ahk_class #32770,OK,OK,; English letters,,,,,
-Uninstall ahk_class #32770,Close,Close,,,,,,
-Удаление ahk_class #32770,Закрыть,Закрыть,,,,,,
+", Do you want to completely remove",Do you want to completely remove,Remove,&Да
+", Removal completed successfully.",Removal completed successfully.,Finish
+Question ahk_class #32770,This will remove ,&Да
+ahk_class #32770,Эта процедура удалит,&Да
+Uninstall Program for ahk_class #32770,Next,Button2
+Установщик Windows ahk_class #32770,Д&а,Д&а
+Удаление программ на вашем компьютере ahk_class #32770,OK,OK
+Подтвердите удаление файла ahk_class #32770,&Да,&Да
+^Подтверждение удаления файла$,,ОК
+,Удалить выбранное приложение и все его компоненты?,&Да
+Удаление ahk_class #32770,&Далее >,&Далее >
+Удаление ahk_class obj_Form,Удалить,obj_BUTTON2
+Удаление ahk_class #32770,Уд&алить,Уд&алить
+Деинсталляция ahk_class #32770,ОК,ОК
+Деинсталляция ahk_class #32770,&Да,&Да
+Uninstall ahk_class #32770,&Uninstall,&Uninstall
+Uninstall ahk_class #32770,Да,Да
+Uninstall ahk_class #32770,Finish,Finish
+Uninstall ahk_class #32770,ОК,ОК,; Russian letters
+Uninstall ahk_class #32770,OK,OK,; English letters
+Uninstall ahk_class #32770,Close,Close
+Удаление ahk_class #32770,Закрыть,Закрыть
 ^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Выбор программ для удаления,X38 Y215,X38 Y256,X38 Y295,X326 Y215,X326 Y256,X326 Y295,&Удалить
-Windows Live ahk_class LiveDialog,Выбор программ для удаления,X58 Y173,X58 Y197,X58 Y224,X58 Y249,X58 Y272,&Продолжить,
-HP ePrint - HP ePrint SW ahk_class WixStdBA,&Удалить,&Удалить,,,,,,
-ahk_exe McUICnt.exe,,X492 Y258,,,,,,
-McAfee SecurityCenter ahk_class uninstall,,X130 Y475,X43 Y207,X64 Y234,X466 Y479,X466 Y479,,
-" WPS Office Uninstallation Wizard ahk_exe Au_.exe",,X43 Y227,X43 Y330,X81 Y364,,,,
+Windows Live ahk_class LiveDialog,Выбор программ для удаления,X58 Y173,X58 Y197,X58 Y224,X58 Y249,X58 Y272,&Продолжить
+HP ePrint - HP ePrint SW ahk_class WixStdBA,&Удалить,&Удалить
+ahk_exe McUICnt.exe,,X492 Y258
+McAfee SecurityCenter ahk_class uninstall,,X130 Y475,X43 Y207,X64 Y234,X466 Y479,X466 Y479
+" WPS Office Uninstallation Wizard ahk_exe Au_.exe",,X43 Y227,X43 Y330,X81 Y364
 ^Программа удаления NVIDIA$,Удалить это программное обеспечение\?,&УДАЛИТЬ
 ^Программа удаления NVIDIA$,Удаление NVIDIA завершено,&ЗАКРЫТЬ
 ^Удаление Lenovo App Explorer$,"ВНИМАНИЕ: Вы уверены, что хотите удалить Lenovo App Explorer\?",Удаление Lenovo App Explorer
 ^Lenovo System Interface Foundation$,"You must restart your system for the configuration changes made to Lenovo System Interface Foundation to take effect\. Click Yes to restart now or No if you plan to restart later\.",No,Н&ет
+^Удалить\?‬$ ahk_class C2RCustomWindow ahk_exe OfficeClickToRun.exe,‪,‪Button3,&Удалить‬
+ahk_exe OfficeClickToRun.exe,‪,‪Button3,&Удалить‬
+‪^Все удалено!‬$ ahk_class C2RCustomWindow ahk_exe OfficeClickToRun.exe,‪,Button3,‪&Закрыть‬
+ahk_exe OfficeClickToRun.exe,‪,Button3,‪&Закрыть‬
