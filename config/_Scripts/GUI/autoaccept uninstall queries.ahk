@@ -20,16 +20,19 @@ Log=%A_Desktop%\%A_ScriptName% ClickLog.log
 if not A_IsAdmin
 {
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+    FileAppend %A_Now% Запрос перезапуска с правами администратора`n, *, CP0
     Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
     if ErrorLevel = ERROR
 	MsgBox Без прав администратора ничего не выйдет.
     ExitApp
 }
 
-cases := Object()
+cases := []
 ;Title	WinText	Buttons to press
 Loop Read, %casesFullPath%
 {
+    winTitle:=winText:=xtra:=""
+    clickList:=[]
     Loop Parse, A_LoopReadLine, CSV
     {
 	If (A_Index = 1) {
@@ -38,35 +41,41 @@ Loop Read, %casesFullPath%
 	} Else If (A_Index = 2) {
 	    winText := A_LoopField
 	    continue
-	} Else If (A_Index = 3) {
-	    clickList:=Object()
+	} Else {
+	    If (Trim(A_LoopField))
+		clickList[A_Index - 2] := A_LoopField
 	}
-	If (Trim(A_LoopField))
-	    clickList.Push(A_LoopField)
     }
     cases[A_Index] := {winTitle: winTitle, winText: winText, clickList: clickList}
-    clickList=
 }
+FileAppend %A_Now% Список окон прочитан`n, *, CP0
 
 Loop {
     WaitCPUIdle()
     FileGetTime scriptCurDate, %A_ScriptFullPath%
     FileGetTime casesCurDate, %casesFullPath%
     If ((scriptCurDate && scriptCurDate != scriptInitDate) || (casesCurDate && casesInitDate != casesCurDate)) {
+	FileAppend %A_Now% Обнаружено изменение скрипта или списка окон`, перезапуск.`n, *, CP0
 	ToolTip Перезапуск скрипта
 	Sleep 500
 	Reload
 	Pause
     }
     
+    FileAppend %A_Now% Проверка окон`n, *, CP0
     For i, case in cases {
 	While (A_TimeIdlePhysical < 3000) {
-	    sleepTime := 2+A_Index
+	    sleepTime := 2 + (A_Index > 10 ? 10 : A_Index)
+	    FileAppend %A_Now% %A_Index% раз обнаружены действия пользователя`, ожидание простоя %sleepTime% с`n, *, CP0
 	    ToolTip Ожидание простоя [%sleepTime% c]
 	    Sleep 300+sleepTime*1000-A_TimeIdlePhysical
 	}
-	ToolTip % "Проверка:`n" case.winTitle "`n" case.winText
+	;ToolTip % "Проверка:`n" case.winTitle "`n" case.winText
 	If (WinExist(case.winTitle, case.winText)) {
+	    FileAppend % A_Now " Найдено окно " ObjectToText(case) "`n", *, CP0
+	    TrayTip
+	    Menu Tray, NoIcon
+	    Menu Tray, Icon
 	    TrayTip % "Найдено окно " case.winTitle, % "`n" case.winText
 	    cclick(case.clickList*)
 	    continue
@@ -81,7 +90,8 @@ ExitApp
 
 #Esc::	ExitApp
 #!SC52:: ;R = SC52 #!R
-    TrayTip Reloading, Reloading due to Win+Alt+R
+    FileAppend % A_Now Перезапуск по нажатию %A_ThisHotkey%`n, *, CP0
+    TrayTip,, Перезапуск по нажатию %A_ThisHotkey%
     Sleep 1000
     Reload
     return
@@ -110,27 +120,38 @@ cclick(labels*) {
     return
 }
 
+ObjectToText(obj) {
+    out := ""
+    For i,v in obj
+	out .= i ": " ( IsObject(v) ? "{" ObjectToText(v) "}" : (InStr(v, ",") ? """" v """" : v) ) ","
+    return Trim(out, ",")
+}
+
 WaitCPUIdle() {
     SetFormat FloatFast, 3.2
     
     cycle:=0
-    cyclesLimit:=10
-    measurementTime:=1000
-    measurementTime_s:=measurementTime // 1000
+    cyclesLimit:=3
+    OneSecond:=1000
     idleLimit:=0.75
     idleLimitPct:=Round(idleLimit * 100,2)
     
-    FileAppend %A_Now% Проверка нагрузки на процессор / ожидание освобождения ресурсов`n, *
     GetIdleTime()
-    Progress Off
-    Progress A R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " секунд"
     Loop {
-	Sleep %measurementTime%
+	Sleep %OneSecond%
 	idle := GetIdleTime()
-	If (idle > idleLimit)
+	FileAppend %A_Now% Доля холостых циклов процессора: %idle%`n, *, CP0
+	If (idle > idleLimit) {
+	    If (A_Index == 1) ; если при первой проверке ниже предела, выход
+		break
 	    cycle++
-	Else
+	} Else
 	    cycle := 0
+	If (A_Index == 1) {
+	    Progress Off
+	    Progress A R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " с"
+	    FileAppend %A_Now% Ожидание %idleLimit% простоя процессора в течение %cyclesLimit% с`n, *, CP0
+	}
 	Progress %cycle%, % "Текущий процент простоя: " . idle*100
     } Until cycle > cyclesLimit
     Progress Off
