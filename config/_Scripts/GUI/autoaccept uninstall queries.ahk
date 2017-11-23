@@ -17,13 +17,9 @@ FileGetTime casesInitDate, %casesFullPath%
 Global Log
 Log=%A_Desktop%\%A_ScriptName% ClickLog.log
 
-if not A_IsAdmin
-{
-    ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+If (!A_IsAdmin) {
     FileAppend %A_Now% Запрос перезапуска с правами администратора`n, *, CP0
-    Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
-    if ErrorLevel = ERROR
-	MsgBox Без прав администратора ничего не выйдет.
+    Run % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
 }
 

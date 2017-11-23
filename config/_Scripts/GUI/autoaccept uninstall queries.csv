@@ -65,3 +65,4 @@ McAfee SecurityCenter ahk_class uninstall,,X130 Y475,X43 Y207,X64 Y234,X466 Y479
 ahk_exe OfficeClickToRun.exe,‪,‪Button3,&Удалить‬
 ‪^Все удалено!‬$ ahk_class C2RCustomWindow ahk_exe OfficeClickToRun.exe,‪,Button3,‪&Закрыть‬
 ahk_exe OfficeClickToRun.exe,‪,Button3,‪&Закрыть‬
+^ASUS GIFTBOX Setup$ ahk_class #32770 ahk_exe uninstall.exe,Are you sure you want to uninstall ASUS GIFTBOX\? You will lose your Web Apps and your access to the ASUS GIFTBOX Store. Your PC will need to be rebooted for ASUS GIFTBOX to be fully uninstalled.,Button1,ОК
