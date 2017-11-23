@@ -13,6 +13,7 @@ IF DEFINED DefaultsSource CALL :getconfigDirFromDefaultsSource "%DefaultsSource%
 IF NOT DEFINED configDir CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd"
 IF NOT DEFINED configDir ECHO Место назначения не определено. Сначала стоит установить _get_defaultconfig_source.cmd & PAUSE & EXIT /B
 )
+IF "%configDir:~0,2%"=="\\" ECHO Папка конфигурации - в сети, обновлять можно только локальную папку! & PAUSE & EXIT /B
 IF NOT EXIST "%configDir%" MKDIR "%configDir%" || EXIT /B
 
 SET "rsyncHost=192.168.1.80"
