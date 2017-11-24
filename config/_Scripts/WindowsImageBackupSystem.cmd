@@ -33,11 +33,12 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     SET "DstDirWIB=%DstBaseDir%\WindowsImageBackup"
     IF /I "%DstBaseDir%"=="R:" SET "CopyToR=0"
     IF NOT DEFINED CopyToR IF EXIST "R:\WindowsImageBackup\%Hostname%\*" (
-	    ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
-	    SET "CopyToR=0"
-	) ELSE IF EXIST R:\ SET /P "CopyToR=Сделать копию образа на R: ? [1=да] "
+	ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
+	SET "CopyToR=0"
+    ) ELSE IF EXIST R:\ SET /P "CopyToR=Сделать копию образа на R: ? [1=да] "
+
+    IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
 )
-    IF NOT DEFINED md5sumexe CALL "%~dp0find_exe.cmd" md5sumexe %SystemDrive%\SysUtils\kliu\md5sum.exe "\\Srv0.office0.mobilmir\profiles$\Share\Programs\md5sum.exe" "%DstDirWIB%\md5sum.exe"
 (
     MKDIR "%DstDirWIB%" 2>NUL
     %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
@@ -47,10 +48,10 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     rem 	The syntax of the command is incorrect.
     rem 	C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
     
-    ECHO Расчёт сумм MD5
-    rem копирование параллельно с расчётом MD5: запуск через START, и после копирования директорий проверка: когда MD5 закончил, копирование MD5 файла
+    ECHO Запись контрольных сумм
+    rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла
 
-    IF DEFINED md5sumexe START "Запись MD5" /MIN %comspec% /C "( %md5sumexe% -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-checksums.md5" ) && MOVE /Y "%DstDirWIB%\%Hostname%-checksums.md5" "%DstDirWIB%\%Hostname%\checksums.md5""
+    IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -scrc* -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%DstDirWIB%\%Hostname%-7zchecksums.txt" "%DstDirWIB%\%Hostname%\7zchecksums.txt""
 
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
@@ -116,13 +117,13 @@ EXIT /B
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /inheritance:r /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
 
-    ECHO Ожидание окончания записи MD5
+    ECHO Ожидание окончания записи контрольных сумм
 )
-:waitmore
 (
+    :waitmore
     PING 127.0.0.1 -n 2 >NUL
-    IF NOT EXIST "%DstDirWIB%\%Hostname%\checksums.md5" IF EXIST "%DstDirWIB%\%Hostname%-checksums.md5" GOTO :waitmore
-    COPY /Y /D /B "%DstDirWIB%\%Hostname%\checksums.md5" "%~1\WindowsImageBackup\%Hostname%\checksums.md5"
+    IF NOT EXIST "%DstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%DstDirWIB%\%Hostname%-7zchecksums.txt" GOTO :waitmore
+    COPY /Y /D /B "%DstDirWIB%\%Hostname%\7zchecksums.txt" "%~1\WindowsImageBackup\%Hostname%\7zchecksums.txt"
 EXIT /B
 )
 :DirToPassFile <path>
