@@ -1,0 +1,15 @@
+REGEDIT4
+
+;[HKEY_CURRENT_USER\Control Panel\Sound]
+;"Beep"="no"
+;"ExtendedSounds"="no"
+
+[HKEY_USERS\.DEFAULT\Control Panel\Sound]
+"Beep"="no"
+"ExtendedSounds"="no"
+
+;[HKEY_CURRENT_USER\Control Panel\Sounds]
+;"SystemDefault"=","
+
+[HKEY_USERS\.DEFAULT\Control Panel\Sounds]
+"SystemDefault"=","

@@ -25,6 +25,6 @@ REGEDIT4
 ;1	SAM does not store the message digest of the user's password.
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa]
-"LMCompatibilityLevel"=dword:00000004
+"LMCompatibilityLevel"=dword:00000005
 "NoLMHash"=dword:00000001
 "SuppressExtendedProtection"=dword:0

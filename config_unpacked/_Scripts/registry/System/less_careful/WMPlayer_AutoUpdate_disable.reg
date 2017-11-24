@@ -19,6 +19,6 @@ REGEDIT4
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MediaPlayer]
 "EnableAutoUpgrade"="no"
  
-[HKEY_CURRENT_USER\Software\Policies\Microsoft\WindowsMediaPlayer]
-"NoCodecDownload"=dword:00000001
+;[HKEY_CURRENT_USER\Software\Policies\Microsoft\WindowsMediaPlayer]
+;"NoCodecDownload"=dword:00000001
  

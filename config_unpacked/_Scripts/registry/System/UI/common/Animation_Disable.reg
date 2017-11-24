@@ -8,10 +8,10 @@ REGEDIT4
 [HKEY_USERS\.DEFAULT\Control Panel\desktop\WindowMetrics]
 "MinAnimate"="0"
 
-[HKEY_CURRENT_USER\Control Panel\Desktop]
-"MenuShowDelay"="1"
-"MinAnimate"="0"
-"SmoothScroll"=hex:00,00,00,00
+;[HKEY_CURRENT_USER\Control Panel\Desktop]
+;"MenuShowDelay"="1"
+;"MinAnimate"="0"
+;"SmoothScroll"=hex:00,00,00,00
 
-[HKEY_CURRENT_USER\Control Panel\desktop\WindowMetrics]
-"MinAnimate"="0"
+;[HKEY_CURRENT_USER\Control Panel\desktop\WindowMetrics]
+;"MinAnimate"="0"

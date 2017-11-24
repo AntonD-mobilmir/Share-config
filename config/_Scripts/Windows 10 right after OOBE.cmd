@@ -12,6 +12,7 @@ CALL "%~dp0\cleanup\AppX\Remove AppX Apps except allowed.cmd" /quiet
 CALL "%~dp0FindAutoHotkeyExe.cmd" "%~dp0cleanup\uninstall\050 OneDrive.ahk"
 
 CALL "%~dp0find7zexe.cmd"
+CALL "%~dp0\registry\reg_commonlysafe.cmd"
 SET "xtmp=%TEMP%\%~n0"
 )
 (
