@@ -51,7 +51,7 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     ECHO Запись контрольных сумм
     rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла
 
-    IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -scrc* -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%DstDirWIB%\%Hostname%-7zchecksums.txt" "%DstDirWIB%\%Hostname%\7zchecksums.txt""
+    IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%DstDirWIB%\%Hostname%-7zchecksums.txt" "%DstDirWIB%\%Hostname%\7zchecksums.txt""
 
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
