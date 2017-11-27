@@ -97,9 +97,9 @@ If (cmd="l") {
 
 ExitApp
 
-LongPathsInDir(path) {
-    path := RTrim(path, "\")
-    remainingLen := 258 - StrLen(path) ; 260 - StrLen('\0') - StrLen('\') - StrLen(base_path).
+LongPathsInDir(dir) {
+    dir := RTrim(dir, "\")
+    remainingLen := 258 - StrLen(dir) ; 260 - StrLen('\0') - StrLen('\') - StrLen(base_path).
     ;If 1, there may still be 1-char-filenames in this directory
     If (remainingLen < 1)
 	return 1
@@ -134,9 +134,9 @@ LongPathsInDir(path) {
     ;  DWORD dwHighDateTime;
     ;} FILETIME, *PFILETIME;
     
-    hFile := DllCall("Kernel32.dll\FindFirstFile", "str", "\\?\" . path . "\*", "ptr", &vFINDDATA)
+    hFile := DllCall("Kernel32.dll\FindFirstFile", "str", "\\?\" . dir . "\*", "ptr", &vFINDDATA)
     if (hFile = -1)
-	Throw Exception(A_LastError, "Kernel32.dll\FindFirstFile", path)
+	Throw Exception(A_LastError, "Kernel32.dll\FindFirstFile", dir)
     subdirs := Object()
     Loop
     {
@@ -166,7 +166,7 @@ LongPathsInDir(path) {
     DllCall("Kernel32.dll\FindClose", "ptr", hFile)
     
     For i,v in subdirs {
-	If (LongPathsInDir(path . "\" . v))
+	If (LongPathsInDir(dir . "\" . v))
 	    return 1
     }
     return 0
