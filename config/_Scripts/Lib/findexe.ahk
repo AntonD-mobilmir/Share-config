@@ -103,13 +103,10 @@ RemoveParameters(runStr) {
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     paths := Object()
     Loop %0%
-    {
-	If (A_Index==1) {
+	If (A_Index==1)
 	    exe := %A_Index%
-	} Else {
-	    paths.Push(%A_Index%)
-	}
-    }
+	Else
+	    paths[A_Index-1] := %A_Index%
     
     If(exe) {
 	Try {

@@ -6,16 +6,10 @@
 argc=%0%
 If (argc) {
     Loop %argc%
-    {
-	path:=%A_Index%
-	Loop Files, %path%, D
-	{
+	Loop Files, % %A_Index%, D
 	    cleanupDealerBeelineDir(A_LoopFileFullPath)
-	}
-    }
-} Else {
+} Else
     cleanupDealerBeelineDir("d:\dealer.beeline.ru")
-}
 
 ExitApp
 

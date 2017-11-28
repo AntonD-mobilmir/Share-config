@@ -11,8 +11,10 @@ tmp = %A_Temp%\%A_ScriptName%
 If (A_ScriptFullPath == A_LineFile) {
     pathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
     
-    optns := TryCallFunc("CommandLineArgsToOptions")
-    
+    argc=%0%
+    If (argc)
+	optns := TryCallFunc("CommandLineArgsToOptions", {Hostname: 1, NVHostname: 1, TVID: 1, shortURL: 1, ID: 1, MAC: -1})
+    Else
     If (!boardDumps)
 	boardDumps := [ A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json.7z"
 		      , A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json"
@@ -172,9 +174,9 @@ AddMatch(ByRef match, ByRef name, ByRef data := "") {
     match[name] := data
 }
 
-TryCallFunc(funcName) {
+TryCallFunc(funcName, optns*) {
     Try {
-	return %funcName%()
+	return %funcName%(optns*)
     }
 }
 
