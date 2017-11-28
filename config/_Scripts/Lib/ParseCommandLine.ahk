@@ -2,7 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
-ParseCommandLine() {
+ParseCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:="") {
     CommandLine := DllCall( "GetCommandLine", "Str" )
     ; ["]%A_AhkPath%["] [args] ["][%A_ScriptDir%\]%A_ScriptName%["] [args]
     
@@ -29,7 +29,12 @@ ParseCommandLine() {
 	; Else := If(!inQuote) { ; quote is just over or not started
 	currArg := Trim(SubStr(CommandLine, currArgStart, currFragmentEnd - currArgStart))
 
-	If (realScriptPath) { ; script name found in cmdline, script args following
+	If (cmdlScriptPath) { ; script name found in cmdline, script args following
+	    If(IsByRef(cmdlPrms)) {
+		If(!IsObject(cmdlArgs))
+		    cmdlArgs := Object()
+		cmdlArgs[argNo] := currArg
+	    }
 	    ; on first entrance, %1% must be = Trim(currArg; """")
 ;	    If (currArg="/KillOnExit") {
 ;		skipChars := currFragmentEnd ; next char after this argument
@@ -40,13 +45,17 @@ ParseCommandLine() {
 	} Else {
 	    If (argNo==1) {
 		;First arg is always autohotkey-exe (path optional, for example, if started via cmdline: try «cmd /c ahk.exe script.ahk»; even extension may not be there. Path can be partial, repeating ahk-name: «./ahk.exe/ahk script/ahk/script.ahk»).
-;		RealAhkPath := currArg
+		cmdlAhkPath := currArg
 	    } Else {
 		Loop Files, % Trim(currArg,"""" A_Space A_Tab)
 		{
 		    If (A_LoopFileLongPath = A_ScriptFullPath) {
-			realScriptPath := currArg
+			cmdlScriptPath := currArg
 			skipChars := currFragmentEnd ; next char after real script name
+		    } Else If (IsByRef(ahkArgs)) { ; otherwise it's AutoHotkey args still
+			If (!IsObject(ahkArgs))
+			    ahkArgs := Object()
+			ahkArgs[argNo] := currArg
 		    }
 		    break
 		}
@@ -54,5 +63,9 @@ ParseCommandLine() {
 	}
     }
     
-    return SubStr(CommandLine, skipChars)
+    cmdlPrms := SubStr(CommandLine, skipChars)
+    If (IsByRef(cmdlPrms)) {
+	return cmdlArgs
+    } Else
+	return cmdlPrms
 }
