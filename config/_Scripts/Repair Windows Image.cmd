@@ -11,6 +11,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 %SystemRoot%\System32\Dism.exe /Online /Cleanup-Image /CheckHealth
 
 ECHO Чтобы запустить восстановление, укажите путь к неповреждённой папке Windows
+ECHO или нажмите Enter, чтобы загрузить исправные файлы через Интернет
+ECHO (или закройте окно, если восстанавливать не надо^)
 SET /P "repairsrc=> "
 )
-IF DEFINED repairsrc %SystemRoot%\System32\Dism.exe /Online /Cleanup-Image /RestoreHealth /Source:"%repairsrc%"
+IF DEFINED repairsrc (
+    %SystemRoot%\System32\Dism.exe /Online /Cleanup-Image /RestoreHealth /Source:"%repairsrc%"
+) ELSE %SystemRoot%\System32\Dism.exe /Online /Cleanup-Image /RestoreHealth
