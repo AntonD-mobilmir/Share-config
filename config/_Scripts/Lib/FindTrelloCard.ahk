@@ -10,6 +10,15 @@ tmp = %A_Temp%\%A_ScriptName%
 
 If (A_ScriptFullPath == A_LineFile) {
     pathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
+    
+    optns := TryCallFunc("CommandLineArgsToOptions")
+    
+    If (!boardDumps)
+	boardDumps := [ A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json.7z"
+		      , A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json"
+		      , A_ScriptDir "\computer-accounting.json"
+		      , A_ScriptDir "\computer-accounting.json.7z" ]
+    
     If (FileExist(pathSavedID)) {
 	lineVarNames := ["txtshortUrl", "txtID", "oldHostname"]
 	Loop Read, %pathSavedID%
@@ -27,9 +36,9 @@ If (A_ScriptFullPath == A_LineFile) {
     For varName, varTitle in {A_ComputerName: "Computer Name", NVHostname: "NV Hostname", oldHostname: "hostname from trello-id.txt"}
 	If (%varName% && Hostname != %varName%)
 	    hostnameAlts[%varName%] := varTitle
-
+    
     fp := GetFingerprint(textfp := "")
-    MACs := {}
+    MACs := Object()
     For i,NIC in fp.NIC
 	MACs[NIC.MACAddress] := NIC.Description
     
@@ -40,7 +49,25 @@ If (A_ScriptFullPath == A_LineFile) {
     If (TVID)
 	query.TVID := TVID
     
-    results := FindTrelloCard(query, cards := "", nMatches := 0)
+    For i, boardDumpOrArc in boardDumps
+	If (FileExist(boardDumpOrArc)) {
+	    Try {
+		SplitPath boardDumpOrArc, , , OutExtension
+		If (OutExtension != "json" && (exe7z || exe7z := TryCallFunc("find7zexe"))) {
+		    RunWait %exe7z% x -y -aoa -o"%tmp%" -- "%boardDumpOrArc%" "computer-accounting.json", %tmp%, Min UseErrorLevel
+		    boardDumpOrArc := tmp "\computer-accounting.json"
+		}
+		FileRead jsonboard, %boardDumpOrArc%
+		If (IsObject(cards := JSON.Load(jsonboard)))
+		    break
+	    }
+	}
+    If (!IsObject(cards)) {
+	; fallback: cards := TrelloAPI1("GET", "/boards/" . boardID . "/cards", jsoncards := Object())
+	Throw Exception("Cards didn't load",, boardDumpOrArc)
+    }
+    
+    results := FindTrelloCard(query, cards, nMatches := 0)
     For i in results
 	results[i]["Ссылка"] := cards[i].shortUrl
     If (nMatches == 1)
@@ -50,12 +77,12 @@ If (A_ScriptFullPath == A_LineFile) {
     MsgBox % "Совпадений: " nMatches "`n" JSON.Dump(results)
     
     ;RunWait "%A_AhkPath%" /ErrorStdOut "%A_LineFile%\..\..\..\..\Inventory\collector-script\DumpBoard.ahk", %A_LineFile%\..\..\..\..\Inventory\collector-script
-
+    
     ;If (!(card := TrelloAPI1("GET", "/cards/" cardID, jsoncard := Object())))
     ;    ShowError("Ошибка при получении карточки с ID " cardID " из Trello.`n", jsoncard, A_LastError, 1)
 }
 
-FindTrelloCard(ByRef SearchParams, ByRef boardOrPath := "", ByRef nMatches := 0, ByRef allMatches := "") {
+FindTrelloCard(ByRef SearchParams, ByRef cards := "", ByRef nMatches := 0, ByRef allMatches := "") {
     ; SearchParams = {Hostname: {(Hostname): "Hostname"
     ;			      , (Hostname): "NV Hostname", (Hostname): "ComputerName", (Hostname): "Hostname name", …}
     ;		      , TVID: (TVID)
@@ -63,32 +90,6 @@ FindTrelloCard(ByRef SearchParams, ByRef boardOrPath := "", ByRef nMatches := 0,
     ;		      , MACAddress: {(MAC): "Adapter name", (MAC): "Adapter name", …}
     ;		      , id: (CardID)
     ;		      , any_other_field_name: {value: "match description", value: "match description", …}, …}
-    If (boardOrPath == "") {
-	boardOrPath := [ A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json.7z"
-		       , A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json"
-		       , A_ScriptDir "\computer-accounting.json"
-		       , A_ScriptDir "\computer-accounting.json.7z" ]
-    } Else If (!IsObject(boardOrPath))
-	boardOrPath := [boardOrPath]
-    For i, boardFileOrArc in boardOrPath {
-	If (FileExist(boardFileOrArc)) {
-	    SplitPath boardFileOrArc, , , OutExtension
-	    If (OutExtension != "json") {
-		RunWait %exe7z% x -y -aoa -o"%tmp%" -- "%boardFileOrArc%" "computer-accounting.json", %tmp%, Min UseErrorLevel
-		boardFileOrArc := tmp "\computer-accounting.json"
-	    }
-	    FileRead jsonboard, %boardFileOrArc%
-	    If (IsObject(cards := JSON.Load(jsonboard)))
-		break
-	}
-    }
-    If (!IsObject(cards)) {
-	; fallback: cards := TrelloAPI1("GET", "/boards/" . boardID . "/cards", jsoncards := Object())
-	Throw Exception("Cards didn't load",, boardFileOrArc)
-    }
-    
-    boardOrPath := cards
-    
     For k, card in cards {
 	cardTVID := cardHostname := match := ""
 	For pName, pData in SearchParams {
@@ -171,5 +172,13 @@ AddMatch(ByRef match, ByRef name, ByRef data := "") {
     match[name] := data
 }
 
-#include %A_LineFile%\..\TrelloAPI1.ahk
-#include %A_LineFile%\..\GetFingerprint.ahk
+TryCallFunc(funcName) {
+    Try {
+	return %funcName%()
+    }
+}
+
+;#include %A_LineFile%\..\TrelloAPI1.ahk
+#include *i %A_LineFile%\..\GetFingerprint.ahk
+#include *i %A_LineFile%\..\find7zexe.ahk
+#include *i %A_LineFile%\..\CommandLineArgsToOptions.ahk
