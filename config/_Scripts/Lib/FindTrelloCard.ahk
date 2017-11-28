@@ -33,10 +33,21 @@ If (A_ScriptFullPath == A_LineFile) {
     For i,NIC in fp.NIC
 	MACs[NIC.MACAddress] := NIC.Description
     
-    MsgBox % JSON.Dump(FindTrelloCard({ Hostname: hostnameAlts
-				      , TVID: TVID
-				      , URL: txtshortUrl
-				      , MACAddress: MACs }),, nMatches := 0) "`nN=" nMatches
+    query := { Hostname: hostnameAlts
+	     , MACAddress: MACs }
+    If (txtshortUrl)
+	query.URL := txtshortUrl
+    If (TVID)
+	query.TVID := TVID
+    
+    results := FindTrelloCard(query, cards := "", nMatches := 0)
+    For i in results
+	results[i]["Ссылка"] := cards[i].shortUrl
+    If (nMatches == 1)
+	For i in results
+	    Run % cards[i].shortUrl
+	
+    MsgBox % "Совпадений: " nMatches "`n" JSON.Dump(results)
     
     ;RunWait "%A_AhkPath%" /ErrorStdOut "%A_LineFile%\..\..\..\..\Inventory\collector-script\DumpBoard.ahk", %A_LineFile%\..\..\..\..\Inventory\collector-script
 
