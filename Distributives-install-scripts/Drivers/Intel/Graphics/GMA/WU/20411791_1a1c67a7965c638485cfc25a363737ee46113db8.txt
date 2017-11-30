@@ -1,0 +1,9 @@
+﻿Intel Corporation
+Intel(R) 4 Series Internal Chipset
+Intel(R) B43 Express Chipset
+Intel(R) G41 Express Chipset
+Intel(R) G45/G43 Express Chipset
+Intel(R) Graphics Media Accelerator Driver for Windows
+Intel(R) HD Graphics
+Intel(R) Q45/Q43 Express Chipset
+Mobile Intel(R) 4 Series Express Chipset Family
