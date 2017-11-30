@@ -7,7 +7,6 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
     CALL "%~dp0_getGAMpath.cmd"
-    SET "timeFNameSuffix=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%"
     IF EXIST "%~dp0auth" SET "authpath=%~dp0auth"
     SET "dfltAuthPath=%LOCALAPPDATA%\_sec\GAM"
 )
@@ -25,17 +24,27 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     )
     SET "origPtrPath=%GAMpath%\oauth2-origin.txt"
 )
-@FOR /F "usebackq delims=" %%I IN ("%origPtrPath%") DO SET "origname=%authpath%\%%~I"
-@(
-    IF EXIST "%origname%" (
-	ECHO N|COMP "%GAMpath%\oauth2.txt" "%origname%" >NUL
-	IF NOT ERRORLEVEL 2 IF ERRORLEVEL 1 MOVE /Y "%origname%" "%origname% %timeFNameSuffix%.bak"
+@IF EXIST "%GAMpath%\oauth2.txt" (
+    FOR /F "usebackq tokens=* delims=" %%I IN ("%origPtrPath%") DO SET "origname=%authpath%\%%~I"
+    IF NOT DEFINED origname (
+	ECHO Название посленего использованного домена не прочиталось из "%origPtrPath%". Укажите его вручную, или нажмите Enter, чтобы использовать время файла вместо имени домена.
+	SET /P "origname=> "
+	IF NOT DEFINED origname FOR %%A IN ("%GAMpath%\oauth2.txt") DO SET "origname=%%~tA"
     )
-    MOVE /Y "%GAMpath%\oauth2.txt" "%origname%"
+) ELSE GOTO :SkiporignameProc
+IF NOT "%origname:~0,7%"=="oauth2 " SET "origname=oauth2 %origname::=%"
+IF NOT "%origname:~-4%"==".txt" SET "origname=%origname%.txt"
+:SkiporignameProc
+(
+    IF EXIST "%authpath%\%origname%" (
+	ECHO N|COMP "%GAMpath%\oauth2.txt" "%authpath%\%origname%" >NUL
+	IF NOT ERRORLEVEL 2 IF ERRORLEVEL 1 MOVE /Y "%authpath%\%origname%" "%authpath%\%origname% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%.bak"
+    )
+    MOVE /Y "%GAMpath%\oauth2.txt" "%authpath%\%origname%"
     xln.exe "%authpath%\oauth2 %1.txt" "%GAMpath%\oauth2.txt"
-    ECHO "oauth2 %1.txt">"%origPtrPath%"||PAUSE
+    (ECHO %~1)>"%origPtrPath%"||PAUSE
 
     IF NOT EXIST "%GAMpath%\client_secrets.json" xln.exe "%authpath%\client_secrets.json" "%GAMpath%\client_secrets.json"
 
-    CALL "%~dp0gam.cmd" info user
+rem     CALL "%~dp0gam.cmd" info user
 )
