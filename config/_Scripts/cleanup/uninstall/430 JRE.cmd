@@ -8,6 +8,8 @@ IF DEFINED JREInstalled (
     FOR /D %%A IN ("%SoftSourceDir%\System\Virtual Machines Sandboxes\Sun Java\otn-pub\java\jdk\*") DO IF EXIST "%%A\*.exe" SET "JREDistributiveFound=1"
     IF DEFINED JREDistributiveFound (
 	ECHO %DATE% %TIME% Удаление JRE
+	CALL "%SoftSourceDir%\System\Virtual Machines Sandboxes\Sun Java\jre6_uninstall.cmd"
+	CALL "%SoftSourceDir%\System\Virtual Machines Sandboxes\Sun Java\jre7_uninstall.cmd"
 	%AutohotkeyExe% "%SoftSourceDir%\System\Virtual Machines Sandboxes\Sun Java\uninstall.ahk"
 
 	CALL "%~dp0..\..\Lib\.utils.cmd" MarkForInstall "%SoftSourceDir%\System\Virtual Machines Sandboxes\Sun Java\jre_install.cmd"
