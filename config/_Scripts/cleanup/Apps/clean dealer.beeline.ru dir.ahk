@@ -36,7 +36,7 @@ cleanupDealerBeelineDir(dir) {
 	FileRemoveDir reg, 1
 	; unregister ActiveX component and remove bin
 	If (FileExist("bin\criacx.ocx"))
-	    RunWait %A_WinDir%\System32\regsvr32.exe /q /u bin\criacx.ocx
+	    RunWait %A_WinDir%\System32\regsvr32.exe /s /u bin\criacx.ocx
 	FileRemoveDir bin, 1
 
 	; Remove logs and static data
