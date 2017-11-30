@@ -2,7 +2,6 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 rem SETLOCAL ENABLEEXTENSIONS
-    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED PROGRAMDATA (
 	REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "ProgramData" /t REG_EXPAND_SZ /d "%%ALLUSERSPROFILE%%\Application Data" /f
 	SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
@@ -17,8 +16,12 @@ rem SETLOCAL ENABLEEXTENSIONS
 
     ECHO Running uninstall scripts...
 
-    FOR /F "usebackq delims=" %%A IN (`DIR /O /B "%~dp0uninstall\*.cmd"`) DO (
+    FOR /F "usebackq delims=" %%A IN (`DIR /O /B "%~dp0uninstall\*.cmd" "%~dp0uninstall\*.ahk"`) DO (
 	SET "RunningUninstallName=%%~nA"
-	CALL "%~dp0uninstall\%%~A"
+	IF /I "%%~xA"==".cmd" (
+	    CALL "%~dp0uninstall\%%~A"
+	) ELSE IF /I "%%~xA"==".ahk" (
+	    %AutohotkeyExe% /ErrorStdOut "%~dp0uninstall\%%~A"
+	)
     )
 )
