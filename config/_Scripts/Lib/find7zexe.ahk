@@ -12,7 +12,8 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     Exit
 }
 
-find7zexe(exename="7z.exe", paths*) {
+find7zexe(exename:="7z.exe", paths*) {
+    local regPaths, bakRegView, i, regpath, currpath, ProgramFilesx86, SystemDrive, findexefunc, path, fullpath
     ;key, value, flag "this is path to exe (only use directory)"
     regPaths := [["HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command",,1]
 		,["HKEY_CURRENT_USER\Software\7-Zip", "Path"]
@@ -23,8 +24,7 @@ find7zexe(exename="7z.exe", paths*) {
 		,["HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip", "UninstallString", 1] ]
     
     bakRegView := A_RegView
-    For i,regpath in regPaths
-    {
+    For i,regpath in regPaths {
 	SetRegView 64
 	RegRead currpath, % regpath[1], % regpath[2]
 	SetRegView %bakRegView%
@@ -61,17 +61,21 @@ Check7zDir(exename,dir7z) {
     return exe7z
 }
 
-find7zaexe(paths:="") {
-    If(paths=="")
+find7zaexe(paths*) {
+    If(!IsObject(paths))
 	paths := []
-    paths.push("\Distributives\Soft\PreInstalled\utils", "D:\Distributives\Soft\PreInstalled\utils","W:\Distributives\Soft\PreInstalled\utils", "\\localhost\Distributives\Soft\PreInstalled\utils", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils","\\192.168.1.80\Distributives\Soft\PreInstalled\utils")
-    return find7zexe("7za.exe",paths*)
+    paths.push(	  "\Distributives\Soft\PreInstalled\utils"
+		, "D:\Distributives\Soft\PreInstalled\utils"
+		, "\\localhost\Distributives\Soft\PreInstalled\utils"
+		, "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils"
+		, A_LineFile "\..\..\..\..\Soft\PreInstalled\utils")
+    return find7zexe("7za.exe", paths*)
 }
 
-find7zGUIorAny() {
-    Try	return find7zexe("7zg.exe")
-    Try return find7zexe()
-    return find7zaexe()
+find7zGUIorAny(paths*) {
+    Try return find7zexe("7zg.exe", paths*)
+    Try return find7zexe("7z.exe", paths*)
+    return find7zaexe(paths*)
 }
 
 ;The FileName parameter may optionally be preceded by *i and a single space, which causes the program to ignore any failure to read the included file. For example: #Include *i SpecialOptions.ahk. This option should be used only when the included file's contents are not essential to the main script's operation.
