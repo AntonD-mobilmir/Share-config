@@ -4,31 +4,41 @@
 If A_UserName In Install,Admin,Administrator,Guest,Гость
     SelfRemoveAndExit()
 
-Try defaultsSourceDir:=getDefaultConfigDir()
-If (!defaultsSourceDir)
-    defaultsSourceDir:="\\Srv0.office0.mobilmir\profiles$\Share\config"
+Try DefaultConfigDir:=getDefaultConfigDir()
+If (!DefaultConfigDir)
+    DefaultConfigDir:="\\Srv0.office0.mobilmir\profiles$\Share\config"
 
 If A_UserName In Продавец,Пользователь
 {
     SharedUserActions()
 } Else {
     FileEncoding cp1 ; OEM
-    FileRead fullAdminList, %defaultsSourceDir%\_Scripts\AddUsers\Add_Admins_list.txt
+    FileRead fullAdminList, %DefaultConfigDir%\_Scripts\AddUsers\Add_Admins_list.txt
     
     If (SubStr(A_LoopReadLine,1,1)!=";") {
-	nameUserFound := RegexMatch(A_LoopReadLine, "^[^/\t]+", listedAdminName)
-	If (nameUserFound && A_UserName=listedAdminName)
+	len := 0
+	Loop Parse, A_LoopReadLine
+	{
+	    If A_LoopField in /,%A_Tab%,%A_Space%
+		break
+	    len++
+	}
+	If (len && A_UserName=SubStr(A_LoopReadLine, 1, len))
 	    SelfRemoveAndExit()
     }
 }
 
-
 Loop Parse, A_UserName
-    If (A_LoopField >= "а" && A_LoopField <= "я" || A_LoopField==" ") ; Any russian letter or a space
+    If (A_LoopField >= "А" && A_LoopField <= "Я" || A_LoopField >= "а" && A_LoopField <= "я" || A_LoopField==" ") ; Any russian letter or a space
 	SharedUserActions()
 
 ; Non-shared user actions
-RunCreateMTProfile("thunderbird\create_new_profile.ahk")
+
+; https://redbooth.com/a/#!/projects/59756/tasks/33304584
+If (InStr(SubStr(A_UserName, 2, 3), "."))
+    RunCreateMTProfile("thunderbird\create_new_profile_askparm.ahk")
+Else
+    RunCreateMTProfile("thunderbird\create_new_profile.ahk")
 SelfRemoveAndExit()
 
 SharedUserActions() {
@@ -64,15 +74,17 @@ SharedUserActions() {
 }
 
 RunCreateMTProfile(subpath:="") {
-    If(!subpath)
-	subpath:="thunderbird\create_new_profile.ahk"
-    execCmd := "\\Srv0\profiles$\Share\config\" . subpath
-    IfNotExist %execCmd%
-    {
-	execCmd := defaultsSourceDir . "\" . subpath
-	IfNotExist %execCmd%
-	    MailCreationScriptNotFound()
-    }
+    global DefaultConfigDir
+    For i, basePath in [  DefaultConfigDir
+			, "\\Srv0.office0.mobilmir\profiles$\Share\config"
+			, "D:\Distributives\config"
+			, A_AppDataCommon "\mobilmir.ru\config" ] {
+	If (FileExist(execCmd := basePath "\" subpath))
+	    break
+	Else
+	    execCmd=
+    If (!execCmd)
+	MailCreationScriptNotFound()
     
     SplitPath execCmd, , , cmdExt
     If (cmdExt="ahk") {

@@ -15,11 +15,13 @@ If (A_ScriptFullPath == A_LineFile) {
     If (argc)
 	optns := TryCallFunc("CommandLineArgsToOptions", {Hostname: 1, NVHostname: 1, TVID: 1, shortURL: 1, ID: 1, MAC: -1})
     Else
-    If (!boardDumps)
-	boardDumps := [ A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json.7z"
-		      , A_LineFile "\..\..\..\..\Inventory\actual\computer-accounting.json"
-		      , A_ScriptDir "\computer-accounting.json"
-		      , A_ScriptDir "\computer-accounting.json.7z" ]
+	If (!boardDumps)
+	    boardDumps := [ A_LineFile "\..\..\..\..\Inventory\collector-script\trello-accounting-board-dump\computer-accounting.json.7z"
+			  , A_LineFile "\..\..\..\..\Inventory\collector-script\trello-accounting-board-dump\computer-accounting.json"
+			  , A_ScriptDir "\trello-accounting-board-dump\computer-accounting.json"
+			  , A_ScriptDir "\trello-accounting-board-dump\computer-accounting.json.7z"
+			  , A_ScriptDir "\computer-accounting.json"
+			  , A_ScriptDir "\computer-accounting.json.7z" ]
     
     If (FileExist(pathSavedID)) {
 	lineVarNames := ["txtshortUrl", "txtID", "oldHostname"]

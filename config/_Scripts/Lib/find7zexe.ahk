@@ -57,7 +57,7 @@ Check7zDir(exename,dir7z) {
     If(SubStr(dir7z,0)=="\")
 	dir7z:=SubStr(dir7z,1,-1)
     If (!FileExist(exe7z := dir7z "\" exename))
-	Throw exename " not found in " dir7z
+	Throw Exception("File not found in dir",, """" exename """ in """ dir7z """")
     return exe7z
 }
 

@@ -16,7 +16,7 @@ CALL "%~dp0\registry\reg_commonlysafe.cmd"
 SET "xtmp=%TEMP%\%~n0"
 )
 (
-%exe7z% x -o"%xtmp%" "%~dp0..\Users\Default\AppData\Local\DefaultUserRegistrySettings.7z"
+%exe7z% x -o"%xtmp%" "%~dp0..\Users\Default\AppData\Local\mobilmir.ru\DefaultUserRegistrySettings.7z"
 FOR %%A IN ("%xtmp%\*.reg") DO REG IMPORT "%%~A"
 RD /S /Q "%xtmp%"
 )

@@ -16,9 +16,8 @@ Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
     RegRead URLUpdateInfo, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLUpdateInfo
     RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
     
-    If ((Publisher == "Oracle Corporation" || URLUpdateInfo == "http://java.sun.com") && StartsWith(DisplayName, "Java ") && DisplayName ~= "^Java [0-9]+ Update [0-9]+$") {
+    If ((Publisher == "Oracle Corporation" || URLUpdateInfo == "http://java.sun.com") && StartsWith(DisplayName, "Java ") && DisplayName ~= "^Java [0-9]+ Update [0-9]+$")
 	RunWait %A_WinDir%\System32\MsiExec.exe /X "%A_LoopRegName%" /qn /norestart
-    }
 }
 
 ExitApp
