@@ -12,6 +12,8 @@ IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
     SET "PasswdPart1=0000%RANDOM%"
     SET "PasswdPart2=0000%RANDOM%"
     SET "lastTriedPass=*"
+    SET "unpostedPass=tadFtCnyrpIeUWxQob00"
+    SET "unpostedPassName=Пароль №287"
 
     CALL "%~dp0..\FindAutoHotkeyExe.cmd"
     IF EXIST "C:\Users\Install\Install-pwd.txt" (
@@ -29,8 +31,8 @@ IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
 rem :CreateNewUser
 %AutoHotkeyExe% "%~dp0AddUser_Install_PostPasswordToForm.ahk" "%InstallUsername%" "%showPwd%" "предварительная отправка (до смены пароля)" || (
     ECHO Отправка пароля в форму не удалась. Будет установлен пароль №287, смените его при первой возможности!
-    SET "newPwd=tadFtCnyrpIeUWxQob00"
-    SET "showPwd=№287"
+    SET "newPwd=%unpostedPass%"
+    SET "showPwd=%unpostedPassName%"
 )
 (
     rem Check user existence
@@ -63,7 +65,10 @@ EXIT /B
     SET /A TryNo=0
 )
 :ExistingUserNextTry
-SET /A TryNo+=1
+(
+SET "showOldPwd="
+SET /A "TryNo+=1"
+)
 IF %TryNo% EQU 1 (
     rem Read last old password and username from the file OR try empty
     IF NOT EXIST "%PassFilePath%" GOTO :ExistingUserNextTry
@@ -76,10 +81,12 @@ IF %TryNo% EQU 1 (
     )
 ) ELSE IF %TryNo% EQU 3 (
     SET "OldPwd=1"
-) ELSE (
-    GOTO :ExistingUserResetPwd
-)
+) ELSE IF %TryNo% EQU 4 (
+    SET "showOldPwd=%unpostedPassName%"
+    SET "OldPwd=%unpostedPass%"
+) ELSE GOTO :ExistingUserResetPwd
 (
+    IF NOT DEFINED showOldPwd SET "showOldPwd=%OldPwd%"
     CALL :ExistingUserChangePass && GOTO :ShowFileAndPostPassword
     GOTO :ExistingUserNextTry
 )   
@@ -112,8 +119,8 @@ EXIT /B %ERRORLEVEL%
     SET "lastError=32761"
     IF NOT "%lastTriedPass%"=="%OldPwd%" (
 	SET "lastTriedPass=%OldPwd%"
-	IF DEFINED OldPwd ( SET "status=Успешная смена пароля с '%OldPwd%'" ) ELSE SET "status=Успешная смена пароля с пустого"
-	ECHO %InstallUsername%	%showPwd%	%DATE% %TIME% @%Hostname% Changing password from "%OldPwd%">>"%PassFilePath%"
+	IF DEFINED OldPwd ( SET "status=Успешная смена пароля с '%showOldPwd%'" ) ELSE SET "status=Успешная смена пароля с пустого"
+	ECHO %InstallUsername%	%showPwd%	%DATE% %TIME% @%Hostname% Changing password from "%showOldPwd%">>"%PassFilePath%"
 	SET "lastError="
 	%passwdexe% -u %InstallUsername% -c "%OldPwd%" "%newPwd%" >>"%PassFilePath%" 2>&1
 	IF ERRORLEVEL 1 CALL :EchoPasswdExeError
@@ -124,7 +131,7 @@ EXIT /B %lastError%
 :EchoPasswdExeError
 (
     SET "lastError=%ERRORLEVEL%"
-    SET "status=Ошибка %ERRORLEVEL% при попытке смены пароля с '%OldPwd%'"
+    SET "status=Ошибка %ERRORLEVEL% при попытке смены пароля с '%showOldPwd%'"
     (
 	ECHO passwd.exe returned error %ERRORLEVEL%
     )>>"%PassFilePath%"
