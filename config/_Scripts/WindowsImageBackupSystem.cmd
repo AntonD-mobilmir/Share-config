@@ -47,6 +47,7 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     rem previous thing inine instead of CALL causes this:
     rem 	The syntax of the command is incorrect.
     rem 	C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
+    COPY /B /Y "%ProgramData%\mobilmir.ru\trello-id.txt" "%DstDirWIB%\%Hostname%\"
     
     ECHO Запись контрольных сумм
     rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла

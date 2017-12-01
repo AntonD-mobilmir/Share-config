@@ -14,7 +14,7 @@ MOVE "%SystemRoot%\SoftwareDistribution" "%SystemRoot%\SoftwareDistribution.bak"
 :again
 RD /S /Q "%SystemRoot%\SoftwareDistribution.bak"
 IF EXIST "%SystemRoot%\SoftwareDistribution.bak" GOTO :again
-rem RD /S /Q "%SystemRoot%\SoftwareDistribution\Download"
+RD /S /Q "%SystemRoot%\SoftwareDistribution\Download"
 
 DEL "%ProgramData%\Microsoft\Network\Downloader\qmgr0.dat"
 DEL "%ProgramData%\Microsoft\Network\Downloader\qmgr1.dat"

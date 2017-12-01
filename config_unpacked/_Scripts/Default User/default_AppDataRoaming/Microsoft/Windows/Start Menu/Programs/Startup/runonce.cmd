@@ -22,8 +22,8 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
 (
     CALL "%ConfigDir%_Scripts\find7zexe.cmd"
     CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd" "%ConfigDir%_Scripts\cleanup\uninstall\050 OneDrive.ahk"
-    FOR %%A IN ("\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%ConfigDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\regDfltNewUser.7z" (
-	SET "regDfltNewUser=%%~A\regDfltNewUser.7z"
+    FOR %%A IN ("\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%ConfigDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\DefaultUserRegistrySettings.7z" (
+	SET "regDfltNewUser=%%~A\DefaultUserRegistrySettings.7z"
 	SET "dirNewUserDefaults=%%~A"
 	GOTO :NewUserDefaultsFound
     )
@@ -33,8 +33,8 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
     GOTO :GetDefaultConfigDirAgain
 )
 :NewUserDefaultsFound
-IF EXIST "%dirNewUserDefaults%\RunOnce\*.ahk" CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd"
 (
+    REM invoked above with 050 OneDrive.ahk -- CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd"
     IF EXIST "%regDfltNewUser%" (
 	IF DEFINED exe7z %exe7z% x -o"%RegTmpDir%" -- "%regDfltNewUser%"
 	FOR /R %%I IN ("%RegTmpDir%\*.reg") DO REG IMPORT "%%~fI"
@@ -55,7 +55,7 @@ IF EXIST "%dirNewUserDefaults%\RunOnce\*.ahk" CALL "%ConfigDir%_Scripts\FindAuto
 	)
     )
     
-    IF NOT "%srcpath:0,2%=="\\" DEL "%~f0"
+    IF NOT "%srcpath:~0,2%"=="\\" DEL "%~f0"
     EXIT /B
 )
 :GetDir

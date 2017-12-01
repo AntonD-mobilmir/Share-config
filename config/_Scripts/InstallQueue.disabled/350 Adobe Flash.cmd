@@ -7,7 +7,7 @@ IF NOT DEFINED DistSourceDir CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
 IF NOT DEFINED AutohotkeyExe CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd"
 )
 (
-%AutohotkeyExe% "%SoftSourceDir%\MultiMedia\Plugins Frameworks Components\Adobe Flash\install.ahk" /noRunInteractiveInstalls /InstallPlugin /InstallActiveX
+%AutohotkeyExe% "%Distributives%\Soft com freeware\MultiMedia\Plugins Frameworks Components\Adobe Flash\install.ahk" /noRunInteractiveInstalls /InstallPlugin /InstallActiveX
 ) >>%logfile% 2>&1
 EXIT /B
 

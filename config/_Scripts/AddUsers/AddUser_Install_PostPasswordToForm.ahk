@@ -11,7 +11,7 @@ UserName=%1%
 Password=%2%
 Status=%3%
 
-If (Domain != "office0.mobilmir" && Domain != "officeVPN.mobilmir")
+If Domain not in office0.mobilmir,officeVPN.mobilmir
     Hostname .= "." . Domain
 POSTDATA := { "entry.1427319477" : Hostname
 	    , "entry.1727019064" : UserName
