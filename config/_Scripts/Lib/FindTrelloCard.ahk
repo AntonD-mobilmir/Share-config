@@ -4,94 +4,14 @@
 ;https://redbooth.com/a/#!/projects/59756/tasks/32350056
 ;https://drive.google.com/a/mobilmir.ru/file/d/0B6JDqImUdYmlejlIRTRWY0JCZjA/view?usp=sharing
 
-#NoEnv
-FileEncoding UTF-8
-tmp = %A_Temp%\%A_ScriptName%
-
-If (A_ScriptFullPath == A_LineFile) {
-    pathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
-    
-    argc=%0%
-    If (argc)
-	optns := TryCallFunc("CommandLineArgsToOptions", {Hostname: 1, NVHostname: 1, TVID: 1, shortURL: 1, ID: 1, MAC: -1})
-    Else
-	If (!boardDumps)
-	    boardDumps := [ A_LineFile "\..\..\..\..\Inventory\collector-script\trello-accounting-board-dump\computer-accounting.json.7z"
-			  , A_LineFile "\..\..\..\..\Inventory\collector-script\trello-accounting-board-dump\computer-accounting.json"
-			  , A_ScriptDir "\trello-accounting-board-dump\computer-accounting.json"
-			  , A_ScriptDir "\trello-accounting-board-dump\computer-accounting.json.7z"
-			  , A_ScriptDir "\computer-accounting.json"
-			  , A_ScriptDir "\computer-accounting.json.7z" ]
-    
-    If (FileExist(pathSavedID)) {
-	lineVarNames := ["txtshortUrl", "txtID", "oldHostname"]
-	Loop Read, %pathSavedID%
-	    If (varName := lineVarNames[A_Index])
-		%varName% := A_LoopReadLine
-    }
-    RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
-    RegRead NVHostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, NV Hostname
-    regViewBak := A_RegView
-    SetRegView 32
-    RegRead TVID, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, ClientID
-    SetRegView %regViewBak%
-    
-    hostnameAlts := {(Hostname): "Hostname"}
-    For varName, varTitle in {A_ComputerName: "Computer Name", NVHostname: "NV Hostname", oldHostname: "hostname from trello-id.txt"}
-	If (%varName% && Hostname != %varName%)
-	    hostnameAlts[%varName%] := varTitle
-    
-    fp := GetFingerprint(textfp := "")
-    MACs := Object()
-    For i,NIC in fp.NIC
-	MACs[NIC.MACAddress] := NIC.Description
-    
-    query := { Hostname: hostnameAlts
-	     , MACAddress: MACs }
-    If (txtshortUrl)
-	query.URL := txtshortUrl
-    If (TVID)
-	query.TVID := TVID
-    
-    For i, boardDumpOrArc in boardDumps
-	If (FileExist(boardDumpOrArc)) {
-	    Try {
-		SplitPath boardDumpOrArc, , , OutExtension
-		If (OutExtension != "json" && (exe7z || exe7z := TryCallFunc("find7zexe"))) {
-		    RunWait %exe7z% x -y -aoa -o"%tmp%" -- "%boardDumpOrArc%" "computer-accounting.json", %tmp%, Min UseErrorLevel
-		    boardDumpOrArc := tmp "\computer-accounting.json"
-		}
-		FileRead jsonboard, %boardDumpOrArc%
-		If (IsObject(cards := JSON.Load(jsonboard)))
-		    break
-	    }
-	}
-    If (!IsObject(cards)) {
-	; fallback: cards := TrelloAPI1("GET", "/boards/" . boardID . "/cards", jsoncards := Object())
-	Throw Exception("Cards didn't load",, boardDumpOrArc)
-    }
-    
-    results := FindTrelloCard(query, cards, nMatches := 0)
-    For i in results
-	results[i]["Ссылка"] := cards[i].shortUrl
-    If (nMatches == 1)
-	For i in results
-	    Run % cards[i].shortUrl
-	
-    MsgBox % "Совпадений: " nMatches "`n" JSON.Dump(results)
-    
-    ;RunWait "%A_AhkPath%" /ErrorStdOut "%A_LineFile%\..\..\..\..\Inventory\collector-script\DumpBoard.ahk", %A_LineFile%\..\..\..\..\Inventory\collector-script
-    
-    ;If (!(card := TrelloAPI1("GET", "/cards/" cardID, jsoncard := Object())))
-    ;    ShowError("Ошибка при получении карточки с ID " cardID " из Trello.`n", jsoncard, A_LastError, 1)
-}
-
-FindTrelloCard(ByRef SearchParams, ByRef cards := "", ByRef nMatches := 0, ByRef allMatches := "") {
+FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef allMatches := "") {
     ; SearchParams = {Hostname: {(Hostname): "Hostname"
     ;			      , (Hostname): "NV Hostname", (Hostname): "ComputerName", (Hostname): "Hostname name", …}
+    ;   	      , Hostname: (Hostname) ; alt to previous
     ;		      , TVID: (TVID)
     ;		      , URL: (ShortURL or ID part)
     ;		      , MACAddress: {(MAC): "Adapter name", (MAC): "Adapter name", …}
+    ;		      , MACAddress: (MAC) ; alt to previous
     ;		      , id: (CardID)
     ;		      , any_other_field_name: {value: "match description", value: "match description", …}, …}
     For k, card in cards {
@@ -175,14 +95,3 @@ AddMatch(ByRef match, ByRef name, ByRef data := "") {
 	match := Object()
     match[name] := data
 }
-
-TryCallFunc(funcName, optns*) {
-    Try {
-	return %funcName%(optns*)
-    }
-}
-
-;#include %A_LineFile%\..\TrelloAPI1.ahk
-#include *i %A_LineFile%\..\GetFingerprint.ahk
-#include *i %A_LineFile%\..\find7zexe.ahk
-#include *i %A_LineFile%\..\CommandLineArgsToOptions.ahk
