@@ -57,10 +57,11 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
     EXIT /B
 )
 :PostForm
-(
-    START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfgTj9FsG59AXrNLACfINR8Qart94ehi3zTrZ2P3IaMeY0ABg/formResponse" "entry.1278320779=%MailUserId%" "entry.1958374743=%Hostname%" "entry.2091378917=%RetailHelperAhkTime%" "entry.1721351309=%criacxcabTime%"
+FOR /F "usebackq delims=" %%A IN ("%~dp0secrets\%~nx0.txt") DO (
+    START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "%%~A" "entry.1278320779=%MailUserId%" "entry.1958374743=%Hostname%" "entry.2091378917=%RetailHelperAhkTime%" "entry.1721351309=%criacxcabTime%"
 EXIT /B
 )
+EXIT /B
 :FindCommonDesktopPath
 (
     SET RegQueryParsingOptions="usebackq tokens=3* delims= "

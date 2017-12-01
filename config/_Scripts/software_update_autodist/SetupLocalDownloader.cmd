@@ -112,9 +112,12 @@ CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
 IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 )
 (
-ECHO MailUserId=%MailUserId%
-ECHO instVersion=%instVersion%
-START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleForm.ahk" "https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSfEDfrPvAJ4BuhfT4BNqAXiJOKjR767C4p0M3k6N2Ft0BI1LQ/formResponse" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
+ECHO "MailUserId=%MailUserId%"
+ECHO "instVersion=%instVersion%"
+FOR /F "usebackq delims=" %%A IN ("%~dp0..\secrets\%~nx0.txt") DO (
+    START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
+    EXIT /B
+)
 
 EXIT /B
 )

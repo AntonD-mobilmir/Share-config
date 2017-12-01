@@ -18,7 +18,9 @@ RetailStatusReport(ByRef st:="", ByRef einf:="", ByRef mdl:="") {
 	mdl := A_ScriptName " (" scriptmtime ")"
     }
     
-    return PostGoogleForm("https://docs.google.com/forms/d/e/1FAIpQLSdOUHD7aqfgkRgXmvQz66eRDZk3jEeQRPwfrfluGq8FndZyow/formResponse"
+    SplitPath A_LineFile, ScriptName
+    FileReadLine URL, %A_LineFile%\..\..\secrets\%ScriptName%.txt, 1
+    return PostGoogleFormWithPostID(URL
 	, {"entry.1804185158":	GetMailUserId()
 	 , "entry.1223335585":	hostname . (hostSuffix ? " (" hostSuffix ")" : "")
 	 , "entry.338457113":	(A_IsAdmin ? "^" : "") A_UserName
@@ -45,5 +47,5 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     ExitApp !mdl || !RetailStatusReport(st, Trim(einf, "`n"), mdl)
 }
 
-#include %A_LineFile%\..\PostGoogleForm.ahk
+#include %A_LineFile%\..\PostGoogleFormWithPostID.ahk
 #include %A_LineFile%\..\GetMailUserId.ahk

@@ -53,6 +53,7 @@ formData := { "entry.1427319477"	: Hostname
 	    , "entry.1602906221"	: m.Password
 	    , "entry.854965881"		: backupName
 	    , "entry.1625305818"	: statusText }
-ExitApp PostGoogleForm("https://docs.google.com/a/mobilmir.ru/forms/d/1eBHS2d49-qtD096mYZDK_wIXwjS1WyImFi-_kYWUkhY/formResponse", formData)
+FileReadLine URL, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt, 1
+ExitApp !PostGoogleFormWithPostID(URL, formData)
 
 #include %A_LineFile%\..\..\Lib\PostGoogleForm.ahk

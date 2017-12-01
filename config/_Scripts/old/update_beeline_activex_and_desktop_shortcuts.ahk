@@ -46,7 +46,7 @@ If (criacxinbin) {
     If (diffOcxTime)
 	comment .= ", timeDiff: " . diffOcxTime
     
-    PostGoogleForm("https://docs.google.com/a/mobilmir.ru/forms/d/e/1FAIpQLSeRvIBRHnVjhnUS09Dh7lNEoXtTRjkY9210stwJhftwqQ8tgg/formResponse"
+    PostGoogleForm("URL removed, search by name «Обновления criacx.ocx и beeline DOL2.ahk»"
 		    , {   "entry.1266830572": GetDeptID()
 			, "entry.298209335": A_ComputerName
 			, "entry.411109659": A_UserName

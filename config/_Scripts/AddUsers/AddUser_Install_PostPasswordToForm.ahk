@@ -7,14 +7,9 @@ RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Param
 If (!Domain)
     RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, DhcpDomain
 
-URL:="https://docs.google.com/a/mobilmir.ru/forms/d/1eBHS2d49-qtD096mYZDK_wIXwjS1WyImFi-_kYWUkhY/formResponse"
 UserName=%1%
 Password=%2%
 Status=%3%
-
-;ToDo: сменить на Trello ID
-Random postID, 0, 0xFFFF
-postID := A_Now . "#" . Format("{:04x}", postID)
 
 If (Domain != "office0.mobilmir" && Domain != "officeVPN.mobilmir")
     Hostname .= "." . Domain
@@ -22,24 +17,16 @@ POSTDATA := { "entry.1427319477" : Hostname
 	    , "entry.1727019064" : UserName
 	    , "entry.1602906221" : Password
 	    , "entry.1625305818" : Status
-	    , "entry.1342070748" : postID }
+	    , "entry.1342070748" : Object() }
 
-;PostGoogleForm(URL, ByRef kv, tries:=20, retryDelay:=20000)
-While (!(success:=PostGoogleForm(URL, POSTDATA, 2, 1000))) {
-    If (IsObject(debug)) {
-	debugtxt=
-	For n,v in debug
-	    debugtxt .= n ": " SubStr(v, 1, 100) "`n"
-    } Else {
-	debugtxt=При отправке пароля произошла ошибка.
-    }
-    MsgBox 53, Запись пароля %UserName% в таблицу, %debugtxt%`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
-    IfMsgBox Cancel
+ReadURLs := []
+Loop Read, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt
+{
+    ReadURLs[A_Index] := A_LoopReadLine
+    If (A_Index>2)
 	break
 }
+FileReadLine URL, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt, 1
+ExitApp !PostGoogleFormWithPostID(ReadURLs, POSTDATA) ; PostGoogleFormWithPostID(ByRef URLs, ByRef kv, ByRef postID:="", ByRef trelloURL:="")
 
-;ToDo: загружать https://docs.google.com/spreadsheets/d/16j2LRTvGMsX5zLxrJJFC0eQtOMZYRVomwdJ5msqAu_A/export?format=csv&gid=1201239047 и проверять, добавилась ли строчка с postID
-
-ExitApp !success
-
-#Include %A_LineFile%\..\..\Lib\PostGoogleForm.ahk
+#Include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk
