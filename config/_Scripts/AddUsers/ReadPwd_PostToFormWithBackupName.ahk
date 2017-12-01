@@ -52,8 +52,9 @@ formData := { "entry.1427319477"	: Hostname
 	    , "entry.1727019064"	: m.UserName
 	    , "entry.1602906221"	: m.Password
 	    , "entry.854965881"		: backupName
-	    , "entry.1625305818"	: statusText }
+	    , "entry.1625305818"	: statusText
+	    , "entry.1342070748" 	: {CutTrelloCardURL: "", TrelloCardName: "", "":"-"} }
 FileReadLine URL, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt, 1
 ExitApp !PostGoogleFormWithPostID(URL, formData)
 
-#include %A_LineFile%\..\..\Lib\PostGoogleForm.ahk
+#include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk

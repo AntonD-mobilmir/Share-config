@@ -5,10 +5,18 @@
 
 RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
+If Domain in ,office0.mobilmir,officeVPN.mobilmir
+    Domain=
+Else
+    Domain=%Domain%%A_Space%
+
+FileReadLine trelloURL, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 1
+FileReadLine trelloCardName, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 3
+
 IPAddresses=
 Loop 4
     If ( A_IPAddress%A_Index%!="0.0.0.0" )
-	IPAddresses .= " " . A_IPAddress%A_Index%
+	IPAddresses .= A_IPAddress%A_Index% . " "
 
 If (!configPost) { ; it may be defined when this script is included in "%USERPROFILE%\Dropbox\Developement\TeamViewer\Host\install_script\install.ahk"
     EnvGet configPost, DefaultsSource
@@ -44,7 +52,7 @@ POSTDATA := "entry.1137503626="  . UriEncode(Hostname)
 	  . "&entry.287789183="  . UriEncode(configPost)
 	  . "&entry.1477798008=" . UriEncode(Trim(geoLocation, " `t`n"))
 	  . "&entry.1221721146=" . UriEncode(A_UserName)
-	  . "&entry.1999739813=" . UriEncode(Domain . " " . Trim(IPAddresses))
+	  . "&entry.1999739813=" . UriEncode(Trim(trelloCardName . " " . Domain . IPAddresses . trelloURL))
 	  . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"
 
 Loop

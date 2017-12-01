@@ -347,10 +347,18 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
 	XMLHTTP_Request("GET", "http://freegeoip.net/json/", , geoLocation)
     }
     
-    POSTDATA :="entry.781637524="  . UriEncode(Hostname)
-	    . "&entry.1905065751=" . UriEncode(A_UserName)
-	    . "&entry.157476182="  . UriEncode(Trim(geoLocation, " `t`n`r"))
-	    . "&entry.1781068882=" . UriEncode(ResultsURL)
+    FileReadLine trelloURL, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 1
+    FileReadLine trelloCardName, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 3
+    nameShtnr = CutTrelloCardURL
+    If (IsFunc(nameShtnr))
+	trelloURL := %nameShtnr%(trelloURL)
+    
+    POSTDATA :="entry.781637524=" 	. UriEncode(Hostname)
+	    . "&entry.1905065751="	. UriEncode(A_UserName)
+	    . "&entry.293033176="	. UriEncode(trelloURL)
+	    . "&entry.56786602="	. UriEncode(trelloCardName)
+	    . "&entry.157476182="	. UriEncode(Trim(geoLocation, " `t`n`r"))
+	    . "&entry.1781068882="	. UriEncode(ResultsURL)
 	    . ( IsObject(perfResultsObj)
 		? ( "&entry.1510085348=" . UriEncode(perfResultsObj.Desktop)
 		  . "&entry.223703596="  . UriEncode(perfResultsObj.CPU)
@@ -439,6 +447,7 @@ GetIdleTime()    ;idle time fraction
 
 #include %A_LineFile%\..\..\Lib\XMLHTTP_Request.ahk
 #include %A_LineFile%\..\..\Lib\PostGoogleForm.ahk
+#include %A_LineFile%\..\..\Lib\CutTrelloCardURL.ahk
 
 GetKnownFolder(FolderName) { ;http://www.autohotkey.com/forum/viewtopic.php?t=68194 
     If !RegExMatch(folderdata(),"im`a)^" . foldername . ".+$",line) 
