@@ -33,7 +33,8 @@ If (!configPost) { ; it may be defined when this script is included in "%USERPRO
     }
 }
 
-getURL("http://freegeoip.net/json/", , reqStatus, geoLocation)
+If (!geoLocation := getURL("http://freegeoip.net/json/")) 
+    getURLWinHTTP("http://freegeoip.net/json/", , reqStatus, geoLocation)
 
 SetRegView 32
 Loop {
@@ -51,14 +52,15 @@ POSTDATA := "entry.1137503626="  . UriEncode(Hostname)
 	  . "&entry.1756894160=" . UriEncode(ClientID)
 	  . "&entry.287789183="  . UriEncode(configPost)
 	  . "&entry.1477798008=" . UriEncode(Trim(geoLocation, " `t`n"))
-	  . "&entry.1221721146=" . UriEncode(A_UserName)
-	  . "&entry.1999739813=" . UriEncode(Trim(trelloCardName . " " . Domain . IPAddresses . trelloURL))
+	  . "&entry.1221721146=" . UriEncode(trelloCardName ? trelloCardName : A_UserName)
+	  . "&entry.1999739813=" . UriEncode(Trim(trelloURL ? trelloURL : Domain . IPAddresses))
 	  . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"
+
+URL := "https://docs.google.com/a/mobilmir.ru/forms/d/1Wy8ZFhfnV1VGYN_vHabQvr6Ziy9E9GTbgaua64CcORU/formResponse"
 
 Loop
 {
-    success := tryPOSTWithProxies("https://docs.google.com/a/mobilmir.ru/forms/d/1Wy8ZFhfnV1VGYN_vHabQvr6Ziy9E9GTbgaua64CcORU/formResponse", POSTDATA)
-    
+    success := XMLHTTP_Post(URL, POSTDATA) || tryPOSTWithProxies(URL, POSTDATA)
     If (!success)
     {
 	MsgBox 53, Сведения об установке TeamViewer, При отправке сведений об установке TeamViewer в таблицу произошла ошибка.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
@@ -76,7 +78,7 @@ tryPOSTWithProxies(URL, POSTDATA, ByRef aStatus:=false, ByRef aResponse:="", ByR
 	  || sendHTTPPOSTRequest(URL, POSTDATA, "", aStatus, aResponse, aResponseHeaders) )
 }
 
-getURL(URL, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
+getURLWinHTTP(URL, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
     WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     WebRequest.Open("GET", URL, false)
     If (proxy!="")
@@ -94,6 +96,7 @@ getURL(URL, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponse
     If proxy
 	proxyText := %A_Space%(over proxy %proxy%)
     FileAppend GET %URL%%proxyText%`n%aStatus%`n%aResponseHeaders%`n%aResponse%,*
+    return !err
 }
 
 sendHTTPPOSTRequest(URL, POSTDATA, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
@@ -219,6 +222,109 @@ ReadSetVarFromBatchFile(filename, varname) {
 	    If (splitter && Trim(SubStr(trimmedReadLine, 5, splitter-5), """`t ") = varname) {
 		return Trim(SubStr(trimmedReadLine, splitter+1), """`t ")
 	    }
+	}
+    }
+}
+
+XMLHTTP_Post(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef reqmoreHeaders:=0) {
+    If (IsObject(reqmoreHeaders)) {
+	If (reqmoreHeaders.HasKey("Content-Type")) {
+	    moreHeaders := reqmoreHeaders
+	} Else {
+	    moreHeaders := reqmoreHeaders.Clone()
+	    moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
+	}
+    } Else {
+	moreHeaders := {"Content-Type": "application/x-www-form-urlencoded"}
+    }
+    return XMLHTTP_Request("POST", URL, POSTDATA, response, moreHeaders)
+}
+
+GetURL(ByRef URL, tries := 20, delay := 3000) {
+    While (!XMLHTTP_Request("GET", URL,, resp))
+	If (A_Index > tries)
+	    Throw Exception("Error downloading URL",, resp.status)
+	Else
+	    sleep delay
+    
+    return resp
+}
+
+XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef moreHeaders:=0) {
+    global debug
+    static useObjName:=""
+    ;Error at line 13 in #include file "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Post.ahk".
+
+    ;Line Text: local xhr := ComObjCreate(useObjName)
+    ;Error: Local variables must not be declared in this function.
+
+    ;The program will exit.
+    ;local i, objName, hName, hVal, k, v
+    
+    If (IsObject(debug)) {
+	If (moreHeaders)
+	    For i, v in moreHeaders
+		txtHeaders .= "`t" i ": " v "`n"
+	FileAppend % method " " URL . (POSTDATA ? " ← " POSTDATA : "") ( moreHeaders ? "`n`tHeaders:`n" txtHeaders : "") "`n", **
+    }
+    If (useObjName) {
+	xhr := ComObjCreate(useObjName)
+    } Else {
+	objNames := [ "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP", "Microsoft.XMLHTTP" ]
+	For i, objName in objNames {
+	    ;xhr=XMLHttpRequest
+	    If (IsObject(debug))
+		FileAppend `tTrying to create object %objName%…
+		
+	    xhr := ComObjCreate(objName) ; https://msdn.microsoft.com/en-us/library/ms535874.aspx
+	    If (IsObject(xhr)) {
+		useObjName := objName
+		If (IsObject(debug))
+		    FileAppend Done!`n, **
+		break
+	    }
+	    If (IsObject(debug))
+		FileAppend nope`n, **
+	}
+	If (!useObjName)
+	    Throw "Не удалось создать объект XMLHTTP"
+    }
+    ;xhr.open(bstrMethod, bstrUrl, varAsync, varUser, varPassword);
+    xhr.open(method, URL, false)
+    ;xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    
+    If (IsObject(moreHeaders))
+	For hName, hVal in moreHeaders
+	    xhr.setRequestHeader(hName, hVal)
+    
+    Try {
+	xhr.send(POSTDATA)
+	If (IsObject(response))
+	    response := {status: xhr.status, headers: xhr.getAllResponseHeaders, responseText: xhr.responseText}
+	Else If (IsByRef(response))
+	    response := xhr.responseText
+	If (IsObject(debug)) {
+	    debug.Headers := xhr.getAllResponseHeaders
+	    debug.Response := xhr.responseText
+	    debug.Status := xhr.status	;can be 200, 404 etc., including proxy responses
+	}
+	return xhr.Status >= 200 && xhr.Status < 300
+    } catch e {
+	If (IsObject(debug)) {
+	    debug.What:=e.What
+	    debug.Message:=e.Message
+	    debug.Extra:=e.Extra
+	}
+	return
+    } Finally {
+	xhr := ""
+	If (IsObject(debug)) {
+	    ;http://www.autohotkey.com/board/topic/56987-com-object-reference-autohotkey-l/#entry358974
+	    ;static document
+	    ;Gui Add, ActiveX, w750 h550 vdocument, % "MSHTML:" . debug.Response
+	    ;Gui Show
+	    For k,v in debug
+		FileAppend %k%: %v%`n, **
 	}
     }
 }
