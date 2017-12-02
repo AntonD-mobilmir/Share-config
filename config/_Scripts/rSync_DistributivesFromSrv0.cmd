@@ -29,7 +29,7 @@ ECHO args: %*
 ECHO compressMode: %compressMode%
 SET "SrcBaseURI=rsync://%DistributivesHost%/Distributives"
 IF NOT "%~1"=="" (
-    CALL :rsyncDistributives %1
+    FOR %%A IN (%*) DO CALL :rsyncDistributives "%%~A"
     EXIT /B
 )
 
@@ -41,7 +41,7 @@ EXIT /B
 rem %1 - local destination path without driveletter
 rem source is determined with SrcBaseURI and part of destination:
 rem %SrcBaseURI%\local_destination_without_?:\Distributives_prefix
-SET "argDestDir=%~1"
+SET "argDestDir=%~f1"
 )
 IF "%argDestDir:~-1%"=="\" SET "argDestDir=%argDestDir:~,-1%"
 (

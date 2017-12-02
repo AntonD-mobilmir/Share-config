@@ -2,7 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 XMLHTTP_PostForm(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef moreHeaders:=0) {
-    ;wrapper fol older scripts
+    ;wrapper for older scripts
     return XMLHTTP_Post(URL, POSTDATA, response, moreHeaders)
 }
 
