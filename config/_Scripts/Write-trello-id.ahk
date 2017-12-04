@@ -66,8 +66,8 @@ If (argc) {
 	If (%varName% && Hostname != %varName%)
 	    hostnameAlts[%varName%] := varTitle
 
-    fp := GetFingerprint(textfp := "")
     MACs := Object()
+    fp := GetFingerprint(textfp := "")
     For i,NIC in fp.NIC
 	MACs[NIC.MACAddress] := NIC.Description
 
@@ -101,6 +101,24 @@ If (!IsObject(cards)) {
 
 For i, match in FindTrelloCard(query, cards, nMatches := 0)
     FileAppend % "Сard " JSON.Dump(cards[i]) " matched with " JSON.Dump(match) "`n", *, CP1
+If (fp && !nMatches) { ; по быстрым параметрам карточка не найдена, поиск по серийникам из отпечатка
+    Loop 2 ; первая попытка – с заголовками, вторая – без
+    {
+	noHeaders := A_Index==1 ; change to 2 after debug
+	rs := Object()
+	; MACAddress are sought before
+	For subsys, set in { "System" :  { "IdentifyingNumber": "[^:]+", "UUID": "[A-F\-]{36}" }
+			   , "MB" :      { "SerialNumber": "[^:]+"}
+			   , "RAM" :     { "SerialNumber": "[^:]+"}
+			   , "Storage" : { "SerialNumber": "[^:]+" } }
+	    For i, kv in fp[subsys]
+		For field in set ; ,regex
+		    rs[subsys . i " " field] := noHeaders ? "\b" EscapeRegex(kv[field]) "\b" : EscapeRegex(subsys) ":.*" EscapeRegex(field) ": " EscapeRegex(kv[field]) "(?!, \w+: .+)"
+	For i, match in FindTrelloCard("", cards, nMatches, rs)
+	    FileAppend % "Сard " JSON.Dump(cards[i]) " matched with " JSON.Dump(match) "`n", *, CP1
+	    ;MsgBox % "searched " JSON.Dump(rs) ",`ncard " JSON.Dump(cards[i]) " matched with " JSON.Dump(match) "`n"
+    } Until nMatches
+}
 
 If (writeSavedID) {
     If (nMatches==1) {
@@ -136,3 +154,4 @@ TryCallFunc(funcName, optns*) {
 #include <find7zexe>
 #include <JSON>
 #include <CutTrelloCardURL>
+#include <EscapeRegex>

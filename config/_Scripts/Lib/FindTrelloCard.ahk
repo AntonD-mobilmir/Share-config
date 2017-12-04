@@ -4,7 +4,8 @@
 ;https://redbooth.com/a/#!/projects/59756/tasks/32350056
 ;https://drive.google.com/a/mobilmir.ru/file/d/0B6JDqImUdYmlejlIRTRWY0JCZjA/view?usp=sharing
 
-FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef allMatches := "") {
+FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef RegexSearches := "") {
+    allMatches := Object()
     ; SearchParams = {Hostname: {(Hostname): "Hostname"
     ;			      , (Hostname): "NV Hostname", (Hostname): "ComputerName", (Hostname): "Hostname name", …}
     ;   	      , Hostname: (Hostname) ; alt to previous
@@ -50,13 +51,22 @@ FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef allMa
 	    } Else
 		MatchKeyNameOrText(match, card[pName], pData, pName)
 	}
+	If (RegexSearches && card.desc) {
+	    If (IsObject(RegexSearches)) {
+		For pName, pData in RegexSearches
+		    If (card.desc ~= pData)
+			AddMatch(match, pName, midShort)
+		    ;Else
+			;MsgBox % pData "!~" card.desc
+	    } Else
+		If (card.desc ~= RegexSearches)
+		    AddMatch(match, "Шаблон Regex", midShort)
+	}
 	
 	;MsgBox % "cardHostname: " cardHostname "`ncardTVID: " cardTVID "`ncard.idShort: " card.idShort "`ncard.name: " card.name
 	
 	If (IsObject(match)) {
 	    nMatches++
-	    If (!IsObject(allMatches))
-		allMatches := Object()
 	    allMatches[k] := match
 	}
     }
