@@ -11,6 +11,7 @@
 #SingleInstance force
 If A_OSVersion in WIN_2003,WIN_XP,WIN_2000
     ExitApp 1
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
 Arg1 = %1%
 If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFromBrowser.lnk") {
@@ -70,7 +71,7 @@ If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFr
 			}
 		    } Else { ; just send
 			;GetKeyboardLayoutName https://msdn.microsoft.com/en-us/library/windows/desktop/ms646298.aspx
-			If (DllCall(A_WinDir . "\System32\User32.dll\GetKeyboardLayoutName", "Str", layoutName)
+			If (DllCall(SystemRoot . "\System32\User32.dll\GetKeyboardLayoutName", "Str", layoutName)
 				&& layoutName != LANG_ENG) { ; if language is not english,
 			    Loop
 			    {
@@ -173,7 +174,7 @@ While (!FileExist(exeName)) {
     }
 }
 If (!FileExist(exeName)) {
-    RunWait %A_WinDir%\explorer.exe /select`,"%archiveName%"
+    RunWait %SystemRoot%\explorer.exe /select`,"%archiveName%"
     MsgBox 16, %A_ScriptName%, Не удалось распаковать UserBenchmark.exe из %archiveName%.`nРаспакуйте вручную`, файл должен называться %exeName%., 60
 }
 

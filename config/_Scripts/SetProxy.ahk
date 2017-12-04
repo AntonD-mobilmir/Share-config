@@ -5,6 +5,7 @@
 #SingleInstance ignore
 SetRegView 64
 
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 EnvGet RunInteractiveInstalls, RunInteractiveInstalls
 ProxySettingsRegRoot	= HKEY_CURRENT_USER
 ProxySettingsIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
@@ -21,14 +22,14 @@ If (A_IsAdmin) {
     } Else {
 	UseNetShForWinHTTP=1
 	If ( A_Is64bitOS ) { ; at least on Windows 10 single run of netsh.exe modifies settings for bot 64-bit and 32-bit winhttp; if this is case for Vista/7/8, if is not needed and only Else can be executes without negative side-effects
-	    netsh32exe=%A_WinDir%\SysWOW64\netsh.exe
+	    netsh32exe=%SystemRoot%\SysWOW64\netsh.exe
 	    If ( A_PtrSize == 4 ) { ;32-bit AutoHotkey on 64-bit system
-		netsh64exe=%A_WinDir%\SysNative\netsh.exe
+		netsh64exe=%SystemRoot%\SysNative\netsh.exe
 	    } Else {
-		netsh64exe=%A_WinDir%\System32\netsh.exe
+		netsh64exe=%SystemRoot%\System32\netsh.exe
 	    }
 	} Else {
-	    netsh32exe=%A_WinDir%\System32\netsh.exe
+	    netsh32exe=%SystemRoot%\System32\netsh.exe
 	}
     }
 
@@ -118,7 +119,7 @@ If (proxy) {
 	If (UseNetShForWinHTTP) {
 	    netshargs=winhttp set proxy proxy-server="http=%proxy%;https=%proxy%;ftp=%proxy%" bypass-list="%ProxyOverride%"
 	} Else {
-	    RunWait %A_WinDir%\System32\proxycfg.exe -p %proxy% %ProxyOverride%,,Min UseErrorLevel
+	    RunWait %SystemRoot%\System32\proxycfg.exe -p %proxy% %ProxyOverride%,,Min UseErrorLevel
 	}
     }
 
@@ -137,7 +138,7 @@ If (proxy) {
     If (SystemProxy) {
 	netshargs=winhttp reset proxy
     } Else {
-	RunWait %A_WinDir%\System32\proxycfg.exe -d,,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\proxycfg.exe -d,,Min UseErrorLevel
     }
 
     ;Internet Explorer

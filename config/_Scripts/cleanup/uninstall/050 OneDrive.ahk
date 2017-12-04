@@ -35,9 +35,9 @@ ResetACL(path) {
     ;SYSTEM=S-1-5-18
     ;sidBackupOperators=S-1-5-32-551
     ;sidCREATOROWNER=S-1-3-0
-    RunWait %A_WinDir%\System32\icacls.exe "%path%" /reset /T /C /L,,Min UseErrorLevel
-    RunWait %A_WinDir%\System32\icacls.exe "%path%" /inheritance:r /C /L,,Min UseErrorLevel
-    RunWait %A_WinDir%\System32\icacls.exe "%path%" /grant "*%sidAuthenticatedUsers%:(OI)(CI)M" /C /L,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\icacls.exe "%path%" /reset /T /C /L,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\icacls.exe "%path%" /inheritance:r /C /L,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\icacls.exe "%path%" /grant "*%sidAuthenticatedUsers%:(OI)(CI)M" /C /L,,Min UseErrorLevel
 }
 
 ; Display Name      : Microsoft OneDrive

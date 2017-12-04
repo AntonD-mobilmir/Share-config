@@ -1,6 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
 IF (A_LineFile==A_ScriptFullPath) {
     passwd = %1%
@@ -18,7 +19,7 @@ IF (A_LineFile==A_ScriptFullPath) {
 }
 
 WriteAndShowPassword(passwd) {
-    global passwdNo
+    global passwdNo, SystemRoot
     passwdNo := WritePassword(passwd, WrittenActually)
 
     If (WrittenActually)
@@ -35,7 +36,7 @@ WriteAndShowPassword(passwd) {
 
     ;Соответствия в https://docs.google.com/a/mobilmir.ru/spreadsheets/d/1lUGVjDWEG3znDUKy-l59Ewt95eFrIgUO-L8dy3lxNWQ
     FileAppend %passwdNo%: %passwd%`n, %A_Temp%\%A_ScriptName%.txt
-    Run %A_WinDir%\System32\cipher.exe /E /B "%A_Temp%\%A_ScriptName%.txt",,Min
+    Run %SystemRoot%\System32\cipher.exe /E /B "%A_Temp%\%A_ScriptName%.txt",,Min
     ;MsgBox 4, Регистрация пароля BIOS, Пароль: «%passwd%»`nНомер пароля: %passwdNo%`n`nСкопировать пароль в буфер обмена?
     ;IfMsgBox Yes
     ;    Clipboard := passwd

@@ -2,9 +2,9 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 #NoEnv
-SetRegView 64
-
 EnvGet SystemDrive, SystemDrive
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+SetRegView 64
 
 if not A_IsAdmin
 {
@@ -41,12 +41,12 @@ If ( ProfilesDirectory = ProfilesDest ) {
     RegWrite REG_EXPAND_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory, %ProfilesDest%
 }
 
-RunWait %comspec% /C "%A_WinDir%\System32\net.exe SHARE Users /DELETE /Y & %A_WinDir%\System32\net.exe SHARE Users="%ProfilesDest%" /GRANT:Everyone`,FULL & %A_WinDir%\System32\net.exe SHARE Users="%ProfilesDest%" /GRANT:Все`,FULL & %A_WinDir%\System32\net.exe SHARE Users="%ProfilesDest%""
+RunWait %comspec% /C "%SystemRoot%\System32\net.exe SHARE Users /DELETE /Y & %SystemRoot%\System32\net.exe SHARE Users="%ProfilesDest%" /GRANT:Everyone`,FULL & %SystemRoot%\System32\net.exe SHARE Users="%ProfilesDest%" /GRANT:Все`,FULL & %SystemRoot%\System32\net.exe SHARE Users="%ProfilesDest%""
 
-;RunWait %A_WinDir%\System32\net.exe SHARE Users$ /DELETE
-;RunWait %A_WinDir%\System32\net.exe SHARE Users$="%ProfilesDirectory%" /GRANT:Everyone`,FULL
-;RunWait %A_WinDir%\System32\net.exe SHARE Users$="%ProfilesDirectory%" /GRANT:Все`,FULL
-;RunWait %A_WinDir%\System32\net.exe SHARE Users$="%ProfilesDirectory%"
+;RunWait %SystemRoot%\System32\net.exe SHARE Users$ /DELETE
+;RunWait %SystemRoot%\System32\net.exe SHARE Users$="%ProfilesDirectory%" /GRANT:Everyone`,FULL
+;RunWait %SystemRoot%\System32\net.exe SHARE Users$="%ProfilesDirectory%" /GRANT:Все`,FULL
+;RunWait %SystemRoot%\System32\net.exe SHARE Users$="%ProfilesDirectory%"
 
 findexefunc:="findexe"
 If(IsFunc(findexefunc)) {

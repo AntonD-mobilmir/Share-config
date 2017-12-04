@@ -15,6 +15,7 @@
 
 #NoEnv
 #SingleInstance off
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 EnvGet SystemDrive, SystemDrive
 EnvGet UserProfile, UserProfile
 MailUserId=
@@ -85,8 +86,8 @@ If (!skipCreatingProfile) {
 	Exit
     }
 
-    Run %A_windir%\System32\compact.exe /C /S:"%mailProfileDir%\Mail" /I, %mailProfileDir%, Min UseErrorLevel
-    Run %A_windir%\System32\compact.exe /C /S:"%mailProfileDir%\ImapMail" /I, %mailProfileDir%, Min UseErrorLevel
+    Run %SystemRoot%\System32\compact.exe /C /S:"%mailProfileDir%\Mail" /I, %mailProfileDir%, Min UseErrorLevel
+    Run %SystemRoot%\System32\compact.exe /C /S:"%mailProfileDir%\ImapMail" /I, %mailProfileDir%, Min UseErrorLevel
 
     If ( IsObject(prefsJsHndl := FileOpen(mailProfileDir "\prefs.js", "r-wd", "UTF-8")) ) {
 	prefsjs := prefsJsHndl.Read(), prefsJsHndl.Close()

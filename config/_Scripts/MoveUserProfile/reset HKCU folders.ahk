@@ -1,6 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
 FileEncoding UTF-16
 
@@ -10,10 +11,10 @@ Loop Read, %A_ScriptDir%\HKCU Shell Folders template.ini, *%tempRegFile%
     FileAppend % ExpandWithScreen(A_LoopReadLine) . "`r`n"
 }
 
-If (FileExist(A_Windir . "\SysNative")) {
-    sysNative := A_Windir . "\SysNative"
+If (FileExist(SystemRoot . "\SysNative")) {
+    sysNative := SystemRoot . "\SysNative"
 } Else {
-    sysNative := A_Windir . "\System32"
+    sysNative := SystemRoot . "\System32"
 }
 
 RunWait "%sysNative%\reg.exe" IMPORT "%A_ScriptDir%\HKCU User Shell Folders.reg"

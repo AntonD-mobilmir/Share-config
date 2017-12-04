@@ -1,9 +1,9 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
-if not A_IsAdmin
-{
+if (!A_IsAdmin) {
     EnvGet RunInteractiveInstalls, RunInteractiveInstalls
     If RunInteractiveInstalls!=0
     {
@@ -24,10 +24,10 @@ if not A_IsAdmin
 destDir=%A_AppDataCommon%\mobilmir.ru\reg-backup
 
 FileCreateDir %destDir%
-RunWait %A_WinDir%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "%destDir%\HKLM-Shell Folders.%A_Now%.reg"
-RunWait %A_WinDir%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" "%destDir%\HKLM-User Shell Folders.%A_Now%.reg"
+RunWait %SystemRoot%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "%destDir%\HKLM-Shell Folders.%A_Now%.reg"
+RunWait %SystemRoot%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" "%destDir%\HKLM-User Shell Folders.%A_Now%.reg"
 
-RunWait %A_WinDir%\System32\REG.exe IMPORT "%A_ScriptDir%\HKLM User Shell Folders D_Users_Public.reg"
+RunWait %SystemRoot%\System32\REG.exe IMPORT "%A_ScriptDir%\HKLM User Shell Folders D_Users_Public.reg"
 
 Loop Files, %A_ScriptDir%\D\*, D
 {

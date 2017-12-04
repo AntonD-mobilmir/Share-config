@@ -3,7 +3,7 @@
 #NoEnv
 #SingleInstance force
 
-;EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
 ProxySettingsRegRoot	 = HKEY_CURRENT_USER
 ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
@@ -26,7 +26,7 @@ maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collec
 serverScriptPath	:= configDirSrv0 "\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting(A_ScriptDir "\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 
-regsvr32exe		:= FirstExisting(A_WinDir "\SysWOW64\regsvr32.exe", A_WinDir "\System32\regsvr32.exe")
+regsvr32exe		:= FirstExisting(SystemRoot "\SysWOW64\regsvr32.exe", SystemRoot "\System32\regsvr32.exe")
 If (!regsvr32exe)
     regsvr32exe		:= "regsvr32.exe"
 
@@ -50,7 +50,7 @@ AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] 
 
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
-    Run %A_WinDir%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
+    Run %SystemRoot%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
 } Else {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     
@@ -467,7 +467,7 @@ If (FileExist("c:\squid")) {
     }
 }
 
-backup_1S_baseTask := CheckPath(FirstExisting(A_WinDir . "\System32\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", A_WinDir . "\System32\Tasks\mobilmir\backup_1S_base", A_WinDir . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
+backup_1S_baseTask := CheckPath(FirstExisting(SystemRoot . "\System32\Tasks\mobilmir.ru\backup_1S_base", SystemRoot . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", SystemRoot . "\System32\Tasks\mobilmir\backup_1S_base", SystemRoot . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
 If (IsObject(backup_1S_baseTask)) {
     AddLog("Задача резервного копирования 1С-Рарус", backup_1S_baseTask.mtime)
     Loop 2
@@ -552,20 +552,20 @@ If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdSc
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
 AddLog("Удаление задачи планировщика mobilmir\AddressBook…")
-RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F,, Min UseErrorLevel
+RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F,, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
 
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 RunFromConfigDir("_Scripts\Tasks\AddressBook_download.cmd")
-RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$ /DELETE,,Min UseErrorLevel
+RunWait %SystemRoot%\System32\NET.exe SHARE AddressBook$ /DELETE,,Min UseErrorLevel
 If (!ErrorLevel) {
     abDir = D:\Mail\Thunderbird\AddressBook
     AddLog("Настройка доступа к " abDir, "Настройка \\…\AddressBook$")
-    RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$="%abDir%" /GRANT:Everyone`,READ,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\NET.exe SHARE AddressBook$="%abDir%" /GRANT:Everyone`,READ,,Min UseErrorLevel
     If (ErrorLevel)
-	RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$="%abDir%" /GRANT:Все`,READ,,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\NET.exe SHARE AddressBook$="%abDir%" /GRANT:Все`,READ,,Min UseErrorLevel
     If (ErrorLevel)
-	RunWait %A_WinDir%\System32\NET.exe SHARE AddressBook$="%abDir%",,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\NET.exe SHARE AddressBook$="%abDir%",,Min UseErrorLevel
     If (ErrorLevel)
 	SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
     Else {
@@ -580,11 +580,11 @@ If (!ErrorLevel) {
 	;SYSTEM=S-1-5-18
 	;sidBackupOperators=S-1-5-32-551
 	;sidCREATOROWNER=S-1-3-0
-	RunWait %A_WinDir%\System32\takeown.exe /A /R /D Y /F "%abDir%",,Min UseErrorLevel
-	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /reset /T /C /L,,Min UseErrorLevel
-	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /inheritance:r /C /L,,Min UseErrorLevel
-	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /setowner "*%sidAdministrators%" /T /C /L,,Min UseErrorLevel
-	RunWait %A_WinDir%\System32\icacls.exe "%abDir%" /grant "*%sidAdministrators%:(OI)(CI)F" /grant "*%sidSYSTEM%:(OI)(CI)F" /grant "*%sidEveryone%:(OI)(CI)R" /C /L,,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\takeown.exe /A /R /D Y /F "%abDir%",,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\icacls.exe "%abDir%" /reset /T /C /L,,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\icacls.exe "%abDir%" /inheritance:r /C /L,,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\icacls.exe "%abDir%" /setowner "*%sidAdministrators%" /T /C /L,,Min UseErrorLevel
+	RunWait %SystemRoot%\System32\icacls.exe "%abDir%" /grant "*%sidAdministrators%:(OI)(CI)F" /grant "*%sidSYSTEM%:(OI)(CI)F" /grant "*%sidEveryone%:(OI)(CI)R" /C /L,,Min UseErrorLevel
 	SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
     }
 }
@@ -611,9 +611,9 @@ cleanupAdobeReadercmd=Soft\Office Text Publishing\PDF\Adobe Reader\RemoveUnneede
 RunScriptFromNewestDistDir(cleanupAdobeReadercmd, cleanupAdobeReadercmd, "Удаление лишней службы Adobe Reader")
 
 AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
-RunWait %A_WinDir%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
+RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
-If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", A_WinDir . "\SysNative\criacx.ocx", A_WinDir . "\System32\criacx.ocx", A_WinDir . "\SysWOW64\criacx.ocx"), 0))) {
+If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", SystemRoot . "\SysNative\criacx.ocx", SystemRoot . "\System32\criacx.ocx", SystemRoot . "\SysWOW64\criacx.ocx"), 0))) {
     ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     ;timecriacxcab -= instCriacxocx.mtime, Days
     ;https://redbooth.com/a/#!/projects/59756/tasks/32400133

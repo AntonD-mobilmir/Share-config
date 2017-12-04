@@ -2,8 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 #SingleInstance force
-
-global childPID
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 OnExit("KillChild")
 
 FileGetTime origOcxDate, d:\dealer.beeline.ru\bin\criacx.ocx
@@ -61,8 +60,9 @@ If (criacxinbin) {
 
 
 KillChild() {
+    global childPID, SystemRoot
     If (childPID)
-	Run %A_Windir%\System32\TASKKILL.exe /PID %childPID% /T /F
+	Run %SystemRoot%\System32\TASKKILL.exe /PID %childPID% /T /F
     return
 }
 

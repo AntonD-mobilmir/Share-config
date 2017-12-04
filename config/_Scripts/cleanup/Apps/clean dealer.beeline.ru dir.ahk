@@ -2,6 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 #NoEnv
+EnvGet SystemRoot,SystemRoot
 
 argc=%0%
 If (argc) {
@@ -36,7 +37,7 @@ cleanupDealerBeelineDir(dir) {
 	FileRemoveDir reg, 1
 	; unregister ActiveX component and remove bin
 	If (FileExist("bin\criacx.ocx"))
-	    RunWait %A_WinDir%\System32\regsvr32.exe /s /u bin\criacx.ocx
+	    RunWait %SystemRoot%\System32\regsvr32.exe /s /u bin\criacx.ocx
 	FileRemoveDir bin, 1
 
 	; Remove logs and static data
