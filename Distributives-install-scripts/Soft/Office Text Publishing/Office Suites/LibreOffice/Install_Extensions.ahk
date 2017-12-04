@@ -1,53 +1,45 @@
-﻿#NoEnv
+﻿;by LogicDaemon <www.logicdaemon.ru>
+;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+#NoEnv
 #SingleInstance ignore
 
 EnvGet LogPath,log
 If Not LogPath
     LogPath=%A_TEMP%\LibreOffice_Install_Extensions.log
 
-ComspecLogSuffix=>"%LogPath%"
+path_LO_bin := Find_LO_program_dir()
+unopkgexe=%path_LO_bin%\unopkg.com
 
-if not A_IsAdmin
-{
-    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-    If RunInteractiveInstalls!=0
-    {
-	ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-	Run *RunAs %ScriptRunCommand% ; Requires v1.0.92.01+
+If (A_IsAdmin) {
+    shared=--shared
+    Process Exist, soffice.bin
+    If (ErrorLevel) {
+	FileAppend soffice.bin runnning`, will not try to install shared extensions!, *
+	If RunInteractiveInstalls!=0
+	    MsgBox 48, LibreOffice Extensions Installing error, soffice.bin runnning`, will not try to install shared extensions!, 30
 	ExitApp
     }
 }
 
-Process Exist, soffice.bin
-If ErrorLevel
-{
-    FileAppend soffice.bin runnning`, will not try to install shared extensions!, *
-    If RunInteractiveInstalls!=0
-	MsgBox 48, LibreOffice Extensions Installing error, soffice.bin runnning`, will not try to install shared extensions!, 30
-    ExitApp
+For i, path in [A_ScriptDir "\AddOns\*.oxt", A_ScriptDir "\..\LibreOffice\AddOns\*.oxt"]
+    Loop Files, %path%
+    {
+	FileAppend Installing extension %A_LoopFileName%%A_Tab%, *, CP1
+	SetTimer ShowCmdPIDWindow, -30000
+	RunWait %comspec% /C "ECHO y|"%unopkgexe%" add %shared% -v -f -s "%A_LoopFileLongPath%" >"%LogPath%" 2>&1", %path_LO_bin%, Hide UseErrorLevel, cmdPID
+	unopkgexeErrLevel := ErrorLevel
+	SetTimer ShowCmdPIDWindow, Off
+	If (unopkgexeErrLevel)
+	    Result=Failure`, Error Level=%unopkgexeErrLevel%
+	Else
+	    Result=Success
+	FileAppend %Result%`n, *, CP1
+	FileAppend Installing extension %A_LoopFileName% %Result%`n, %LogPath%
+    }
+
+ShowCmdPIDWindow() {
+    global cmdPID
+    WinShow ahk_pid %cmdPID%
 }
 
-EnvGet ProgramFiles_x86,ProgramFiles(x86)
-If ProgramFiles_x86
-    LibreOfficePath=%ProgramFiles_x86%\LibreOffice *
-Else
-    LibreOfficePath=%ProgramFiles%\LibreOffice *
-
-Loop %LibreOfficePath%, 2 ; Only folders
-{
-    unopkgexe=%A_LoopFileFullPath%\program\unopkg.com
-    LibreOfficePath:=A_LoopFileFullPath
-    IfExist %unopkgexe%
-	break
-}
-
-Loop %A_ScriptDir%\AddOns\*.oxt
-{
-    RunWait %comspec% /C "ECHO y|"%unopkgexe%" add --shared -v -f -s "%A_LoopFileLongPath%" %ComspecLogSuffix%",,Hide UseErrorLevel
-    If ErrorLevel
-	Result=Failure`, Error Level=%ErrorLevel%
-    Else
-	Result=Success
-    FileAppend Installing extension %A_LoopFileName% %Result%`n, *
-    FileAppend Installing extension %A_LoopFileName% %Result%`n, %LogPath%
-}
+#include %A_LineFile%\..\Find_LO_program_dir.ahk

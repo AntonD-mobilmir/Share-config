@@ -21,20 +21,21 @@ If (A_IsAdmin) {
     }
 }
 
-Loop Files, %A_ScriptDir%\..\LibreOffice\AddOns\*.oxt
-{
-    FileAppend Installing extension %A_LoopFileName%%A_Tab%, *, CP1
-    SetTimer ShowCmdPIDWindow, -30000
-    RunWait %comspec% /C "ECHO y|"%unopkgexe%" add %shared% -v -f -s "%A_LoopFileLongPath%" >"%LogPath%" 2>&1", %path_LO_bin%, Hide UseErrorLevel, cmdPID
-    unopkgexeErrLevel := ErrorLevel
-    SetTimer ShowCmdPIDWindow, Off
-    If (unopkgexeErrLevel)
-	Result=Failure`, Error Level=%unopkgexeErrLevel%
-    Else
-	Result=Success
-    FileAppend %Result%`n, *, CP1
-    FileAppend Installing extension %A_LoopFileName% %Result%`n, %LogPath%
-}
+For i, path in [A_ScriptDir "\AddOns\*.oxt", A_ScriptDir "\..\LibreOffice\AddOns\*.oxt"]
+    Loop Files, %path%
+    {
+	FileAppend Installing extension %A_LoopFileName%%A_Tab%, *, CP1
+	SetTimer ShowCmdPIDWindow, -30000
+	RunWait %comspec% /C "ECHO y|"%unopkgexe%" add %shared% -v -f -s "%A_LoopFileLongPath%" >"%LogPath%" 2>&1", %path_LO_bin%, Hide UseErrorLevel, cmdPID
+	unopkgexeErrLevel := ErrorLevel
+	SetTimer ShowCmdPIDWindow, Off
+	If (unopkgexeErrLevel)
+	    Result=Failure`, Error Level=%unopkgexeErrLevel%
+	Else
+	    Result=Success
+	FileAppend %Result%`n, *, CP1
+	FileAppend Installing extension %A_LoopFileName% %Result%`n, %LogPath%
+    }
 
 ShowCmdPIDWindow() {
     global cmdPID
