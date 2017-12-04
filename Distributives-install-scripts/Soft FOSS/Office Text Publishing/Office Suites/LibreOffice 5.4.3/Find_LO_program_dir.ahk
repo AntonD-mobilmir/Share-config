@@ -11,7 +11,7 @@ Find_LO_program_dir() {
 	EnvGet ProgramFiles_x86,ProgramFiles(x86)
     For i, lProgramFiles in [ ProgramFiles_x86, A_ProgramFiles]
 	Loop Files, %lProgramFiles%\LibreOffice *, D
-	    If !FileExist((dir_LO_program := A_LoopFileFullPath "\program")) "\soffice.bin")
+	    If !FileExist((dir_LO_program := A_LoopFileFullPath "\program") "\soffice.bin")
 		dir_LO_program=
     return dir_LO_program
 }
