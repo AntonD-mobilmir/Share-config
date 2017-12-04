@@ -124,7 +124,7 @@ If (writeSavedID) {
     If (nMatches==1) {
 	newtxtf := FileOpen(newpathSavedID := pathSavedID ".tmp", "w`n")
 	newtxtf.WriteLine(cards[i].url
-		   . "`n" ExtractHostnameFromCardName(cards[i].name)
+		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))
 		   . "`n" cards[i].name
 		   . "`n" cards[i].id
 		 . "`n`n" JSON.Dump(cards[i]))
@@ -134,7 +134,6 @@ If (writeSavedID) {
 	    FileReadLine oldID, %pathSavedID%, 4
 	    ;"shortLink":"6D5aO2qM"
 	    If (!(CutTrelloCardURL(oldurl, 1) == cards[i].shortLink && oldID == cards[i].id)) {
-	    } Else {
 		FileMove %newpathSavedID%, %pathSavedID%.%A_Now%.txt
 		Run %A_AhkPath% "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "Карточка, найденная для компьютера, отличается от сохранённой"
 		Throw Exception("Карточка, найденная для компьютера, отличается от сохранённой")
