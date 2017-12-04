@@ -51,7 +51,7 @@ IF NOT DEFINED xlnexe CALL "%ConfigDir%_Scripts\find_exe.cmd" xlnexe xln.exe || 
 ECHO ON
 %exe7z% x -aoa -o"%ProgramData%\mobilmir.ru" -- "%srcpath%Rarus_Scripts.7z"
 %exe7z% x -aoa -o"%dir1SBin%" -- "%srcpath%1Cv77_BIN.7z"
-MKDIR "%link1SBin%" & %xlnexe% -n "%dir1SBin%" "%link1SBin%"
+rem #INC-7519 -- MKDIR "%link1SBin%" & %xlnexe% -n "%dir1SBin%" "%link1SBin%" 
 
 REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%link1SBin%\1cv7s.exe" /d "DisableNXShowUI" /f
 REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v "%dir1SBin%\1cv7s.exe" /d "DisableNXShowUI" /f

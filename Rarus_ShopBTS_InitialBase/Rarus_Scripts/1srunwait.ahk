@@ -19,7 +19,11 @@ EnvGet lProgramFiles, ProgramFiles(x86)
 If (!lProgramFiles)
     lProgramFiles=%A_ProgramFiles%
 
-run1sDir=%lProgramFiles%\1Cv77\BIN
+For i, v in ["D:\1S\1Cv77\BIN", lProgramFiles "\1Cv77\BIN"]
+    If (FileExist(v "\" run1sexe))
+	run1sDir := v
+If (!run1sDir)
+    Throw Exception("Не найдена папка с исполняемым файлом 1С-Рарус",,v "\" run1sexe)
 
 If (WinExist(rarusWinTitle " ahk_exe " run1sexe)) {
     WinRestore
