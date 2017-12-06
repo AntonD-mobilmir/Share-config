@@ -46,7 +46,7 @@ IF "%Inst1S%"=="1" (
     wmic path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
 )
 (
-START "" control userpasswords2
+CALL "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 
 TITLE Writing DefaultsSource
 IF NOT EXIST "%ProgramData%\mobilmir.ru" MKDIR "%ProgramData%\mobilmir.ru"
