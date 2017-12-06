@@ -17,6 +17,7 @@ CALL "%~dp0CheckWinVer.cmd" 6 && bcdedit /set nx optout
 %comspec% /C "%~dp0registry\reg_commonlysafe.cmd"
 CALL "%~dp0CheckWinVer.cmd" 6.2 && CALL "%~dp0share File History for Windows 8.cmd"
 CALL "%~dp0dontIncludeRecommendedUpdates.cmd"
+%SystemRoot%\Sysmte32\wbem\WMIC.exe recoveros set DebugInfoType = 0
 
 REM Set up security policy and add admin users
 %comspec% /C "%~dp0Security\import_policy.cmd"
