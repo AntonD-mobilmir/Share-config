@@ -10,8 +10,15 @@ If Domain in ,office0.mobilmir,officeVPN.mobilmir
 Else
     Domain=%Domain%%A_Space%
 
-FileReadLine trelloURL, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 1
-FileReadLine trelloCardName, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 3
+trelloidlines := ["trelloURL", "trelloHostname", "trelloCardName", "trelloID", "trelloLocation"]
+Loop Read, %A_AppDataCommon%\mobilmir.ru\trello-id.txt
+    If (A_LoopReadLine && varName := trelloidlines[A_Index])
+	%varName% := A_LoopReadLine
+Until A_Index > trelloidlines.Length()
+If (trelloHostname && trelloHostname != Hostname)
+    Hostname .= " (trello-id.txt: " trelloHostname ")"
+If (trelloLocation)
+    trelloLocation .= " "
 
 IPAddresses=
 Loop 4
@@ -51,7 +58,7 @@ Loop {
 POSTDATA := "entry.1137503626="  . UriEncode(Hostname)
 	  . "&entry.1756894160=" . UriEncode(ClientID)
 	  . "&entry.287789183="  . UriEncode(configPost)
-	  . "&entry.1477798008=" . UriEncode(Trim(geoLocation, " `t`n"))
+	  . "&entry.1477798008=" . UriEncode(Trim(trelloLocation . geoLocation, " `t`n"))
 	  . "&entry.1221721146=" . UriEncode(trelloCardName ? trelloCardName : A_UserName)
 	  . "&entry.1999739813=" . UriEncode(Trim(trelloURL ? trelloURL : Domain . IPAddresses))
 	  . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"

@@ -4,17 +4,26 @@
 FileEncoding UTF-8
 
 boardID := "5732cc3d0a8bee805cab7f11" ; Учёт системных блоков
-dumpFName = %A_ScriptDir%\..\actual\computer-accounting.json
+dumpDir = %A_ScriptDir%\trello-accounting-board-dump
 
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk
 
-If (TrelloAPI1("GET", "/boards/" . boardID . "/cards", boardDump)) {
-    FileDelete "%dumpFName%.7z"
-    FileAppend %boardDump%, %dumpFName%
-    Run %exe7z% a -mx=9 "%dumpFName%.7z" "%dumpFName%"
-    ExitApp %ErrorLevel%
-}
-
-ExitApp 1
+Try {
+    For dumpFName, request in {"computer-accounting": "/cards"
+			    , "lists": "/lists"}
+	If (TrelloAPI1("GET", "/boards/" . boardID . request, jsonDump)) {
+	    If (IsObject(fout := FileOpen(dumpDir "\" dumpFName ".new", "w")) && fout.Write(jsonDump), fout.Close()) {
+		thisFile = %dumpFName%.json
+		FileMove %dumpDir%\%dumpFName%.new, %dumpDir%\%thisFile%, 1
+		arcFiles .= " """ thisFile """"
+	    }
+	}
+    RunWait %exe7z% a -mx=9 -- "dump.7z.new" %arcFiles%, %dumpDir%, Min UseErrorLevel
+    If (ErrorLevel)
+	ExitApp %ErrorLevel%
+    Else
+	FileMove %dumpDir%\dump.7z.new, %dumpDir%\dump.7z, 1
+} Catch
+    ExitApp 1
 
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\TrelloAPI1.ahk
