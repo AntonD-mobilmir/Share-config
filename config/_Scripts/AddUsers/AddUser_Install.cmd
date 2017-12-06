@@ -23,6 +23,8 @@ IF NOT DEFINED ErrorCmd SET ErrorCmd=PAUSE
     FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 )
 (
+    IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
+    
     SET "newPwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%"
     SET "showPwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%"
     IF NOT EXIST "%PassFilePath%" IF EXIST "%TEMP%\install-pwd.txt" ECHO Y|MOVE /Y "%TEMP%\install-pwd.txt" "%PassFilePath%"

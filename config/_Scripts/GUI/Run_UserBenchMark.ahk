@@ -108,6 +108,9 @@ If (!A_IsAdmin) {
     ExitApp
 }
 
+If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt"))
+    Run "%A_AhkPath%" %AutoHotkeyExe% "%A_LineFile%\..\..\Write-trello-id.ahk"
+
 UBMzipURL := "http://www.userbenchmark.com/resources/download/UserBenchMark.zip"
 TempDir := A_Temp . "\UserBenchMark-DL"
 archiveName := TempDir . "\UserBenchMark.zip"
