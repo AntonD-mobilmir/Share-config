@@ -14,7 +14,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 )
 (
     %exe7z% x -aoa "%~dp0System.7z" -o"%TempDir%" || PAUSE
-    FOR /F "usebackq tokens=1 delims=[]" %%I IN (`find /n "REM -!!! Registry Files List -" "%selfname%"`) DO SET skiplines=%%I
+    FOR /F "usebackq tokens=1 delims=[]" %%I IN (`find /n "REM -!!! Registry Files List -" "%~f0"`) DO SET skiplines=%%I
 )
 (
     PUSHD "%TempDir%" && (
