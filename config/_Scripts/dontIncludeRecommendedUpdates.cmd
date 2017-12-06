@@ -5,7 +5,7 @@ SETLOCAL ENABLEEXTENSIONS
 
 rem exit if winver is less than Win7
 CALL "%~dp0CheckWinVer.cmd" 6.1 || EXIT /B
-rem exit if winver is higher or equal to Win8.1
+rem exit if winver is higher or equal to Win10
 CALL "%~dp0CheckWinVer.cmd" 6.4 && EXIT /B
 
 REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v "IncludeRecommendedUpdates" /d 0 /f
