@@ -346,7 +346,7 @@ user_pref("mailnews.start_page.enabled", false);
 user_pref("network.cookie.cookieBehavior", 2);
 user_pref("network.cookie.lifetimePolicy", 2);
 //user_pref("network.proxy.http_port", 3128);
-//user_pref("network.proxy.type", 4); - causes fail on VPN
+user_pref("network.proxy.type", 4); //causes fail on VPN
 user_pref("offline.startup_state", 0);
 user_pref("security.default_personal_cert", "Select Automatically");
 user_pref("spellchecker.dictionary", "ru");
