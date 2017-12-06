@@ -42,9 +42,9 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
 	IF NOT "%regDfltNewUser:~0,2%"=="\\" DEL "%regDfltNewUser%"
     )
     IF DEFINED RemoveAllAppX (
-	CALL "%ConfigDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon
+	START "Удаление всех Metro-приложений" %comspec% /C ""%ConfigDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon"
     ) ELSE (
-	CALL "%ConfigDir%_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /firstlogon
+	START "Удаление Metro-приложений, кроме разрешенных" %comspec% /C ""%ConfigDir%_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /firstlogon"
     )
     
     FOR %%A IN ("%dirNewUserDefaults%\RunOnce\*.cmd" "%dirNewUserDefaults%\RunOnce\*.ahk") DO (
