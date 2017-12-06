@@ -9,13 +9,16 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "fnametime=%TIME::=%"
     CALL :find7zexe
 
-    FOR /F "usebackq tokens=1 delims=[]" %%A IN (`%windir%\System32\find.exe /n "-!!! list of WMI paths to request" "%~0"`) DO SET "WMIListSkipLines=skip=%%A"
+    FOR /F "usebackq tokens=1 delims=[]" %%A IN (`%SystemRoot%\System32\find.exe /n "-!!! list of WMI paths to request" "%~0"`) DO SET "WMIListSkipLines=skip=%%A"
     FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID" /reg:32`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
     rem /reg:32 won't work on Vista and XP, so fall back
     IF ERRORLEVEL 1 FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID"`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
-    START "Сохранение отпечатка для обновления доски Trello" /MIN %comspec% /C "%~dp0SaveJsonFingerprint.cmd"
+    SET "localFPdir=%ProgramData%\mobilmir.ru\Fingerprint"
 )
 (
+    MKDIR "%localFPdir%" 2>NUL
+    START "Сохранение отпечатка для обновления доски Trello" /MIN %comspec% /C ""%~dp0SaveJsonFingerprint.cmd" "%localFPdir%""
+
     REM %TIME% не всегда возвращает 2 цифры часов
     SET "datetime=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%_%fnametime:~,6%"
 
@@ -32,24 +35,24 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF DEFINED tvID SET "fnametvID=TVID=%tvID% "
 )
 (
-    ECHO Y|DEL /F /Q "%TEMP%\WinAudit\TempWmicBatchFile.bat"
-    RD "%TEMP%\WinAudit">NUL
-    IF EXIST "%TEMP%\WinAudit" (
+    ECHO Y|DEL /F /Q "%TEMP%\%~n0\TempWmicBatchFile.bat"
+    RD "%TEMP%\%~n0">NUL
+    IF EXIST "%TEMP%\%~n0" (
 	IF "%RunInteractiveInstalls%"=="0" EXIT /B 127
-	ECHO Папка "%TEMP%\WinAudit" существует. Возможно, в данный момент выполняется другой процесс аудита.
+	ECHO Папка "%TEMP%\%~n0" существует. Возможно, в данный момент выполняется другой процесс аудита.
 	ECHO Нажмите любую клавишу для попытки полного удаления этой папки.
 	PAUSE
-	RD /S /Q "%TEMP%\WinAudit"
+	RD /S /Q "%TEMP%\%~n0"
     )
-    %exe7z% x -o"%TEMP%\WinAudit" -- "%srcpath%WinAudit.7z"
-    PUSHD "%TEMP%\WinAudit"||EXIT /B
+    %exe7z% x -o"%TEMP%\%~n0" -- "%srcpath%WinAudit.7z"
+    PUSHD "%TEMP%\%~n0"||EXIT /B
 	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
 	rem Security included to full WinAudit report
 	rem     secedit.exe /export /CFG "SecurityPolicy-%Hostname%.inf"
 	rem     secedit.exe /export /mergedpolicy /CFG "SecurityPolicy-ADMerged-%Hostname%.inf"
-	"%TEMP%\WinAudit\WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\WinAudit\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
-	"%TEMP%\WinAudit\WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\WinAudit\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
-	"%TEMP%\WinAudit\WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\WinAudit\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
+	"%TEMP%\%~n0\WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
+	"%TEMP%\%~n0\WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
+	"%TEMP%\%~n0\WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
 	
 	rem winaudit switches:
 	rem g	Include System Overview
@@ -86,17 +89,18 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	
 	FOR /F "usebackq tokens=1" %%I IN (`"%smartctlexe%" --scan`) DO "%smartctlexe%" -s on -x %%I >"%%~nI-smart-%Hostname%.txt" 2>"%%~nI-smart-%Hostname%.log"
 	FOR %%I IN (*.log) DO IF "%%~zI"=="0" DEL %%I
-	ECHO %DATE% %TIME%>wmi-description.log
+	(ECHO %DATE% %TIME%)>wmi-description.log
 	FOR /F "usebackq %WMIListSkipLines% tokens=1* delims=	" %%A IN ("%~0") DO (
-	    ECHO "%windir%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.log
-	    ECHO.|"%windir%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.txt 2>>wmi-description.log
+	    ECHO "%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.log
+	    ECHO.|"%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.txt 2>>wmi-description.log
 	)
 	
 	DEL smartctl-32.exe smartctl-64.exe smartmontools.url WinAudit.exe "WinAudit - Home.url"
-	FOR %%A IN ("%TEMP%\WinAudit\*.*") DO IF %%~zA EQU 0 DEL "%%~A"
-	%exe7z% a -mx=9 -m0=LZMA2:a=2:d26:fb=273 -- "%ReportPath%\%Hostname% %fnametvID%%datetime%.7z" *.html *.csv *.txt *.inf *.log && DEL *.html *.csv *.txt *.inf *.log
+	FOR %%A IN ("%TEMP%\%~n0\*.*") DO IF %%~zA EQU 0 ECHO.|DEL "%%~A"
+	FOR %%A IN ("%localFPdir%\*.*") DO COPY /Y "%%~A" "%TEMP%\%~n0\*.*" <NUL
+	%exe7z% a -mx=9 -m0=LZMA2:a=2:d26:fb=273 -- "%ReportPath%\%Hostname% %fnametvID%%datetime%.7z" *.html *.csv *.txt *.inf *.json *.log && DEL *.html *.csv *.txt *.inf *.json *.log
     POPD
-    RD /Q "%TEMP%\WinAudit"
+    RD /Q "%TEMP%\%~n0"
     EXIT /B
 )
 
