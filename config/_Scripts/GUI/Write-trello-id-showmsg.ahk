@@ -7,20 +7,20 @@ EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 
 pathTrelloID=%A_AppDataCommon%\mobilmir.ru\trello-id.txt
+errTextSuffix=`n`nИсправьте карточку`, обновите дамп доски (или дождитесь автоматического обновления) и снова запустите на этом компьютере "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Write-trello-id.ahk"
 
-argc = %0%
-If (argc) {
-    errtxt=
-    Loop %argc%
-    {
-	If (FileExist(%A_Index%))
-	    Run % """" %A_Index% """"
-	Else
-	    errtxt .= %A_Index% " "
-    }
+Loop %0%
+{
+    argv := %A_Index%
+    CheckRun(FileExist(argv) && argv != pathTrelloID, argv) || errtxt .= argv " "
 }
-If (errtxt || !FileExist(pathTrelloID)) {
-    MsgBox Файл "%pathTrelloID%" не записан.`nИсправьте карточку`, обновите дамп Inventory\collector-script\trello-accounting-board-dump (или дождитесь автоматического обновления) и снова запустите на этом компьютере "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Write-trello-id.ahk"
+
+If (errtxt)
+    MsgBox %errtxt%%errTextSuffix%
+If (!FileExist(pathTrelloID)) {
+    Throw
+    If (!errtxt)
+	MsgBox Файл "%pathTrelloID%" не записан.%errTextSuffix%
     ExitApp
 }
 
@@ -36,24 +36,33 @@ Loop Read, %pathTrelloID%
     Else
 	cardText .= A_LoopReadLine "`n"
 } Until A_Index >= 4
+
+lastHotkeyTime := A_TickCount
 Loop
-    Sleep 200
-Until A_TimeIdlePhysical > 100
+    Sleep 250
+Until A_TimeIdlePhysical > 500 ; ожидание простоя
+
 Progress zh0, %cardText%`n`n[F1] – открыть %cardURL%`n[F2] – открыть trello-id.txt, %cardTitle%, %cardHostname%
 Loop
     Sleep 200
-Until A_TimeIdlePhysical < 200
+Until A_TimeIdlePhysical < 200 ; ожидание любого действия пользователя
+
+While (CheckRun(openURL, cardURL) || CheckRun(openFile, pathTrelloID) || (A_TickCount - lastHotkeyTime) < 1000) {
+    Sleep 200
+} ; в течение 1 с после нажатия клавиши, можно нажать ещё раз
 Progress Off
-Sleep 200
-
-If (runURL)
-    Run %cardURL%
-If (openFile)
-    Run %pathTrelloID%
-
 ExitApp
 
-F1:: runURL := 1
-F2:: openFile := 1
+CheckRun(ByRef val, ByRef exec) {
+    If (val && exec) {
+	ToolTip Открывается "%exec%"
+	Run "%exec%"
+	val := 0
+	return 1
+    }
+}
+
+F1:: openURL := 1, lastHotkeyTime := A_TickCount
+F2:: openFile := 1, lastHotkeyTime := A_TickCount
 
 #include %A_ScriptDir%\..\Lib\CutTrelloCardURL.ahk
