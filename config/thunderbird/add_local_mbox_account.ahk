@@ -23,7 +23,7 @@ If (FileExist(tmpPrefs))
 
 While FileExist(mtProfileDir . "\parent.lock") {
     WinClose ahk_exe thunderbird.exe
-    If (!splashOn) {
+    If (!splashOn && A_Index > 1) {
 	Progress AM ZH0, При выходе Thunderbird перезаписывает prefs.js`, так что добавить учётную запись в открытый профиль нельзя., Профиль занят`, ожидание освобождения., %A_ScriptName%
 	splashOn := 1
     }

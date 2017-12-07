@@ -11,8 +11,6 @@ rem srcpath with baseDistUpdateScripts replaced to baseDistributives
 rem relpath is srcpath relatively to baseDistributives (no trailing backslash)
 rem workdir - baseWorkdir with relpath (or %srcpath%temp if baseWorkdir isn't defined)
 rem logsDir - baseLogsDir with relpath (or nothing)
-)
-(
 SET "findargs=-name *.exe -and -not -name *beta*"
-CALL "%baseScripts%\_DistDownload.cmd" http://www.foobar2000.org/download *.exe -ml2 -nd -A.exe
 )
+CALL "%baseScripts%\_DistDownload.cmd" http://www.foobar2000.org/download *.exe -ml2 -nd -A.exe
