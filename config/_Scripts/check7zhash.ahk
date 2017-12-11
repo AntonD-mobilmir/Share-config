@@ -75,8 +75,8 @@ Warning(text) {
 ObjectToText(obj) {
     out := ""
     For i,v in obj
-	out .= i ": " ( IsObject(v) ? "{" ObjectToText(v) "}" : (InStr(v, ",") ? """" v """" : v) ) ", "
-    return Trim(out, ", ")
+	out .= i ": " ( IsObject(v) ? "(" ObjectToText(v) ")" : (InStr(v, ",") ? """" v """" : v) ) ", "
+    return SubStr(out, 1, -2)
 }
 
 #include <Read7zHashOut>

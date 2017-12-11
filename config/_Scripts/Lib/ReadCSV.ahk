@@ -80,10 +80,8 @@ ReadCSV(ByRef tsvpath, ByRef reqHeaders := "", separator:="CSV") {
 			    currLine[tsvHdrs[A_Index]] := A_LoopField
 		}
 	    }
-	    ;MsgBox % "currLine: " ObjectToText(currLine) "`nA_Index: " A_Index
 	    objTSV[A_Index-1] := currLine
 	}
     }
-    ;MsgBox % ObjectToText(objTSV)
     return (objTSV)
 }
