@@ -8,16 +8,20 @@ SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 CALL "%~dp0_Scripts\move Local_Scripts to ProgramData_mobilmir.cmd"
 CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
+
+IF NOT "%~1"=="" SET "configDir=%~1"
+SET "rsyncHost=192.168.1.80"
 )
-    (
-    IF DEFINED DefaultsSource CALL :getconfigDirFromDefaultsSource "%DefaultsSource%"
-    IF NOT DEFINED configDir CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd"
-    IF NOT DEFINED configDir ECHO Место назначения не определено. Сначала стоит установить _get_defaultconfig_source.cmd & PAUSE & EXIT /B
+    IF NOT DEFINED configDir (
+	IF DEFINED DefaultsSource CALL :getconfigDirFromDefaultsSource "%DefaultsSource%"
+	IF NOT DEFINED configDir CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd"
+	IF NOT DEFINED configDir ECHO Место назначения не определено. Сначала стоит установить _get_defaultconfig_source.cmd & PAUSE & EXIT /B
     )
+)
+(
     IF "%configDir:~0,2%"=="\\" ECHO Папка конфигурации - в сети, обновлять можно только локальную папку! & PAUSE & EXIT /B
     IF NOT EXIST "%configDir%" MKDIR "%configDir%" || EXIT /B
 
-    SET "rsyncHost=192.168.1.80"
     IF EXIST "%SystemDrive%\SysUtils\cygwin\cygpath.exe" IF EXIST "%SystemDrive%\SysUtils\cygwin\rsync.exe" (
 	CALL "%ProgramData%\mobilmir.ru\Common_Scripts\waithost.cmd" %rsyncHost% 1 && CALL :RunRsync && EXIT /B
     )
@@ -65,7 +69,10 @@ EXIT /B
 )
 (
     %SystemRoot%\System32\icacls.exe "%dst%" /reset /T /C /Q
-    %SystemDrive%\SysUtils\cygwin\rsync.exe -v --inplace -t --modify-window=3601 -m -y -8 -h --progress -r --delete %args% "%src%" "%cygDst%" && %SystemRoot%\System32\icacls.exe "%dst%" /reset /T /C /Q
+    
+    rem -m, --prune-empty-dirs      prune empty directory chains from the file-list
+    rem --modify-window=3601 
+    %SystemDrive%\SysUtils\cygwin\rsync.exe -v --inplace -t -8 -h --progress -r --delete %args% "%src%" "%cygDst%" && %SystemRoot%\System32\icacls.exe "%dst%" /reset /T /C /Q
     rem без && теряется код ошибки rsync
     
     ENDLOCAL
