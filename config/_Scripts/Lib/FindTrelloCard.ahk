@@ -136,7 +136,6 @@ FingerprintMACs_to_FindTrelloCardQuery(ByRef fp, ByRef currentQuery:="") {
     return currentQuery
 }
 
-
 FingerprintSNs_to_Regexes(ByRef fp, withHeaders := 1) {
     SNFieldNames := { "IdentifyingNumber": 1, "UUID": 1, "SerialNumber": 1 }
     rs := Object()
