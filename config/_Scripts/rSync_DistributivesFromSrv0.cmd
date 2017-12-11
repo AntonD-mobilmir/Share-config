@@ -9,39 +9,44 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
 SET "DistributivesHost=Srv0.office0.mobilmir"
 SET "syncFlagMasks=.sync*"
-SET "DstDir=%~d0\Distributives"
 
 IF NOT DEFINED ErrorCmd (
     IF "%RunInteractiveInstalls%"=="0" (
-	SET "ErrorCmd=ECHO  & PING -n 30 127.0.0.1 >NUL & EXIT /B"
+	SET "ErrorCmd=(ECHO  & PING -n 30 127.0.0.1 >NUL & EXIT /B)"
     ) ELSE (
-	SET "ErrorCmd=PAUSE & EXIT /B"
+	SET "ErrorCmd=(PAUSE & EXIT /B)"
     )
 )
 
 IF NOT EXIST %SystemDrive%\SysUtils\cygwin\rsync.exe CALL :unpackRsync
 
+IF NOT DEFINED fuzzyDirs FOR %%A IN ("%~1.bak" "%~d0\Distributives.bak") DO IF EXIST "%%~A" CALL :AppendfuzzyDirs %%A
 SET "compressMode=-z --compress-level=9"
-route print | find "          0.0.0.0          0.0.0.0      192.168.1.1" /C && SET "compressMode="
+route print | find "          0.0.0.0          0.0.0.0      192.168.1.1" /C && (SET "compressMode=" & SET "fuzzyDirs=")
 )
 (
 ECHO args: %*
 ECHO compressMode: %compressMode%
+ECHO fuzzyDirs: %fuzzyDirs%
 SET "SrcBaseURI=rsync://%DistributivesHost%/Distributives"
-IF NOT "%~1"=="" (
+IF "%~1"=="" (
+    IF "%CD%"=="%CD:\Distributives\=%" (
+	IF NOT "%~d0"=="\\" FOR /R "%~dp0" %%I IN (%syncFlagMasks%) DO CALL :rsyncDistributives "%%~dpI"
+    ) ELSE CALL :rsyncDistributives "%CD%"
+) ELSE (
     FOR %%A IN (%*) DO CALL :rsyncDistributives "%%~A"
-    EXIT /B
 )
 
-FOR /R "%DstDir%" %%I IN (%syncFlagMasks%) DO CALL :rsyncDistributives "%%~dpI"
 EXIT /B
 )
 :rsyncDistributives
 (
-rem %1 - local destination path without driveletter
+rem %1 - local destination path
 rem source is determined with SrcBaseURI and part of destination:
 rem %SrcBaseURI%\local_destination_without_?:\Distributives_prefix
 SET "argDestDir=%~f1"
+IF "%~d1"=="\\" %ErrorCmd%
+SET "argdestDrive=%~d1"
 )
 IF "%argDestDir:~-1%"=="\" SET "argDestDir=%argDestDir:~,-1%"
 (
@@ -52,10 +57,17 @@ IF "%argDestDir:~-1%"=="\" SET "argDestDir=%argDestDir:~,-1%"
     ECHO %DATE% %TIME% local dest: %argDestDir%
     SET "lastCallSrc=%argDestDir%"
 
-    CALL :getRelPath relDestPath "%argDestDir%"
+    CALL :getRelativePath relDestPath "%argDestDir%"
+    IF NOT DEFINED relDestPath %ErrorCmd%
     IF "%argDestDir:~0,2%"=="\\" ( SET "icaclsDestDir=%argDestDir%" ) ELSE SET "icaclsDestDir=\\?\%argDestDir%"
 )
 (
+    IF DEFINED fuzzyDirs (
+	SET fuzzyMode=-y
+	rem  -y, --fuzzy                 find similar file for basis if no dest file
+	CALL :AppendFuzzyArgs "/%relDestPath:\=/%" %fuzzyDirs:\=/%
+    )
+    
     SET "cygpathRsyncSrc="
     ECHO %DATE% %TIME% Converting "%SrcBaseURI%\%relDestPath%\." to cygpath...
     FOR /F "usebackq delims=" %%A IN (`%SystemDrive%\SysUtils\cygwin\cygpath.exe "%SrcBaseURI%\%relDestPath%\."`) DO SET "cygpathRsyncSrc=%%~A"
@@ -64,22 +76,32 @@ IF "%argDestDir:~-1%"=="\" SET "argDestDir=%argDestDir:~,-1%"
     SET "rulefiles="
     SET "recursion=-r"
 )
-PUSHD %1 || EXIT /B
+PUSHD %1 || %ErrorCmd%
 (
-    IF "%CD%"=="%SystemRoot%" @ECHO %DATE% %TIME% PUSHD ended up in SystemRoot & PAUSE & %ErrorCmd%
-    IF "%CD:~1,9%"==":\Windows" @ECHO %DATE% %TIME% PUSHD ended up in a Windows dir & PAUSE & %ErrorCmd%
-    IF "%CD:~1,9%"==":\" @ECHO %DATE% %TIME% PUSHD ended up in a drive root & PAUSE & %ErrorCmd%
+    IF /I "%CD%"=="%SystemRoot%" @ECHO %DATE% %TIME% PUSHD ended up in SystemRoot & PAUSE & %ErrorCmd%
+    IF /I "%CD:~1,9%"==":\Windows" @ECHO %DATE% %TIME% PUSHD ended up in a Windows dir & PAUSE & %ErrorCmd%
+    IF /I "%CD:~1,9%"==":\" @ECHO %DATE% %TIME% PUSHD ended up in a drive root & PAUSE & %ErrorCmd%
     @rem TODO: includes still don't work
     IF EXIST ".sync.includes" SET rulefiles=%rulefiles% --include-from=.sync.includes
     IF EXIST ".sync.excludes" SET rulefiles=%rulefiles% --exclude-from=.sync.excludes
 )
 (
-    CALL :ResetACL "%icaclsDestDir%" || (ECHO Resetting ownership & %SystemRoot%\System32\takeown.exe /F "%icaclsDestDir%" /D Y /R & CALL :ResetACL "%icaclsDestDir%")
     SET "rsyncError="
-    ECHO %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" .
-    %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay --super -tmy8hP --exclude=.sync* --exclude=temp %recursion% %rulefiles% "%cygpathRsyncSrc%" . || CALL :SetRsyncError
-    POPD
+    CALL :ResetACL "%icaclsDestDir%" || (ECHO Resetting ownership & %SystemRoot%\System32\takeown.exe /F "%icaclsDestDir%" /D Y /R & CALL :ResetACL "%icaclsDestDir%")
+    ECHO Creating folder structure
+    ECHO %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk --ignore-existing -t8hP -f "+ */" -f "- *" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" .
+    %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk --ignore-existing -t8hP -f "+ */" -f "- *" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" . || CALL :SetRsyncError
+    rem -m, --prune-empty-dirs      prune empty directory chains from the file-list
     CALL :ResetACL "%icaclsDestDir%"
+    ECHO Syncing
+    ECHO %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% %fuzzyMode% -t8hP --delete-delay -f "- .sync*" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" .
+    %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% %fuzzyMode% -t8hP --delete-delay -f "- .sync*" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" . || CALL :SetRsyncError
+    CALL :ResetACL "%icaclsDestDir%"
+rem     ECHO Syncing again deleting excess files this time
+rem     ECHO %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay -t8hP -f "- .sync*" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" .
+rem     %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk %compressMode% --delete-delay -t8hP -f "- .sync*" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" . || CALL :SetRsyncError
+rem     CALL :ResetACL "%icaclsDestDir%"
+    POPD
 IF NOT DEFINED rsyncError EXIT /B
 )
 EXIT /B %rsyncError%
@@ -136,25 +158,63 @@ EXIT /B
     exit /b
 )
 
-:getRelPath <varname> <fullpath>
-SET "fallback=%~pnx2"
-SET "fallback=%fallback:~14%"
-
-SET /A "pathTokenNum=0"
-:nextToken
-SET /A "pathTokenNum+=1"
-FOR /F "delims=\ tokens=%pathTokenNum%*" %%A IN ("%~2") DO (
-    IF "%%~B"=="" (
-	SET "%~1=%fallback%"
-	EXIT /B
-    )
-    IF "%%~A"=="Distributives" (
-	SET "%~1=%%~B"
-	EXIT /B
-    )
-    ECHO Skipping: %%A
+:getRelativePath <varname> <fullpath>
+(
+SETLOCAL
+SET "destPath=%~f2"
+CALL :strlen srcpathLen srcpath
+rem Сначала проверка, не находится ли скрипт в той же папке, в которой лежит папка для синхронизации
+rem если да, то относительный путь = подпапке относительно скрипта
 )
-GOTO :nextToken
+FOR /F "usebackq delims=" %%A IN (`ECHO "%%destPath:~0,%srcpathLen%%%"`) DO IF /I "%%~A"=="%srcpath%" FOR /F "usebackq delims=" %%B IN (`ECHO "%%destPath:~%srcpathLen%%%"`) DO IF NOT "%%~B"=="" (
+    ENDLOCAL
+    SET "%~1=%%~B"
+    EXIT /B
+)
+rem Иначе надо попробовать найти слово Distributives в пути
+SET /A "pathTokenNum=1"
+:getRelativePath_nextToken
+(
+    FOR /F "delims=\ tokens=%pathTokenNum%*" %%A IN ("%~2") DO (
+	IF "%%~B"=="" (
+	    %ErrorCmd%
+	    EXIT /B
+	)
+	IF /I "%%~A"=="Distributives" (
+	    ENDLOCAL
+	    SET "%~1=%%~B"
+	    EXIT /B
+	)
+	ECHO Skipping: %%A
+    )
+    SET /A "pathTokenNum+=1"
+GOTO :getRelativePath_nextToken
+)
+
+:AppendFuzzyArgs <"/%relDestPath:\=/%"> <%fuzzyDirs:\=/%>
+(
+    rem      --compare-dest=DIR      also compare destination files relative to DIR
+    rem      --copy-dest=DIR         ... and include copies of unchanged files
+    rem      --link-dest=DIR         hardlink to files in DIR when unchanged
+    IF "%~2"=="" EXIT /B
+    IF /I "%~d2"=="%argdestDrive%" (
+	IF EXIST "%~2%~1" (
+	    SET "fuzzyMode=%fuzzyMode% "--link-dest=%~2%~1" "--link-dest=%~2""
+	) ELSE SET "fuzzyMode=%fuzzyMode% "--link-dest=%~2""
+    ) ELSE (
+	IF EXIST "%~2%~1" (
+	    SET "fuzzyMode=%fuzzyMode% "--copy-dest=%~2%~1" "--copy-dest=%~2""
+	) ELSE SET "fuzzyMode=%fuzzyMode% "--copy-dest=%~2""
+    )
+    SHIFT /2
+    GOTO :AppendFuzzyArgs
+)
+
+:AppendfuzzyDirs
+(
+SET "fuzzyDirs=%fuzzyDirs% %*"
+EXIT /B
+)
 
 :strlen <resultVar> <stringVar>
 (   
@@ -165,7 +225,7 @@ GOTO :nextToken
         if "!s:~%%P,1!" NEQ "" ( 
             set /a "len+=%%P"
             set "s=!s:~%%P!"
-            ECHO len: !len! string: !s!
+            rem ECHO len: !len! string: !s!
         )
     )
 )
