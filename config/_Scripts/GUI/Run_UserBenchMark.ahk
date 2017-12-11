@@ -15,24 +15,29 @@ EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
 Arg1 = %1%
 If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFromBrowser.lnk") {
-    OnClipboardChange("ClipHook")
+    sendModes := {0: "Play", 1: "Input", 2: "Event"}
+    
     SetTitleMatchMode 2
-    actnList := "_;^f;_;Copy results{Esc};{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
+    actnList := "_;^f;_;Copy results{Esc};_;{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
     wantUserIdle := 10000 ; ms
 
     KL_NAMELENGTH = 9
     LANG_ENG := "00000409"
     ;LANG_RUS := "00000419"
-    VarSetCapacity(layoutName, KL_NAMELENGTH * (A_IsUnicode+1) + 1) ; +1 for EOL
+    VarSetCapacity(layoutName, (KL_NAMELENGTH+1) * (A_IsUnicode+1)) ; +1 for '\0'
     
+    OnClipboardChange("ClipHook")
     Loop
     {
 	;MsgBox ResultsURL: %ResultsURL%`nA_Index: %A_Index%
 	If (ResultsURL && (IsObject(perfResultsObj) || A_Index > 100) ) {
 	    ExitApp !PostResults(ResultsURL, perfResultsObj)
 	} Else {
-	    IfWinExist Performance Results - UserBenchmark
-	    {
+	    sendModeName := SendModes[Mod(A_Index, 3)]
+	    SendMode %sendModeName%
+	    Menu Tray, Tip, %A_ScriptName%: Cycle %A_Index%`, SendMode %sendModeName%
+
+	    If (WinExist("Performance Results - UserBenchmark")) {
 		Loop Parse, actnList, `;
 		{
 		    Sleep 250
@@ -87,14 +92,6 @@ If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFr
 	    }
 	    
 	    Sleep 1000
-	    sendModeN := Mod(A_Index, 3) ; SendMode Input|Play|Event; on first loop, A_Index = 1, so remainder = 1 → SendMode Play for next try
-	    If (sendModeN = 0) {
-		SendMode Input
-	    } Else If (sendModeN = 1) {
-		SendMode Play
-	    } Else If (sendModeN = 2) {
-		SendMode Event
-	    }
 	}
     }
     Progress Off
