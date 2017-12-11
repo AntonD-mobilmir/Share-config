@@ -6,7 +6,7 @@
 StringCaseSense On
 FileEncoding CP1251
 
-Global sendemailexe, tailexe, ReturnError, logfile, localcfg, arcDir
+Global sendemailexe, tailexe, ReturnError, logfile, localcfg, arcDir, errorsOccured
 
 ShopBTS_Add_install := "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk"
 verFName=%A_ScriptDir%\ShopBTS_Add_ver.txt
@@ -36,9 +36,7 @@ If (!sendemailexe || !tailexe) {
 	RunWait "%A_AhkPath%" "%ShopBTS_Add_install%" /autoupdate
 	Reload
     }
-    MsgBox 5, Отправка выгрузок и уведомлений Рарус не работает, Не удалось найти утилиту отправки писем.`nПожалуйста`, сообщите об этом технической поддержке!`n`nЕсли подключть VPN`, при повторной проверке утилита будет автоматически распакована с севера в офисе.
-    IfMsgBox Cancel
-	Exit
+    Panic("Не удалось найти утилиту отправки писем.`nПожалуйста`, сообщите об этом технической поддержке!`n`nЕсли подключть VPN`, при повторной проверке утилита будет автоматически распакована с севера в офисе.")
     Reload
 }
 
@@ -51,7 +49,7 @@ FileGetTime logfileDate,%logfile%
 If (logfileDate) {
     logfileAge -= logfileDate, Seconds
     If (logfileAge < 60) {
-	CheckTrayIcon(" Последний раз отправка выполнялась менее минуты назад`, поэтому данный запуск будет пропущен.", "Отправка файлов отложена")
+	CheckTrayIcon("Последний раз отправка выполнялась менее минуты назад`, поэтому данный запуск будет пропущен.", "Отправка файлов отложена")
 	Sleep 1500
 	ExitApp
     }
@@ -74,22 +72,37 @@ If (!InStr(FileExist(A_ScriptDir "\Arc"), "D")) {
 }
 FileCreateDir %arcDir%
 
-If %0%
-{
-    Loop %0%
-	DispatchSingleFile(%A_Index%)
-} Else {
-    Loop %OutgoingFilesQueueDir%\*.7z
-	DispatchSingleFile(A_LoopFileFullPath)
-    Loop %OutgoingTextsQueueDir%\*.txt
-	DeliverOneEmail(A_LoopFileFullPath)
-}
+Try {
+    If %0%
+    {
+	Loop %0%
+	    DispatchSingleFile(%A_Index%)
+    } Else {
+	Loop %OutgoingFilesQueueDir%\*.7z
+	    DispatchSingleFile(A_LoopFileFullPath)
+	Loop %OutgoingTextsQueueDir%\*.txt
+	    DeliverOneEmail(A_LoopFileFullPath)
+    }
+} Catch e
+    Panic(e)
 
 Sleep 3000
+If (!errorsOccured)
+    FileDelete %logfile%.errflag
 Exit %ReturnError%
+
+Panic(e) {
+    errorsOccured=1
+    If (!IsObject(e))
+	e := Exception(e, -2)
+    AppendError(ObjectToText(e))
+    MsgBox 0x30, Отправка выгрузок и/или уведомлений из 1С-Рарус не работает, % e.Message "`n" e.Extra (e.What ? "`n(" e.What ")" : "")
+    ExitApp ReturnError ? ReturnError : -1
+}
 
 DispatchSingleFile(pathFileToSend) {
     global killedSendEmail, pidSendEmail
+    static emailUserName,emailPassword
 
     SplitPath pathFileToSend, nameExtToSend, dirFileToSend, , nameOnlyToSend
     pathNote = %dirFileToSend%\%nameOnlyToSend%.txt
@@ -104,18 +117,20 @@ DispatchSingleFile(pathFileToSend) {
     }
     encSubj := EncodeWrapBase64UTF8(note)
     CheckTrayIcon(trayMsgText " (""" nameExtToSend """)", "Отправка выгрузки", 15, 0x31)
-    Loop Read, %A_ScriptDir%\sendemail.cfg
-    {
-	If (A_Index==1)
-	    emailUserName=%A_LoopReadLine%
-	Else If (A_Index==2)
-	    emailPassword=%A_LoopReadLine%
-	Else
-	    Break
-    }
-    If (!emailUserName || !emailPassword) {
-	MsgBox 5, Отправка выгрузок и уведомлений Рарус не работает, Не настроена отправка выгрзок по почте.`nПожалуйста`, сообщите об этом технической поддержке!`n`nЕсли подключть VPN`, выгрузки будут автоматически перемещены на сервер.
-	ExitApp
+    While (!emailUserName || !emailPassword) {
+	If (A_Index==1) {
+	    Loop Read, %A_ScriptDir%\sendemail.cfg
+	    {
+		If (A_Index==1)
+		    emailUserName=%A_LoopReadLine%
+		Else If (A_Index==2)
+		    emailPassword=%A_LoopReadLine%
+		Else
+		    Break
+	    }
+	} Else {
+	    Throw Exception("Не настроена отправка выгрузок 1С-Рарус", A_ScriptDir "\sendemail.cfg", "Не прочиталось имя пользователя или пароль.")
+	}
     }
     FileAppend %A_Now% %trayMsgText%…`t, %logfile%
     SetupTemp()
@@ -126,21 +141,18 @@ DispatchSingleFile(pathFileToSend) {
     sendemailerr := ErrorLevel
     SetTimer killSendEmail, Off
     If (sendemailerr || killedSendEmail) {
-	CheckTrayIcon(trayMsgText "`n" note " (""" nameExtToSend """) неудачна", "Ошибка при попытке отправки выгрузки", 30, 0x23)
 	If (killedSendEmail) {
-	    FileAppend sendemail.exe завершен по таймауту`n, %logfile%
+	    errText = sendemail.exe завершен по таймауту
 	    ReturnError:=-1
 	} Else {
-	    FileAppend sendemail.exe завершен с ошибкой %sendemailerr%`n, %logfile%
+	    errText = sendemail.exe завершен с ошибкой %sendemailerr%
 	    ReturnError:=sendemailerr
 	}
-	FileRemoveDir %A_Temp%\perl, 1
-	Loop Files, %A_Temp%\pdk*, D
-	    FileRemoveDir %A_LoopFileFullPath%, 1
+	AppendError(errText, pathFileToSend ": " errText)
+	CheckTrayIcon(trayMsgText "`n" note " (""" nameExtToSend """) неудачна", "Ошибка при попытке отправки выгрузки", 30, 0x23)
+	RemovePerlTemp()
     } Else {
 	CheckTrayIcon(trayMsgText "`n" note " (""" nameExtToSend """) успешна", "Выгрузка отправлена", 5, 0x31)
-	;FileDelete %pathFileToSend%
-	;FileDelete %pathNote%
 	FileMove %pathFileToSend%, %arcDir%, 1
 	FileMove %pathNote%, %arcDir%, 1
     }
@@ -229,7 +241,7 @@ DeliverOneEmail(EmailFileName) {
     fBody.Close()
     
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Отправка письма")
-    FileAppend %A_Now% Отправка письма "%plainSubj%" на %addrlistTo%…, %logfile%
+    FileAppend %A_Now% Отправка письма "%plainSubj%" на %addrlistTo%…`t, %logfile%
     tempDir := SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -600000
@@ -244,25 +256,39 @@ DeliverOneEmail(EmailFileName) {
 	CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo "`nОшибка: " sendemailErr " / " sendemailLastErr, "Ошибка при отправке", 30, 0x23)
 
 	If (killedSendEmail) {
-	    FileAppend sendemail.exe завершен по таймауту`n, %logfile%
-	    ReturnError:=-1
+	    AppendError("sendemail.exe завершен по таймауту", "timeout " EmailFileName)
+	    ReturnError := -1
 	} Else {
-	    FileAppend sendemail.exe завершен с ошибкой %sendemailerr%`n, %logfile%
-	    ReturnError:=sendemailerr
+	    AppendError("sendemail.exe завершен с ошибкой " sendemailerr, "error " sendemailerr " for " EmailFileName)
+	    ReturnError := sendemailerr
 	}
-	FileRemoveDir %A_Temp%\perl, 1
-	Loop Files, %A_Temp%\pdk*, D
-	    FileRemoveDir %A_LoopFileFullPath%, 1
+	RemovePerlTemp()
 
 	return ReturnError
     }
     
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Письмо отправлено", 5, 0x31)
-    ;FileDelete %EmailFileName%
-    ;FileRemoveDir %dirAttachments%, 1
     FileMove %EmailFileName%, %arcDir%, 1
     Loop Files, %dirAttachments%, D
 	FileMoveDir %A_LoopFileLongPath%, %arcDir%\%A_LoopFileName%, 1
+}
+
+RemovePerlTemp() {
+    Try {
+	FileRemoveDir %A_Temp%\perl, 1
+	Loop Files, %A_Temp%\pdk*, D
+	    FileRemoveDir %A_LoopFileFullPath%, 1
+    }
+}
+
+AppendError(ByRef logText, ByRef flagText := "") {
+    global logfile, errorsOccured
+    errorsOccured := 1
+    FileAppend %logText%`n, %logfile%
+    If (flagText)
+	FileAppend %A_Now% %flagText%`n, %logfile%.errflag
+    Else
+	FileAppend %A_Now% %logText%`n, %logfile%.errflag
 }
 
 FilterRecipients(ByRef rcptList, ByRef filteredOut := "", ByRef allowedRegex := 0) {
@@ -354,6 +380,15 @@ FirstExisting(paths*) {
     
     return ""
 }
+
+ObjectToText(obj) {
+    out := ""
+    For i,v in obj
+	out .= i ": " ( IsObject(v) ? "(" ObjectToText(v) ")" : (InStr(v, ",") ? """" v """" : v) ) ", "
+    return SubStr(out, 1, -2)
+}
+
+; //
 
 Base64Encode(ByRef bin, n=0) {
    m := VarSetCapacity(bin)

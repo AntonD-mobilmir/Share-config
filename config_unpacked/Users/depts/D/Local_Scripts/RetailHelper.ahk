@@ -37,6 +37,18 @@ SetTimer Periodic, %timerPeriod%
 EnvGet LocalAppData,LOCALAPPDATA
 RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C, %A_Temp%, Min UseErrorLevel
 
+; Проверка флагов ошибок при отправке выгрузок
+Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log_*.errflag
+{
+    FileReadLine errLine, %A_LoopFileFullPath%, 1
+    foundErrFlags .= A_LoopFileName ": " errLine ", "
+}
+If (foundErrFlags) {
+    foundErrFlags := SubStr(foundErrFlags, 1, -2)
+    MsgBox 0x30, Ошибки при отправке выгрузок или уведомлений из 1С-Рарус, При отправке выгрузок или увеодмлений из 1С-Рарус возникли ошибки`, и отправка частично либо полностью не работает.`n`nСейчас откроется шаблон письма для регистрации заявки`, проверьте его`, добавьте известную Вам информацию и отправляйте. Если письмо не отправится – звоните.
+    Run % "mailto:it-task@status.mobilmir.ru?subject=Ошибки%20" UriEncode(SubStr(foundErrFlags, 1, 50)) "%20отправки%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%20&body=Обнаружены%20сигнальные%20файлы%20ошибок%20при%20отправке%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%0A%0A" UriEncode(foundErrFlags)
+}
+
 Exit
 
 Periodic:
@@ -128,4 +140,49 @@ getFirstPid(exeNames*) {
 	    return ErrorLevel
     }
     return
+}
+
+;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/
+; modified from jackieku's code (http://www.autohotkey.com/forum/post-310959.html#310959)
+UriEncode(Uri, Enc = "UTF-8") {
+    Res := ""
+	StrPutVar(Uri, Var, Enc)
+	f := A_FormatInteger
+	SetFormat, IntegerFast, H
+	Loop
+	{
+		Code := NumGet(Var, A_Index - 1, "UChar")
+		If (!Code)
+			Break
+		If (Code >= 0x30 && Code <= 0x39 ; 0-9
+			|| Code >= 0x41 && Code <= 0x5A ; A-Z
+			|| Code >= 0x61 && Code <= 0x7A) ; a-z
+			Res .= Chr(Code)
+		Else
+			Res .= "%" . SubStr(Code + 0x100, -1)
+	}
+	SetFormat, IntegerFast, %f%
+	Return, Res
+}
+
+UriDecode(Uri, Enc = "UTF-8") {
+	Pos := 1
+	Loop
+	{
+		Pos := RegExMatch(Uri, "i)(?:%[\da-f]{2})+", Code, Pos++)
+		If (Pos = 0)
+			Break
+		VarSetCapacity(Var, StrLen(Code) // 3, 0)
+		StringTrimLeft, Code, Code, 1
+		Loop, Parse, Code, `%
+			NumPut("0x" . A_LoopField, Var, A_Index - 1, "UChar")
+		StringReplace, Uri, Uri, `%%Code%, % StrGet(&Var, Enc), All
+	}
+	Return, Uri
+}
+
+StrPutVar(Str, ByRef Var, Enc = "") {
+	Len := StrPut(Str, Enc) * (Enc = "UTF-16" || Enc = "CP1200" ? 2 : 1)
+	VarSetCapacity(Var, Len, 0)
+	Return, StrPut(Str, &Var, Enc)
 }
