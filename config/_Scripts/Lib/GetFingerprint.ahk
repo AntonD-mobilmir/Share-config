@@ -22,12 +22,12 @@ GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
 	    Loop Parse, valArray,`,
 	    {
 		v := Trim(o[A_LoopField])
-		;MsgBox query: %query%`nA_LoopField: %A_LoopField%`, v: %v%
-		If (v && v!="To be filled by O.E.M." && v!="Base Board Serial Number" && v!="Base Board") {
-		    
-		    ; check if this is Locally administered MAC address, for example, for virtual adapters
-		    If (A_LoopField=="MACAddress" && (firstOctet := "0x" SubStr(v, 1, 2)) & 0x2) {
-			; if so, clean up and skip this adapter
+		If (v && v!="To be filled by O.E.M." && v!="Base Board Serial Number" && v!="Base Board") { ; Поля с этими значениями пропускаются (остальные поля остаются)
+		    ; виртуальные NIC не нужны в отпечатке, пропускаются целиком
+		    If (dispnameMC == "NIC"
+		      && ( A_LoopField=="Description" && v=="RAS Async Adapter" ; Виртуальный NIC VPN с одним и тем же MAC на разных системах:
+		        || A_LoopField=="MACAddress" && (v=="20:41:53:59:4E:FF" ; {"Description":"RAS Async Adapter","MACAddress":"20:41:53:59:4E:FF"}
+						    || (firstOctet := "0x" SubStr(v, 1, 2)) & 0x2))) { ; если второй бит первого октета = 1, это локально-администрируемый MAC адрес, его не может быть у физического адаптера
 			objDataMO=
 			txtDataMO=
 			break 

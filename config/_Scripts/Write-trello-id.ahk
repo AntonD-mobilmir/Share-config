@@ -108,7 +108,7 @@ If (writeSavedID && nMatches==1) {
     For i, match in lastMatch
 	ffc.WriteLine("`nУ карточки " cards[i].name " " cards[i].shortUrl "/" cards[i].idShort "`n`tсовпало " JSON.Dump(match) "`n`t" cards[i].desc)
     ffc.Close()
-    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%pathffc%" "Подходящих карточек: %nMatches% (когда всё в порядке, должна быть одна)"
+    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%pathffc%" "Подходящих карточек: %nMatches% (когда всё в порядке`, должна быть одна)"
 }
 ; если nMatches = 1, найдена всего одна карточка, всё в порядке → выход без ошибок (код 0)
 ; если nMatches = 0, карточек не найдено → код ошибки 1

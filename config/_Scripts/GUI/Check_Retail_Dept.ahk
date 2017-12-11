@@ -437,10 +437,10 @@ If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
     EnvSet Inst1S,1
 }
 
-tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
-tvPassChangeErr := RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
-Loop Read, %tvPassChangeLog%
-    SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
+;tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
+;tvPassChangeErr := RunScript("\\Srv0.office0.mobilmir\profiles$\Share\software_update\scripts\_TeamViewerSecurityPasswordAES 2017-09-13.ahk", "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
+;Loop Read, %tvPassChangeLog%
+;    SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
 
 ;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
 ;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
