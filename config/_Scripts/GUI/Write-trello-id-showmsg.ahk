@@ -37,12 +37,11 @@ Loop Read, %pathTrelloID%
 	cardText .= A_LoopReadLine "`n"
 } Until A_Index >= 4
 
+Progress zh0, %cardText%`n`n[F1] – открыть %cardURL%`n[F2] – открыть trello-id.txt, %cardTitle%, %cardHostname%
 lastHotkeyTime := A_TickCount
 Loop
     Sleep 250
 Until A_TimeIdlePhysical > 500 ; ожидание простоя
-
-Progress zh0, %cardText%`n`n[F1] – открыть %cardURL%`n[F2] – открыть trello-id.txt, %cardTitle%, %cardHostname%
 Loop
     Sleep 200
 Until A_TimeIdlePhysical < 200 ; ожидание любого действия пользователя

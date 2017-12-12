@@ -12,7 +12,7 @@ SET "ReportsDest=\\Srv0\profiles$\Share\Inventory\actual\"
 )
 (
 FOR /D %%I IN ("%ReportsDest%RetailDepts\*") DO (
-    IF EXIST "%ReportsSource%%%~nxI-*.7z" FOR %%J IN ("%ReportsSource%%%~nxI-k *.7z" "%ReportsSource%%%~nxI-2 *.7z" "%ReportsSource%%%~nxI-3 *.7z" "%ReportsSource%%%~nxI-nb *.7z") DO MOVE "%%~J" "%%~I\"
+    IF EXIST "%ReportsSource%%%~nxI-*.7z" FOR %%J IN ("%ReportsSource%%%~nxI-k *.7z" "%ReportsSource%%%~nxI-k2 *.7z" "%ReportsSource%%%~nxI-2 *.7z" "%ReportsSource%%%~nxI-3 *.7z" "%ReportsSource%%%~nxI-nb *.7z") DO MOVE "%%~J" "%%~I\"
 )
 FOR %%I IN ("%ReportsSource%*.7z") DO (
     SET "pathReport=%%~fI"
