@@ -1,8 +1,6 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
-EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
-
 IF (A_LineFile==A_ScriptFullPath) {
     passwd = %1%
     If(!passwd) {
@@ -20,11 +18,14 @@ IF (A_LineFile==A_ScriptFullPath) {
 
 WriteAndShowPassword(passwd) {
     global passwdNo, SystemRoot
+    If (!SystemRoot)
+	EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+    
     passwdNo := WritePassword(passwd, WrittenActually)
-
+    
     If (WrittenActually)
 	Run "%A_AhkPath%" "%A_LineFile%\..\..\Lib\PostNumberedPassword.ahk" %passwdNo% "%passwd%"
-
+    
     Gui Add, Button, xm section gCopypasswdNo, Скопировать
     Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwdNo%
     Gui Add, Button, xm section gCopypasswd, Скопировать
@@ -33,7 +34,7 @@ WriteAndShowPassword(passwd) {
     Gui Font
     Gui Add, Button, xm section gReload, Получить ещё один код&.
     Gui Show
-
+    
     ;Соответствия в https://docs.google.com/a/mobilmir.ru/spreadsheets/d/1lUGVjDWEG3znDUKy-l59Ewt95eFrIgUO-L8dy3lxNWQ
     FileAppend %passwdNo%: %passwd%`n, %A_Temp%\%A_ScriptName%.txt
     Run %SystemRoot%\System32\cipher.exe /E /B "%A_Temp%\%A_ScriptName%.txt",,Min
