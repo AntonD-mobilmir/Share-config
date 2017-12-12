@@ -1,38 +1,92 @@
 ﻿#NoEnv
 
-Suffix = .7z
-SuffixLen := StrLen(Suffix)
+ext = .7z
+extLen := StrLen(ext)
 
-Loop Files, *, DR ; Dirs only, recursively
-{
-    NameList=
-    Loop %A_LoopFileFullPath%\*%Suffix%
+SetWorkingDir %A_ScriptDir%
+oldDest = ..\old\
+
+files := Object()
+
+Try {
+    RotateLogs(A_ScriptFullPath "-errors.log", A_ScriptFullPath ".log")
+    Loop Files, *%ext%, R
     {
-    ;    SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-	NameList .= SubStr(A_LoopFileName, 1, -SuffixLen) . "`n"
+	hostname := SubStr(A_LoopFileName, 1, InStr(A_LoopFileName, " ")-1)
+	If (!IsObject(files[hostname])) {
+	    files[hostname] := props := {Dirs: Object(), c: 1}
+	} Else {
+	    props := files[hostname]
+	    props.c++
+	}
+	props.Dirs[A_LoopFileDir] := -1
+	If (props.latest < A_LoopFileTimeModified)
+	    props.latest := A_LoopFileTimeModified
     }
-    Sort NameList
-    Loop Parse, NameList, `n
-    {
-	If ( Before1stSpace(A_LoopField) = Before1stSpace(PrevName) ) {
-	    try {
-		IfNotExist ..\old\%A_LoopFileFullPath%
-		    FileCreateDir ..\old\%A_LoopFileFullPath%
-		FileMove %A_LoopFileFullPath%\%PrevName%.7z, ..\old\%A_LoopFileFullPath%\%PrevName%.7z
-	    } catch e {
-;		MsgBox % e.Message . " in " . e.What . " (Line# " . e.Line . ")`n" . "Extra: " . e.Extra
-		log(e.Message . " in " . e.What . " (Line# " . e.Line . ")`n" . "Extra: " . e.Extra)
+
+    lstRmv := {}
+
+    For hostname,props in files
+	If (props.c==1)
+	    lstRmv[hostname] := 1
+    For hostname in lstRmv
+	files.Delete(hostname)
+    c:=0
+    For hostname in files
+	c++
+    If (c) {
+	Log(ObjectToText(files))
+    } Else {
+	Log("No duplicate hostnames found")
+	ExitApp
+    }
+
+    For hostname,props in files {
+	;MsgBox % hostname ": " ObjectToText(props)
+	For dir in props.Dirs {
+	    Loop Files, %dir%\%hostname%*%ext%
+	    {
+		If (A_LoopFileTimeModified < props.latest) {
+		    Try {
+			If (!InStr(FileExist(curDst := oldDest . dir), "D"))
+			    FileCreateDir %curDst%
+			FileMove %A_LoopFileFullPath%, %oldDest%%A_LoopFileFullPath%
+			If (FileExist(txtPath := SubStr(A_LoopFileFullPath, 1, -extLen) ".txt"))
+			    FileMove %txtPath%, %oldDest%%txtPath%
+		    } Catch e {
+			If (!IsObject(e))
+			    e := Exception(e)
+			Log("Error " ObjectToText(e) ", current file: " A_LoopFileFullPath ", current hostname: " hostname ", props: " props, 1)
+		    }
+		}
 	    }
 	}
-	PrevName = %A_LoopField%
     }
+} Catch e {	
+    Log(ObjectToText(e), 1)
+    ExitApp 1
+}
+ExitApp
+
+Log(text, err:=0) {
+    fileText := A_Now "`t" (err ? "!" err "`t" : "") text "`n"
+    Try FileAppend %fileText%, *, CP1
+    Try FileAppend %fileText%, %A_ScriptFullPath%.log
+    If (err)
+	FileAppend %fileText%, %A_ScriptFullPath%-errors.log
 }
 
-Before1stSpace(str) {
-    return SubStr(str, 1, InStr(str, " ")-1)
+ObjectToText(obj) {
+    out := ""
+    For i,v in obj
+	out .= i ": " ( IsObject(v) ? "(" ObjectToText(v) ")" : (InStr(v, ",") ? """" v """" : v) ) ", "
+    return SubStr(out, 1, -2)
 }
 
-log(text) {
-    FileAppend %text%`n, *, cp1
-    FileAppend %text%`n, %A_Temp%\%A_ScriptName%.log
+RotateLogs(paths*) {
+    For i,path in paths {
+	Try FileGetSize size, %path%, M
+	If (size > 1)
+	    FileMove %path%, %path%.bak, 1
+    }
 }
