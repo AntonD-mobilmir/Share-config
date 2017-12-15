@@ -21,15 +21,19 @@ if (!A_IsAdmin) {
 ;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
 ;Public
 
-destDir=%A_AppDataCommon%\mobilmir.ru\reg-backup
+Try {
+    destDir=%A_AppDataCommon%\mobilmir.ru\reg-backup
 
-FileCreateDir %destDir%
-RunWait %SystemRoot%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "%destDir%\HKLM-Shell Folders.%A_Now%.reg"
-RunWait %SystemRoot%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" "%destDir%\HKLM-User Shell Folders.%A_Now%.reg"
+    FileCreateDir %destDir%
+    RunWait %SystemRoot%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "%destDir%\HKLM-Shell Folders.%A_Now%.reg",,Min
+    RunWait %SystemRoot%\System32\REG.exe EXPORT "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" "%destDir%\HKLM-User Shell Folders.%A_Now%.reg",,Min
 
-RunWait %SystemRoot%\System32\REG.exe IMPORT "%A_ScriptDir%\HKLM User Shell Folders D_Users_Public.reg"
+    RunWait %SystemRoot%\System32\REG.exe IMPORT "%A_ScriptDir%\HKLM User Shell Folders D_Users_Public.reg",,Min
 
-Loop Files, %A_ScriptDir%\D\*, D
-{
-    FileCopyDir %A_LoopFileFullPath%, D:\%A_LoopFileName%, 1
+    Loop Files, %A_ScriptDir%\D\*, D
+    {
+	FileCopyDir %A_LoopFileFullPath%, D:\%A_LoopFileName%, 1
+    }
+} Catch e {
+    Throw e
 }
