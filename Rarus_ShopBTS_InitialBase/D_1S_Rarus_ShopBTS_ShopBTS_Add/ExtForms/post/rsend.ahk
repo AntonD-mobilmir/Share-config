@@ -3,47 +3,36 @@ Menu Tray, Icon, %A_WinDir%\system32\shell32.dll,69,0
 Menu Tray, Tip, Отправка выгрузок 1C-Рарус
 
 moveFileInsteadOfEmail:=0
-queueDir=%A_ScriptDir%\OutgoingFiles
 logfile=%A_Temp%\%A_ScriptName%.log
 lockfile=%A_Temp%\%A_ScriptName%.lock
 exe7z := find7zGUIorAny()
 
 TrayTip Подготовка файла выгрузки к отправке, Проверка прямого доступа к папке входящих на офисном сервере 1С
-IfExist \\Srv1S\ExchangeIncoming$
-{
-    queueDir=\\Srv1S\ExchangeIncoming$
-    moveFileInsteadOfEmail:=1
-} Else IfExist \\Srv1S.office0.mobilmir\ExchangeIncoming$
-{
-    queueDir=\\Srv1S.office0.mobilmir\ExchangeIncoming$
-    moveFileInsteadOfEmail:=1
-} Else IfExist \\Rarus-Exchange-Server.office.mobilmir.ru\ExchangeIncoming$
-{
-    queueDir=\\Rarus-Exchange-Server.office.mobilmir.ru\ExchangeIncoming$
-    moveFileInsteadOfEmail:=1
-}
+For i, exchangeSrvr in ["Srv1S.office0.mobilmir", "Rarus-Exchange-Server.office.mobilmir.ru"] {
+    queueDir := "\\" exchangeSrvr "\Exchange\LAN\In\txt"
+    moveFileInsteadOfEmail := InStr(FileExist(queueDir), "D")
+} Until moveFileInsteadOfEmail
 TrayTip
 
-IfNotExist %queueDir%
-{
-    FileCreateDir %queueDir%
+If (!moveFileInsteadOfEmail)
+    queueDir := A_ScriptDir "\OutgoingFiles"
 
-    IfNotExist %queueDir%
-    {
+While (!FileExist(queueDir)) {
+    If (A_Index==1) {
+	FileCreateDir %queueDir%
+    } Else {
 	MsgBox 16, Ошибка при инициализации отправки, Папка очереди не существует`, и не может быть создана: "%queueDir%"`n`nОтправка невозможна`, обратитесь к системному администратору для устанения проблемы., 30
-	Exit
+	ExitApp
     }
 }
 
-If Not %0%	;No arguments
-{
+argc = %0%
+If (!argc) {
     MsgBox 64, Отправка выгрузок и подтверждений, Для отправки перетащите файлы на специальный ярлык скрипта. Перетащенные файлы будут отправлены и удалёны!
     Exit 32767
 }
 
-;CommandLine:=DllCall("GetCommandLine", "str")
-
-Loop %0%
+Loop %argc%
 {
     FileToSend:=%A_Index%
     ;Иногда при перетаскивании в качестве аргумента передаётся путь и имя в формате 8.3. Получается что-то вроде ST_С0_~1.7z

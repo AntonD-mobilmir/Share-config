@@ -102,11 +102,30 @@ Panic(e) {
 
 DispatchSingleFile(pathFileToSend) {
     global killedSendEmail, pidSendEmail
-    static emailUserName,emailPassword
+    static emailUserName, emailPassword, exchangeSrvrDest, moveFileInsteadOfEmail
 
     SplitPath pathFileToSend, nameExtToSend, dirFileToSend, , nameOnlyToSend
     pathNote = %dirFileToSend%\%nameOnlyToSend%.txt
-    FileRead note, *P65001 %pathNote% ; *P65001 = Unicode (UTF-8)
+    Try FileRead note, *P65001 %pathNote% ; *P65001 = Unicode (UTF-8)
+    
+    If (!exchangeSrvrDest) {
+	For i, exchangeSrvr in ["Srv1S.office0.mobilmir", "Rarus-Exchange-Server.office.mobilmir.ru"] {
+	    FileAppend `n%A_Now% Проверка прямого доступа к %exchangeSrvr%…`t, %logfile%
+	    exchangeSrvrDest := "\\" exchangeSrvr "\Exchange\LAN\In\arc" 
+	    If (moveFileInsteadOfEmail := InStr(FileExist(exchangeSrvrDest), "D"))
+		FileAppend к "%exchangeSrvrDest%" доступ есть!, %logfile%
+	} Until moveFileInsteadOfEmail
+    }
+
+    If (moveFileInsteadOfEmail) {
+	CheckTrayIcon("Перемещение выгрузки напрямую на сервер без отправки по почте…")
+	Try {
+	    FileMove %pathFileToSend%, %exchangeSrvrDest%\
+	    If (FileExist(exchangeSrvrDest "\" nameExtToSend))
+		return
+	}
+    }
+
     
     If (SubStr(note, 1, 2) = "ST") {
 	trayMsgText := "Отправка выгрузки " . note
@@ -154,7 +173,7 @@ DispatchSingleFile(pathFileToSend) {
     } Else {
 	CheckTrayIcon(trayMsgText "`n" note " (""" nameExtToSend """) успешна", "Выгрузка отправлена", 5, 0x31)
 	FileMove %pathFileToSend%, %arcDir%, 1
-	FileMove %pathNote%, %arcDir%, 1
+	Try FileMove %pathNote%, %arcDir%, 1
     }
 }
 
