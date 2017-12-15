@@ -47,7 +47,19 @@ If (jsonZones := XMLHTTP("https://api.cloudflare.com/client/v4/zones/", "GET", h
 		return		
 	    }
 	    ;?page=3&per_page=20&order=type&direction=asc
-	    FileAppend %page%`n, % zone.name . ".json"
+	    fnameBkpZone := zone.name . ".json"
+	    If (FileExist(fnameBkpZone)) {
+		suffix=
+		Loop
+		{
+		    FileGetTime mtime, %fnameBkpZone%
+		    FormatTime fmtTime, %mtime%, yyyy-mm-dd
+		    oldBkpRename := zone.name A_Space mtime suffix ".json"
+		    suffix = A_Space A_Index
+		} Until !FileExist(oldBkpRename)
+		FileMove %fnameBkpZone%, % zone.name A_Space mtime ".json"
+	    }
+	    FileAppend %page%`n, %fnameBkpZone%
 	    page := JSON.Load(page)
 	    ;MsgBox % "A_Index * per_page: " A_Index * per_page "`npage.result_info.total_count: " page.result_info.total_count
 	} Until A_Index * per_page >= page.result_info.total_count
