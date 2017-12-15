@@ -4,6 +4,13 @@
 FileEncoding UTF-8
 
 GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
+    static SkipValues := { "To be filled by O.E.M.": ""
+			 , "Base Board Serial Number": ""
+			 , "Base Board": ""
+			 , "System Product Name": ""
+			 , "System manufacturer": ""
+			 , "System Version": ""
+			 , "System Serial Number": ""}
     ;https://autohotkey.com/board/topic/60968-wmi-tasks-com-with-ahk-l/
     objWMIService := ComObjGet("winmgmts:{impersonationLevel=impersonate}!\\" . strComputer . "\root\cimv2")
     
@@ -22,7 +29,8 @@ GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
 	    Loop Parse, valArray,`,
 	    {
 		v := Trim(o[A_LoopField])
-		If (v && v!="To be filled by O.E.M." && v!="Base Board Serial Number" && v!="Base Board") { ; Поля с этими значениями пропускаются (остальные поля остаются)
+		;"System IdentifyingNumber":"System Serial Number"
+		If (v && !SkipValues.HasKey(v)) { ; Поля с этими значениями пропускаются (остальные поля остаются)
 		    ; виртуальные NIC не нужны в отпечатке, пропускаются целиком
 		    If (dispnameMC == "NIC"
 		      && ( A_LoopField=="Description" && v=="RAS Async Adapter" ; Виртуальный NIC VPN с одним и тем же MAC на разных системах:

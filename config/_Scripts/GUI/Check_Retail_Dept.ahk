@@ -271,7 +271,7 @@ FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
 
 regViews := [32]
 If (A_Is64bitOS)
-    regViews.Push(64)
+    regViews[2] := 64
 For i,regview in regViews {
     SetRegView %regview%
     HKLMRunKKMSuite=

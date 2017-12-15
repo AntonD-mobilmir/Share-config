@@ -2,11 +2,13 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 TrelloAPI1(ByRef method, ByRef req, ByRef jsonresp, jsondata:="") {
-    ;req is as in documentation https://developers.trello.com/advanced-reference/member#get-1-members-idmember-or-username-boards
-    ;
+    ;method and req are as in documentation https://developers.trello.com/advanced-reference/member#get-1-members-idmember-or-username-boards
     ;example:	
     ; req:	/members/me/boards
     ; URL:	https://api.trello.com/1/members/me/boards?key=[application_key]&token=[optional_auth_token]
+    ;jsonresp: will contain full response text (usually json)
+    ;	If any Object() passed in jsonresp, function returns Object parsed from Trello reponse data (jsonresp is still overwritten with response text), useful for immediate fields checking: For i, card in TrelloAPI1("GET", "…/cards") {…}
+    ;jsondata: additional request data
     
     authToken:=GetTrelloAuthToken(APIkey:="")
     

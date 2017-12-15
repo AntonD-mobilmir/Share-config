@@ -75,9 +75,11 @@ For i, match in lastMatch := FindTrelloCard(query, cards, nMatches := 0)
     FileAppend % "Сard " JSON.Dump(cards[i]) " matched with " JSON.Dump(match) "`n", *, CP1
 If (!nMatches && IsObject(fp)) { ; по быстрым параметрам карточка не найдена и есть отпечаток
     While (!nMatches && A_Index <= 2) { ;  поиск по серийникам из отпечатка
-	For i, match in lastMatch := FindTrelloCard("", cards, nMatches, FingerprintSNs_to_Regexes(fp, A_Index == 2)) ; первая попытка – с заголовками, вторая – без
+	lastMatch := FindTrelloCard("", cards, nMatches, extSearch := FingerprintSNs_to_Regexes(fp, A_Index == 2)) ; первая попытка – с заголовками, вторая – без
+	For i, match in lastMatch
 	    FileAppend % "Сard " JSON.Dump(cards[i]) " regex-" A_Index " matched with " JSON.Dump(match) "`n", *, CP1
     }
+    ;MsgBox % (A_Index == 2 ? "Расширенный п" : "П" ) "оиск выполнен, результаты: " JSON.Dump(lastMatch)
 }
 
 If (writeSavedID && nMatches==1) {
@@ -104,7 +106,7 @@ If (writeSavedID && nMatches==1) {
     Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
 } Else {
     ffc := FileOpen(pathffc := A_Temp "\все найденные карточки " A_Now ".txt", "a`n")
-    ffc.WriteLine("Найдено " nMatches " карточ" NumForm(nMatches,"ка","ки","ек") ".`nПараметры строгого поиска: " JSON.Dump(query) "`n" (extSearch ? "Параметры расширенного поиска: " JSON.Dump(extSearch) : "Расширенный поиск не выполнялся") "`n`nИнформация о системе:`n" GetFingerprint_Object_To_Text(fp) "`n`n---")
+    ffc.WriteLine("Найдено " nMatches " карточ" NumForm(nMatches,"ка","ки","ек") ".`nПараметры строгого поиска: " JSON.Dump(query) "`n" (extSearch ? "Выражения Regex расширенного поиска: " JSON.Dump(extSearch) : "Расширенный поиск не выполнялся") "`n`nИнформация о системе:`n" GetFingerprint_Object_To_Text(fp) "`n`n---")
     For i, match in lastMatch
 	ffc.WriteLine("`nУ карточки " cards[i].name " " cards[i].shortUrl "/" cards[i].idShort "`n`tсовпало " JSON.Dump(match) "`n`t" cards[i].desc)
     ffc.Close()

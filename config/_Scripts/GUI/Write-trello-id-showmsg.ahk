@@ -18,7 +18,6 @@ Loop %0%
 If (errtxt)
     MsgBox %errtxt%%errTextSuffix%
 If (!FileExist(pathTrelloID)) {
-    Throw
     If (!errtxt)
 	MsgBox Файл "%pathTrelloID%" не записан.%errTextSuffix%
     ExitApp
