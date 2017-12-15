@@ -9,20 +9,39 @@ dumpDir = %A_ScriptDir%\trello-accounting-board-dump
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk
 
 Try {
-    For dumpFName, request in {"computer-accounting": "/cards"
-			    , "lists": "/lists"}
-	If (TrelloAPI1("GET", "/boards/" . boardID . request, jsonDump)) {
-	    If (IsObject(fout := FileOpen(dumpDir "\" dumpFName ".new", "w")) && fout.Write(jsonDump), fout.Close()) {
-		thisFile = %dumpFName%.json
-		FileMove %dumpDir%\%dumpFName%.new, %dumpDir%\%thisFile%, 1
-		arcFiles .= " """ thisFile """"
-	    }
+    Try FileRead jsonsavedBoard, %dumpDir%\board.json
+    savedBoard := JSON.Load(jsonsavedBoard)
+    savedActionDate := savedBoard.lastActionDate
+    
+    If (savedActionDate != (lastActionDate := TrelloAPI1("GET", "/boards/" . boardID "/actions?limit=1&fields=date", jsonActions := Object())[1].date)) {
+	;MsgBox % "savedActionDate: " savedActionDate "`nlastActionDate: " lastActionDate "`n" jsonActions
+	
+	If (board := TrelloAPI1("GET", "/boards/" . boardID, Object())) {
+	    board.lastActionDate := lastActionDate
+	    If (IsObject(fout := FileOpen(dumpDir "\board.json.new", "w")) && fout.Write(JSON.Dump(board)), fout.Close())
+		FileMove %dumpDir%\board.json.new, %dumpDir%\board.json, 1
 	}
-    RunWait %exe7z% a -mx=9 -- "dump.7z.new" %arcFiles%, %dumpDir%, Min UseErrorLevel
-    If (ErrorLevel)
-	ExitApp %ErrorLevel%
-    Else
-	FileMove %dumpDir%\dump.7z.new, %dumpDir%\dump.7z, 1
+	
+	For dumpFName, request in {"computer-accounting": "/cards"
+				  , "lists": "/lists"}
+	    If (TrelloAPI1("GET", "/boards/" . boardID . request, jsonDump)) {
+		fnameCurDmp := dumpFName ".json"
+		arcFiles .= " """ fnameCurDmp """"
+		Try FileRead lastDump, %dumpDir%\%fnameCurDmp%
+		If (!(lastDump == jsonDump)) {
+		    If (IsObject(fout := FileOpen(dumpDir "\" dumpFName ".new", "w")) && fout.Write(jsonDump), fout.Close()) {
+			Loop Files, %dumpDir%\%fnameCurDmp%
+			    FileMove %A_LoopFileFullPath%, % A_LoopFileDir "\" SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)) . A_LoopFileTimeModified "." A_LoopFileExt, 1
+			FileMove %dumpDir%\%dumpFName%.new, %dumpDir%\%fnameCurDmp%
+		    }
+		}
+	    }
+	RunWait %exe7z% a -mx=9 -- "dump.7z.new" %arcFiles%, %dumpDir%, Min UseErrorLevel
+	If (ErrorLevel)
+	    ExitApp %ErrorLevel%
+	Else
+	    FileMove %dumpDir%\dump.7z.new, %dumpDir%\dump.7z, 1
+    }
 } Catch
     ExitApp 1
 
