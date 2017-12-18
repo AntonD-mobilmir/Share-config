@@ -45,14 +45,15 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	RD /S /Q "%TEMP%\%~n0"
     )
     %exe7z% x -o"%TEMP%\%~n0" -- "%srcpath%WinAudit.7z"
+    IF NOT EXIST "%TEMP%\%~n0" MKDIR "%TEMP%\%~n0"
     PUSHD "%TEMP%\%~n0" && (
 	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
 	rem Security included to full WinAudit report
 	rem     secedit.exe /export /CFG "SecurityPolicy-%Hostname%.inf"
 	rem     secedit.exe /export /mergedpolicy /CFG "SecurityPolicy-ADMerged-%Hostname%.inf"
-	"%TEMP%\%~n0\WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
-	"%TEMP%\%~n0\WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
-	"%TEMP%\%~n0\WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
+	"WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
+	"WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
+	"WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
 	
 	rem winaudit switches:
 	rem g	Include System Overview

@@ -36,7 +36,7 @@ Loop Read, %pathTrelloID%
 	cardText .= A_LoopReadLine "`n"
 } Until A_Index >= 4
 
-Progress zh0, %cardText%`n`n[F1] – открыть %cardURL%`n[F2] – открыть trello-id.txt, %cardTitle%, %cardHostname%
+Progress zh0 M, %cardText%`n`n[F1] – открыть %cardURL%`n[F2] – открыть trello-id.txt, %cardTitle%, %cardHostname%
 lastHotkeyTime := A_TickCount
 Loop
     Sleep 250
@@ -62,5 +62,9 @@ CheckRun(ByRef val, ByRef exec) {
 
 F1:: openURL := 1, lastHotkeyTime := A_TickCount
 F2:: openFile := 1, lastHotkeyTime := A_TickCount
+GuiEscape:
+GuiClose:
+    Sleep 200
+    ExitApp
 
 #include %A_ScriptDir%\..\Lib\CutTrelloCardURL.ahk
