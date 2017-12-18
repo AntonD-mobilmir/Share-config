@@ -15,6 +15,7 @@ If (RunInteractiveInstalls=="0") {
 }
 
 Try {
+    RunWait "%A_AhkPath%" "%A_ScriptDir%\DumpBoard.ahk"
     FileRead jsoncards, %A_ScriptDir%\..\trello-accounting\board-dump\computer-accounting.json
     cards := JSON.Load(jsoncards)
     
@@ -35,8 +36,6 @@ ExitApp -1
 ProcessDir(ByRef srcDir) {
     static SuffixesToQueries := {".json": "fp", ".txt": "", " TVID.txt": {1: "TVID:"}, " trello-id.txt": {1: "url:", 4: "/id "}}
 	 , nameRegex := "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2} {1,2}\d{5,6}\.\d\d)(?P<Suffix>.*)"
-
-    RunWait "%A_AhkPath%" "%A_ScriptDir%\DumpBoard.ahk"
 
     hostNames := {}
     Loop Files, %srcDir%\*.txt
