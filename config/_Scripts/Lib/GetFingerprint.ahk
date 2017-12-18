@@ -7,6 +7,7 @@ GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
     static SkipValues := { "To be filled by O.E.M.": ""
 			 , "Base Board Serial Number": ""
 			 , "Base Board": ""
+			 , "BSN12345678901234567": ""
 			 , "System Product Name": ""
 			 , "System manufacturer": ""
 			 , "System Version": ""
