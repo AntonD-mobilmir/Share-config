@@ -57,7 +57,7 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
     EXIT /B
 )
 :PostForm
-FOR /F "usebackq delims=" %%A IN ("%~dp0secrets\%~nx0.txt") DO (
+FOR /F "usebackq delims=" %%A IN ("%~dp0pseudo-secrets\%~nx0.txt") DO (
     START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "%%~A" "entry.1278320779=%MailUserId%" "entry.1958374743=%Hostname%" "entry.2091378917=%RetailHelperAhkTime%" "entry.1721351309=%criacxcabTime%"
 EXIT /B
 )

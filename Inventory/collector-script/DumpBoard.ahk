@@ -4,7 +4,8 @@
 FileEncoding UTF-8
 
 boardID := "5732cc3d0a8bee805cab7f11" ; Учёт системных блоков
-dumpDir = %A_ScriptDir%\trello-accounting-board-dump
+dumpDir = %A_ScriptDir%\..\trello-accounting\board-dump
+olddumpsDir = %A_ScriptDir%\..\old\board-dumps
 
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk
 
@@ -31,12 +32,13 @@ Try {
 		If (!(lastDump == jsonDump)) {
 		    If (IsObject(fout := FileOpen(dumpDir "\" dumpFName ".new", "w")) && fout.Write(jsonDump), fout.Close()) {
 			Loop Files, %dumpDir%\%fnameCurDmp%
-			    FileMove %A_LoopFileFullPath%, % A_LoopFileDir "\" SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)) . A_LoopFileTimeModified "." A_LoopFileExt, 1
+			    FileMove %A_LoopFileFullPath%, % olddumpsDir "\" SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)) . A_LoopFileTimeModified "." A_LoopFileExt, 1
 			FileMove %dumpDir%\%dumpFName%.new, %dumpDir%\%fnameCurDmp%
 		    }
 		}
 	    }
-	RunWait %exe7z% a -mx=9 -- "dump.7z.new" %arcFiles%, %dumpDir%, Min UseErrorLevel
+	FileDelete %dumpDir%\dump.7z.new
+	RunWait %exe7z% a -mx=9 -- "%dumpDir%\dump.7z.new" %arcFiles%, %dumpDir%, Min UseErrorLevel
 	If (ErrorLevel)
 	    ExitApp %ErrorLevel%
 	Else

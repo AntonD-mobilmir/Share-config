@@ -17,16 +17,16 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 (
     MKDIR "%localFPdir%" 2>NUL
-    START "Сохранение отпечатка для обновления доски Trello" /MIN %comspec% /C ""%~dp0SaveJsonFingerprint.cmd" "%localFPdir%""
-
+    START "Сохранение отпечатка для обновления доски Trello" /B %comspec% /C ""%~dp0SaveJsonFingerprint.cmd" "%localFPdir%""
+    
     REM %TIME% не всегда возвращает 2 цифры часов
     SET "datetime=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%_%fnametime:~,6%"
-
+    
     REM not using %COMPUTERNAME% because it's always uppercase
     FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED Hostname SET "Hostname=%COMPUTERNAME%"
 
-    SET "ReportPath=%srcpath%Reports"
+    SET "ReportPath=%srcpath%..\new-unsorted-reports"
 
     SET "smartctlexe=smartctl-32.exe"
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" "SET smartctlexe=smartctl-64.exe"
@@ -36,7 +36,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 (
     ECHO Y|DEL /F /Q "%TEMP%\%~n0\TempWmicBatchFile.bat"
-    RD "%TEMP%\%~n0">NUL
+    RD "%TEMP%\%~n0" 2>NUL
     IF EXIST "%TEMP%\%~n0" (
 	IF "%RunInteractiveInstalls%"=="0" EXIT /B 127
 	ECHO Папка "%TEMP%\%~n0" существует. Возможно, в данный момент выполняется другой процесс аудита.
@@ -45,7 +45,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	RD /S /Q "%TEMP%\%~n0"
     )
     %exe7z% x -o"%TEMP%\%~n0" -- "%srcpath%WinAudit.7z"
-    PUSHD "%TEMP%\%~n0"||EXIT /B
+    PUSHD "%TEMP%\%~n0" && (
 	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
 	rem Security included to full WinAudit report
 	rem     secedit.exe /export /CFG "SecurityPolicy-%Hostname%.inf"
@@ -99,8 +99,9 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	FOR %%A IN ("%TEMP%\%~n0\*.*") DO IF %%~zA EQU 0 ECHO.|DEL "%%~A"
 	FOR %%A IN ("%localFPdir%\*.*") DO COPY /Y "%%~A" "%TEMP%\%~n0\*.*" <NUL
 	%exe7z% a -mx=9 -m0=LZMA2:a=2:d26:fb=273 -- "%ReportPath%\%Hostname% %fnametvID%%datetime%.7z" *.html *.csv *.txt *.inf *.json *.log && DEL *.html *.csv *.txt *.inf *.json *.log
-    POPD
-    RD /Q "%TEMP%\%~n0"
+	POPD
+	RD /Q "%TEMP%\%~n0"
+    )
     EXIT /B
 )
 

@@ -7,8 +7,8 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-SET "ReportsSource=%~dp0Reports\"
-SET "ReportsDest=\\Srv0\profiles$\Share\Inventory\actual\"
+SET "ReportsSource=%~dp0..\new-unsorted-reports\"
+SET "ReportsDest=%~dp0..\actual\"
 )
 (
 FOR /D %%I IN ("%ReportsDest%RetailDepts\*") DO (
@@ -90,7 +90,7 @@ EXIT /B 1
 	MOVE "%pathReport%" "%destPath%"
 	EXIT /B
     ) ELSE (
-	ECHO Не существует папка "%destPath%" для перемещения "%nameReport%"
+	ECHO Не существует папки "%destPath%" для перемещения "%nameReport%"
 	EXIT /B 1
     )
 )

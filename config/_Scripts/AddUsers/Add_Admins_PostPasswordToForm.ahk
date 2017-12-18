@@ -22,7 +22,7 @@ POSTDATA := { "entry.1247228425" : Hostname
 	    , "entry.1306387427" : Status
 	    , "entry.1299832479" : Object() }
 
-FileReadLine URL, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt, 1
+FileReadLine URL, %A_LineFile%\..\..\pseudo-secrets\%A_ScriptName%.txt, 1
 ExitApp !PostGoogleFormWithPostID(URL, POSTDATA)
 
 #Include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk

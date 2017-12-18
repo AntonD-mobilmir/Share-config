@@ -20,7 +20,7 @@ POSTDATA := { "entry.1427319477" : Hostname
 	    , "entry.1342070748" : Object() }
 
 ReadURLs := []
-Loop Read, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt
+Loop Read, %A_LineFile%\..\..\pseudo-secrets\%A_ScriptName%.txt
 {
     ReadURLs[A_Index] := A_LoopReadLine
     If (A_Index>2)

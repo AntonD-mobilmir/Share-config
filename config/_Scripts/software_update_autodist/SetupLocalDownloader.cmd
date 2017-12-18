@@ -114,7 +114,7 @@ IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 (
 ECHO "MailUserId=%MailUserId%"
 ECHO "instVersion=%instVersion%"
-FOR /F "usebackq delims=" %%A IN ("%~dp0..\secrets\%~nx0.txt") DO (
+FOR /F "usebackq delims=" %%A IN ("%~dp0..\pseudo-secrets\%~nx0.txt") DO (
     START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
     EXIT /B
 )

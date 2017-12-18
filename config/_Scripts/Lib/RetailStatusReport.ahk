@@ -19,7 +19,7 @@ RetailStatusReport(ByRef st:="", ByRef einf:="", ByRef mdl:="") {
     }
     
     SplitPath A_LineFile, ScriptName
-    FileReadLine URL, %A_LineFile%\..\..\secrets\%ScriptName%.txt, 1
+    FileReadLine URL, %A_LineFile%\..\..\pseudo-secrets\%ScriptName%.txt, 1
     return PostGoogleFormWithPostID(URL
 	, {"entry.1804185158":	GetMailUserId()
 	 , "entry.1223335585":	hostname . (hostSuffix ? " (" hostSuffix ")" : "")
