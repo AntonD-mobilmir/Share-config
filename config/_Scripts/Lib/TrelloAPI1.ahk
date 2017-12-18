@@ -48,7 +48,7 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope
 	secretsDir = %LocalAppData%\mobilmir.ru\Trello-ahk\%appName%
 	
 	APIkeytxt = %secretsDir%\APIkey.txt
-	FileRead APIkey, %APIkeytxt%
+	Try FileRead APIkey, %APIkeytxt%
 	If (APIkey) {
 	    authtokentxt = %secretsDir%\authtoken.txt
 	    FileRead authToken, %authtokentxt%
