@@ -62,15 +62,20 @@ ProcessDir(ByRef srcDir) {
 	    }
 	}
 	
-	If (FillInCard(query, options) == 1)
-	    FileDelete %srcDir%\%Hostname% *
-	Else
-	    MsgBox FillInCard returned fail
+	Try {
+	    If (FillInCard(query, options) == 1)
+		FileDelete %srcDir%\%Hostname% *
+	    Else
+		MsgBox FillInCard returned fail
+	} Catch e {
+	    ShowError(ObjectToText(e))
+	}
     }
 }
 
 FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
     global logFile, cards
+    static blockCheckRegexp := ""
     
     If (!IsObject(fp) && pathjsonfp := options.fp) {
 	FileRead jsonfp, %pathjsonfp%
@@ -101,6 +106,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	    FileAppend Найдена карточка %cardName%`n, %logFile%
 	    cardID := card.id 
 	    cardDesc := card.desc
+	    textfp=
 	    If (pathtextfp := options.txt)
 		FileRead textfp, %pathtextfp%
 	    If ((!textfp || textfp ~= "^\w:\w" ) && IsObject(fp))
@@ -116,8 +122,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 		If (trimmedfpline && !InStr(cardDesc, trimmedfpline)) {
 		    FileAppend `tВ карточке не найдена строка %trimmedfpline% из отпечатка.`n, %logFile%
 		    
-		    ;static blockCheckRegexp
-		    If (!blockCheckRegexp) {
+		    If (blockCheckRegexp=="") {
 			For s in GetWMIQueryParametersforFingerprint()
 			    blockCheckRegexp .= (A_Index == 1 ? "" : "|") . s ; варианты начала строк
 			blockCheckRegexp := "(\n+|^)``````\n+(?P<text>((" . blockCheckRegexp . "):[^\n]+\n+)+)``````\n*"
@@ -160,7 +165,6 @@ ShowError(text) {
     If (!RunInteractiveInstalls)
 	ExitApp 0x100
     MsgBox %text%
-    ExitApp 0x100
 }
 
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\FindTrelloCard.ahk
