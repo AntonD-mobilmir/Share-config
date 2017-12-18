@@ -42,7 +42,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 
 GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
     static SkipValues := ""
-    If (!SkipValues)
+    If (SkipValues == "")
 	SkipValues := GetFingerprint_GetForgedValues()
     ;https://autohotkey.com/board/topic/60968-wmi-tasks-com-with-ahk-l/
     objWMIService := ComObjGet("winmgmts:{impersonationLevel=impersonate}!\\" . strComputer . "\root\cimv2")
@@ -123,7 +123,7 @@ GetFingerprint_Object_To_Text(fpo) {
 	Loop Parse, % WMIQparm[2]
 	{
 	    paramNames[dispnameMC][A_Index] := A_LoopField
-	    paramNames[dispnameMC][A_LoopField] := A_Index
+	    paramOrder[dispnameMC][A_LoopField] := A_Index
 	}
     }
     
@@ -151,8 +151,8 @@ GetFingerprint_Text_To_Object(t) {
 }
 
 GetFingerprint_WMIMgmtObjPropToText(ByRef propName, ByRef propVal, ByRef currLine:="") {
-    static SkipValues
-    If (!SkipValues)
+    static SkipValues := ""
+    If (SkipValues == "")
 	SkipValues := GetFingerprint_GetForgedValues()
     If (SkipValues.HasKey(propVal))
 	return ""
@@ -167,7 +167,7 @@ GetWMIQueryParametersforFingerprint(ByRef UniqueIDsOnly:=0) {
     static qParams :=  { "System" :  [ "Win32_ComputerSystemProduct" ,	"Vendor,Name,Version,IdentifyingNumber,UUID" ]
 		       , "MB" :      [ "Win32_BaseBoard" , 	    	"Manufacturer,Product,Name,Model,Version,OtherIdentifyingInfo,PartNumber,SerialNumber" ]
 		       , "CPU" :     [ "Win32_Processor" , 	    	"Manufacturer,Name,Caption,ProcessorId,SocketDesignation" ]
-		       , "RAM" :	    [ "Win32_PhysicalMemory",		"Manufacturer,PartNumber,SerialNumber" ]
+		       , "RAM" :     [ "Win32_PhysicalMemory",		"Manufacturer,PartNumber,SerialNumber" ]
 		       , "NIC" :     [ "Win32_NetworkAdapter where MACAddress is not null" , "Description,MACAddress" ]
 		       , "Storage" : [ "Win32_DiskDrive where InterfaceType<>'USB'" , "Model,InterfaceType,SerialNumber" ] }
     return qParams
