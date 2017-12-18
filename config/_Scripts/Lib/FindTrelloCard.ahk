@@ -4,6 +4,22 @@
 ;https://redbooth.com/a/#!/projects/59756/tasks/32350056
 ;https://drive.google.com/a/mobilmir.ru/file/d/0B6JDqImUdYmlejlIRTRWY0JCZjA/view?usp=sharing
 
+ExtendedFindTrelloCard(ByRef query, Byref cards, ByRef nMatches := 0, ByRef fp := "", matchCallback := -1) {
+    If (matchCallback==-1)
+	matchCallback := Func("ExtendedFindTrelloCard_LogMatches").Bind(["Карточка ", " подошла по параметрам ", "`n", "Выражения расширенного поиска: ", "`n"])
+    
+    Loop
+    {
+	If (A_Index==1)
+	    lastMatch := FindTrelloCard(query, cards, nMatches := 0)
+	Else If (IsObject(fp)) ; по быстрым параметрам карточка не найдена и есть отпечаток → поиск по серийникам из отпечатка
+	    lastMatch := FindTrelloCard("", cards, nMatches, extSearch := FingerprintSNs_to_Regexes(fp, A_Index == 2)) ; первая попытка (A_Index==2) – с заголовками, вторая (A_Index==3) – без
+	If (IsFunc(matchCallback))
+	    matchCallback.Call(lastMatch, cards, extSearch)
+    } Until nMatches || A_Index >= 3
+    return lastMatch
+}
+
 FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef RegexSearches := "") {
     allMatches := Object()
     ; SearchParams = {Hostname: {(Hostname): "Hostname"
@@ -100,6 +116,37 @@ AddMatch(ByRef match, ByRef name, ByRef data := "") {
     match[name] := data
 }
 
+FingerprintMACs_to_FindTrelloCardQuery(ByRef fp, ByRef currentQuery:="") {
+    If (currentQuery=="")
+	currentQuery := Object()
+    MACs := Object()
+    For i,NIC in fp.NIC
+	MACs[NIC.MACAddress] := NIC.Description
+    currentQuery.MACAddress := MACs
+    return currentQuery
+}
+
+FingerprintSNs_to_Regexes(ByRef fp, withHeaders := 1) {
+    SNFieldNames := { "IdentifyingNumber": 1, "UUID": 1, "SerialNumber": 1 }
+    rs := Object()
+    For subsys, devs in fp { ; fp looks like {subsys: [dev1, dev2], subsys2: [dev], …} ; each dev is {key: value, key: value, …}
+	For i, kv in devs { ; i = index, kv = data for device/subsys (multiple nics = multiple kvs within single subsys)
+	    For field in SNFieldNames
+		If kv.HasKey(field)
+		    rs[subsys . (i > 1 ? i : "") " " field] := withHeaders ? "m)^" EscapeRegex(subsys) ":[^\r\n]*" EscapeRegex(field) ": " EscapeRegex(kv[field]) "(\b|, )" : "\b" EscapeRegex(kv[field]) "\b"
+	}
+    }
+    
+    return rs
+}
+
+ExtractSNsFromCardText() {
+    Throw "Not implemented"
+    rs := { "IdentifyingNumber": "[^:]+"
+	  , "UUID": "[A-F\-]{36}"
+	  , "SerialNumber": "[^:]+" }
+}
+
 CommandLineArgs_to_FindTrelloCardQuery() {
     query := Object()
     Loop %0%
@@ -126,35 +173,22 @@ CommandLineArgs_to_FindTrelloCardQuery() {
     return query
 }
 
-FingerprintMACs_to_FindTrelloCardQuery(ByRef fp, ByRef currentQuery:="") {
-    If (currentQuery=="")
-	currentQuery := Object()
-    MACs := Object()
-    For i,NIC in fp.NIC
-	MACs[NIC.MACAddress] := NIC.Description
-    currentQuery.MACAddress := MACs
-    return currentQuery
-}
-
-FingerprintSNs_to_Regexes(ByRef fp, withHeaders := 1) {
-    SNFieldNames := { "IdentifyingNumber": 1, "UUID": 1, "SerialNumber": 1 }
-    rs := Object()
-    For subsys, devs in fp { ; fp looks like {subsys: [dev1, dev2], subsys2: [dev], …} ; each dev is {key: value, key: value, …}
-	For i, kv in devs { ; i = index, kv = data for device/subsys (multiple nics = multiple kvs within single subsys)
-	    For field in SNFieldNames
-		If kv.HasKey(field)
-		    rs[subsys . (i > 1 ? i : "") " " field] := withHeaders ? "\b" EscapeRegex(kv[field]) "\b" : "m)^" EscapeRegex(subsys) ":[^\r\n]*" EscapeRegex(field) ": " EscapeRegex(kv[field]) "(\b|, )"
-	}
+ExtendedFindTrelloCard_LogMatches(delimCardMatch, ByRef lastMatch, ByRef cards, ByRef extSearch:="", ByRef path := "", ByRef coding := "") {
+    If (path=="") {
+	path := "*"
+	coding := "CP1"
     }
     
-    return rs
-}
-
-ExtractSNsFromCardText() {
-    Throw "Not implemented"
-    rs := { "IdentifyingNumber": "[^:]+"
-	  , "UUID": "[A-F\-]{36}"
-	  , "SerialNumber": "[^:]+" }
+    If (!IsObject(delimCardMatch))
+	delimCardMatch := ["", delimCardMatch, "`n", "", "`n"]
+    
+    If (IsObject(of := FileOpen(path, "a`n", coding))) {
+	If (extSearch)
+	    of.Write(matchFormatting[4] . extSearch . matchFormatting[5])
+	For i, match in lastMatch
+	    of.Write(delimCardMatch[1] . JSON.Dump(cards[i]) . delimCardMatch[2] . JSON.Dump(match) . delimCardMatch[3])
+	of.Close()
+    }
 }
 
 #include %A_LineFile%\..\ExtractHostnameFromTrelloCardName.ahk

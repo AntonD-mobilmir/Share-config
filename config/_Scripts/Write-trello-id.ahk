@@ -13,9 +13,11 @@ EnvGet SystemRoot,SystemRoot
 Tmp = %A_Temp%\%A_ScriptName%
 PathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
 
-boardDumpDirs := [ A_LineFile "\..\..\..\Inventory\collector-script\trello-accounting-board-dump"
-	         , A_ScriptDir "\trello-accounting-board-dump"
+boardDumpDirs := [ A_LineFile "\..\..\..\Inventory\trello-accounting\board-dump"
+	         , A_ScriptDir "\board-dump"
 	         , A_ScriptDir ]
+
+; ToDo: save fingerprint on request to avoid double-fingerprinting in Inventory\collector-script\SaveJsonFingerprint.cmd
 argc=%0%
 If (argc) {
     FileEncoding UTF-8
@@ -71,46 +73,43 @@ If (IsObject(boardlists)) {
     boardlists :=
 }
 
-For i, match in lastMatch := FindTrelloCard(query, cards, nMatches := 0)
-    FileAppend % "Сard " JSON.Dump(cards[i]) " matched with " JSON.Dump(match) "`n", *, CP1
-If (!nMatches && IsObject(fp)) { ; по быстрым параметрам карточка не найдена и есть отпечаток
-    While (!nMatches && A_Index <= 2) { ;  поиск по серийникам из отпечатка
-	lastMatch := FindTrelloCard("", cards, nMatches, extSearch := FingerprintSNs_to_Regexes(fp, A_Index == 2)) ; первая попытка – с заголовками, вторая – без
-	For i, match in lastMatch
-	    FileAppend % "Сard " JSON.Dump(cards[i]) " regex-" A_Index " matched with " JSON.Dump(match) "`n", *, CP1
-    }
-    ;MsgBox % (A_Index == 2 ? "Расширенный п" : "П" ) "оиск выполнен, результаты: " JSON.Dump(lastMatch)
-}
+lastMatch := ExtendedFindTrelloCard(query, cards, nMatches, fp, Func("CountSearchRuns"))
 
+EnvGet RunInteractiveInstalls, RunInteractiveInstalls
 If (writeSavedID && nMatches==1) {
-    newtxtf := FileOpen(newPathSavedID := PathSavedID ".tmp", "w`n")
-    newtxtf.WriteLine(cards[i].url
-	       . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))
-	       . "`n" cards[i].name
-	       . "`n" cards[i].id
-	       . "`n" lists[cards[i].idList]
-	     . "`n`n" JSON.Dump(cards[i]))
-    newtxtf.Close()
-    If (FileExist(PathSavedID)) {
-	FileReadLine oldurl, %PathSavedID%, 1
-	FileReadLine oldID, %PathSavedID%, 4
-	;"shortLink":"6D5aO2qM"
-	If (!(CutTrelloCardURL(oldurl, 1) == cards[i].shortLink && oldID == cards[i].id)) {
-	    newcardname = %PathSavedID%.%A_Now%.txt
-	    FileMove %newPathSavedID%, %newcardname%
-	    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%A_ProgramData%\mobilmir.ru" "Карточка, найденная для компьютера, отличается ссылкой или ID от уже сохранённой. Найденная карточка записана в %newcardname%, а файл %PathSavedID% остался без изменений."
-	    ExitApp
+    For i, match in lastMatch {
+	newtxtf := FileOpen(newPathSavedID := PathSavedID ".tmp", "w`n")
+	newtxtf.WriteLine(cards[i].url
+		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))
+		   . "`n" cards[i].name
+		   . "`n" cards[i].id
+		   . "`n" lists[cards[i].idList]
+		 . "`n`n" JSON.Dump(cards[i]))
+	newtxtf.Close()
+	If (FileExist(PathSavedID)) {
+	    FileReadLine oldurl, %PathSavedID%, 1
+	    FileReadLine oldID, %PathSavedID%, 4
+	    ;"shortLink":"6D5aO2qM"
+	    If (!(CutTrelloCardURL(oldurl, 1) == cards[i].shortLink && oldID == cards[i].id)) {
+		newcardname = %PathSavedID%.%A_Now%.txt
+		FileMove %newPathSavedID%, %newcardname%
+		If (!(RunInteractiveInstalls == "0"))
+		    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%A_AppDataCommon%\mobilmir.ru" "Карточка`, найденная для компьютера`, отличается ссылкой или ID от уже сохранённой. Найденная карточка записана в %newcardname%`, а файл %PathSavedID% остался без изменений."
+		ExitApp
+	    }
 	}
+	FileMove %newPathSavedID%, %PathSavedID%, 1
+	If (!(RunInteractiveInstalls == "0"))
+	    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
     }
-    FileMove %newPathSavedID%, %PathSavedID%, 1
-    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
 } Else {
     ffc := FileOpen(pathffc := A_Temp "\все найденные карточки " A_Now ".txt", "a`n")
     ffc.WriteLine("Найдено " nMatches " карточ" NumForm(nMatches,"ка","ки","ек") ".`nПараметры строгого поиска: " JSON.Dump(query) "`n" (extSearch ? "Выражения Regex расширенного поиска: " JSON.Dump(extSearch) : "Расширенный поиск не выполнялся") "`n`nИнформация о системе:`n" GetFingerprint_Object_To_Text(fp) "`n`n---")
     For i, match in lastMatch
 	ffc.WriteLine("`nУ карточки " cards[i].name " " cards[i].shortUrl "/" cards[i].idShort "`n`tсовпало " JSON.Dump(match) "`n`t" cards[i].desc)
     ffc.Close()
-    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%pathffc%" "Подходящих карточек: %nMatches% (когда всё в порядке`, должна быть одна)"
+    If (!(RunInteractiveInstalls == "0"))
+	Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%pathffc%" "Подходящих карточек: %nMatches% (когда всё в порядке`, должна быть одна)"
 }
 ; если nMatches = 1, найдена всего одна карточка, всё в порядке → выход без ошибок (код 0)
 ; если nMatches = 0, карточек не найдено → код ошибки 1
@@ -119,6 +118,11 @@ ExitApp nMatches==1 ? 0 : (nMatches==0 ? 1 : nMatches)
 
 TryCallFunc(funcName, optns*) {
     Try return %funcName%(optns*)
+}
+
+CountSearchRuns(ByRef matches := "", ByRef cards := "", ByRef extSearch := "") {
+    static timesInvoked := 0
+    return {(timesInvoked += IsObject(cards)): extSearch}
 }
 
 #include <find7zexe>
