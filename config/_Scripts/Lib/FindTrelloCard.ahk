@@ -7,7 +7,7 @@
 ExtendedFindTrelloCard(ByRef query, Byref cards, ByRef nMatches := 0, ByRef fp := "", matchCallback := -1) {
     If (matchCallback==-1)
 	matchCallback := Func("ExtendedFindTrelloCard_LogMatches").Bind(["Карточка ", " подошла по параметрам ", "`n", "Выражения расширенного поиска: ", "`n"])
-    If (IsObject(fp) && !query.HasKey(MACAddress))
+    If (IsObject(fp) && !query.HasKey("MACAddress"))
 	FingerprintMACs_to_FindTrelloCardQuery(fp, query)
     
     Loop
