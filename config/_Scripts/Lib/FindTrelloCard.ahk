@@ -7,6 +7,8 @@
 ExtendedFindTrelloCard(ByRef query, Byref cards, ByRef nMatches := 0, ByRef fp := "", matchCallback := -1) {
     If (matchCallback==-1)
 	matchCallback := Func("ExtendedFindTrelloCard_LogMatches").Bind(["Карточка ", " подошла по параметрам ", "`n", "Выражения расширенного поиска: ", "`n"])
+    If (IsObject(fp) && !query.HasKey(MACAddress))
+	FingerprintMACs_to_FindTrelloCardQuery(fp, query)
     
     Loop
     {
@@ -141,27 +143,38 @@ FingerprintSNs_to_Regexes(ByRef fp, withHeaders := 1) {
 }
 
 ExtractSNsFromCardText() {
-    Throw "Not implemented"
-    rs := { "IdentifyingNumber": "[^:]+"
+    Throw Exception("Not implemented")
+    rs := { "IdentifyingNumber": "\w+"
 	  , "UUID": "[A-F\-]{36}"
-	  , "SerialNumber": "[^:]+" }
+	  , "SerialNumber": "\w+" }
 }
 
-CommandLineArgs_to_FindTrelloCardQuery() {
-    query := Object()
-    Loop %0%
+CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "") {
+    If (!IsObject(query))
+	query := Object()
+    
+    args := ParseScriptCommandLine("""")
+    Loop % args[""]
     {
-	If (parmName) {
-	    parmValue := %A_Index%
+	argv := args[A_Index]
+	If (option) {
+	    options[option] := argv
+	    option=
+	} Else If (parmName) {
+	    parmValue := argv
 	} Else {
-	    argv := %A_Index%
-	    If (!colon := InStr(argv, ":"))
-		Throw Exception("Param name should end with a colon",,argv)
-	    parmName := Trim(SubStr(argv, 1, colon-1))
-	    parmValue := Trim(SubStr(argv, colon+1)) ; if "", this arg is just a param name, next arg is parm value
+	    If (SubStr(argv, 1, 1) == "/") {
+		option := SubStr(argv, 2)
+		continue
+	    } Else {
+		If (!colon := InStr(argv, ":"))
+		    Throw Exception("Param name should end with a colon",,argv)
+		parmName := Trim(SubStr(argv, 1, colon-1))
+		parmValue := Trim(SubStr(argv, colon+1)) ; if "", this arg is just a param name, next arg is parm value
+	    }
 	}
 	If (parmValue) { 
-	    If (query[parmName]) {
+	    If (query.HasKey(parmName)) {
 		If (!IsObject(query[parmName]))
 		    query[parmName] := {query[parmName]: parmName "0"}
 		query[parmName][parmValue] := parmName A_Index
@@ -192,3 +205,4 @@ ExtendedFindTrelloCard_LogMatches(delimCardMatch, ByRef lastMatch, ByRef cards, 
 }
 
 #include %A_LineFile%\..\ExtractHostnameFromTrelloCardName.ahk
+#include %A_LineFile%\..\ParseScriptCommandLine.ahk

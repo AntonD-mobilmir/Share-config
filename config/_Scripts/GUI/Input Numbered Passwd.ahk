@@ -72,6 +72,5 @@ return
 Reload:
     Reload
 
-#include %A_LineFile%\..\..\Lib\ParseCommandLine.ahk
 #include %A_LineFile%\..\..\Lib\WriteNumberedPassword.ahk
 #include %A_LineFile%\..\..\Lib\URIEncodeDecode.ahk
