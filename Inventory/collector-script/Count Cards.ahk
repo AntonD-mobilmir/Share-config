@@ -18,12 +18,20 @@ c := {}
 For i, card in cards {
     list := card.idList
     ;MsgBox % ObjectToText(card)
-    If (!c.HasKey(card.idList))
-	c[card.idList] := 1
+    If (!c.HasKey(list))
+	c[list] := 1
     Else
-	c[card.idList]++
+	c[list]++
 }
 
-MsgBox % ObjectToText(c)
+listNames := {}
+For i, list in lists
+    listNames[list.id] := list.name
+
+o := {}
+For listid, count in c
+    o[listNames[listid]] := count
+
+MsgBox % ObjectToText(o)
 
 #include <JSON>
