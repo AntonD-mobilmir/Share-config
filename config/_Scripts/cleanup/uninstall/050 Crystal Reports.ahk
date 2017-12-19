@@ -15,10 +15,30 @@ ResetACL(SystemRoot "\winsxs\x86_microsoft.vc80.atl_1fc8b3b9a1e18e3b_8.0.50727.1
 
 For i,regview in regViews {
     SetRegView %regview%
-    RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
+    ;not working RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
+    RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, ModifyPath
     If (unCR) {
 	;RunWait %unCR% /qn /norestart,, Min UseErrorLevel
-	Run %unCR% /passive /norestart,, Min UseErrorLevel
+	Run %unCR% /norestart,, Min UseErrorLevel, rpid
+	WinWait ahk_pid %rpid%, Re&move Crystal Reports for .NET Framework 2.0 (x86)
+	Sleep 1000
+	ControlClick Button4 ;  Re&move Crystal Reports for .NET Framework 2.0 (x86)
+	Sleep 300
+	ControlClick Button1 ;  &Finish
+	
+	GroupAdd endscreenFails, Installation Incomplete ahk_pid %rpid%, The installer was interrupted before Crystal Reports for .NET Framework 2.0 (x86) could be removed. You need to restart the installer to try again.
+	GroupAdd endscreenSuccess, Installation Incomplete ahk_pid %rpid%, Crystal Reports for .NET Framework 2.0 (x86) has been successfully removed.
+	GroupAdd endscreens, Installation Incomplete ahk_pid %rpid%
+	GroupAdd endscreens, ahk_group endscreenFails
+	GroupAdd endscreens, ahk_group endscreenSuccess
+
+	WinWait ahk_group endscreens
+	Sleep 1000
+	fail := WinExist("ahk_group endscreenFails")
+	success := WinExist("ahk_group endscreenSuccess")
+	If (success || fail) ; только для известных окон
+	    ControlClick Button1 ; &Close
+	ExitApp fail
     }
 }
 SetRegView Default
@@ -27,18 +47,20 @@ ExitApp
 
 ResetACL(ByRef path) {
     global SystemRoot
-    ;sidEveryone=S-1-1-0
+    sidEveryone=S-1-1-0
     ;sidAuthenticatedUsers=S-1-5-11
     ;sidUsers=S-1-5-32-545
     ;sidSYSTEM=S-1-5-18
     ;sidCreatorOwner=S-1-3-0
     sidAdministrators=S-1-5-32-544
     ;Administrators=S-1-5-32-544
-    ;SYSTEM=S-1-5-18
+    sidSYSTEM=S-1-5-18
     ;sidBackupOperators=S-1-5-32-551
     ;sidCREATOROWNER=S-1-3-0
     RunWait %SystemRoot%\System32\takeown.exe /F "%path%" /A,,Min UseErrorLevel
     RunWait %SystemRoot%\System32\icacls.exe "%path%" /reset /T /C /L,,Min UseErrorLevel
     RunWait %SystemRoot%\System32\icacls.exe "%path%" /inheritance:r /C /L,,Min UseErrorLevel
-    RunWait %SystemRoot%\System32\icacls.exe "%path%" /grant "*%sidAdministrators%:(OI)(CI)F" /C /L,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\icacls.exe "%path%" /grant "*%sidAdministrators%:F" /C /L,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\icacls.exe "%path%" /grant "*%sidSYSTEM%:F" /C /L,,Min UseErrorLevel
+    RunWait %SystemRoot%\System32\icacls.exe "%path%" /grant "*%sidEveryone%:RX" /C /L,,Min UseErrorLevel
 }
