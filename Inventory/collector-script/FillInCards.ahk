@@ -1,18 +1,13 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
-#Warn All
-#Warn LocalSameAsGlobal, Off
-#Warn UseUnsetGlobal, Off
 FileEncoding UTF-8
 ;boardID := "5732cc3d0a8bee805cab7f11" ; Учёт системных блоков
 EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-If (RunInteractiveInstalls=="0") {
+If (RunInteractiveInstalls=="0")
     RunInteractiveInstalls:=0
-} Else {
+Else
     RunInteractiveInstalls:=1
-    logFile = %A_Temp%\%A_ScriptName%.%A_Now%.txt
-}
 
 Try {
     RunWait "%A_AhkPath%" "%A_ScriptDir%\DumpBoard.ahk"
@@ -22,14 +17,12 @@ Try {
     argc = %0%
     If (argc) {
 	query := CommandLineArgs_to_FindTrelloCardQuery(options := Object())
-	If (options.log)
-	    logFile := options.log
 	If (query || options.HasKey(fp))
 	    ExitApp FillInCard(query, options)
     }
     ExitApp ProcessDir(A_ScriptDir "\..\trello-accounting\update-queue") 
 } Catch e {
-    ShowError(ObjectToText(e))
+    ShowError(e)
 }
 ExitApp -1
 
@@ -46,9 +39,10 @@ ProcessDir(ByRef srcDir) {
     ;nameOnly := SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)-1)
     For Hostname, DateTime in hostNames {
 	query := {Hostname: Hostname}
-	options := {}
+	commonprefix := srcDir "\" Hostname " " DateTime 
+	options := {log: commonprefix ".log"}
 	For fnamesuffix, qParam in SuffixesToQueries {
-	    fpath := srcDir "\" Hostname " " DateTime fnamesuffix
+	    fpath := commonprefix fnamesuffix
 	    If (FileExist(fpath)) {
 		If (IsObject(qParam)) {
 		    lastLine := qParam.MaxIndex()
@@ -67,13 +61,13 @@ ProcessDir(ByRef srcDir) {
 	    Else
 		MsgBox FillInCard returned fail
 	} Catch e {
-	    ShowError(ObjectToText(e))
+	    LogError(e, options.log)
 	}
     }
 }
 
 FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
-    global logFile, cards
+    global cards
     static blockCheckRegexp := ""
     
     If (!IsObject(fp) && pathjsonfp := options.fp) {
@@ -93,21 +87,24 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	Else If (cID ~= "^https://trello.com/c/[^ /]{8}/") ; "url":"https://trello.com/c/bbUOOuFD/330-s1151-2-3-%D0%B2-%D0%B1%D1%83-%D0%BA%D0%BE%D1%80%D0%BF%D1%83%D1%81%D0%B5-mitx-reserve-mitx2"
 	    query.url := cID
     }
-    
-    FileAppend % "query: " ObjectToText(query) "`nFingerprint: " ObjectToText(fp) "`n", %logFile%
-    lastMatch := ExtendedFindTrelloCard(query, cards, nMatches := 0, fp)
-    FileAppend % "lastMatch: " ObjectToText(lastMatch) "`n", %logFile%
+    logEncoding=
+    If (options.log)
+	logFile := options.log
+    Else
+	logfile := "*", logEncoding := "CP1"
     
     If (nMatches==1) {
+	lfo := FileOpen(logfile, "a", logEncoding)
+	lfo.WriteLine("query: " ObjectToText(query) "`nFingerprint: " ObjectToText(fp))
+	lastMatch := ExtendedFindTrelloCard(query, cards, nMatches := 0, fp)
+	lfo.WriteLine("lastMatch: " ObjectToText(lastMatch))
 	For i in lastMatch {
 	    card := TrelloAPI1("GET", "/cards/" cards[i].id, Object()) ; card := cards[i].id to save API calls
-	    cardName := card.name " <" card.shortUrl ">"
 	    cardID := card.id 
 	    If (!cardID)
 		Throw Exception("Карточка без ID",,ObjectToText(card))
 	    cardDesc := card.desc
-	    cardURL := card.shortUrl
-	    FileAppend Найдена карточка %cardName% <%cardURL%> #%cardID%`n, %logFile%
+	    lfo.WriteLine("Найдена карточка " card.name " <" card.shortUrl "> #" cardID "`n" cardDesc)
 	    textfp=
 	    If (pathtextfp := options.txt)
 		FileRead textfp, %pathtextfp%
@@ -116,13 +113,13 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	    Else
 		Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
 	    
-	    FileAppend textfp: %textfp%`ncardDesc: %cardDesc%`n, %logFile%
+	    lfo.WriteLine("Текст отпечатка: " textfp)
 	    Loop Parse, textfp, `n
 	    {
 		; Если любой из строк %textfp% нет в карточке, найти блок ````nCPU: …`nSystem: …`n``` , сравнить с %textfp%, отсутствующие в новом %textfp% строки добавить в комментарий и заменить на новый %textfp%
 		trimmedfpline := Trim(A_LoopField)
 		If (trimmedfpline && !InStr(cardDesc, trimmedfpline)) {
-		    FileAppend `tВ карточке не найдена строка %trimmedfpline% из отпечатка.`n, %logFile%
+		    lfo.WriteLine("`tВ карточке не найдена строка " trimmedfpline " из отпечатка. Описание карточки будет изменено.")
 		    
 		    If (blockCheckRegexp=="") {
 			For s in GetWMIQueryParametersforFingerprint()
@@ -130,7 +127,6 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 			blockCheckRegexp := "(\n+|^)``````\n+(?P<text>((" . blockCheckRegexp . "):[^\n]+\n+)+)``````\n*"
 		    }
 		    
-		    ;FileAppend % ObjectToText(), %logFile%
 		    If (startCardDescFP := RegexMatch(cardDesc, blockCheckRegexp, cardDescFP)) {
 			newDesc := Trim(SubStr(cardDesc, 1, startCardDescFP - 1) "`n" SubStr(cardDesc, startCardDescFP + StrLen(cardDescFP)), "`n`r")
 			
@@ -144,7 +140,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 				commentText .= A_LoopField SubStr(cardDescFPtext, currentPos, 1)
 			}
 			commentText := Trim(commentText, tokenizingSeparators)
-			FileAppend commentText: %commentText%`n, %logFile%
+			lfo.WriteLine("`tК карточке будет добавлен комментарий: " commentText)
 			If (commentText)
 			    If (!TrelloAPI1("POST", "/cards/" cardID "/actions/comments?text=" UriEncode("Из отпечатка удалены строки:`n`n```````n" Trim(commentText, "`n") "`n``````"), r := ""))
 				Throw Exception("Ошибка при добавлении комментария",,r)
@@ -153,7 +149,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 			newDesc := cardDesc
 		    }
 		    newDesc .= "`n`n```````n" Trim(textfp, "`r`n`t ") "`n``````"
-		    FileAppend newDesc: %newDesc%`n, %logFile%
+		    lfo.WriteLine("`tНовое описание карточки: " newDesc)
 		    If (!TrelloAPI1("PUT", "/cards/" cardID "?desc=" UriEncode(newDesc), r := ""))
 			Throw Exception("Ошибка при изменении описания карточки",,r)
 		    break
@@ -161,18 +157,36 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	    } ; runs until first line of textfp missing from cardDesc
 	    ;otherwise, all lines from textfp are already in card, nothing to add/update
 	}
+	lfo.Close()
 	return 1
     } Else {
 	Throw Exception("Количество подходящих карточек не равно 1",, nMatches ? JSON.Dump(lastMatch) : nMatches)
     }
 }
 
-ShowError(text) {
-    global logFile, RunInteractiveInstalls
-    FileAppend %A_Now% %text%`n, %logFile%
-    If (!RunInteractiveInstalls)
-	ExitApp 0x100
-    MsgBox %text%
+LogError(ByRef msg, ByRef morepaths*) {
+    static pathCommonErrorLog := A_ScriptDir "\..\trello-accounting\update-queue\errors.log"
+    logTime := A_Now
+    If (IsObject(msg))
+	text := ObjectToText(msg)
+    Else
+	text := msg
+    FileAppend %logTime% %text%`n, *, CP1
+    FileGetSize logsize, %pathCommonErrorLog%, M
+    If (logsize)
+	FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
+    FileAppend %logTime% %text%`n, %pathCommonErrorLog%
+    For i, path in morepaths
+	FileAppend %logTime% %text%`n, %path%
+}
+
+ShowError(ByRef text) {
+    global RunInteractiveInstalls
+    LogError(text)
+    
+    If (RunInteractiveInstalls)
+	MsgBox %text%
+    ExitApp 0x100
 }
 
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\FindTrelloCard.ahk
