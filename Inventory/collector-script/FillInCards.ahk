@@ -152,7 +152,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 			; ToDo: удалять описание в других форматах (например, отдельностоящая строка с MAC-адресом)
 			newDesc := cardDesc
 		    }
-		    newDesc .= "`n`n```````n" textfp "`n``````"
+		    newDesc .= "`n`n```````n" Trim(textfp, "`r`n`t ") "`n``````"
 		    FileAppend newDesc: %newDesc%`n, %logFile%
 		    If (!TrelloAPI1("PUT", "/cards/" cardID "?desc=" UriEncode(newDesc), r := ""))
 			Throw Exception("Ошибка при изменении описания карточки",,r)
