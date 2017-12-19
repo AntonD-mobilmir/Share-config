@@ -102,9 +102,12 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	For i in lastMatch {
 	    card := TrelloAPI1("GET", "/cards/" cards[i].id, Object()) ; card := cards[i].id to save API calls
 	    cardName := card.name " <" card.shortUrl ">"
-	    FileAppend Найдена карточка %cardName%`n, %logFile%
 	    cardID := card.id 
+	    If (!cardID)
+		Throw Exception("Карточка без ID",,ObjectToText(card))
 	    cardDesc := card.desc
+	    cardURL := card.shortUrl
+	    FileAppend Найдена карточка %cardName% <%cardURL%> #%cardID%`n, %logFile%
 	    textfp=
 	    If (pathtextfp := options.txt)
 		FileRead textfp, %pathtextfp%
@@ -113,7 +116,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	    Else
 		Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
 	    
-	    FileAppend cardName: %cardName%`tcardID: %cardID%`ntextfp: %textfp%`ncardDesc: %cardDesc%`n, %logFile%
+	    FileAppend textfp: %textfp%`ncardDesc: %cardDesc%`n, %logFile%
 	    Loop Parse, textfp, `n
 	    {
 		; Если любой из строк %textfp% нет в карточке, найти блок ````nCPU: …`nSystem: …`n``` , сравнить с %textfp%, отсутствующие в новом %textfp% строки добавить в комментарий и заменить на новый %textfp%
@@ -130,11 +133,17 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 		    ;FileAppend % ObjectToText(), %logFile%
 		    If (startCardDescFP := RegexMatch(cardDesc, blockCheckRegexp, cardDescFP)) {
 			newDesc := Trim(SubStr(cardDesc, 1, startCardDescFP - 1) "`n" SubStr(cardDesc, startCardDescFP + StrLen(cardDescFP)), "`n`r")
-
+			
+			tokenizingSeparators = `n`r%A_Space%%A_Tab%`,
 			commentText =
-			Loop Parse, cardDescFPtext, `n
+			currentPos := 0
+			Loop Parse, cardDescFPtext, %tokenizingSeparators%
+			{
+			    currentPos += StrLen(A_LoopField) + 1
 			    If (!InStr(textfp, Trim(A_LoopField)))
-				commentText .= A_LoopField "`n"
+				commentText .= A_LoopField SubStr(cardDescFPtext, currentPos, 1)
+			}
+			commentText := Trim(commentText, tokenizingSeparators)
 			FileAppend commentText: %commentText%`n, %logFile%
 			If (commentText)
 			    If (!TrelloAPI1("POST", "/cards/" cardID "/actions/comments?text=" UriEncode("Из отпечатка удалены строки:`n`n```````n" Trim(commentText, "`n") "`n``````"), r := ""))
