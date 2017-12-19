@@ -96,7 +96,10 @@ GetFingerprint_GetForgedValues() {
 			 , "System Product Name": ""
 			 , "System manufacturer": ""
 			 , "System Version": ""
-			 , "System Serial Number": "" }
+			 , "System Serial Number": ""
+			 , "x.x": ""
+			 , "Основная плата": ""
+			 , "00000000": "" } ; RAM: 8502, PartNumber: 1600LL Series, SerialNumber: 00000000
     return SkipValues
 }
 
@@ -115,26 +118,36 @@ GetFingerprint_CheckVirtualNIC(fieldName, v) {
 GetFingerprint_Object_To_Text(fpo) {
     t=
     
-    paramNames := Object()
-    paramOrder := Object()
+    paramNames := Object(), paramOrder := Object()
     For dispnameMC,WMIQparm in GetWMIQueryParametersforFingerprint() {
-	paramNames[dispnameMC] := Object()
-	paramOrder[dispnameMC] := Object()
-	Loop Parse, % WMIQparm[2]
-	{
-	    paramNames[dispnameMC][A_Index] := A_LoopField
-	    paramOrder[dispnameMC][A_LoopField] := A_Index
-	}
+	paramNames[dispnameMC] := Object(), paramOrder[dispnameMC] := Object()
+	Loop Parse, % WMIQparm[2],`,
+	    paramNames[dispnameMC][A_Index] := A_LoopField, paramOrder[dispnameMC][A_LoopField] := A_Index
     }
+    
+    ;MsgBox % ObjectToText({paramNames: paramNames, paramOrder: paramOrder})
     
     For dispnameMC, objDataMO in fpo {
 	For j, kv in objDataMO {
 	    line=
-	    
+	    If (dispnameMC=="NIC") {
+		skipNIC := 0
+		For k, v in kv {
+		    If (GetFingerprint_CheckVirtualNIC(k, v)) {
+			skipNIC := 1
+			break
+		    }
+		}
+		If (skipNIC)
+		    continue
+	    }
 	    Loop % paramNames[dispnameMC].Length() ; known
-		If (kv.HasKey(k := paramNames[dispnameMC][A_Index]) && !(dispnameMC=="NIC" && GetFingerprint_CheckVirtualNIC(k, kv)))
-		    line .= GetFingerprint_WMIMgmtObjPropToText(k, kv[k], line)
-		
+	    {
+		k := paramNames[dispnameMC][A_Index]
+		v := kv[k]
+		If (kv.HasKey(k))
+		    line .= GetFingerprint_WMIMgmtObjPropToText(k, v, line)
+	    }
 	    For k, v in kv
 		If (!paramOrder[dispnameMC].HasKey(k)) ; unknown
 		    line .= GetFingerprint_WMIMgmtObjPropToText(k, v, line)
@@ -154,7 +167,7 @@ GetFingerprint_WMIMgmtObjPropToText(ByRef propName, ByRef propVal, ByRef currLin
     static SkipValues := ""
     If (SkipValues == "")
 	SkipValues := GetFingerprint_GetForgedValues()
-    If (SkipValues.HasKey(propVal))
+    If (propVal=="" || SkipValues.HasKey(propVal))
 	return ""
     If propName in Name,Vendor,Version,Manufacturer,Product,Model,Caption,Description
 	return " " . propVal
