@@ -51,7 +51,7 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope
 	Try FileRead APIkey, %APIkeytxt%
 	If (APIkey) {
 	    authtokentxt = %secretsDir%\authtoken.txt
-	    FileRead authToken, %authtokentxt%
+	    Try FileRead authToken, %authtokentxt%
 	    ; get auth token (user auth): https://trello.com/1/authorize?expiration=never&scope=read,write,account&response_type=token&name=AutoHotkey%20Script%2016-05-16&key=<API_key>
 	    If (!authToken) {
 		If (!interactively)

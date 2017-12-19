@@ -328,9 +328,9 @@ For i,regview in regViews {
     SetRegView %regview%
     RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
     If (unCR) {
-	AddLog("Запуск удаления Crystal Reports")
-;	RunWait %unCR% /qn /norestart,, Min UseErrorLevel
-	Run %unCR% /passive /norestart,, Min UseErrorLevel
+	AddLog("Удаление Crystal Reports")
+	;RunWait "%A_AhkPath%" "%DefaultConfigDir%\_Scripts\cleanup\uninstall\050 Crystal Reports.ahk"
+	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\cleanup\uninstall\050 Crystal Reports.ahk"
 	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     }
 }
