@@ -8,6 +8,7 @@ If (RunInteractiveInstalls=="0")
     RunInteractiveInstalls:=0
 Else
     RunInteractiveInstalls:=1
+global stderr := FileOpen("*", "w", "CP1")
 
 Try {
     RunWait "%A_AhkPath%" "%A_ScriptDir%\DumpBoard.ahk"
@@ -22,7 +23,7 @@ Try {
     }
     ExitApp ProcessDir(A_ScriptDir "\..\trello-accounting\update-queue") 
 } Catch e {
-    ShowError(e)
+    ShowError(ObjectToText(e))
 }
 ExitApp -1
 
@@ -87,17 +88,17 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	Else If (cID ~= "^https://trello.com/c/[^ /]{8}/") ; "url":"https://trello.com/c/bbUOOuFD/330-s1151-2-3-%D0%B2-%D0%B1%D1%83-%D0%BA%D0%BE%D1%80%D0%BF%D1%83%D1%81%D0%B5-mitx-reserve-mitx2"
 	    query.url := cID
     }
-    logEncoding=
     If (options.log)
-	logFile := options.log
+	logFile := options.log, logEncoding := ""
     Else
 	logfile := "*", logEncoding := "CP1"
-    
+    If (!IsObject(lfo := FileOpen(logfile, "a", logEncoding)))
+	Throw Exception("Не открылся файл журнала",, logfile)
+    lfo.WriteLine("query: " ObjectToText(query) "`nFingerprint: " ObjectToText(fp))
+    lastMatch := ExtendedFindTrelloCard(query, cards, nMatches := 0, fp)
+    lfo.WriteLine("lastMatch: " ObjectToText(lastMatch))
+
     If (nMatches==1) {
-	lfo := FileOpen(logfile, "a", logEncoding)
-	lfo.WriteLine("query: " ObjectToText(query) "`nFingerprint: " ObjectToText(fp))
-	lastMatch := ExtendedFindTrelloCard(query, cards, nMatches := 0, fp)
-	lfo.WriteLine("lastMatch: " ObjectToText(lastMatch))
 	For i in lastMatch {
 	    card := TrelloAPI1("GET", "/cards/" cards[i].id, Object()) ; card := cards[i].id to save API calls
 	    cardID := card.id 
@@ -171,13 +172,14 @@ LogError(ByRef msg, ByRef morepaths*) {
 	text := ObjectToText(msg)
     Else
 	text := msg
-    FileAppend %logTime% %text%`n, *, CP1
-    FileGetSize logsize, %pathCommonErrorLog%, M
+    
+    Try stderr.WriteLine(logTime " " text)
+    Try FileGetSize logsize, %pathCommonErrorLog%, M
     If (logsize)
-	FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
-    FileAppend %logTime% %text%`n, %pathCommonErrorLog%
+	Try FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
+    Try FileAppend %logTime% %text%`n, %pathCommonErrorLog%
     For i, path in morepaths
-	FileAppend %logTime% %text%`n, %path%
+	Try FileAppend %logTime% %text%`n, %path%
 }
 
 ShowError(ByRef text) {
