@@ -14,20 +14,27 @@ listNames := {}
 For i, list in lists
     listNames[list.id] := list.name
 
-c := {}
+Cols := [ 1, "name", "shortUrl", "idShort" ]
+
+out =
+Loop % Cols.Length()
+    out .= Cols[A_Index] A_Tab
+
 For i, card in cards {
-    list := card.idList
-    ;MsgBox % ObjectToText(card)
-    If (!c.HasKey(list))
-	c[list] := 1
-    Else
-	c[list]++
+    Loop % Cols.Length()
+    {
+	tcol := Cols[A_Index]
+	If (tcol == 1)
+	    vcol := listNames[card.idList]
+	Else
+	    vcol := card[tcol]
+	out .= vcol A_Tab
+    }
+    out .= "`n"
 }
 
-o := {}
-For listid, count in c
-    o[listNames[listid]] := count
-
-MsgBox % ObjectToText(o)
+fnameout = %A_Temp%\%A_ScriptName%.%A_Now%.tsv
+FileAppend %out%, %fnameout%
+Run %fnameout%
 
 #include <JSON>
