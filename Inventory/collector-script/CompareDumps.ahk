@@ -71,20 +71,21 @@ CompareBoards(currCards, prvCards, ByRef logpath) {
 	currCard := currCards[curCardIDsToIdx[cardid]]
 	For field, oldV in card {
 	    newV := currCard[field]
-	    If (oldV != newV) {
+	    If (oldV != newV && diffText := FindMissingInfo(oldV, newV)) {
 		If (!IsObject(diffs[cardid]))
 		    diffs[cardid] := Object()
-		diffs[cardid][field] := FindRemovedInfo(oldV, newV)
+		diffs[cardid][field] := diffText
 	    }
 	}
     }
+    
     If ((diffsText := Trim(ObjectToText(diffs))) && logf := FileOpen(logpath, "a")) {
 	logf.WriteLine(diffsText)
 	logf.Close()
     }
 }
 
-FindRemovedInfo(ByRef oldt, ByRef newt) {
+FindMissingInfo(ByRef oldt, ByRef newt) {
     removed := Object()
     Loop Parse, oldt, %A_Space%`n`r
 	If (!InStr(newt, A_LoopField))

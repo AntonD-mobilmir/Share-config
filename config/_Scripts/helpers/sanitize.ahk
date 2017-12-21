@@ -12,7 +12,6 @@ If (!baseDestDir)
     baseDestDir = \\Srv0.office0.mobilmir\Документы\IT\Разное\Движения ТМЦ
 
 OnClipboardChange("ClipChanged")
-
 Loop
 {
     WinWait Save As ahk_class #32770 ahk_exe 1cv8.exe
@@ -36,8 +35,8 @@ ClipChanged(type) {
     c:=Clipboard
     ;Перемещение товаров ШМ000011076 19.07.2017 17:21:26 Сканер ШК → Электроника el@
     ;ЗМ^0000768
-    If (RegexMatch(c, "(?P<Num>..(^\d{7}|\d{9}))\s+(.*)$", d)) {
-	c := d3
+    If (RegexMatch(c, "(?P<Num>..(^\d{7}|\d{9}))\s+(от\s+)?(?P<Suffix>.*)$", d)) {
+	c := dSuffix
 	Clipboard := dNum
     }
     
@@ -49,12 +48,10 @@ ClipChanged(type) {
 
     ;Перемещение товаров ШМ000011076 - обрезается выше
     ;19.07.2017 17:21:26 Сканер ШК → Электроника el@
-    If (RegExMatch(c, "^(?P<DD>\d\d)\.(?P<MM>\d\d)\.(?P<YYYY>\d{4})\s(\d{1,2}:\d\d:\d\d\s)?(?P<text>.+)$", m)) {
-	newSubdir := 
+    If (RegExMatch(c, "^(?P<DD>\d\d)\.(?P<MM>\d\d)\.(?P<YYYY>\d{4})\s(\d{1,2}:\d\d:\d\d\s)?(?P<text>.+)$", m))
 	destDir := baseDestDir "\" mYYYY "\" mYYYY "-" mMM "-" mDD " " StripNonfilenameChars(mtext)
-    } Else {
+    Else
 	newName := StripNonfilenameChars(c)
-    }
     ttip :=   (dNum ? "В буфере обмена: " dNum : "")
 	    . (destDir ? "`nПапка назначения: " destDir : "")
 	    . (newName ? "`nИмя файла: " newName : "")

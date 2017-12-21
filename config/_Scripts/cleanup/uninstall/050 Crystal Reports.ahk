@@ -26,18 +26,19 @@ For i,regview in regViews {
 	Sleep 300
 	ControlClick Button1 ;  &Finish
 	
-	GroupAdd endscreenFails, Installation Incomplete ahk_pid %rpid%, The installer was interrupted before Crystal Reports for .NET Framework 2.0 (x86) could be removed. You need to restart the installer to try again.
-	GroupAdd endscreenSuccess, Installation Incomplete ahk_pid %rpid%, Crystal Reports for .NET Framework 2.0 (x86) has been successfully removed.
-	GroupAdd endscreens, Installation Incomplete ahk_pid %rpid%
-	GroupAdd endscreens, ahk_group endscreenFails
-	GroupAdd endscreens, ahk_group endscreenSuccess
+	titleWinFinish = Crystal Reports for .NET Framework 2.0 (x86) ahk_pid %rpid%
+	GroupAdd endscreens, %titleWinFinish%
+	GroupAdd endscreenFails, %titleWinFinish%, The installer was interrupted before Crystal Reports for .NET Framework 2.0 (x86) could be removed. You need to restart the installer to try again.
+	GroupAdd endscreenSuccess, %titleWinFinish%, Crystal Reports for .NET Framework 2.0 (x86) has been successfully removed.
 
-	WinWait ahk_group endscreens
-	Sleep 1000
-	fail := WinExist("ahk_group endscreenFails")
-	success := WinExist("ahk_group endscreenSuccess")
-	If (success || fail) ; только для известных окон
-	    ControlClick Button1 ; &Close
+	While WinExist("ahk_pid " rpid) { ; ahk_class MsiDialogCloseClass ahk_exe msiexec.exe
+	    WinWait ahk_group endscreens,,5
+	    Sleep 1000
+	    If (WinExist("ahk_group endscreenSuccess") || fail := WinExist("ahk_group endscreenFails")) { ; только для известных окон
+		ControlClick Button1 ; &Close
+		ControlClick &Close ; repeat, just in case
+	    }
+	}
 	ExitApp fail
     }
 }
