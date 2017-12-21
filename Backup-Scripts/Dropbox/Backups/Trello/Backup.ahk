@@ -21,16 +21,18 @@ GetTrelloAuthToken(,, "read", "mobilmir.ru Trello Backup AutoHotkey Script")
 ;TrelloAPI1(method, req, response, data)
 
 SetWorkingDir %A_ScriptDir%
+FormatTime today,, yyyy-MM-dd
+RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 
-queryOrgsBoards := queryMyBoards := 1
+queryOrgsBoards := queryMyBoards := 0
 destDir := filter := ""
 Loop %0%
 {
     argv := %A_Index%
     If (argv = "/org")
-	queryOrgsBoards := -1
+	queryOrgsBoards := 1
     If (argv = "/my" || argv = "/me")
-	queryMyBoards := -1
+	queryMyBoards := 1
     Else If (Instr(FileExist(argv), "D"))
 	destDir := argv
     Else If (InStr(argv, "\")) {
@@ -41,36 +43,37 @@ Loop %0%
     Else Throw Exception("Excess argument",, "(arg no. " A_Index ") " argv)
 }
 
-If (StrLen(destDir) && SubStr(destDir, 0) != "\")
+If (!destDir)
+    destDir := A_ScriptDir "\"
+Else If (SubStr(destDir, 0) != "\")
     destDir .= "\"
 
-log = %destDir%%A_ScriptName%.log
-FileGetSize logSize, %log%, M
-If (logSize > 1)
-    FileMove %log%, %log%.bak, 1
-FormatTime today,, yyyy-MM-dd
-RegRead Hostname, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
-batchDir := destDir A_UserName "@" Hostname "\" today
-While FileExist(batchDir)
-    batchDir := A_UserName "\" today . Format("#{:.2i}", A_Index)
-FileCreateDir %batchDir%
-FileAppend `n[·] %A_Now%`tStaring backup for %A_UserName% to %batchDir%`n, %log%
+Log(destDir "\" A_ScriptName " " A_UserName "@" Hostname ".log", "*LogOpen")
 
-If (queryOrgsBoards + queryMyBoards) {
-    FileAppend [↓] %A_Now%`tGET /members/me/organizations`n, %log%
+baseBatchDir := destDir A_UserName "@" Hostname "\" today
+Loop
+    batchDir := baseBatchDir . (A_Index > 1 ? Format("#{:.2i}", A_Index) : "")
+Until !FileExist(batchDir)
+FileCreateDir %batchDir%
+
+Log("Staring backup for" A_UserName " to " batchDir)
+
+If (queryMyBoards >= queryOrgsBoards)
+    QueueBackupBoards("/members/me/boards" filter)
+
+If (queryOrgsBoards >= queryMyBoards) {
+    Log("GET /members/me/organizations", 2)
     orgsBoardsBatch := ""
     For i,org in TrelloAPI1("GET", "/members/me/organizations", jsonOrgs := Object())
 	QueueBackupBoards("/organizations/" org.id "/boards" filter)
     TransactWrite(batchDir "\organizations.json", jsonOrgs)
+    
 }
-
-If (queryMyBoards + queryOrgsBoards)
-    QueueBackupBoards("/members/me/boards" filter)
 
 ExitApp QueueBackupBoards()
 
 QueueBackupBoards(ByRef query := "") {
-    global log, batchDir, destDir
+    global batchDir, destDir
     static backupBoards := {}, oAllBoards := "", boardFields := ""
     If (boardFields=="")
 	For i, v in GetBoardFields()
@@ -78,16 +81,15 @@ QueueBackupBoards(ByRef query := "") {
     
     If (oAllBoards=="") {
 	FileRead jsonOldBoards, boards.json
-	If (jsonOldBoards) {
-	    FileAppend [←] %A_Now%`tLoaded old board list from boards.json`n, %log%
-	    oAllBoards := JSON.Load(jsonOldBoards)
-	} Else {
-	    FileAppend [.] %A_Now%`tOld board list (boards.json) is empty`n, %log%
+	If (ErrorLevel || !IsObject(oAllBoards := JSON.Load(jsonOldBoards))) {
+	    Log("Old board list (boards.json) not loaded", -1)
 	    oAllBoards := {}
-	}
+	} Else
+	    Log("Loaded old board list from boards.json", 3)
     }
     
     If (query) {
+	Log(query, 2)
 	If (curBoards := TrelloAPI1("GET", tmpFullQuery := query . (InStr(query, "?") ? "&" : "?") . "board_fields=" boardFields , jsonBoards := Object())) {
 	    For i,board in curBoards {
 		If (board.dateLastActivity != oAllBoards[board.id].dateLastActivity) {
@@ -95,28 +97,30 @@ QueueBackupBoards(ByRef query := "") {
 		    backupBoards[board.id] := ""
 		}
 	    }
-	    FileAppend [🔍] %A_Now%`tFound %i% boards via %query%`n, %log%
+	    Log("Found " i " boards via " query, 4)
 	} Else {
 	    Fail("GET " tmpFullQuery, jsonBoards)
 	}
 	WriteoutBatch(batchDir "\boards*.json", jsonBoards)
 	WriteoutBatch(batchDir "\boards*.txt", BoardsFormatTextReport(curBoards))
     } Else {
-	WriteoutBatch(batchDir "\*.json", oAllBoards)
+	Log("Backing up all boards", 1)
+	batchPath := batchDir "\*.json"
+	WriteoutBatch(batchPath, oAllBoards)
 	
 	backupListHasContents := 0
 	For boardid in backupBoards {
 	    backupListHasContents := 1
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid)))
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/actions/")))
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/checklists/")))
-	    ;Routes do not exist: /1/boards/577f529fbf5d7ba0ec804c7a/tags/ – WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/tags/"))
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/labels/")))
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/lists/")))
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/members/")))
-	    WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest("/boards/" boardid "/plugins?filter=enabled")))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid)))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/actions/")))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/checklists/")))
+	    ;Routes do not exist: /1/boards/577f529fbf5d7ba0ec804c7a/tags/ – WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/tags/"))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/labels/")))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/lists/")))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/members/")))
+	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/plugins?filter=enabled")))
 	}
-	WriteoutBatch(batchDir "\*.json", ObjToNEJson(BatchRequest()))
+	WriteoutBatch(batchPath, ObjToNEJson(BatchRequest()))
 	
 	; backup Checklists
 	
@@ -148,8 +152,9 @@ ObjToNEJson(objOrVal) {
 }
 
 BatchRequest(ByRef req := "") {
-    global log
-    static urls := "", TrelloRequestsPerBatch := 10, leftRequests := 10 ; https://developers.trello.com/v1.0/reference#batch-1
+    static urls := ""
+	 , TrelloRequestsPerBatch := 10
+	 , leftRequests := 10 ; https://developers.trello.com/v1.0/reference#batch-1
 
     If (req) {
 	urls .= (urls ? "," : "") . req
@@ -158,13 +163,10 @@ BatchRequest(ByRef req := "") {
     }
     
     If (urls) {
-	If (TrelloAPI1("GET", "/batch/?urls=" urls, resp)) {
-	    FileAppend [↓] %A_Now%`tGET /batch/?urls=%urls%`n, %log%
-	    leftRequests := TrelloRequestsPerBatch
-	} Else {
+	If (!TrelloAPI1("GET", "/batch/?urls=" urls, resp))
 	    Fail(A_ThisFunc, "[↑] " urls " [↓] " resp)
-	}
-	return {urls: urls, response: resp}, urls := ""
+	Log("GET /batch/?urls=" urls, 2)
+	return {urls: urls, response: resp}, urls := "", leftRequests := TrelloRequestsPerBatch
     }
 }
 
@@ -198,9 +200,9 @@ TransactWrite(ByRef path, ByRef contents) {
 	file.Close()
 	FileMove %path%.tmp, %path%, 1
 	If (ErrorLevel)
-	    FileAppend [!] %A_Now%`tFailed renaming "%path%.tmp" to "%path%"`n, %log%
+	    Log("Failed renaming """ path ".tmp"" to """ path """", -1)
 	Else
-	    FileAppend [→] %A_Now%`tWrote %path%`n, %log%
+	    Log("Wrote " path, 5)
     } Else {
 	Fail("Cannot open file", path ".tmp")
 	return 0
@@ -209,10 +211,37 @@ TransactWrite(ByRef path, ByRef contents) {
 }
 
 Fail(ByRef status, ByRef details := "") {
-    global log
-    FileAppend % "[!] " A_Now "`tFailed: " status . (details ? details : "") "`n", %log%
+    Log("Failure: " status . details, -1)
     ;MsgBox 0x10, %A_ScriptName%, %status%`n`n%details%
     Throw Exception(status,,details)
+}
+
+
+Log(text, status := 0) {
+    static    lfo := ""
+	    , statusChars := {1: "·", 2: "↓", 3: "←", 4: "🔍", 5: "→", -1: "!", -2: "?"}
+	    , listStatusAuto := [{"^GET ": 2}, {"": -2}]
+    If (status == "*LogOpen") {
+	If (IsObject(lfo))
+	    lfo.Close()
+	FileGetSize logSize, %text%, M
+	If (logSize)
+	    FileMove %text%, %text%.bak, 1
+	return IsObject(lfo := FileOpen(text, "a-w"))
+    } Else If (status == "*LogClose") {
+	lfo.Close()
+    } Else {
+	If (!IsObject(lfo))
+	    lfo := FileOpen("*", "w", "CP1")
+	If (status)
+	    statusChar := (statusChars.HasKey(status) ? statusChars[status] : (StrLen(status) == 1 ? status : ("?", text := "(" status ") " text)))
+	Else
+	    For i, statusAutoObj in listStatusAuto
+		For textSubstr, status in statusAutoObj
+		    If (text ~= textSubstr)
+			statusChar := statusChars[status]
+	return lfo.WriteLine("[" statusChar "] " A_Now A_Tab (text == "" ? ObjectToText("LastError: " A_LastError ", ErrorLevel: " ErrorLevel) : text))
+    }
 }
 
 ; hash functions by Laszlo
