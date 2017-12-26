@@ -28,34 +28,34 @@ return
 
 ClipChanged(type) {
     global newName,destDir,baseDestDir
+    static savedCardNum
     ttip=
     If (!(type==1))
 	return
     ClipWait 0
     c:=Clipboard
-    ;Перемещение товаров ШМ000011076 19.07.2017 17:21:26 Сканер ШК → Электроника el@
-    ;ЗМ^0000768
-    If (RegexMatch(c, "(?P<Num>..(^\d{7}|\d{9}))\s+(от\s+)?(?P<Suffix>.*)$", d)) {
-	c := dSuffix
-	Clipboard := dNum
-    }
-    
-    ;ttip .= (ttip ? "`n" : "") . "c: " c "`ndNum: " dNum "`nd3: " d3
-    
-
-    c := Trim(c, "`t `n`r")
-    ;11.07.2017 9:20:34 ИБП 3Cott Micropower 1000VA/600W 2 линейно-интерактивный → касса на Доваторцев (Zoho #1775)
-
-    ;Перемещение товаров ШМ000011076 - обрезается выше
-    ;19.07.2017 17:21:26 Сканер ШК → Электроника el@
-    If (RegExMatch(c, "^(?P<DD>\d\d)\.(?P<MM>\d\d)\.(?P<YYYY>\d{4})\s(\d{1,2}:\d\d:\d\d\s)?(?P<text>.+)$", m))
-	destDir := baseDestDir "\" mYYYY "\" mYYYY "-" mMM "-" mDD " " StripNonfilenameChars(mtext)
-    Else
-	newName := StripNonfilenameChars(c)
-    ttip :=   (dNum ? "В буфере обмена: " dNum : "")
-	    . (destDir ? "`nПапка назначения: " destDir : "")
-	    . (newName ? "`nИмя файла: " newName : "")
-    ToolTip % Trim(ttip, "`r`n")
+    If (RegexMatch(c, "(?P<Num>..(^\d{7}|\d{9}))\s+(от\s+)?(?P<Suffix>.*)$", card)) {
+	;Перемещение товаров ШМ000011076 19.07.2017 17:21:26 Сканер ШК → Электроника el@
+	c := cardSuffix, Clipboard := savedCardNum := cardNum
+	;ЗМ^0000768
+	;11.07.2017 9:20:34 ИБП 3Cott Micropower 1000VA/600W 2 линейно-интерактивный → касса на Доваторцев (Zoho #1775)
+	If (RegExMatch(c, "^(?P<DD>\d\d)\.(?P<MM>\d\d)\.(?P<YYYY>\d{4})\s(\d{1,2}:\d\d:\d\d\s)?(?P<text>.+)$", m)) {
+	    ;Перемещение товаров ШМ000011076 - обрезается выше
+	    ;19.07.2017 17:21:26 Сканер ШК → Электроника el@
+	    destDir := baseDestDir "\" mYYYY "\" mYYYY "-" mMM "-" mDD " " StripNonfilenameChars(mtext)
+	}
+    } Else If (RegexMatch(c, "^[^№]+\s+№\s+(?P<docNum>\d+)", prn)) { ; \s+от\s+(?P<docDate>[^\.]+)\.
+	; Требование-накладная № 1712 от 29 ноября 2017 г.
+	If (!InStr(savedCardNum, Format("{:09d}", prndocNum)))
+	    ttip = Номер в заголовке скопированного документа (%prndocNum%) не подходит к номеру документа в карточке (%savedCardNum%).`n
+	Else
+	    newName := StripNonfilenameChars(c)
+    } Else
+	return
+    ToolTip % ttip
+	    . (cardNum ? "В буфере обмена: " cardNum "`n" : "")
+	    . (destDir ? "Папка назначения: " destDir "`n" : "")
+	    . (newName ? "Имя файла: " newName : "")
     SetTimer RemoveTooltip, -3000
 }
 
