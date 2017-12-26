@@ -6,7 +6,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     
     IF NOT DEFINED ahkOptions IF "%RunInteractiveInstalls%"=="0" SET ahkOptions=/ErrorStdOut
     
-    CALL "%~dp0..\..\config\_Scripts\FindAutoHotkeyExe.cmd" || CALL "%~dp0FindAutoHotkeyExe.cmd" || EXIT /B
+    CALL "%~dp0..\..\config\_Scripts\FindAutoHotkeyExe.cmd" || CALL "%~dp0FindAutoHotkeyExe.cmd" || CALL :TryAutohotkeyLocals || EXIT /B
     FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
     FOR /f "usebackq tokens=3*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname"`) DO SET "NVHostname=%%~J"
     
@@ -43,3 +43,11 @@ IF NOT DEFINED destDir (
     rem XCOPY "%destDir%\%destFName% trello-id.txt" "%copyDir%\*.*" /I <NUL
 EXIT /B
 )
+:TryAutohotkeyLocals
+FOR %%A IN ("%~dp0AutoHotkey.exe" "%binDir%dp0AutoHotkey.exe") DO (
+    IF EXIST %%A (
+	SET AutohotkeyExe="%%~A"
+	EXIT /B 0
+    )
+)
+EXIT /B 1

@@ -13,26 +13,12 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID" /reg:32`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
     rem /reg:32 won't work on Vista and XP, so fall back
     IF ERRORLEVEL 1 FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID"`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
-    SET "localFPdir=%ProgramData%\mobilmir.ru\Fingerprint"
-)
-(
-    MKDIR "%localFPdir%" 2>NUL
-    START "Сохранение отпечатка для обновления доски Trello" /B %comspec% /C ""%~dp0SaveJsonFingerprint.cmd" "%localFPdir%""
-    
-    REM %TIME% не всегда возвращает 2 цифры часов
-    SET "datetime=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%_%fnametime:~,6%"
-    
-    REM not using %COMPUTERNAME% because it's always uppercase
-    FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
-    IF NOT DEFINED Hostname SET "Hostname=%COMPUTERNAME%"
-
-    SET "ReportPath=%srcpath%..\new-unsorted-reports"
 
     SET "smartctlexe=smartctl-32.exe"
-    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" "SET smartctlexe=smartctl-64.exe"
-    IF /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" "SET smartctlexe=smartctl-64.exe"
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "smartctlexe=smartctl-64.exe"
+    IF /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" SET "smartctlexe=smartctl-64.exe"
 
-    IF DEFINED tvID SET "fnametvID=TVID=%tvID% "
+    SET "localFPdir=%ProgramData%\mobilmir.ru\Fingerprint"
 )
 (
     ECHO Y|DEL /F /Q "%TEMP%\%~n0\TempWmicBatchFile.bat"
@@ -44,16 +30,36 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	PAUSE
 	RD /S /Q "%TEMP%\%~n0"
     )
-    %exe7z% x -o"%TEMP%\%~n0" -- "%srcpath%WinAudit.7z"
+
+    REM %TIME% не всегда возвращает 2 цифры часов
+    SET "datetime=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%_%fnametime:~,6%"
+
+    MKDIR "%localFPdir%" 2>NUL
+    START "Сохранение отпечатка для обновления доски Trello" /B %comspec% /C ""%~dp0SaveJsonFingerprint.cmd" "%localFPdir%""
+    
+    FOR %%A IN ("%srcpath%bin.7z" "%srcpath%WinAudit.7z") DO IF EXIST "%%~A" (%exe7z% x -o"%TEMP%\%~n0" -- "%%~A" & SET "%%~nADir=%TEMP%\%~n0\")
+    
+    REM not using %COMPUTERNAME% because it's always uppercase
+    FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+    IF NOT DEFINED Hostname SET "Hostname=%COMPUTERNAME%"
+    
+    IF EXIST "%srcpath%..\new-unsorted-reports" (
+	SET "ReportPath=%srcpath%..\new-unsorted-reports"
+    ) ELSE SET "ReportPath=%srcpath%Reports"
+    
+    IF DEFINED tvID SET "fnametvID=TVID=%tvID% "
+
     IF NOT EXIST "%TEMP%\%~n0" MKDIR "%TEMP%\%~n0"
+)
+(
     PUSHD "%TEMP%\%~n0" && (
 	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
 	rem Security included to full WinAudit report
 	rem     secedit.exe /export /CFG "SecurityPolicy-%Hostname%.inf"
 	rem     secedit.exe /export /mergedpolicy /CFG "SecurityPolicy-ADMerged-%Hostname%.inf"
-	"WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
-	"WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
-	"WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
+	"%WinAuditDir%WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
+	"%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
+	"%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
 	
 	rem winaudit switches:
 	rem g	Include System Overview
@@ -88,7 +94,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	rem H	Include Software Metering
 	rem G	Include User Logon Statistics
 	
-	FOR /F "usebackq tokens=1" %%I IN (`"%smartctlexe%" --scan`) DO "%smartctlexe%" -s on -x %%I >"%%~nI-smart-%Hostname%.txt" 2>"%%~nI-smart-%Hostname%.log"
+	FOR /F "usebackq tokens=1" %%I IN (`"%binDir%%smartctlexe%" --scan`) DO "%binDir%%smartctlexe%" -s on -x %%I >"%%~nI-smart.txt" 2>"%%~nI-smart.log"
 	FOR %%I IN (*.log) DO IF "%%~zI"=="0" DEL %%I
 	(ECHO %DATE% %TIME%)>wmi-description.log
 	FOR /F "usebackq %WMIListSkipLines% tokens=1* delims=	" %%A IN ("%~0") DO (
@@ -96,7 +102,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	    ECHO.|"%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.txt 2>>wmi-description.log
 	)
 	
-	DEL smartctl-32.exe smartctl-64.exe smartmontools.url WinAudit.exe "WinAudit - Home.url"
+	DEL smartctl-32.exe smartctl-64.exe smartmontools.url WinAudit.exe "WinAudit - Home.url" AutoHotkey.exe
 	FOR %%A IN ("%TEMP%\%~n0\*.*") DO IF %%~zA EQU 0 ECHO.|DEL "%%~A"
 	FOR %%A IN ("%localFPdir%\*.*") DO COPY /Y "%%~A" "%TEMP%\%~n0\*.*" <NUL
 	%exe7z% a -mx=9 -m0=LZMA2:a=2:d26:fb=273 -- "%ReportPath%\%Hostname% %fnametvID%%datetime%.7z" *.html *.csv *.txt *.inf *.json *.log && DEL *.html *.csv *.txt *.inf *.json *.log
