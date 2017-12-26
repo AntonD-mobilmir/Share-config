@@ -41,13 +41,14 @@ FileMove	%MTProfilePath%\pgprules.xml,	%backupPath%\*.*
 FileMove	%MTProfilePath%\business_contacts.mab, %backupPath%\*.*
 FileCopy	%MTProfilePath%\prefs.js,	%backupPath%\prefs.js
 
-FileCopy	%A_ScriptDir%\default_profile_template\pgprules.xml,	%MTProfilePath%\*.*
-FileCopy	%A_ScriptDir%\default_profile_template\user.js,		%MTProfilePath%\*.*
-FileCopy	%A_ScriptDir%\default_profile_template\extensions.*,	%MTProfilePath%\*.*
-FileCopy	%A_ScriptDir%\default_profile_template\*.mab,		%MTProfilePath%\*,*, 1
+FileCopy	%A_ScriptDir%\default_profile_template\permissions.sqlite,	%MTProfilePath%\*.*
+FileCopy	%A_ScriptDir%\default_profile_template\pgprules.xml,		%MTProfilePath%\*.*
+FileCopy	%A_ScriptDir%\default_profile_template\user.js,			%MTProfilePath%\*.*
+FileCopy	%A_ScriptDir%\default_profile_template\extensions.*,		%MTProfilePath%\*.*
+FileCopy	%A_ScriptDir%\default_profile_template\*.mab,			%MTProfilePath%\*,*, 1
 
-FileRead	prefs_BusinessContacts,		%A_ScriptDir%\prefs-parts\prefs_BusinessContacts.js
-FileRead	prefsCommon,			%A_ScriptDir%\prefs-parts\prefs_commononly.js
+FileRead	prefs_BusinessContacts,	%A_ScriptDir%\prefs-parts\prefs_BusinessContacts.js
+FileRead	prefsCommon,		%A_ScriptDir%\prefs-parts\prefs_commononly.js
 FileAppend	`n%prefs_BusinessContacts%`n`n%prefsCommon%`n, %MTProfilePath%\prefs.js
 
 Process WaitClose, %PIDofUnpackScript%
