@@ -110,7 +110,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	    If (pathtextfp := options.txt)
 		FileRead textfp, %pathtextfp%
 	    If ((!textfp || textfp ~= "^\w:\w" ) && IsObject(fp))
-		textfp := GetFingerprint_Object_To_Text(fp)
+		textfp := ObjectToText(fp)
 	    Else
 		Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
 	    
@@ -192,3 +192,6 @@ ShowError(ByRef text) {
 }
 
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\FindTrelloCard.ahk
+#include %A_ScriptDir%\..\..\config\_Scripts\Lib\ObjectToText.ahk
+#include %A_ScriptDir%\..\..\config\_Scripts\Lib\TrelloAPI1.ahk
+#include %A_ScriptDir%\..\..\config\_Scripts\Lib\GetFingerprint.ahk

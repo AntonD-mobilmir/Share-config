@@ -204,5 +204,6 @@ ExtendedFindTrelloCard_LogMatches(delimCardMatch, ByRef lastMatch, ByRef cards, 
     }
 }
 
+#include %A_LineFile%\..\EscapeRegex.ahk
 #include %A_LineFile%\..\ExtractHostnameFromTrelloCardName.ahk
 #include %A_LineFile%\..\ParseScriptCommandLine.ahk
