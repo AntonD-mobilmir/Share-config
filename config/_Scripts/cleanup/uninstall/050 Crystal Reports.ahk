@@ -27,7 +27,7 @@ For i,regview in regViews {
 	ControlClick Button1 ;  &Finish
 	
 	titleWinFinish = Crystal Reports for .NET Framework 2.0 (x86) ahk_pid %rpid%
-	GroupAdd endscreens, %titleWinFinish%
+	GroupAdd endscreens, %titleWinFinish%, &Close
 	GroupAdd endscreenFails, %titleWinFinish%, The installer was interrupted before Crystal Reports for .NET Framework 2.0 (x86) could be removed. You need to restart the installer to try again.
 	GroupAdd endscreenSuccess, %titleWinFinish%, Crystal Reports for .NET Framework 2.0 (x86) has been successfully removed.
 
