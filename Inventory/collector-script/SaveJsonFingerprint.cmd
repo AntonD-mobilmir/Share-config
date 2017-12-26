@@ -4,7 +4,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     
-    IF NOT DEFINED ahkOptions IF "%RunInteractiveInstalls%"=="0" SET ahkOptions=/ErrorStdOut
+    IF NOT DEFINED ahkOptions IF "%RunInteractiveInstalls%"=="0" SET "ahkOptions=/ErrorStdOut"
     
     CALL "%~dp0..\..\config\_Scripts\FindAutoHotkeyExe.cmd" || CALL "%~dp0FindAutoHotkeyExe.cmd" || CALL :TryAutohotkeyLocals || EXIT /B
     FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
@@ -16,31 +16,56 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     
     SET "cTime=%TIME::=%"
     SET "cDate=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%"
+    IF NOT EXIST "%ProgramData%\mobilmir.ru\Fingerprint" MKDIR "%ProgramData%\mobilmir.ru\Fingerprint"
+    SET "destDir=%ProgramData%\mobilmir.ru\Fingerprint"
     IF EXIST "%~dp0..\trello-accounting\update-queue" (
-	SET "destDir=%~dp0..\trello-accounting\update-queue"
-    )
+	SET "copyDir=%~dp0..\trello-accounting\update-queue"
+    ) ELSE IF EXIST "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\update-queue" (
+	SET "copyDir=\\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\update-queue"
+    ) ELSE SET "copyDir=%~dp0Fingerprints"
     IF EXIST "%~dp0GetFingerprint.ahk" (
 	SET GetFingerprintahk="%~dp0GetFingerprint.ahk"
     ) ELSE SET GetFingerprintahk="%~dp0..\..\config\_Scripts\Lib\GetFingerprint.ahk"
 )
 SET "destFName=%Hostname% %cDate% %cTime:,=.%"
-IF NOT "%~1"=="" (
-    IF EXIST "%destDir%" SET "copyDir=%destDir%"
-    SET "destDir=%~1"
-)
-IF NOT DEFINED destDir (
-    MKDIR "%~dp0update-queue"
-    SET "destDir=%~dp0update-queue"
+(
+    %AutohotkeyExe% %ahkOptions% %GetFingerprintahk% "%destDir%\%destFName%.txt" /json "%destDir%\%destFName%.json" >"%destDir%\%destFName%.log" 2>&1
+    FOR %%A IN ("%destDir%\%destFName%.log") DO IF EXIST "%%~A" IF "%%~zA"=="0" DEL "%%~A"
+    
+    SET "FingerprintChanged=1"
+    IF EXIST "%destDir%\%Hostname%.json" (
+	(ECHO N|"%SystemRoot%\System32\comp.exe" "%destDir%\%Hostname%.json" "%destDir%\%destFName%.json" 2>NUL)
+	IF NOT ERRORLEVEL 1 (
+	    REM Отпечатки не отличаются, можно удалить новый и выйти
+	    DEL "%destDir%\%destFName%.json"
+	    DEL "%destDir%\%destFName%.txt"
+	    SET "FingerprintChanged="
+	)
+	FOR %%A IN ("%destDir%\%Hostname%.json") DO CALL :AppendDateToName "%destDir%\%Hostname%.*" "%%~tA"
+    )
+    IF DEFINED FingerprintChanged (
+	MOVE /Y "%destDir%\%destFName%.json" "%destDir%\%Hostname%.json" 
+	MOVE /Y "%destDir%\%destFName%.txt" "%destDir%\%Hostname%.txt" 
+
+	%AutohotkeyExe% %ahkOptions% "%~dp0..\..\config\_Scripts\Write-trello-id.ahk" >"%destDir%\%Hostname% Write-trello-id.log" 2>&1
+	FOR %%A IN ("%destDir%\%Hostname% Write-trello-id.log") DO IF EXIST "%%~A" IF "%%~zA"=="0" DEL "%%~A"
+    )
+    IF DEFINED tvID (ECHO %tvID%)>"%destDir%\%Hostname% TVID.txt"
 )
 (
-    %AutohotkeyExe% %ahkOptions% "%~dp0..\..\config\_Scripts\Write-trello-id.ahk" >"%destDir%\Write-trello-id.log" 2>&1
-    FOR %%A IN ("%destDir%\Write-trello-id.log") DO IF EXIST "%%~A" IF "%%~zA"=="0" DEL "%%~A"
-    %AutohotkeyExe% %ahkOptions% %GetFingerprintahk% "%destDir%\%destFName%.txt" /json "%destDir%\%destFName%.json" >"%destDir%\GetFingerprint.log" 2>&1
-    FOR %%A IN ("%destDir%\GetFingerprint.log") DO IF EXIST "%%~A" IF "%%~zA"=="0" DEL "%%~A"
-    IF EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" COPY /B /Y "%ProgramData%\mobilmir.ru\trello-id.txt" "%destDir%\%destFName% trello-id.txt"
-    IF DEFINED tvID (ECHO %tvID%)>"%destDir%\%destFName% TVID.txt"
-    IF DEFINED copyDir XCOPY "%destDir%\%destFName%*.*" "%copyDir%\*.*" /I <NUL
-    rem XCOPY "%destDir%\%destFName% trello-id.txt" "%copyDir%\*.*" /I <NUL
+    FOR %%A IN ("%copyDir%" %*) DO IF EXIST "%%~A" (
+	IF EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" COPY /B /Y "%ProgramData%\mobilmir.ru\trello-id.txt" "%%~A\%Hostname% trello-id.txt"
+	XCOPY "%destDir%\%Hostname%.*" "%%~A\" /Y /I <NUL
+	XCOPY "%destDir%\%Hostname% *.*" "%%~A\" /Y /I <NUL
+    )
+EXIT /B
+)
+:AppendDateToName <mask> <date>
+SET "suffix=%~2"
+SET "suffix=%suffix::=%"
+SET "suffix=%suffix:~6,4%-%suffix:~3,2%-%suffix:~0,2%%suffix:~10%"
+(
+    FOR %%B IN (%1) DO MOVE /Y "%%~B" "%%~dpnB %suffix%%%~xB"
 EXIT /B
 )
 :TryAutohotkeyLocals

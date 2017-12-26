@@ -17,8 +17,6 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SET "smartctlexe=smartctl-32.exe"
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "smartctlexe=smartctl-64.exe"
     IF /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" SET "smartctlexe=smartctl-64.exe"
-
-    SET "localFPdir=%ProgramData%\mobilmir.ru\Fingerprint"
 )
 (
     ECHO Y|DEL /F /Q "%TEMP%\%~n0\TempWmicBatchFile.bat"
@@ -34,8 +32,6 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     REM %TIME% не всегда возвращает 2 цифры часов
     SET "datetime=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%_%fnametime:~,6%"
 
-    MKDIR "%localFPdir%" 2>NUL
-    START "Сохранение отпечатка для обновления доски Trello" /B %comspec% /C ""%~dp0SaveJsonFingerprint.cmd" "%localFPdir%""
     
     FOR %%A IN ("%srcpath%bin.7z" "%srcpath%WinAudit.7z") DO IF EXIST "%%~A" (%exe7z% x -o"%TEMP%\%~n0" -- "%%~A" & SET "%%~nADir=%TEMP%\%~n0\")
     
@@ -53,13 +49,14 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 (
     PUSHD "%TEMP%\%~n0" && (
-	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
+	CALL :RunInBackground "%~dp0SaveJsonFingerprint.cmd" "%TEMP%\%~n0"
+	
 	rem Security included to full WinAudit report
 	rem     secedit.exe /export /CFG "SecurityPolicy-%Hostname%.inf"
 	rem     secedit.exe /export /mergedpolicy /CFG "SecurityPolicy-ADMerged-%Hostname%.inf"
-	"%WinAuditDir%WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
-	"%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
-	"%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
+	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
+	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
+	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
 	
 	rem winaudit switches:
 	rem g	Include System Overview
@@ -95,21 +92,29 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	rem G	Include User Logon Statistics
 	
 	FOR /F "usebackq tokens=1" %%I IN (`"%binDir%%smartctlexe%" --scan`) DO "%binDir%%smartctlexe%" -s on -x %%I >"%%~nI-smart.txt" 2>"%%~nI-smart.log"
-	FOR %%I IN (*.log) DO IF "%%~zI"=="0" DEL %%I
-	(ECHO %DATE% %TIME%)>wmi-description.log
-	FOR /F "usebackq %WMIListSkipLines% tokens=1* delims=	" %%A IN ("%~0") DO (
-	    ECHO "%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.log
-	    ECHO.|"%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.txt 2>>wmi-description.log
-	)
+	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
+	FOR /F "usebackq %WMIListSkipLines% tokens=1* delims=	" %%A IN ("%~0") DO ECHO.|"%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.txt 2>&1
 	
+	ECHO Waiting for background processes to finish...
+	DIR /B "%TEMP%\%~n0\*.lock"
+:waitBackgroundProcesses
+	DEL "%TEMP%\%~n0\*.lock" & IF EXIST "%TEMP%\%~n0\*.lock" PING 127.0.0.1 -n 3 >NUL & GOTO :waitBackgroundProcesses
+	ECHO All locks released.
 	DEL smartctl-32.exe smartctl-64.exe smartmontools.url WinAudit.exe "WinAudit - Home.url" AutoHotkey.exe
+	FOR %%I IN (*.log) DO IF "%%~zI"=="0" ECHO.|DEL %%I
 	FOR %%A IN ("%TEMP%\%~n0\*.*") DO IF %%~zA EQU 0 ECHO.|DEL "%%~A"
-	FOR %%A IN ("%localFPdir%\*.*") DO COPY /Y "%%~A" "%TEMP%\%~n0\*.*" <NUL
 	%exe7z% a -mx=9 -m0=LZMA2:a=2:d26:fb=273 -- "%ReportPath%\%Hostname% %fnametvID%%datetime%.7z" *.html *.csv *.txt *.inf *.json *.log && DEL *.html *.csv *.txt *.inf *.json *.log
 	POPD
 	RD /Q "%TEMP%\%~n0"
     )
     EXIT /B
+)
+
+:RunInBackground
+@SET "lock=%~nx1-%RANDOM%-%RANDOM%-%RANDOM%.lock"
+@(
+    START "" /B %comspec% /C "%* >"%TEMP%\%~n0\%lock%""
+EXIT /B
 )
 
 :no7zip
