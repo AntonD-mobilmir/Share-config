@@ -7,8 +7,6 @@ RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Par
 RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
 If Domain in ,office0.mobilmir,officeVPN.mobilmir
     Domain=
-Else
-    Domain=%Domain%%A_Space%
 
 trelloidlines := ["trelloURL", "trelloHostname", "trelloCardName", "trelloID", "trelloLocation"]
 Loop Read, %A_AppDataCommon%\mobilmir.ru\trello-id.txt
@@ -19,11 +17,6 @@ If (trelloHostname && trelloHostname != Hostname)
     Hostname .= " (trello-id.txt: " trelloHostname ")"
 If (trelloLocation)
     trelloLocation .= " "
-
-IPAddresses=
-Loop 4
-    If ( A_IPAddress%A_Index%!="0.0.0.0" )
-	IPAddresses .= A_IPAddress%A_Index% . " "
 
 If (!configPost) { ; it may be defined when this script is included in "%USERPROFILE%\Dropbox\Developement\TeamViewer\Host\install_script\install.ahk"
     EnvGet configPost, DefaultsSource
@@ -54,13 +47,21 @@ Loop {
 } Until ClientID
 
 ;entry.1137503626=testhost&entry.1756894160=testid&entry.287789183=testconfig&entry.1477798008=testdept&entry.1221721146=testuser&entry.1999739813=testdesc&fvv=1&draftResponse=%5B%2C%2C%22-2064060711359362913%22%5D%0D%0A&pageHistory=0&fbzx=-2064060711359362913
+textfp := ""
+If (IsFunc("GetFingerprint")) {
+    Func("GetFingerprint").Call(textfp)
+}
+IPAddresses=
+Loop 4
+    If ( A_IPAddress%A_Index%!="0.0.0.0" )
+	IPAddresses .= A_IPAddress%A_Index% . " "
 
 POSTDATA := "entry.1137503626="  . UriEncode(Hostname)
 	  . "&entry.1756894160=" . UriEncode(ClientID)
 	  . "&entry.287789183="  . UriEncode(configPost)
 	  . "&entry.1477798008=" . UriEncode(Trim(trelloLocation . geoLocation, " `t`n"))
 	  . "&entry.1221721146=" . UriEncode(trelloCardName ? trelloCardName : A_UserName)
-	  . "&entry.1999739813=" . UriEncode(Trim(trelloURL ? trelloURL : Domain . IPAddresses))
+	  . "&entry.1999739813=" . UriEncode(Trim(trelloURL "`n" Trim(Domain " " IPAddresses) "`n" textfp, " `t`n`r"))
 	  . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"
 
 URL := "https://docs.google.com/a/mobilmir.ru/forms/d/1Wy8ZFhfnV1VGYN_vHabQvr6Ziy9E9GTbgaua64CcORU/formResponse"
@@ -335,3 +336,5 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
 	}
     }
 }
+
+#include *i \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\GetFingerprint.ahk
