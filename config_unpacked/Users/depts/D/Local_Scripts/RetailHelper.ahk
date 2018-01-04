@@ -38,15 +38,34 @@ EnvGet LocalAppData,LOCALAPPDATA
 RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C, %A_Temp%, Min UseErrorLevel
 
 ; Проверка флагов ошибок при отправке выгрузок
-Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log_*.errflag
+foundErrFlags=
+Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log*.errflag
 {
     FileReadLine errLine, %A_LoopFileFullPath%, 1
     foundErrFlags .= A_LoopFileName ": " errLine ", "
 }
+If (foundErrFlags)
+    foundErrFlags := "Флаги ошибок: " SubStr(foundErrFlags, 1, -2) "."
+unsentCounts:={}
+For mask, name in {"OutgoingText\*.txt": "уведомления", "OutgoingFiles\*.*": "выгрузки"}
+    Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\%mask%
+    {
+	age=
+	age -= A_LoopFileTimeModified, Days
+	If (!unsentCounts.HasKey(name))
+	    unsentCounts[name] := 0
+	unsentCounts[name] += age > 2
+    }
+unsentCountsText=
+For name, c in unsentCounts
+    unsentCountsText .= name " (" c "), "
+If (unsentCountsText)
+    foundErrFlags := "Есть не отправленные в течение двух дней " SubStr(unsentCountsText, 1, -2) ". " foundErrFlags
 If (foundErrFlags) {
-    foundErrFlags := SubStr(foundErrFlags, 1, -2)
+    ;\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\RetailStatusReport.ahk  <Module> <Status> <Extended info …>
+    Try Run % """" A_AhkPath """ """ getDefaultConfigDir() "\_Scripts\Lib\RetailStatusReport.ahk"" """ A_ScriptName """ ""Rarus email system malfunction"" """ StrReplace(StrReplace(foundErrFlags, """", "'"), "`n", "; ") """"
     MsgBox 0x30, Ошибки при отправке выгрузок или уведомлений из 1С-Рарус, При отправке выгрузок или увеодмлений из 1С-Рарус возникли ошибки`, и отправка частично либо полностью не работает.`n`nСейчас откроется шаблон письма для регистрации заявки`, проверьте его`, добавьте известную Вам информацию и отправляйте. Если письмо не отправится – звоните.
-    Run % "mailto:it-task@status.mobilmir.ru?subject=Ошибки%20" UriEncode(SubStr(foundErrFlags, 1, 50)) "%20отправки%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%20&body=Обнаружены%20сигнальные%20файлы%20ошибок%20при%20отправке%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%0A%0A" UriEncode(foundErrFlags)
+    Run % "mailto:it-task@status.mobilmir.ru?subject=Ошибки%20отправки%20выгрузок%20или%20уведомлений%20из%201С-Рарус%20&body=Обнаружены%20сигнальные%20файлы%20ошибок%20при%20отправке%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%0A%0A" UriEncode(foundErrFlags)
 }
 
 Exit
@@ -100,8 +119,8 @@ Periodic:
 	}
     }
 ;Рарус
-    rarusMinMax := 2
     If (idle > idletimeRarusCheckAutoLoad && A_TickCount > rarusLoadNextCheck && WinExist(wintitle1s)) {
+	rarusMinMax := 2
 	ControlGetText txtBtn, Button20
 	If (ErrorLevel || txtBtn != "ОБМЕН УТ") {
 	    WinGet rarusMinMax, MinMax
@@ -141,6 +160,54 @@ getFirstPid(exeNames*) {
     }
     return
 }
+
+;\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
+getDefaultConfigFileName(defCfg := -1) {
+    If (defCfg==-1)
+	defCfg := getDefaultConfig()
+    SplitPath defCfg, OutFileName
+    return OutFileName
+}
+
+getDefaultConfigDir(defCfg := -1) {
+    If (defCfg==-1) {
+        EnvGet configDir, configDir
+	If (configDir)
+	    return RTrim(configDir, "\")
+	defCfg := getDefaultConfig()
+    }
+    SplitPath defCfg,,OutDir
+    return OutDir
+}
+
+getDefaultConfig(batchPath := -1) {
+    If (batchPath == -1) {
+	EnvGet DefaultsSource, DefaultsSource
+	If (DefaultsSource)
+	    return DefaultsSource
+	Try {
+	    return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
+	}
+	EnvGet SystemDrive, SystemDrive
+	return getDefaultConfig(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd")
+    } Else {
+	return ReadSetVarFromBatchFile(batchPath, "DefaultsSource")
+    }
+}
+
+;\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
+ReadSetVarFromBatchFile(filename, varname) {
+    Loop Read, %filename%
+    {
+	If (RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
+	    If (Trim(Trim(mName), """") = varname) {
+		return Trim(Trim(mValue), """")
+	    }
+	}
+    }
+    Throw Exception("Var not found",, varname)
+}
+
 
 ;http://www.autohotkey.com/board/topic/75390-ahk-l-unicode-uri-encode-url-encode-function/
 ; modified from jackieku's code (http://www.autohotkey.com/forum/post-310959.html#310959)
