@@ -11,17 +11,34 @@ Else
 global stderr := FileOpen("*", "w", "CP1")
 
 Try {
+    query=
+    argc = %0%
+    If (argc) {
+	query := CommandLineArgs_to_FindTrelloCardQuery(options := Object())
+	If (options.HasKey("log"))
+	    options.log := Expand(options.log)
+	If (options.HasKey("silent"))
+	    RunInteractiveInstalls := !options.silent
+	Else
+	    RunInteractiveInstalls := options.interactive
+    }
+    
+    EnvSet RunInteractiveInstalls,RunInteractiveInstalls
+    
     RunWait "%A_AhkPath%" "%A_ScriptDir%\DumpBoard.ahk"
     FileRead jsoncards, %A_ScriptDir%\..\trello-accounting\board-dump\computer-accounting.json
     cards := JSON.Load(jsoncards)
     
-    argc = %0%
-    If (argc) {
-	query := CommandLineArgs_to_FindTrelloCardQuery(options := Object())
-	If (query || options.HasKey(fp))
-	    ExitApp FillInCard(query, options)
+    If (!options.HasKey("fp") && IsObject(query)) {
+	c := 0
+	For i in query
+	    c++
+	If (!c)
+	    query := ""
     }
-    ExitApp ProcessDir(A_ScriptDir "\..\trello-accounting\update-queue") 
+    
+    ;MsgBox % "IsObject(query)? " IsObject(query) "`nquery: " ObjectToText(query)
+    ExitApp (IsObject(query) || options.HasKey("fp")) ? FillInCard(query, options) : ProcessDir(A_ScriptDir "\..\trello-accounting\update-queue") 
 } Catch e {
     ShowError(ObjectToText(e))
 }
@@ -29,40 +46,45 @@ ExitApp -1
 
 ProcessDir(ByRef srcDir) {
     static SuffixesToQueries := {".json": "fp", ".txt": "", " TVID.txt": {1: "TVID:"}, " trello-id.txt": {1: "url:", 4: "/id "}}
-	 , nameRegex := "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2} {1,2}\d{5,6}\.\d\d)(?P<Suffix>.*)"
+	 , nameRegexes :=   [ "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2} {1,2}\d{5,6}\.\d\d)(?P<Suffix>.*)"
+			    , "S)^(?P<Hostname>[^ .]+)(?P<Suffix>.*)" ]
+    
+    For i, nameRegex in nameRegexes {
+	hostNames := {}
+	Loop Files, %srcDir%\*.json
+	    If (RegexMatch(A_LoopFileName, nameRegex, m))
+		If (!hostNames.HasKey(mHostname) || hostNames[mHostname] < mDateTime)
+		    hostNames[mHostname] := mDateTime
 
-    hostNames := {}
-    Loop Files, %srcDir%\*.txt
-	If (RegexMatch(A_LoopFileName, nameRegex, m))
-	    If (!hostNames.HasKey(mHostname) || hostNames[mHostname] < mDateTime)
-		hostNames[mHostname] := mDateTime
-
-    ;nameOnly := SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)-1)
-    For Hostname, DateTime in hostNames {
-	query := {Hostname: Hostname}
-	commonprefix := srcDir "\" Hostname " " DateTime 
-	options := {log: commonprefix ".log"}
-	For fnamesuffix, qParam in SuffixesToQueries {
-	    fpath := commonprefix fnamesuffix
-	    If (FileExist(fpath)) {
-		If (IsObject(qParam)) {
-		    lastLine := qParam.MaxIndex()
-		    Loop Read, %fpath%
-			If (qParam.HasKey(A_Index))
-			    query[qParam[A_Index]] := A_LoopReadLine
-		    Until A_Index >= lastLine
-		} Else
-		    options[qParam] := fpath
+	;nameOnly := SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)-1)
+	For Hostname, DateTime in hostNames {
+	    query := {Hostname: Hostname}
+	    commonprefix := srcDir "\" Hostname . (DateTime ? " " DateTime : "")
+	    options := {log: commonprefix ".log"}
+	    For fnamesuffix, qParam in SuffixesToQueries {
+		fpath := commonprefix fnamesuffix
+		If (FileExist(fpath)) {
+		    If (IsObject(qParam)) {
+			lastLine := qParam.MaxIndex()
+			Loop Read, %fpath%
+			    If (qParam.HasKey(A_Index))
+				query[qParam[A_Index]] := A_LoopReadLine
+			Until A_Index >= lastLine
+		    } Else
+			options[qParam] := fpath
+		}
 	    }
-	}
-	
-	Try {
-	    If (FillInCard(query, options) == 1)
-		FileDelete %srcDir%\%Hostname% *
-	    Else
-		MsgBox FillInCard returned fail
-	} Catch e {
-	    LogError(e, options.log)
+	    
+	    FileAppend %A_Now% Processing %commonprefix%`n, % options.log
+	    Try {
+		If (FillInCard(query, options) == 1) {
+		    FileDelete %srcDir%\%Hostname% *
+		    FileDelete %srcDir%\%Hostname%.*
+		} Else
+		    Throw Exception("FillInCard returned fail")
+	    } Catch e {
+		LogError(e, options.log)
+	    }
 	}
     }
 }
@@ -70,7 +92,7 @@ ProcessDir(ByRef srcDir) {
 FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
     global cards
     static blockCheckRegexp := ""
-    
+    ;MsgBox % "FillInCard " ObjectToText({query: query, options: options, fp: fp})
     If (!IsObject(fp) && pathjsonfp := options.fp) {
 	FileRead jsonfp, %pathjsonfp%
 	fp := JSON.Load(jsonfp)
@@ -94,23 +116,23 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	logfile := "*", logEncoding := "CP1"
     If (!IsObject(lfo := FileOpen(logfile, "a", logEncoding)))
 	Throw Exception("Не открылся файл журнала",, logfile)
-    lfo.WriteLine("query: " ObjectToText(query) "`nFingerprint: " ObjectToText(fp))
+    lfo.WriteLine(ObjectToText({query: query, Fingerprint: fp}))
     lastMatch := ExtendedFindTrelloCard(query, cards, nMatches := 0, fp)
     lfo.WriteLine("lastMatch: " ObjectToText(lastMatch))
 
     If (nMatches==1) {
 	For i in lastMatch {
-	    card := TrelloAPI1("GET", "/cards/" cards[i].id, Object()) ; card := cards[i].id to save API calls
+	    card := TrelloAPI1("GET", "/cards/" cards[i].id, respTrelloAPI := Object()) ; card := cards[i].id to save API calls
 	    cardID := card.id 
 	    If (!cardID)
-		Throw Exception("Карточка без ID",,ObjectToText(card))
+		Throw Exception("Карточка без ID получена от Trello",,{query: "/cards/" cards[i].id, response: respTrelloAPI, lastMatch: lastMatch})
 	    cardDesc := card.desc
 	    lfo.WriteLine("Найдена карточка " card.name " <" card.shortUrl "> #" cardID "`n" cardDesc)
 	    textfp=
 	    If (pathtextfp := options.txt)
 		FileRead textfp, %pathtextfp%
 	    If ((!textfp || textfp ~= "^\w:\w" ) && IsObject(fp))
-		textfp := ObjectToText(fp)
+		textfp := GetFingerprint_Object_To_Text(fp)
 	    Else
 		Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
 	    
@@ -161,25 +183,8 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	lfo.Close()
 	return 1
     } Else {
-	Throw Exception("Количество подходящих карточек не равно 1",, nMatches ? JSON.Dump(lastMatch) : nMatches)
+	Throw Exception("Количество подходящих карточек не равно 1",, nMatches ? ObjectToText(lastMatch) : nMatches)
     }
-}
-
-LogError(ByRef msg, ByRef morepaths*) {
-    static pathCommonErrorLog := A_ScriptDir "\..\trello-accounting\update-queue\errors.log"
-    logTime := A_Now
-    If (IsObject(msg))
-	text := ObjectToText(msg)
-    Else
-	text := msg
-    
-    Try stderr.WriteLine(logTime " " text)
-    Try FileGetSize logsize, %pathCommonErrorLog%, M
-    If (logsize)
-	Try FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
-    Try FileAppend %logTime% %text%`n, %pathCommonErrorLog%
-    For i, path in morepaths
-	Try FileAppend %logTime% %text%`n, %path%
 }
 
 ShowError(ByRef text) {
@@ -191,7 +196,25 @@ ShowError(ByRef text) {
     ExitApp 0x100
 }
 
+LogError(ByRef msg, ByRef morepaths*) {
+    static pathCommonErrorLog := A_ScriptDir "\..\trello-accounting\update-queue\errors.log"
+    logTime := A_Now
+    If (IsObject(msg))
+	text := ObjectToText(msg)
+    Else
+	text := msg
+    
+    Try stderr.WriteLine(logTime " " A_UserName "@" A_ComputerName A_Tab text)
+    Try FileGetSize logsize, %pathCommonErrorLog%, M
+    If (logsize)
+	Try FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
+    Try FileAppend %logTime% %text%`n, %pathCommonErrorLog%
+    For i, path in morepaths
+	Try FileAppend %logTime% %text%`n, %path%
+}
+
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\FindTrelloCard.ahk
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\ObjectToText.ahk
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\TrelloAPI1.ahk
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\GetFingerprint.ahk
+#include %A_ScriptDir%\..\..\config\_Scripts\Lib\Expand.ahk

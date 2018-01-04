@@ -13,6 +13,11 @@ SET "XML=%~3"
 SET /A "ErrorCount=0"
 SET "ErrorList="
 SET "TempXMLOut=%TEMP%\%~n0.%RANDOM%"
+
+IF NOT DEFINED taskschdAddSwitches (
+    SET "taskschdAddSwitches=/F"
+    %SystemRoot%\System32\fltmc.exe >nul 2>&1 || SET "taskschdAddSwitches=/RU "%USERNAME%" /NP /F"
+)
 )
 :CollectArgs
 (
@@ -45,7 +50,7 @@ EXIT /B
 :ScheduleSingleTask <TaskName> <XML>
 (
     REM %System32%\SCHTASKS.exe /Delete /TN "mobilmir\%~1" /F
-    ECHO.|%System32%\SCHTASKS.exe /Create /TN "mobilmir.ru\%~1" /XML %2 %AddArgs% /F
+    ECHO.|%System32%\SCHTASKS.exe /Create /TN "mobilmir.ru\%~1" /XML %2 %AddArgs% %taskschdAddSwitches%
     IF ERRORLEVEL 1 GOTO :SetError
     REM Everyone=*S-1-1-0
     "%WinDir%\System32\icacls.exe" "%System32%\Tasks\mobilmir.ru\%~1" /grant "*S-1-1-0:RX"

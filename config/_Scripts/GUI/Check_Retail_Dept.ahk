@@ -384,9 +384,17 @@ If (gsussScript) {
 Distributives := EnvGetAfterScript(gsussScript, "Distributives")
 SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
 If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
-    Distributives := ServerDistPath
     AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
+    Distributives := ServerDistPath
+    usingServerDist := 1
 }
+If (usingServerDist && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
+    lDistributives := "D:\Distributives"
+    AddLog("Запуск rSync_DistributivesFromSrv0.cmd PreInstalled")
+    Run %comspec% /C ""%DefaultConfigDir%\_Scripts\rSync_DistributivesFromSrv0.cmd" "%lDistributives%\Soft\PreInstalled"", %lDistributives%, Min UseErrorLevel, pidRsyncPreinstalled
+    SetLastRowStatus(ErrorLevel, !ErrorLevel)
+} Else
+    lDistributives := Distributives
 
 exe7z:=find7zexe()
 AddLog("7-Zip: " . exe7z)
@@ -539,18 +547,21 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
     }
 }
-If (SubStr(Distributives, 1, 2) != "\\" && FileExist(Distributives "\Soft\PreInstalled\auto\SysUtils\*.7z")) {
-    AddLog("rSync_DistributivesFromSrv0.cmd PreInstalled")
-    RunWait %comspec% /C ""%DefaultConfigDir%\_Scripts\rSync_DistributivesFromSrv0.cmd" "%Distributives%\Soft\PreInstalled"", %Distributives%, Min UseErrorLevel
-    SetLastRowStatus(ErrorLevel, !ErrorLevel)
-}
-If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts)))
-    RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
-    ;				  distSubpath, 				  scriptSubpath,					  title:="",	 flagMask:="",				    loopOptn:="")
-;MsgBox % "softUpdScripts: " IsObject(softUpdScripts) "`ndistSoftUpdScripts: " IsObject(distSoftUpdScripts)
 
+If (pidRsyncPreinstalled) {
+    AddLog("Ожидание завершения rsync PreInstalled")
+    Loop
+    {
+	Sleep 1000
+	Process Exist, %pidRsyncPreinstalled%
+    } Until !ErrorLevel
+    SetLastRowStatus()
+}
+If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) ; Если IsObject(softUpdScripts), SysUtils уже были обновлены выше
+    RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
+If (FileExist(SystemRoot "\System32\Tasks\mobilmir\AddressBook"))
 AddLog("Удаление задачи планировщика mobilmir\AddressBook…")
 RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F,, Min UseErrorLevel
 SetLastRowStatus(ErrorLevel,!ErrorLevel)
@@ -610,9 +621,11 @@ If (IsObject(instCriacxocx)) {
 cleanupAdobeReadercmd=Soft\Office Text Publishing\PDF\Adobe Reader\RemoveUnneededAutorunAndServices.cmd
 RunScriptFromNewestDistDir(cleanupAdobeReadercmd, cleanupAdobeReadercmd, "Удаление лишней службы Adobe Reader")
 
-AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
-RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,!ErrorLevel)
+If (FileExist(SystemRoot . "\System32\Tasks\mobilmir.ru\update dealer.beeline.ru criacx.ocx")) {
+    AddLog("Удаление задачи планировщика ""update dealer.beeline.ru criacx.ocx""")
+    RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir.ru\update dealer.beeline.ru criacx.ocx" /F,,Min UseErrorLevel
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+}
 If (IsObject(instCriacxocx := CheckPath(FirstExisting("d:\dealer.beeline.ru\bin\CRIACX.ocx", SystemRoot . "\SysNative\criacx.ocx", SystemRoot . "\System32\criacx.ocx", SystemRoot . "\SysWOW64\criacx.ocx"), 0))) {
     ;FileGetTime timecriacxcab,%DefaultConfigDir%\Users\depts\D\dealer.beeline.ru\bin\criacx.cab
     ;timecriacxcab -= instCriacxocx.mtime, Days
@@ -698,12 +711,13 @@ ButtonCancel:
     ExitApp
 
 RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
-    global ServerDistPath, Distributives
+    global ServerDistPath, Distributives, lDistributives
     latestFlagTime:=0
 
     If (!title)
 	title := AbbreviatePath(flagMask ? flagMask : distSubpath)
     AddLog(title, "Проверка")
+    FindLatest(lDistributives "\" distSubpath,, mtimelocal)
     FindLatest(Distributives "\" distSubpath,, mtimelocal)
     FindLatest(ServerDistPath "\" distSubpath,, mtimeSrv0)
     

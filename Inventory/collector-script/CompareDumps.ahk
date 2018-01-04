@@ -79,7 +79,7 @@ CompareBoards(currCards, prvCards, ByRef logpath) {
 	}
     }
     
-    If ((diffsText := Trim(ObjectToText(diffs))) && logf := FileOpen(logpath, "a")) {
+    If (IsObject(diffsText := JSON.Dump(diffs)) && IsObject(logf := FileOpen(logpath, "a"))) {
 	logf.WriteLine(diffsText)
 	logf.Close()
     }

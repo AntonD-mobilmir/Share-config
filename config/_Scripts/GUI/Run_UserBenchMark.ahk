@@ -26,73 +26,75 @@ If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFr
     ;LANG_RUS := "00000419"
     VarSetCapacity(layoutName, (KL_NAMELENGTH+1) * (A_IsUnicode+1)) ; +1 for '\0'
     
+    i := 0
     OnClipboardChange("ClipHook")
     Loop
     {
-	;MsgBox ResultsURL: %ResultsURL%`nA_Index: %A_Index%
-	If (ResultsURL && (IsObject(perfResultsObj) || A_Index > 100) ) {
+	;MsgBox ResultsURL: %ResultsURL%`nA_Index: %i%
+	If (ResultsURL && (IsObject(perfResultsObj) || i > 100) ) {
 	    ExitApp !PostResults(ResultsURL, perfResultsObj)
-	} Else {
-	    sendModeName := SendModes[Mod(A_Index, 3)]
-	    SendMode %sendModeName%
-	    Menu Tray, Tip, %A_ScriptName%: Cycle %A_Index%`, SendMode %sendModeName%
-
-	    If (WinExist("Performance Results - UserBenchmark")) {
-		Loop Parse, actnList, `;
-		{
-		    Sleep 250
-		    If (A_TimeIdlePhysical < wantUserIdle) {
-			TrayTip,, Скопируйте результаты теста и ссылку на результаты в буфер обмена (в любом порядке)
-			While (A_TimeIdlePhysical < wantUserIdle && !(ResultsURL && IsObject(perfResultsObj))) {
-			    If (A_Index==1) {
-				Progress Off
-				Progress R0-%wantUserIdle%, `n, Ожидание бездействия пользователя
-			    }
-			    Progress %A_TimeIdlePhysical%
-			    Sleep 100
-			}
+	
+	WinWait Performance Results - UserBenchmark,,3
+	If (ErrorLevel) ; ToDo: отлавливать сообщения об ошибках и попытаться найти окно выбора браузера
+	    continue
+	
+	; Else [If (!ErrorLevel)]
+	sendModeName := SendModes[Mod(i++, 3)]
+	Menu Tray, Tip, %A_ScriptName%: Cycle %i%`, SendMode %sendModeName%
+	SendMode %sendModeName%
+	Loop Parse, actnList, `;
+	{
+	    Sleep 250
+	    If (A_TimeIdlePhysical < wantUserIdle) {
+		TrayTip,, Скопируйте результаты теста и ссылку на результаты в буфер обмена (в любом порядке)
+		While (A_TimeIdlePhysical < wantUserIdle && !(ResultsURL && IsObject(perfResultsObj))) {
+		    If (A_Index==1) {
 			Progress Off
-			break
+			Progress R0-%wantUserIdle%, `n, Ожидание бездействия пользователя
 		    }
-		    WinActivate
-		    actn := SubStr(A_LoopField,1,1)
-		    If (actn=="_") { 		; wait
-			Sleep (1000 + (SubStr(A_LoopField,2) * 1000))
-		    } Else If (actn=="-") { 	; clipboard
-			subActn := SubStr(A_LoopField,2)
-			Try {
-			    If (subActn=="+") {
-				clipBak := ClipboardAll
-			    } Else If (subActn=="-") {
-				Clipboard := clipBak
-			    } Else {
-				WinActivate
-				Send ^{Ins}
-				Sleep 25
-				WinActivate
-				Send ^{vk43} ;^c, {vk43}=c
-				ClipWait 10
-			    }
-			}
-		    } Else { ; just send
-			;GetKeyboardLayoutName https://msdn.microsoft.com/en-us/library/windows/desktop/ms646298.aspx
-			If (DllCall(SystemRoot . "\System32\User32.dll\GetKeyboardLayoutName", "Str", layoutName)
-				&& layoutName != LANG_ENG) { ; if language is not english,
-			    Loop
-			    {
-				If (A_Index > 1)
-				    Send {Tab}
-				ControlGetFocus,ctl
-			    } Until !ErrorLevel || A_Index > 10
-			    SendMessage 0x50,0,HKL,%ctl%,A ;WM_INPUTLANGCHANGEREQUEST - change locale
-			}
-			Send %A_LoopField%
+		    Progress %A_TimeIdlePhysical%
+		    Sleep 100
+		}
+		Progress Off
+		break
+	    }
+	    WinActivate
+	    actn := SubStr(A_LoopField,1,1)
+	    If (actn=="_") { 		; wait
+		Sleep (1000 + (SubStr(A_LoopField,2) * 1000))
+	    } Else If (actn=="-") { 	; clipboard
+		subActn := SubStr(A_LoopField,2)
+		Try {
+		    If (subActn=="+") {
+			clipBak := ClipboardAll
+		    } Else If (subActn=="-") {
+			Clipboard := clipBak
+		    } Else {
+			WinActivate
+			Send ^{Ins}
+			Sleep 25
+			WinActivate
+			Send ^{vk43} ;^c, {vk43}=c
+			ClipWait 10
 		    }
 		}
+	    } Else { ; just send
+		;GetKeyboardLayoutName https://msdn.microsoft.com/en-us/library/windows/desktop/ms646298.aspx
+		If (DllCall(SystemRoot . "\System32\User32.dll\GetKeyboardLayoutName", "Str", layoutName)
+			&& layoutName != LANG_ENG) { ; if language is not english,
+		    Loop
+		    {
+			If (A_Index > 1)
+			    Send {Tab}
+			ControlGetFocus,ctl
+		    } Until !ErrorLevel || A_Index > 10
+		    SendMessage 0x50,0,HKL,%ctl%,A ;WM_INPUTLANGCHANGEREQUEST - change locale
+		}
+		Send %A_LoopField%
 	    }
-	    
-	    Sleep 1000
 	}
+	
+	Sleep 1000
     }
     Progress Off
     Sleep 1000
@@ -134,6 +136,14 @@ While (!FileExist(exeName)) {
 	UrlDownloadToFile %UBMzipURL%, %archiveName%
 	If (FileExist(archiveName))
 	    break
+
+	If (A_Index>1) {
+	    MsgBox 22, %A_ScriptName%, %UBMzipURL% не скачался., 300
+	    IfMsgBox Continue
+		break
+	    IfMsgBox Cancel
+		ExitApp
+	}
 	
 	; If a new browser is installed, Win8+ will show app selection window instead of launching default one
 	; because of that, launching specific browser is much more safe
@@ -149,14 +159,6 @@ While (!FileExist(exeName)) {
 	
 	MsgBox 0x2040, %A_ScriptName%, Для загрузки %UBMzipURL% запущен браузер. Пауза %delay% секунд., %delay%
 	delay := delay * 2
-	
-	If (A_Index>1) {
-	    MsgBox 22, %A_ScriptName%, %UBMzipURL% не скачался., 300
-	    IfMsgBox Continue
-		break
-	    IfMsgBox Cancel
-		ExitApp
-	}
     }
 
     Loop Files, %archiveName%

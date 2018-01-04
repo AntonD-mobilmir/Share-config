@@ -5,6 +5,7 @@ ahk_class #32770,You must restart your system,No,Н&ет
 InstallShield Wizard$ ahk_class #32770,"No, I will restart my computer later.","No, I will restart my computer later.",Finish
 InstallShield Wizard$ ahk_class #32770,Finish,"No, I will restart my computer later.",Finish
 ^Программа InstallShield Wizard заверш.+,,Нет,Готово
+,^Программа InstallShield Wizard заверш.+,Нет,Готово
 ahk_class #32770,.+ был успешно удален с компьютера\.,ОК,Готово
 ahk_class #32770,.+ был успешно удалено с компьтюера\.,Готово
 Удаление ahk_class #32770,Приложение .+ удалено.,ОК
@@ -19,15 +20,11 @@ ahk_class #32770,^Do &not close applications. \(A Reboot may be required.\),Do &
 ^Беспроводной адапте,^Файл,ОК
 ^Atheros Client Installation Program$,^Программ,Готово
 ^Мастер удаления драйвера устройства$,&ОК,&ОК
-^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,П&ерезапустить позже,П&ерезапустить позже
-^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Удалить одну или несколько программ Windows Live,Удалить одну или несколько программ Windows Live
 ^Удаление Adobe Shockwave Player ahk_class #32770,Закрыть,Закрыть
 ^Удаление Adobe Flash Player ahk_class AdobeFlashPlayerInstaller,УСТАНОВКА,УСТАНОВКА
 ^Установка Adobe AIR$ ahk_class ApolloRuntimeContentWindow,,X159 Y177
 InstallShield Wizard$ ahk_class #32770,YES: All data and settings will be removed with application.,YES: All data and settings will be removed with application.,Next >
  - InstallShield Wizard$,Готово,Нет,Готово
-Windows Live ahk_class LiveDialog,&Продолжить,&Удалить,&Продолжить
-Windows Live ahk_class LiveDialog,Готово,&Закрыть
 InstallShield Wizard$ ahk_class #32770,"Do you want to completely remove the selected application and all of its features?",Yes,Да
 ", Do you want to completely remove",Do you want to completely remove,Remove,&Да
 ", Removal completed successfully.",Removal completed successfully.,Finish
@@ -51,8 +48,15 @@ Uninstall ahk_class #32770,ОК,ОК,; Russian letters
 Uninstall ahk_class #32770,OK,OK,; English letters
 Uninstall ahk_class #32770,Close,Close
 Удаление ahk_class #32770,Закрыть,Закрыть
+^Основные компоненты Windows 2012$ ahk_class LiveDialog ahk_exe wlarp.exe,Удалить один или несколько Основных компонентов Windows,Button1,Удалить один или несколько Основных компонентов Windows
+^Основные компоненты Windows 2012$ ahk_class LiveDialog ahk_exe wlarp.exe,Выбор программ для удаления,X58 Y173,X58 Y224,X58 Y272,Button3,&Удалить
+^Основные компоненты Windows 2012$ ahk_class LiveDialog ahk_exe wlarp.exe,Выбранные программы удалены.,Button4,&Закрыть
+^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,П&ерезапустить позже,П&ерезапустить позже
+^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Удалить одну или несколько программ Windows Live,Удалить одну или несколько программ Windows Live
 ^Основные компоненты Windows Live 2011$ ahk_class LiveDialog,Выбор программ для удаления,X38 Y215,X38 Y256,X38 Y295,X326 Y215,X326 Y256,X326 Y295,&Удалить
 Windows Live ahk_class LiveDialog,Выбор программ для удаления,X58 Y173,X58 Y197,X58 Y224,X58 Y249,X58 Y272,&Продолжить
+Windows Live ahk_class LiveDialog,&Продолжить,&Удалить,&Продолжить
+Windows Live ahk_class LiveDialog,Готово,&Закрыть
 HP ePrint - HP ePrint SW ahk_class WixStdBA,&Удалить,&Удалить
 ahk_exe McUICnt.exe,,X492 Y258
 McAfee SecurityCenter ahk_class uninstall,,X130 Y475,X43 Y207,X64 Y234,X466 Y479,X466 Y479
@@ -66,3 +70,4 @@ ahk_exe OfficeClickToRun.exe,‪,‪Button3,&Удалить‬
 ‪^Все удалено!‬$ ahk_class C2RCustomWindow ahk_exe OfficeClickToRun.exe,‪,Button3,‪&Закрыть‬
 ahk_exe OfficeClickToRun.exe,‪,Button3,‪&Закрыть‬
 ^ASUS GIFTBOX Setup$ ahk_class #32770 ahk_exe uninstall.exe,Are you sure you want to uninstall ASUS GIFTBOX\? You will lose your Web Apps and your access to the ASUS GIFTBOX Store. Your PC will need to be rebooted for ASUS GIFTBOX to be fully uninstalled.,Button1,ОК
+,Программа .*будет удалена с компьютера\. Продолжить\?,&Да

@@ -103,8 +103,14 @@ If (writeSavedID && nMatches==1) {
 	    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
     }
 } Else {
+    stageTitles := ["Строгий поиск", "Идентификаторы с заголовками полей", "Идентификаторы без заголовков (только значения)"]
     ffc := FileOpen(pathffc := A_Temp "\все найденные карточки " A_Now ".txt", "a`n")
-    ffc.WriteLine("Найдено " nMatches " карточ" NumForm(nMatches,"ка","ки","ек") ".`nПараметры строгого поиска: " JSON.Dump(query) "`n" (extSearch ? "Выражения Regex расширенного поиска: " JSON.Dump(extSearch) : "Расширенный поиск не выполнялся") "`n`nИнформация о системе:`n" GetFingerprint_Object_To_Text(fp) "`n`n---")
+    For searchStage, extSearchQuery in CountSearchRuns()
+	ffc.WriteLine( "Найдено " nMatches " карточ" NumForm(nMatches,"ка","ки","ек")
+		     . "`nПараметры строгого поиска: " JSON.Dump(query)
+		     . "`nПоследный выполненный способ поиска: " stageTitles[searchStage]
+		     . (searchStage > 1 ? "`n`tИспользованные регулярные выражения: " JSON.Dump(extSearchQuery) : "")
+		     . "`n`nИнформация о системе:`n" GetFingerprint_Object_To_Text(fp) "`n`n---")
     For i, match in lastMatch
 	ffc.WriteLine("`nУ карточки " cards[i].name " " cards[i].shortUrl "/" cards[i].idShort "`n`tсовпало " JSON.Dump(match) "`n`t" cards[i].desc)
     ffc.Close()
@@ -121,8 +127,12 @@ TryCallFunc(funcName, optns*) {
 }
 
 CountSearchRuns(ByRef matches := "", ByRef cards := "", ByRef extSearch := "") {
-    static timesInvoked := 0
-    return {(timesInvoked += IsObject(cards)): extSearch}
+    static timesInvoked := 0, extSearchMemory
+    If (IsObject(cards)) {
+	extSearchMemory := extSearch
+	timesInvoked++
+    }
+    return {(timesInvoked): extSearchMemory}
 }
 
 #include <find7zexe>
