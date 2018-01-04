@@ -12,7 +12,7 @@ GenPass(len:=20) {
     ;/xVE5-zpl"}rS_.jK2N+	2017-08-29 test1@	{"domain": "rarus.robots.mobilmir.ru", "success": "error", "error": "badpasswd"}
     
     global debug
-    static Charset:="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`!@#$%^*()-_=[]{};:\|,.<>/?0123456789"""
+    static Charset:="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`!@#$%^*()-_=[]{};:\|,.<>/?0123456789"
 	 , CharsetLen:=StrLen(Charset)
     password := ""
     Loop %len%
