@@ -99,7 +99,8 @@ GetFingerprint_GetForgedValues() {
 			 , "System Serial Number": ""
 			 , "x.x": ""
 			 , "Основная плата": ""
-			 , "00000000": "" } ; RAM: 8502, PartNumber: 1600LL Series, SerialNumber: 00000000
+			 , "00000000": "" ; RAM: 8502, PartNumber: 1600LL Series, SerialNumber: 00000000
+			 , "N/A": "" }
     return SkipValues
 }
 
