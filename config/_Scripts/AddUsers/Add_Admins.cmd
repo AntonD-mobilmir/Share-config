@@ -39,21 +39,21 @@ EXIT /B
     NET USER "%NewUsername%" >NUL 2>&1 && EXIT /B
     IF DEFINED %NewUsername%_flags CALL :GetValue flags "%NewUsername%_flags"
     IF DEFINED flags CALL :ParseFlags
+    IF DEFINED flag_n EXIT /B
     IF DEFINED flag_r (
 	rem break if any of following users exist
 	NET USER Пользователь >NUL 2>&1 && EXIT /B
 	NET USER Продавец >NUL 2>&1 && EXIT /B
     )
+    IF NOT DEFINED flag_f IF "%RunInteractiveInstalls%"=="0" EXIT /B
     IF NOT DEFINED flag_f CALL :AskCreateUser || EXIT /B
     IF DEFINED flag_p (
-	NET USER "%NewUsername%" /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /FULLNAME:"%FullName%"
+	%SystemRoot%\System32\net.exe USER "%NewUsername%" /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /USERCOMMENT:"Пользователь создан %DATE% в %TIME% скриптом %~f0" /FULLNAME:"%FullName%"
 	%SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
 	GOTO :setupgroups
     )
     
-    IF DEFINED SaveDir IF EXIST "%SaveDir%" (
-	SET "dirPlainOut=%SaveDir%\%Hostname%"
-    )
+    IF DEFINED SaveDir IF EXIST "%SaveDir%" SET "dirPlainOut=%SaveDir%\%Hostname%"
     IF NOT DEFINED dirPlainOut SET "dirPlainOut=%TEMP%\%~n0.e"
 
     IF DEFINED gpgUserID (
@@ -128,6 +128,7 @@ EXIT /B
     SET "flag_f="
     SET "flag_p="
     SET "flag_r="
+    SET "flag_n="
 )
 :ParseNextFlag
 (
@@ -142,7 +143,7 @@ EXIT /B
     GOTO :ParseNextFlag
 )
 :AskCreateUser
-    SET /P "doit=Создать пользователя %NewUsername% (%FullName%)? [0=N=нет]"
+    SET /P "doit=Создать пользователя %NewUsername% (%FullName%)? [0=N=нет, остальное = да]"
 (
     IF "%doit%"=="0" EXIT /B 1
     IF /I "%doit:~0,1%" EQU "n" EXIT /B 1
