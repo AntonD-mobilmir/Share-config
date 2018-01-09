@@ -7,7 +7,7 @@ FileEncoding UTF-8
 specBaseDir := "D:\Users"
 
 EnvGet UserProfile,UserProfile
-SplitPath UserProfile,profileBaseDir,,,,profileDrive
+SplitPath UserProfile,,profileBaseDir,,,profileDrive
 
 If (profileBaseDir != specBaseDir) {
     EnvGet SystemDrive,SystemDrive
