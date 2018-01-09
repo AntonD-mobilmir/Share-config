@@ -11,7 +11,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     CALL "%~dp0_Scripts\FindSoftwareSource.cmd"
 
     SET "Пользователь_flags=rpf"
-    CALL "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
+    START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
     CALL "%~dp0_Scripts\AddUsers\AddUser_Install.cmd"
     START "Inventory\collector-script\SaveArchiveReport.cmd" /B %comspec% /C "%~dp0..\Inventory\collector-script\SaveArchiveReport.cmd"
     START "..\Programs\collectProductKeys.exe" /B "%~dp0..\Programs\collectProductKeys.exe"

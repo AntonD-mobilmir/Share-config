@@ -35,7 +35,7 @@ IF /I "%argflag%"==":" (
 )
 
 TITLE Initial config
-CALL "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
+START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 
 REM Writing DefaultsSource
 IF NOT EXIST "%ProgramData%\mobilmir.ru" MKDIR "%ProgramData%\mobilmir.ru"
