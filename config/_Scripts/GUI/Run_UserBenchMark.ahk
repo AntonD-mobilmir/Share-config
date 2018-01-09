@@ -31,7 +31,7 @@ If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFr
     Loop
     {
 	;MsgBox ResultsURL: %ResultsURL%`nA_Index: %i%
-	If (ResultsURL && (IsObject(perfResultsObj) || i > 100) ) {
+	If (ResultsURL && (IsObject(perfResultsObj) || i > 100) )
 	    ExitApp !PostResults(ResultsURL, perfResultsObj)
 	
 	WinWait Performance Results - UserBenchmark,,3
