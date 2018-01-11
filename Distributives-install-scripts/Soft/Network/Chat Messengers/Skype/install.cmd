@@ -11,7 +11,8 @@ IF NOT DEFINED logmsi CALL :DefineLogMSI
 )
 (
 rem с 2017-03-01, Skype требует MSVCP140.DLL
-"%~dp0..\..\..\..\Updates\Windows\wsusoffline\cpp\vcredist2015_x86.exe" /q /norestart
+rem 2018-01-10, Updates\Windows\wsusoffline\cpp\vcredist2015_x86.exe переименован в vcredist2017_x86.exe
+"%~dp0..\..\..\..\Updates\Windows\wsusoffline\cpp\vcredist2017_x86.exe" /q /norestart
 %SystemRoot%\System32\msiexec.exe /i "%~dp0%MSIFileName%" /qn /norestart /l+* "%logmsi%" TRANSFORMS=:RemoveStartup.mst;:RemoveDesktopShortcut.mst
 EXIT /B
 )
