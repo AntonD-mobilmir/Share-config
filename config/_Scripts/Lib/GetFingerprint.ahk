@@ -100,6 +100,7 @@ GetFingerprint_GetForgedValues() {
 			 , "x.x": ""
 			 , "Основная плата": ""
 			 , "00000000": "" ; RAM: 8502, PartNumber: 1600LL Series, SerialNumber: 00000000
+			 , "1": "" ; System: FOXCONN A6GMV 0A, IdentifyingNumber: 1
 			 , "N/A": "" }
     return SkipValues
 }
