@@ -22,8 +22,11 @@ RunWait %comspec% /C ""%A_ScriptDir%\copyDefaultSettings.cmd"", Min UseErrorLeve
 
 ExitApp
 
-InstallMSI(MSIFileFullPath, params){
+InstallMSI(MSIFileFullPath, params) {
     Global LogPath
+    static SystemRoot:=""
+    If (SystemRoot=="")
+	EnvGet SystemRoot, SystemRoot
     
     SplitPath MSIFileFullPath, MSIFileName
 
@@ -32,20 +35,22 @@ InstallMSI(MSIFileFullPath, params){
     If(!LogPath)
 	LogPath=%A_TEMP%\%MSIFileName%.log
     Menu Tray, Tip, Installing %MSIFileFullPath%
-TryInstallAgain:
-    RunWait %A_WinDir%\System32\msiexec.exe /i "%MSIFileFullPath%" %params% /norestart /l+* "%LogPath%",, UseErrorLevel
+    
+    Loop {
+	RunWait "%SystemRoot%\System32\msiexec.exe" /i "%MSIFileFullPath%" %params% /norestart /l+* "%LogPath%",, UseErrorLevel
 
-    If (ErrorLevel==1618) { ; Another install is currently in progress
-	TrayTip %textTrayTip%, Error 1618: Another install currently in progress`, waiting 30 sec to repeat
-	Sleep 30000
-	GoTo TryInstallAgain
+	If (ErrorLevel==1618) { ; Another install is currently in progress
+	    TrayTip %textTrayTip%, Error 1618: Another install currently in progress`, waiting 30 sec to repeat
+	    Sleep 30000
+	} Else {
+	    break
+	}
     }
     Menu Tray, Tip, %textTrayTip%
     
     If (ErrorLevel==3010) ;3010: restart required
 	return 0
-    Else
-	return CheckError(ErrorLevel, MSIFileName)
+    return CheckError(ErrorLevel, MSIFileName)
 }
 
 CheckError(ReturnErrValue, ProductName) {
