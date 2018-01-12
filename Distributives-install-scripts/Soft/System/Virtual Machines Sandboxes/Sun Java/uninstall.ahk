@@ -4,23 +4,51 @@
 
 EnvGet RunInteractiveInstalls,RunInteractiveInstalls
 If (!A_IsAdmin && RunInteractiveInstalls!="0") {
-    Run % "*RunAs " . DllCall( "GetCommandLine", "Str" )
+    Run % "*RunAs " DllCall( "GetCommandLine", "Str" )
     ExitApp
 }
 
 uninstKey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
-SetRegView 32
-Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
-{
-    RegRead DisplayName, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, DisplayName
-    RegRead URLUpdateInfo, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLUpdateInfo
-    RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
-    
-    If ((Publisher == "Oracle Corporation" || URLUpdateInfo == "http://java.sun.com") && StartsWith(DisplayName, "Java ") && DisplayName ~= "^Java [0-9]+ Update [0-9]+$")
-	RunWait %A_WinDir%\System32\MsiExec.exe /X "%A_LoopRegName%" /qn /norestart
+For i, regview in [32,64] {
+    SetRegView %regview%
+    Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
+    {
+	RegRead DisplayName, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, DisplayName
+	RegRead URLUpdateInfo, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLUpdateInfo
+	RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
+	
+	If (   	StartsWith(DisplayName, "Java ")
+		    && (   Publisher == "Oracle Corporation"
+			|| URLUpdateInfo == "http://java.sun.com")
+		    && (   DisplayName ~= "^Java [0-9]+ Update [0-9]+\b") ; "Java 8 Update 152" "Java 8 Update 152 (64-bit)"
+			|| DisplayName ~= "^Java (\d+\.)+\d+\b" ) { ; Java 9.0.1 (64-bit)
+	    Run_msiexecExe("/X """ A_LoopRegName """ /qn /norestart")
+	}
+    }
 }
-
 ExitApp
+
+Run_msiexecExe(params) {
+    static SystemRoot:=""
+    If (SystemRoot=="")
+	EnvGet SystemRoot, SystemRoot
+    
+    Loop {
+	Menu Tray, Tip, Running %params%
+	RunWait "%SystemRoot%\System32\msiexec.exe" %params%,, UseErrorLevel
+	
+	If (ErrorLevel==1618) { ; Another install is currently in progress
+	    TrayTip,, Error 1618: Another install currently in progress`, waiting 30 sec to repeat
+	    Sleep 30000
+	} Else
+	    break
+    }
+    Menu Tray, Tip
+    
+    If (ErrorLevel==3010) ;3010: restart required
+	return 0
+    return ErrorLevel
+}
 
 StartsWith(longtext, shorttext) {
     return SubStr(longtext, 1, StrLen(shorttext)) == shorttext
@@ -52,4 +80,3 @@ StartsWith(longtext, shorttext) {
 ;"Version"=dword:08000294
 ;"Language"=dword:00000409
 ;"DisplayName"="Java 8 Update 66"
-
