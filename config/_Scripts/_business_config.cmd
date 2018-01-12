@@ -34,6 +34,9 @@ rem Disable Windows Media Player network sharing service
 %SystemRoot%\System32\sc.exe stop "WMPNetworkSvc"
 
 CALL "%~dp0Tasks\All XML.cmd"
+
+ASSOC ".pwd=pwd_file"
+FTYPE "pwd_file=^%comspec^% /C "ECHO Не трогайте этот файл, пожалуйста&PAUSE""
 )
 
 rem Wait until windows components set up
