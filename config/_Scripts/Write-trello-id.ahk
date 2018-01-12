@@ -79,12 +79,12 @@ EnvGet RunInteractiveInstalls, RunInteractiveInstalls
 If (writeSavedID && nMatches==1) {
     For i, match in lastMatch {
 	newtxtf := FileOpen(newPathSavedID := PathSavedID ".tmp", "w`n")
-	newtxtf.WriteLine(cards[i].url
-		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))
-		   . "`n" cards[i].name
-		   . "`n" cards[i].id
-		   . "`n" lists[cards[i].idList]
-		 . "`n`n" JSON.Dump(cards[i]))
+	newtxtf.WriteLine(cards[i].url								; 1
+		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))	; 2
+		   . "`n" cards[i].name								; 3
+		   . "`n" cards[i].id								; 4
+		   . "`n" lists[cards[i].idList] )						; 5
+		 ;. "`n`n" JSON.Dump(cards[i])
 	newtxtf.Close()
 	If (FileExist(PathSavedID)) {
 	    FileReadLine oldurl, %PathSavedID%, 1
