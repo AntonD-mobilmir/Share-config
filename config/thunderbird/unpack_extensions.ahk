@@ -4,7 +4,7 @@
 
 EnvGet SystemDrive,SystemDrive
 global defaultConfig
-retailDept := getDefaultConfigFileName() = "Apps_dept.7z"
+Try retailDept := getDefaultConfigFileName() = "Apps_dept.7z"
 
 destDir = %1%
 srcDir = %2%

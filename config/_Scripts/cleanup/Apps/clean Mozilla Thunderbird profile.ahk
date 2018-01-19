@@ -32,7 +32,7 @@ CleanupMTProfile(Dir) {
 	    prefsjsExists := true
 	If c in %flags%
 	    cleanMore := true
-
+	
 	If u in %flags%
 	{
 	    If f not in %flags%
@@ -76,30 +76,67 @@ CleanupMTProfile(Dir) {
 	FileDelete *.sqlite-shm
 	FileDelete *.sqlite-wal
 	FileDelete *.tmp
-
+	
+	;FileDelete session-*.json
+	FileDelete addons.json
 	FileDelete AddThisProfile.ahk
+	FileDelete AlternateServices.txt
+	FileDelete blocklist.xml
+	FileDelete blocklist-addons.json
+	FileDelete blocklist-gfx.json
+	FileDelete blocklist-plugins.json
+	FileDelete business_contacts.mab
+	FileDelete compatibility.ini
+	FileDelete compreg.dat
 	FileDelete descript.ion
+	FileDelete directoryTree.json
 	FileDelete downloads.json
+	FileDelete extensions.cache
+	FileDelete extensions.ini
+	FileDelete extensions.json
+	FileDelete extensions.log
+	FileDelete extensions-install.txt
+	FileDelete folderTree.json
 	FileDelete IniFilesUnicode.ahk
 	FileDelete IniReadUnicode.ahk
+	FileDelete mailViews.dat
+	FileDelete panacea.dat
+	FileDelete pgprules.xml
+	FileDelete pluginreg.dat
+	FileDelete prefs.jsr
 	FileDelete prefs_AddRarusExchAcc.sed
 	FileDelete prefs_BusinessContacts.js
 	FileDelete prefs_CommonOnly.js
 	FileDelete prefs_RarusExch.js
 	FileDelete restore_business_contacts.ahk
 	FileDelete revocations.txt
+	FileDelete search.json
+	FileDelete search-metadata.json
+	FileDelete SecurityPreloadState.txt
+	FileDelete session.json
+	FileDelete sessionCheckpoints.json
+	FileDelete ShutdownDuration.json
 	FileDelete SiteSecurityServiceState.txt
+	FileDelete storage.sdb
+	FileDelete Telemetry.ShutdownTime.txt
+	FileDelete times.json
+	FileDelete tmprules.dat
+	FileDelete training.dat
+	FileDelete traits.dat
 	FileDelete update_pgprules.ahk
 	FileDelete update_profile.ahk
 	FileDelete update_profile.cmd
-	FileDelete prefs.jsr
-
+	FileDelete urlclassifier.pset
+	FileDelete user.js
+	FileDelete XPC.mfl
+	FileDelete xpti.dat
+	FileDelete XUL.mfl
+	FileDelete xulstore.json
+	
 	Loop backup_*, 2
 	    FileRemoveDir %A_LoopFileFullPath%, 1
 	Loop Files, Cache.Trash*, D
-	{
 	    FileRemoveDir %A_LoopFileFullPath%, 1
-	}
 	
 	FileRemoveDir Cache, 1
 	FileRemoveDir ABphotos, 1
@@ -117,51 +154,17 @@ CleanupMTProfile(Dir) {
 	FileRemoveDir TestPilotExperimentFiles, 1
 	FileRemoveDir .clipbak, 1
 	FileRemoveDir datareporting, 1
-
+	
 	FileDelete gnupg\*.cmd
 	FileDelete gnupg\*.ahk
 	FileDelete gnupg\*.lock
 	FileDelete gnupg\random_seed
 	FileDelete gnupg\trust.asc
-
-	;FileDelete session-*.json
-	FileDelete addons.json
-	FileDelete blocklist.xml
-	FileDelete business_contacts.mab
-	FileDelete compatibility.ini
-	FileDelete compreg.dat
-	FileDelete directoryTree.json
-	FileDelete extensions.ini
-	FileDelete extensions.json
-	FileDelete extensions.log
-	FileDelete extensions-install.txt
-	FileDelete extensions.cache
-	FileDelete folderTree.json
-	FileDelete mailViews.dat
-	FileDelete panacea.dat
-	FileDelete pgprules.xml
-	FileDelete pluginreg.dat
-	FileDelete search.json
-	FileDelete search-metadata.json
-	FileDelete session.json
-	FileDelete sessionCheckpoints.json
-	FileDelete ShutdownDuration.json
-	FileDelete storage.sdb
-	FileDelete Telemetry.ShutdownTime.txt
-	FileDelete times.json
-	FileDelete tmprules.dat
-	FileDelete training.dat
-	FileDelete traits.dat
-	FileDelete urlclassifier.pset
-	FileDelete user.js
-	FileDelete xpti.dat
-	FileDelete xulstore.json
-	FileDelete XPC.mfl
-	FileDelete XUL.mfl
-
+	FileDelete gnupg\0xE91EA97A.asc
+	
 	IfNotExist calendar-data\local.sqlite
 	    FileRemoveDir calendar-data, 1
-
+	
 	Loop Mail\*.mozmsgs, 2, 1 ; Removing Windows Search index-helpers
 	{
 ;	    If (A_LoopFileExt = "mozmsgs") ; implied in Loop mask
@@ -179,7 +182,7 @@ CleanupMTProfile(Dir) {
 		If (!cleanMore)
 		    FileDelete %A_LoopFileFullPath%.msf
 	    }
-
+	
 	If (cleanMore) {
 	    FileRemoveDir ImapMail, 1
 	    Loop Mail\*.msf, 0, 1
