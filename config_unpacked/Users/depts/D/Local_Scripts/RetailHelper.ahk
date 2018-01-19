@@ -58,7 +58,8 @@ For mask, name in {"OutgoingText\*.txt": "уведомления", "OutgoingFile
     }
 unsentCountsText=
 For name, c in unsentCounts
-    unsentCountsText .= name " (" c "), "
+    If (c)
+	unsentCountsText .= name " (" c "), "
 If (unsentCountsText)
     foundErrFlags := "Есть не отправленные в течение двух дней " SubStr(unsentCountsText, 1, -2) ". " foundErrFlags
 If (foundErrFlags) {
@@ -68,6 +69,8 @@ If (foundErrFlags) {
     Run % "mailto:it-task@status.mobilmir.ru?subject=Ошибки%20отправки%20выгрузок%20или%20уведомлений%20из%201С-Рарус%20&body=Обнаружены%20сигнальные%20файлы%20ошибок%20при%20отправке%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%0A%0A" UriEncode(foundErrFlags)
 }
 
+If (A_IsAdmin)
+    ExitApp
 Exit
 
 Periodic:
