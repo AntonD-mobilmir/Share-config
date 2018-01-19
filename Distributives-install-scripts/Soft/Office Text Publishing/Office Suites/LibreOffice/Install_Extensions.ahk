@@ -21,8 +21,10 @@ If (A_IsAdmin) {
     }
 }
 
-For i, path in [A_ScriptDir "\AddOns\*.oxt", A_ScriptDir "\..\LibreOffice\AddOns\*.oxt"]
-    Loop Files, %path%
+For i, extDir in [ A_ScriptDir "\AddOns"
+	         , A_ScriptDir "\..\LibreOffice\AddOns"
+	         , A_ScriptDir "\..\..\..\..\Soft FOSS\Office Text Publishing\Office Suites\LibreOffice\AddOns" ]
+    Loop Files, %extDir%\*.oxt
     {
 	FileAppend Installing extension %A_LoopFileName%%A_Tab%, *, CP1
 	SetTimer ShowCmdPIDWindow, -30000

@@ -35,7 +35,7 @@ IF "%argflag%"=="/" (
 	SET "RegConfigName=%TEMP%\%RegConfigName%"
     )
     (
-    REG IMPORT "%RegConfigName%"
+    %SystemRoot%\System32\reg.exe IMPORT "%RegConfigName%" /reg:32
     IF "%del%"=="1" DEL "%RegConfigName%"
     
     IF DEFINED debug PAUSE
