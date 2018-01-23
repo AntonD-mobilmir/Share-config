@@ -1,19 +1,36 @@
 ﻿#NoEnv
 
-RunPath="\\Srv1S.office0.mobilmir\1S\Дистрибутив\install.ahk"
-IfNotExist %RunPath%
-    RunPath="\\Srv1S\1S\Дистрибутив\install.ahk"
+For i, RunPath in [ "\\Srv1S.office0.mobilmir\1S\Дистрибутив\install.ahk"
+		  , "\\Srv1S\1S\Дистрибутив\install.ahk"
+		  , "" ] {
+    If (!RunPath)
+	MsgError("Не найден путь к скрипту создания ярлыков. Сервера нет в сети или Ваш пароль на сервере отличается от установленного на компьютере.")
+} Until FileExist(RunPath)
 
-TryRun:
-RunWait "%A_AhkPath%" "%RunPath%",,UseErrorLevel
-
-If ErrorLevel=ERROR
+Loop
 {
-    MsgBox 18, Скрипт установки 1С недоступен, Отсутствует подключение к серверу`, нет прав для доступа к скрипту`, или скрипт расположен в другом месте. Можно попробовать запустить его ещё раз (Повтор`, Retry)`, Прервать (Abort) попытку запуска сейчас и запустить его при следующем входе в систему`, либо игнорировать (Ignore) ошибку и не запускать его вообще.
-    IfMsgBox Retry
-	GoTo TryRun
-    IfMsgBox Abort
-	Exit
+    RunWait "%A_AhkPath%" "%RunPath%" /s,,UseErrorLevel
+    If (ErrorLevel)
+	MsgError("Cкрипт создания ярлыка (""" RunPath """) вернул код ошибки " ErrorLevel " [ошибка Windows: " A_LastError "]")
+    Else
+	break
 }
 
 FileDelete %A_ScriptFullPath%
+
+;Yes/No 0x4
+;Icon Question 0x20
+;Makes the 2nd button the default 0x100
+MsgBox 0x124, Открыть справку?, Открыть справку о доступе в 1С?`n`nЕсли у Вас нет пароля для доступа в 1С`, Вы узнаете`, как его получить.
+IfMsgBox Yes
+    Run http://help.mobilmir.ru/rules/access-to-1cv8-offce
+
+MsgError(txt := "") {
+    If (!txt)
+	txt=Можно Повторить (Retry) или Отменить (Cancel).
+    ; Icon Exclamation 0x30
+    ; Retry/Cancel 0x5
+    MsgBox 0x35, Ошибка при создании ярлыков 1С, %txt%
+    IfMsgBox Cancel
+	ExitApp
+}
