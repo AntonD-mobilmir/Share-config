@@ -28,6 +28,11 @@ SETLOCAL ENABLEEXTENSIONS
     ATTRIB -H -R "%DefaultUserProfile%" /S /D /L
     RD /S /Q "%DefaultUserProfile%\AppData\Roaming\Opera"
     RD /S /Q "%DefaultUserProfile%\AppData\Roaming\DefaultUserRegistrySettings.7z"
+    RD /S /Q "%DefaultUserProfile%\Обмен"
+    RD /S /Q "%DefaultUserProfile%\Документы"
+    RD /S /Q "%DefaultUserProfile%\дополнительные ярлыки.lnk"
+    RD /S /Q "%DefaultUserProfile%\Обмен.lnk"
+    RD /S /Q "%DefaultUserProfile%\Установить 1С (создать ярлыки).ahk"
     XCOPY "%~dp0..\..\Users\Default\*.*" "%DefaultUserProfile%" /E /I /Q /G /H /K /Y
 
     %exe7z% x -aoa -y -o"%DefaultUserProfile%\AppData\Roaming" -- "%~dp0default_AppDataRoaming.7z"
