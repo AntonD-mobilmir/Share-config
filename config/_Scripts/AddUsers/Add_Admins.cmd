@@ -94,6 +94,7 @@ EXIT /B
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
     
     IF DEFINED gpgexe (
+	DEL %gpgencOut% 2>NUL
 	%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%"
 	START "Copying gpg-encrypted password to Srv0" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
 	IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
