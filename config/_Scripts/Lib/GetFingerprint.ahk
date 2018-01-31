@@ -101,6 +101,19 @@ GetFingerprint_GetForgedValues() {
 			 , "Основная плата": ""
 			 , "00000000": "" ; RAM: 8502, PartNumber: 1600LL Series, SerialNumber: 00000000
 			 , "1": "" ; System: FOXCONN A6GMV 0A, IdentifyingNumber: 1
+			 , "CPUSocket": "" ; trello.com/c/iqzGJkcI/307-кисловодск-вокзальная-kvvz-2-kvvz-ранее-essstcg-2-647550708
+			 , "Manufacturer0": "" ; RAM: Manufacturer0, PartNumber: PartNum0, SerialNumber: SerNum0
+			 , "Manufacturer1": "" ; RAM: Manufacturer2, PartNumber: PartNum2, SerialNumber: SerNum2
+			 , "Manufacturer2": ""
+			 , "Manufacturer3": ""
+			 , "PartNum0": ""
+			 , "PartNum1": ""
+			 , "PartNum2": ""
+			 , "PartNum3": ""
+			 , "SerNum0": ""
+			 , "SerNum1": ""
+			 , "SerNum2": ""
+			 , "SerNum3": ""
 			 , "N/A": "" }
     return SkipValues
 }
