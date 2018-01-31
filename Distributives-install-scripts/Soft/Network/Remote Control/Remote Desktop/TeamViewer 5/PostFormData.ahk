@@ -46,11 +46,9 @@ Loop {
     }
 } Until ClientID
 
-;entry.1137503626=testhost&entry.1756894160=testid&entry.287789183=testconfig&entry.1477798008=testdept&entry.1221721146=testuser&entry.1999739813=testdesc&fvv=1&draftResponse=%5B%2C%2C%22-2064060711359362913%22%5D%0D%0A&pageHistory=0&fbzx=-2064060711359362913
 textfp := ""
-If (IsFunc("GetFingerprint")) {
+If (IsFunc("GetFingerprint"))
     Func("GetFingerprint").Call(textfp)
-}
 IPAddresses=
 Loop 4
     If ( A_IPAddress%A_Index%!="0.0.0.0" )

@@ -77,7 +77,7 @@ If (!ErrorsOccured) {
     {
 	Menu Tray, Tip, Installing Extensions
 	TrayTip %textTrayTip%, Extensions
-	RunWait "%A_AhkPath%" %AhkParm% Install_Extensions.ahk, %A_ScriptDir%, Min UseErrorLevel
+	RunWait "%A_AhkPath%" %AhkParm% "%A_ScriptDir%\Install_Extensions.ahk", %A_ScriptDir%, Min UseErrorLevel
 	ErrorsOccured := ErrorsOccured || ErrorLevel
     }
 
