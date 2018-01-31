@@ -23,8 +23,8 @@ Try {
 		FileMove %dumpDir%\board.json.new, %dumpDir%\board.json, 1
 	}
 	
-	For dumpFName, request in {"computer-accounting": "/cards"
-				  , "lists": "/lists"}
+	For dumpFName, request in { "computer-accounting": "/cards"
+				  , "lists": "/lists" }
 	    If (TrelloAPI1("GET", "/boards/" . boardID . request, jsonDump)) {
 		fnameCurDmp := dumpFName ".json"
 		arcFiles .= " """ fnameCurDmp """"
