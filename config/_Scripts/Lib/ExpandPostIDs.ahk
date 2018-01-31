@@ -6,6 +6,7 @@ ExpandPostIDs(ByRef query) {
     ; use "" in place of idFuncName to specify values splitter in the string
     ; otherwise, idFuncName is expanded with ExpandIDFunc
     
+    splitter := " "
     foundKeys := 0
     Loop 2
     {
@@ -21,7 +22,9 @@ ExpandPostIDs(ByRef query) {
     numberedPrefixesFuncs := []
     UnnumberedQueriedFuncs := {}
     For idFunc, txtPrefix in query {
-	If (!(txtPrefix==""))
+	If (idFunc=="") {
+	    splitter := txtPrefix
+	} Else {
 	    If txtPrefix is integer
 	    {
 		If (!IsObject(numberedPrefixesFuncs[txtPrefix])) {
@@ -32,12 +35,12 @@ ExpandPostIDs(ByRef query) {
 	    } Else {
 		UnnumberedQueriedFuncs[idFunc] := ExpandIDFunc(idFunc)
 	    }
+	}
     }
     If (!IsObject(numberedPrefixesFuncs[0]))
 	numberedPrefixesList .= "0"
     Sort N, numberedPrefixesList
     
-    splitter := query[""]
     iov := 0
     Loop Parse, numberedPrefixesList, `n
     {
