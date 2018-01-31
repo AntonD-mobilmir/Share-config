@@ -64,7 +64,6 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     ExitApp !PostGoogleFormWithPostID(URL,kv)
 }
 
-#include %A_LineFile%\..\ReadTrelloIdFromTxt.ahk
 #include %A_LineFile%\..\PostGoogleForm.ahk
 #include %A_LineFile%\..\CutTrelloCardURL.ahk
 #include %A_LineFile%\..\ExpandPostIDs.ahk
