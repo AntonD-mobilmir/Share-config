@@ -4,6 +4,9 @@
 #SingleInstance force
 
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+EnvGet ProgramFiles32bit, ProgramFiles(x86)
+If (!ProgramFiles32bit)
+    ProgramFiles32bit := A_ProgramFiles
 
 ProxySettingsRegRoot	 = HKEY_CURRENT_USER
 ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
@@ -31,9 +34,9 @@ If (!regsvr32exe)
     regsvr32exe		:= "regsvr32.exe"
 
 FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
-If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc)) {
+If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc))
     AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
-} Else
+Else
     AhkDistVer		:= "1.1.26.01"
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
@@ -192,6 +195,19 @@ If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendem
 	    Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.Fill_DispatchFiles-NotificationsAccount.pwd.ahk"
 	} Else
 	    SetLastRowStatus(rarusnotifLogin)
+    }
+    
+    BIN1Cv77_on_D := FileExist("d:\1S\1Cv77\BIN\1cv7s.exe")
+    BIN1Cv77_on_C := FileExist(ProgramFiles32bit "\1Cv77\BIN\1cv7s.exe")
+    If (BIN1Cv77_on_D) {
+	If (BIN1Cv77_on_C)
+	    AddLog("1Cv77\BIN есть и в D:\1S, и в ProgramFiles")
+    } Else If (A_IsAdmin && BIN1Cv77_on_C) {
+	AddLog("1Cv77\BIN в d:\1S", "Копирование")
+	FileCopyDir %ProgramFiles32bit%\1Cv77, d:\1S\1Cv77
+	SetLastRowStatus("Регистрация COM")
+	RunWait %comspec% /C "d:\1S\1Cv77\BIN\register_all_components.cmd",,Min UseErrorLevel
+	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     }
 }
 
