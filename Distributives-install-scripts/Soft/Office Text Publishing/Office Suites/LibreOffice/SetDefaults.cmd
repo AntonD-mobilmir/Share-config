@@ -21,7 +21,7 @@ rem     IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLe
 )
 CALL :GetName nameLO "%dirLO:~0,-1%"
 (
-    %exe7z% x -aoa -y "%DefaultsSource%" "%nameLO%" -o"%dirLO%"
+    %exe7z% x -aoa -y "%DefaultsSource%" "%nameLO%" -o"%dirLO%..\"
 EXIT /B
 )
 :findConfigDir

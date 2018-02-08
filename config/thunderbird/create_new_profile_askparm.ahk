@@ -59,3 +59,4 @@ ButtonCancel:
     ExitApp
 
 #include %A_LineFile%\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
+#include %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk

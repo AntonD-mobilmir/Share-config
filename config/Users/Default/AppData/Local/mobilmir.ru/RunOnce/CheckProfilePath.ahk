@@ -4,6 +4,9 @@
 #NoEnv
 FileEncoding UTF-8
 
+If (A_UserName = "Install")
+    ExitApp
+
 specBaseDir := "D:\Users"
 
 EnvGet UserProfile,UserProfile

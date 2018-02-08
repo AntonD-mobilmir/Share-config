@@ -1,7 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-WMIGetUserFullname(ByRef ParsedParts := 0) {
+WMIGetUserFullName(ByRef ParsedParts := 0) {
     ;https://autohotkey.com/board/topic/60968-wmi-tasks-com-with-ahk-l/
     strComputer:="."
     objWMIService := ComObjGet("winmgmts:{impersonationLevel=impersonate}!\\" . strComputer . "\root\cimv2")
