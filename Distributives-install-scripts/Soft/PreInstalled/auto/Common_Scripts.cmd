@@ -23,5 +23,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     
     SET "PATH=%PATH%;%ProgramData%\mobilmir.ru\Common_Scripts"
     "%utilsdir%AutoHotkey.exe" "%utilsdir%pathman.ahk" /as "%ProgramData%\mobilmir.ru\Common_Scripts"
+
+    FOR %%A IN (log pwd) DO (
+	FTYPE %%~A_file="%ProgramData%\mobilmir.ru\Common_Scripts\open_file.ahk" "%%1"
+	ASSOC .%%~A=%%~A_file
+    )
 )
 EXIT /B %ErrorPresence%

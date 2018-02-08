@@ -1,7 +1,7 @@
 @(REM coding:CP866
 ECHO %DATE% %TIME% Running %0
 
-START "Collecting inventory information" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
+START "Collecting inventory information" /MIN /I %comspec% /C ""\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd" >"%TEMP%\SaveArchiveReport.cmd.lock" 2>&1 & DEL "%TEMP%\SaveArchiveReport.cmd.lock""
 IF NOT DEFINED AutoHotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 
 SET "dismLockFile=%TEMP%\WindowsComponentsSetup.lock"
@@ -34,9 +34,6 @@ rem Disable Windows Media Player network sharing service
 %SystemRoot%\System32\sc.exe stop "WMPNetworkSvc"
 
 CALL "%~dp0Tasks\All XML.cmd"
-
-ASSOC ".pwd=pwd_file"
-FTYPE "pwd_file=^%comspec^% /C "ECHO Не трогайте этот файл, пожалуйста&PAUSE""
 )
 
 rem Wait until windows components set up
