@@ -6,7 +6,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-FOR /F "usebackq tokens=1,2*" %%A IN (`%SystemRoot%\System32\reg.exe QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v "ProfilesDirectory"`) DO IF "%%A"=="ProfilesDirectory" SET "ProfilesDirectory=%%C"
+FOR /F "usebackq tokens=1,2*" %%A IN (`%SystemRoot%\System32\reg.exe QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v "ProfilesDirectory"`) DO IF "%%~A"=="ProfilesDirectory" SET "ProfilesDirectory=%%~C"
 )
 FOR /F "usebackq delims=" %%I IN (`CALL ECHO "%ProfilesDirectory%"`) DO SET "ProfilesDirectory=%%~I"
 (

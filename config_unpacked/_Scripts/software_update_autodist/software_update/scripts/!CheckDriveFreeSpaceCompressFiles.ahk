@@ -1,4 +1,10 @@
+﻿;by LogicDaemon <www.logicdaemon.ru>
+;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
+FileEncoding UTF-8
+
+EnvGet LocalAppData, LOCALAPPDATA
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 SetFormat IntegerFast, D
 FreeSpaceLowMarginMB := 5120 ; KB4038782 отказывалось устанавливаться, когда на системном диске было свободно меньше 4 гигабайт
 CBSlogMaxSizeMB := 512
@@ -10,25 +16,25 @@ CBSlogMaxSizeMB := 512
 EnvGet SystemDrive, SystemDrive
 
 global System32,SystemDrive
-System32=%A_WinDir%\System32
-IfExist %A_WinDir%\SysNative
-    System32 = %A_WinDir%\SysNative
+System32=%SystemRoot%\System32
+IfExist %SystemRoot%\SysNative
+    System32 = %SystemRoot%\SysNative
     
 
-If (CheckAndLogFreeSpace(A_WinDir) < FreeSpaceLowMarginMB) {
+If (CheckAndLogFreeSpace(SystemRoot) < FreeSpaceLowMarginMB) {
 ; not in win below 7   RunWait dism /online /cleanup-image /spsuperseded
 ; requires confirmation    RunWait vssadmin Delete Shadows /All
-    Loop Files, %A_WinDir%\Logs\CBS\*.*, D
+    Loop Files, %SystemRoot%\Logs\CBS\*.*, D
 	FileRemoveDir %A_LoopFileFullPath%, 1
-    FileDelete %A_WinDir%\Logs\CBS\*.*
-    CallCompact(A_WinDir . "\Logs\CBS")
-    Loop Files, %A_WinDir%\Temp\*.*, D
+    FileDelete %SystemRoot%\Logs\CBS\*.*
+    CallCompact(SystemRoot . "\Logs\CBS")
+    Loop Files, %SystemRoot%\Temp\*.*, D
 	FileRemoveDir %A_LoopFileFullPath%, 1
-    FileDelete %A_WinDir%\Temp\*.*
+    FileDelete %SystemRoot%\Temp\*.*
     
-    CheckAndLogFreeSpace(A_WinDir,"after cleanup of %WinDir%\Temp and %WinDir%\Logs\CBS")
+    CheckAndLogFreeSpace(SystemRoot,"after cleanup of %WinDir%\Temp and %WinDir%\Logs\CBS")
     
-    CBSlog=%A_WinDir%\Logs\CBS\CBS.log
+    CBSlog=%SystemRoot%\Logs\CBS\CBS.log
     FileGetSize sizeCBSlogMB, CBSlog, M
     FileAppend %A_Now% Size of %CBSlog% is %sizeCBSlogMB% MB`, limit is %CBSlogMaxSizeMB% MB`, , *, CP1
     If (sizeCBSlogMB > CBSlogMaxSizeMB) {
@@ -70,24 +76,24 @@ If (CheckAndLogFreeSpace(A_ProgramFiles) < FreeSpaceLowMarginMB) {
     CheckAndLogFreeSpace(A_ProgramFiles,"after defrag")
 }
 
-If (CheckAndLogFreeSpace(A_WinDir) < FreeSpaceLowMarginMB) {
-    CallCompact(A_WinDir . "\assembly")
-    CallCompact(A_WinDir . "\ie8")
-    CallCompact(A_WinDir . "\ie8updates")
-    CallCompact(A_WinDir . "\inf")
-    CallCompact(A_WinDir . "\Microsoft.NET")
-    CallCompact(A_WinDir . "\WinSxS")
-    CallCompact(A_WinDir . "\Installer")
-    CallCompact(A_WinDir . "\pchealth")
-    Loop %A_WinDir%\$*, 2
+If (CheckAndLogFreeSpace(SystemRoot) < FreeSpaceLowMarginMB) {
+    CallCompact(SystemRoot . "\assembly")
+    CallCompact(SystemRoot . "\ie8")
+    CallCompact(SystemRoot . "\ie8updates")
+    CallCompact(SystemRoot . "\inf")
+    CallCompact(SystemRoot . "\Microsoft.NET")
+    CallCompact(SystemRoot . "\WinSxS")
+    CallCompact(SystemRoot . "\Installer")
+    CallCompact(SystemRoot . "\pchealth")
+    Loop %SystemRoot%\$*, 2
 	RunWait compact /c /i /s "%A_LoopFileFullPath%",,UseErrorLevel
 
-    CheckAndLogFreeSpace(A_WinDir,"after compression of Windows dirs")
-    Defrag(A_WinDir)
+    CheckAndLogFreeSpace(SystemRoot,"after compression of Windows dirs")
+    Defrag(SystemRoot)
     CheckAndLogFreeSpace(A_ProgramFiles,"after defrag")
 }
 
-If (CheckAndLogFreeSpace(A_WinDir) < FreeSpaceLowMarginMB) {
+If (CheckAndLogFreeSpace(SystemRoot) < FreeSpaceLowMarginMB) {
 ; Win7+		RunWait dism /online /cleanup-image /spsuperseded
 ; interactive	RunWait vssadmin Delete Shadows /All
     FileAppend %A_Now% Emptying SoftwareDistribution\Download`n, *, CP1
@@ -96,21 +102,21 @@ If (CheckAndLogFreeSpace(A_WinDir) < FreeSpaceLowMarginMB) {
     FileAppend %A_Now% Running Clean Manager`n, *, CP1
     RunWait %comspec% /C "%ConfigDir%_Scripts\cleanup\cleanmgr-full.cmd",,UseErrorLevel
     
-    ; compacted above CallCompact(A_WinDir . "\Logs\CBS")
-    CallCompact(A_WinDir . "\assembly")
-    CallCompact(A_WinDir . "\ie8")
-    CallCompact(A_WinDir . "\ie8updates")
-    CallCompact(A_WinDir . "\inf")
-    CallCompact(A_WinDir . "\Microsoft.NET")
-    CallCompact(A_WinDir . "\WinSxS")
-    CallCompact(A_WinDir . "\Installer")
-    CallCompact(A_WinDir . "\pchealth")
-    Loop %A_WinDir%\$*, 2
+    ; compacted above CallCompact(SystemRoot . "\Logs\CBS")
+    CallCompact(SystemRoot . "\assembly")
+    CallCompact(SystemRoot . "\ie8")
+    CallCompact(SystemRoot . "\ie8updates")
+    CallCompact(SystemRoot . "\inf")
+    CallCompact(SystemRoot . "\Microsoft.NET")
+    CallCompact(SystemRoot . "\WinSxS")
+    CallCompact(SystemRoot . "\Installer")
+    CallCompact(SystemRoot . "\pchealth")
+    Loop %SystemRoot%\$*, 2
 	CallCompact(A_LoopFileFullPath)
 
-    Defrag(A_WinDir)
+    Defrag(SystemRoot)
 
-    CheckAndLogFreeSpace(A_WinDir,"after compression")
+    CheckAndLogFreeSpace(SystemRoot,"after compression")
 }
 
 ;If (CheckAndLogFreeSpace(SystemDrive) < FreeSpaceLowMarginMB) {

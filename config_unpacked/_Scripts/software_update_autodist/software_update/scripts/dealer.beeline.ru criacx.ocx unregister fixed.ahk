@@ -1,6 +1,7 @@
 ;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
+EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 
 dbBaseDir := "D:\dealer.beeline.ru"
 dbBinDir  := dbBaseDir . "\bin"
@@ -10,9 +11,9 @@ dbocx     := dbBinDir . "\" . ocxFName
 sidAuthenticatedUsers:="*S-1-5-11"
 
 EnvGet SystemRoot,SystemRoot
-System3232bit := A_WinDir . "\SysWOW64"
+System3232bit := SystemRoot . "\SysWOW64"
 If (!FileExist(regsvr32exe . ""))
-    System3232bit := A_WinDir . "\System32"
+    System3232bit := SystemRoot . "\System32"
 
 regsvr32exe = %System3232bit%\regsvr32.exe
 
@@ -41,7 +42,7 @@ If (FileExist(dbocx)) {
     Echo("Modify date of """ . dbocx . """ = " . ocxDate)
 }
 
-Echo(ConRun("""" SystemRoot "\System32\schtasks.exe"" /Delete /TN ""mobilmir.ru\update dealer.beeline.ru criacx.ocx"") . "`nschtasks ExitCode: " . ProgramExitCode)
+Echo(ConRun("""" SystemRoot "\System32\schtasks.exe"" /Delete /TN ""mobilmir.ru\update dealer.beeline.ru criacx.ocx""") . "`nschtasks ExitCode: " . ProgramExitCode)
 Echo(ConRun("""" SystemRoot "\System32\icacls.exe"" """ . dbocx . """ /grant """ . sidAuthenticatedUsers . ":RX""", dbBinDir) . "`nicacls.exe ExitCode: " . ProgramExitCode)
 Echo(ConRun(regsvr32exe . " /u /s """ . dbocx . """") . "`nregsvr32 ExitCode: " . ProgramExitCode)
 
