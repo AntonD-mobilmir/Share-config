@@ -11,10 +11,15 @@ SETLOCAL ENABLEEXTENSIONS
     rem TeamViewer Settings
     ECHO N|REG ADD "HKEY_CURRENT_USER\Software\TeamViewer\Version5.1" /v Username /t REG_SZ /d "%UserName% \\%COMPUTERNAME%"
     REG ADD "HKEY_CURRENT_USER\Software\TeamViewer\Version5.1" /v ShowTaskbarInfoOnMinimize /t REG_DWORD /d 0 /f
-
+    
     IF /I "%USERNAME%"=="Продавец" SET "RemoveAllAppX=1"
     IF /I "%USERNAME%"=="Пользователь" SET "RemoveAllAppX=1"
     IF /I "%USERNAME%"=="Install" SET "RemoveAllAppX=1"
+    
+    CALL :CheckTempProfile "%USERPROFILE%" || (
+	ECHO Вход в систему выполнен с временным профилем, при выходе все изменения будут утеряны!
+	PAUSE
+    )
 )
 :GetDefaultConfigDirAgain
 CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
@@ -62,4 +67,11 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
 (
     SET "%~1=%~dp2"
 EXIT /B
+)
+:CheckTempProfile
+SET "profileDirName=%~nx1"
+(
+    IF NOT DEFINED tempProfileDir IF /I "%profileDirName%"=="TEMP" EXIT /B 1
+    IF NOT DEFINED tempProfileDir IF /I "%profileDirName:~0,5%"=="TEMP" EXIT /B 1
+    EXIT /B 0
 )
