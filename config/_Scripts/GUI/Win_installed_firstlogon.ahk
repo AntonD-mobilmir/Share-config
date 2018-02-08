@@ -16,6 +16,8 @@ If (!A_IsAdmin) {
     ExitApp
 }
 
+FileCreateShortcut %configDir%, %A_Desktop%\config.lnk
+
 OSVersionObj := RtlGetVersion()
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
 
