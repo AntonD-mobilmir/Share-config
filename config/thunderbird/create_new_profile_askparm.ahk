@@ -14,7 +14,7 @@ If (!MailUserId) {
 	GetSharedMailUserIdScript := A_AppDataCommon "\mobilmir.ru\_get_SharedMailUserId.cmd"
     
     If (FileExist(GetSharedMailUserIdScript))
-	Try MailUserId := ReadSetVarFromBatchFile(GetSharedMailUserIdScript, "MailUserId")
+	Try MailUserId := Func("ReadSetVarFromBatchFile").Call(GetSharedMailUserIdScript, "MailUserId")
     
     If (!MailUserId && RegexMatch(A_ComputerName, "i)(.+)-[0-9k]"), m)
 	MailUserId := Format("{:Ls}", m1)
@@ -28,7 +28,7 @@ If (MailUserId) {
     If (!destPath)
 	destPath = %UserProfile%\Mail\Thunderbird\profile
     
-    fullName := WMIGetUserFullname(3)
+    Try fullName := Func("WMIGetUserFullname").Call(3)
     If (!fullName)
 	fullName = (не удалось разобрать: %userFIO%)
 }
@@ -58,5 +58,5 @@ GuiClose:
 ButtonCancel:
     ExitApp
 
-#include %A_LineFile%\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
-#include %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk

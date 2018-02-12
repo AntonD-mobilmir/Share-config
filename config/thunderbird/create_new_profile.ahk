@@ -106,7 +106,7 @@ If (!skipCreatingProfile) {
 	    }
 	}
     } Else {
-	mailFullName := WMIGetUserFullname()
+	mailFullName := Func("WMIGetUserFullname").Call(3)
     }
     
     ;prefsjs := RegExReplace(prefsjs, "\{\$\w+\$\}", )
@@ -145,6 +145,7 @@ StartsWith(longstr, shortstr) {
     return shortstr == SubStr(longstr,1,StrLen(shortstr))
 }
 
-#Include *i %A_ScriptDir%\..\_Scripts\Lib\getDefaultConfig.ahk
-#Include *i %A_ScriptDir%\..\_Scripts\Lib\findexe.ahk
+#Include *i %A_LineFile%\..\..\_Scripts\Lib\getDefaultConfig.ahk
+#Include *i %A_LineFile%\..\..\_Scripts\Lib\findexe.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk
 #include <IniFilesUnicode>
