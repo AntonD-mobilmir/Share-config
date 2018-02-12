@@ -5,7 +5,7 @@ Menu Tray, Tip, Запуск 1С-Рарус
 
 global	run1sexe:="1cv7s.exe"
       , ExcessArcTimeLim:=5*60 ; s
-      , WaitArchivingAfterBoot:=5*60*1000 ; ms
+      , WaitArchivingStartTimeout := A_TickCount + 5*60*1000 ; ms
       , lProgramFiles
       , run1sDir
       , params := ParseCommandLine()
@@ -59,18 +59,18 @@ Loop Files, %rarusbackupflag%
     }
 }
 
-If (A_TickCount < WaitArchivingAfterBoot                    			; soon after boot
+If (A_TickCount < WaitArchivingStartTimeout                    			; soon after script start
 	&& !(  FileExist(rarusbackupflag)  		    			; and no: flag
 	    || FileExist(backupsDir . "\" . zpaqFName)  		    	; 	or zpaq archive
 	    || FileExist(backupsDir . "\" . DailyArchiveFName) 			; 	or daily backup
 	    || FileCreatedAfterBoot(backupsDir . "\" . DailyArchiveFName . ".tmp")	; 	or daily backup temp exist
 	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp")	; 	or temporary file of monthly archive exist
 	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) ) { 	;	or monthly backup created after last boot (e.g. just now) - because if it's created before last boot, we should wait daily archive instead
-    ResetProgress(WaitArchivingAfterBoot)
+    ResetProgress(WaitArchivingStartTimeout, A_TickCount)
     Loop {
-	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, A_TickCount//1000 . " / " . WaitArchivingAfterBoot//1000)
+	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, A_TickCount//1000 . " / " . WaitArchivingStartTimeout//1000)
 	Sleep 100
-    } Until (A_TickCount > WaitArchivingAfterBoot || FileExist(rarusbackupflag))
+    } Until (A_TickCount > WaitArchivingStartTimeout || FileExist(rarusbackupflag))
     Sleep 1000
 }
 
@@ -93,7 +93,7 @@ If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
     ; ToDo: рассчитать время создания архива по значениям в %rarusbackuplogfile%
     If (!FileExist(backupsDir . "\" . zpaqFName)) { ; но нет архива за текущий год
 	avgArchivingTime := 600
-	If (!WaitFile(rarusbackupflag, backupsDir . "\" . zpaqFName, WaitArchivingAfterBoot))
+	If (!WaitFile(rarusbackupflag, backupsDir . "\" . zpaqFName, WaitArchivingStartTimeout))
 	    BackupAppearanceTimeout("Вышло время ожидания появления архива zpaq (" avgArchivingTime " с)")
     } Else {
 	avgArchivingTime := 300
@@ -103,13 +103,13 @@ If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
 	 || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) { ;или ежемесяный архив уже существует и создан после загрузки (ежедневного архива не будет до следующей перезагрузки)
     ; то ожидание ежемесячного архива
     ; Ежемесячный архив может создаваться долго: 1-2 минуты перед появлением файла, и ещё 2-3 до создания архива. При этом r:\rarus-backup-start.log будет пустой с актуальной датой.
-    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . MonthlyArchiveFName, backupsDir . "\" . MonthlyArchiveFName . ".tmp"], WaitArchivingAfterBoot) ) {
+    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . MonthlyArchiveFName, backupsDir . "\" . MonthlyArchiveFName . ".tmp"], WaitArchivingStartTimeout) ) {
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_????-??.7z")
     } Else {
 	BackupAppearanceTimeout("Вышло время ожидания ежемесячного архива (" avgArchivingTime " с)")
     }
 } Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
-    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . DailyArchiveFName, backupsDir . "\" . DailyArchiveFName . ".tmp"], WaitArchivingAfterBoot) ) {
+    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . DailyArchiveFName, backupsDir . "\" . DailyArchiveFName . ".tmp"], WaitArchivingStartTimeout) ) {
 	If (A_MM==1) {
 	    prevMonth := A_Year-1 . "-12"
 	} Else {
@@ -283,10 +283,10 @@ FirstExisting(paths) {
 	    return path
 }
 
-ResetProgress(pRange:=0) {
+ResetProgress(pRange := 0, pInit := 0) {
     Progress Off
     If (pRange)
-	progressBarRange:=" R0-" . pRange
+	progressBarRange:=" R" pInit "-" . pRange
     Else
 	progressBarHeight:=" ZH0"
     Progress A M%progressBarHeight%%progressBarRange% Hide, %A_Space%, `n`n`n`n`n, Запуск 1С-Рарус
