@@ -86,6 +86,7 @@ Loop Files, OutgoingFiles\*.*, DFR
 Loop Files, OutgoingText\*.*, DFR
     RecordOlder(A_LoopFileFullPath, A_LoopFileTimeCreated)
 
+ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
 FileAppend,
 ( LTrim
     anton.derbenev@rarus.robots.mobilmir.ru
@@ -93,7 +94,8 @@ FileAppend,
     Проверочное сообщение после обновления скриптов отправки.
     Пользователь, от имени которого запущен скрипт: %A_UserName%
     Время: %A_YYYY%-%A_MM%-%A_DD% %A_Hour%:%A_Min%:%A_Sec%
-), OutgoingText\test%A_Now%.txt, CP1251
+    Командная строка: %ScriptRunCommand%
+), OutgoingText\%A_ScriptName%.%A_Now%.txt, CP1251
 
 SetWorkingDir %bakWorkingDir%
 

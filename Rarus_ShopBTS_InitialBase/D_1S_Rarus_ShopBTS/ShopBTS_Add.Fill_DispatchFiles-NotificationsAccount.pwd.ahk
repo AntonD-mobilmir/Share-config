@@ -5,6 +5,7 @@ FileEncoding CP1251
 
 cfgTemplatePath=d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd.template
 cfgDestPath=d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd
+notificationReportPath=d:\1S\Rarus\ShopBTS\ExtForms\post\OutgoingText\%A_ScriptName%.%A_Now%.txt
 
 accCfgListPaths := ["\\IT-Head.office0.mobilmir\d$\Users\LogicDaemon\Google Drive\IT\Ограниченный доступ\Аккаунты почтовых ящиков для 1С-Рарус\rarus.robots.mobilmir.ru.txt"]
 
@@ -69,6 +70,24 @@ Try {
 	    Throw Exception("Логин не найден в файле учетных записей",,rarusnotifCfg.login)
 	}
     } Else Throw Exception("Данные аккаунтов не прочитались",,accCfgListPath)
+
+    WriteReport("Отправка уведомлений через " cfgTemplate[1] " настроена")
 } Catch e {
-    Throw e
+    If (IsObject(e))
+	For k,v in e
+	    errText .= k ": " v "`n"
+    Else
+	errText = Ошибка %e%
+    WriteReport("Ошибка настройки отправки уведомлений через " cfgTemplate[1], errText)
+}
+ExitApp
+
+WriteReport(ByRef title, ByRef body := "") {
+    global notificationReportPath, rarusnotifCfg, cfgTemplate
+    static reportDest := ""
+    
+    If (!reportDest)
+	reportDest := "dispatchfiles-setup-reports" SubStr(cfgTemplate[2], InStr(cfgTemplate[2], "@"))
+    FormatTime currTime,, yyyy-MM-dd HH-mm-ss
+    FileAppend % reportDest "`n" title "`n" body "`n`nlogin: " rarusnotifCfg.login "`nСкрипт настройки был запущен " currTime " от имени " A_UserName " на компьютере " A_ComputerName, %notificationReportPath%
 }
