@@ -32,26 +32,76 @@ If (!ErrorLevel && FileExist(pathLastStatus)) {
 
 Loop {
     textMsgBoxNF=`n`n(через 60 секунд либо при нажатии OK данное сообщение будет скрыто`, и статус будет выводиться рядом с часами)
-    timeLastModified:=timeBoot
-    timeLastModifiedRunning:=timeBoot
+    timeLastModifiedRunning:=timeLastModified:=timeBoot
     nameLastModified=
     nameLastModifiedRunning=
 
     TrayTip %scriptName%, Проверка папки журналов обновлений (%dirSUStatus%),, 1
     Loop Files, %dirSUStatus%\*.*
     {
-	If (timeLastModified < A_LoopFileTimeModified) {
-	    timeLastModified := A_LoopFileTimeModified
-	    nameLastModified := A_LoopFileName
+	If (A_LoopFileTimeModified > timeLastModifiedRunning) {
 	    If (A_LoopFileExt = "running") {
 		timeLastModifiedRunning := A_LoopFileTimeModified
 		nameLastModifiedRunning := A_LoopFileName
+		If (A_LoopFileName == ".running")
+		    updateRunning := 1
+	    } Else If (A_LoopFileTimeModified > timeLastModified) { ; only checking non- *.running if it's newer than last running
+		timeLastModified := A_LoopFileTimeModified
+		nameLastModified := A_LoopFileName
 	    }
 	}
     }
     TrayTip
+    
+    If (timeLastModified < timeLastModifiedRunning) {
+	timeLastModified =
+	nameLastModified =
+    }
+    
+    If (timeLastModifiedRunning || timeLastModified) { ; когда обновления запускаются, обновляется время файла ".running" (название начинается с точки)
+	;LibreOffice 4.3.1.ahk.running
+	;LibreOffice 4.3.1.ahk-msiexec.log
 
-    If (!nameLastModified) {
+	;SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+	SplitPath nameLastModifiedRunning,,,, namenoextLastRunning
+	If (timeLastModified) { ; if it is defined, it's newer than timeLastModifiedRunning
+	    timeDiffLastMod := timeLastModified
+	    timeDiffLastMod -= timeLastModifiedRunning, Seconds
+	    If ( EndsWith(nameLastModified, "-msiexec.log")
+		|| SubStr(nameLastModified,1,StrLen(namenoextLastRunning)) = namenoextLastRunning
+		|| timeDiffLastMod > 15) {
+		nameLastModifiedRunning := nameLastModified
+		timeLastModifiedRunning := timeLastModified
+	    }
+	}
+	SplitPath nameLastModifiedRunning,,, extLast, nameLastModNoExt
+	
+	timeSinceLastMod=
+	EnvSub timeSinceLastMod, timeLastModifiedRunning, Seconds
+	If (updateRunning && timeSinceLastMod > timeoutUpdaterunning_s)
+	    updateStuck := 1
+	
+	For i, o in [{lim: 60*99, div: 60*60, unit: " ч."}, {lim: 90, div: 60, unit: " мин."}, {lim: 0, div: 1, unit: " с"}]
+	    If (timeSinceLastMod > o.lim) {
+		timeSinceLastMod := (timeSinceLastMod + o.div//2) // o.div . o.unit ; чтобы использовать математическое округление при целочисленном делении, надо заранее прибавить половину делителя
+		break
+	    }
+	
+	FormatTime ftimeLast, timeLastModified
+	If (extLast = "running") {
+	    If (updateStuck) {
+		textStatus = Последнее изменение журнала "%nameLastModNoExt%" было %ftimeLast% (%timeSinceLastMod% назад)`, но обновление не отмечено`, как завершенное. Возможно`, в процессе обновления произошел сбой`, и в этом сеансе оно уже не завершится.`n`nЕсли это сообщение появилось первый раз`, рекомендуем перезагрузить компьютер`, и дать обновлению завершиться. Иначе сообщите`, пожалуйста`, службе ИТ.
+		finished := 1
+	    } Else {
+		textStatus = Обновление выполняется`, название журнала:`n"%nameLastModNoExt%"`, последнее изменение %ftimeLast% (%timeSinceLastMod% назад).
+		textStatusMsgBoxAdd = `nЧтобы избежать сбоев`, не стоит использовать программу`, название которой совпадает с названием журнала.
+		textStatusTray = `nПожалуйста, не используйте программу`, пока она обновляется.
+	    }
+	} Else {
+	    textStatus = Обновление завершено в %ftimeLast%`nПоследний журнал: %nameLastModified% (%timeSinceLastMod% назад).
+	    finished := 1
+	}
+    } Else {
 	FileGetTime timeLastModified, %pathLastStatus%
 	FormatTime ftLastModified, %timeLastModified%
 	FormatTime ftBoot, %timeBoot%
@@ -61,50 +111,6 @@ Loop {
 	} Else {
 	    textStatus = Со времени последней загрузки обновление ещё не запустилось.`nЗапуск обновления может откладываться до 15 минут после загрузки`n`n(проверка будет автоматически повторяться каждые 60 секунд)
 	    finished := -4 ; In MsgBox options, Retry/Cancel = 5
-	}
-    } Else {
-	;LibreOffice 4.3.1.ahk.running
-	;LibreOffice 4.3.1.ahk-msiexec.log
-
-	;SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-	SplitPath nameLastModifiedRunning,,,, namenoextLastRunning
-	timeDiffLastMod := timeLastModified
-	timeDiffLastMod -= timeLastModifiedRunning, Seconds
-	If ( CheckSuffix(nameLastModified, "-msiexec.log") || SubStr(nameLastModified,1,StrLen(namenoextLastRunning)) = namenoextLastRunning || timeDiffLastMod < 15) {
-	    ;diff := timeLastModified
-	    ;EnvSub diff, timeLastModifiedRunning, Minutes
-	    nameLastModified:=nameLastModifiedRunning
-	    timeLastModified:=timeLastModifiedRunning
-	}
-	SplitPath nameLastModified,,,extLast
-	
-	timeSinceLastMod=
-	EnvSub timeSinceLastMod, timeLastModified, Seconds
-	unitSinceLastMod = с
-	If (timeSinceLastMod > timeoutUpdaterunning_s)
-	    updateStuck := 1
-	If (timeSinceLastMod > 60*60) {
-	    timeSinceLastMod /= 60*60
-	    unitSinceLastMod = ч.
-	}
-	If (timeSinceLastMod > 60) {
-	    timeSinceLastMod /= 60
-	    unitSinceLastMod = мин.
-	}
-
-	FormatTime ftimeLast, timeLastModified
-	If (extLast = "running") {
-	    textStatus = Обновление выполняется`, название журнала: %nameLastModified%.`nПоследнее изменение журнала было %ftimeLast% (%timeSinceLastMod% %unitSinceLastMod% назад).
-	    If (updateStuck) {
-		textStatus = %textStatus%`n`nС помента последнего изменения журнала прошло много времени`, но обновление не отмечено`, как завершенное. Возможно`, в процессе обновления произошел сбой`, и в этом сеансе оно уже не завершится.`n`nЕсли это сообщение появилось первый раз`, рекомендуем перезагрузить компьютер`, и дать обновлению завершиться. Иначе сообщите`, пожалуйста`, службе ИТ.
-		finished := 1
-	    } Else {
-		textStatusMsgBoxAdd = `nЧтобы избежать сбоев`, не стоит использовать программу`, название которой совпадает с названием журнала.
-		textStatusTray = `nПожалуйста, не используйте программу`, пока она обновляется.
-	    }
-	} Else {
-	    textStatus = Обновление завершено %ftimeLast%.`nПоследний журнал: %nameLastModified% (%timeSinceLastMod% %unitSinceLastMod% назад).
-	    finished := 1
 	}
     }
 
@@ -128,7 +134,7 @@ Loop {
 	Exit
 }
 
-CheckSuffix(ByRef t, suffix) {
+EndsWith(ByRef t, suffix) {
     return SubStr(t, StrLen(t) - StrLen(suffix)) = suffix
 }
 
