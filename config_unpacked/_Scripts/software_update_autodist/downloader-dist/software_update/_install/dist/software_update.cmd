@@ -40,9 +40,9 @@ IF NOT EXIST "%SUScripts%" EXIT /B 32003
 IF NOT EXIST "%SUScriptsStatus%" MKDIR "%SUScriptsStatus%" & IF NOT EXIST "%SUScriptsStatus%" EXIT /B 32767
 IF NOT EXIST "%SUScriptsOldLogs%" MKDIR "%SUScriptsOldLogs%" & IF NOT EXIST "%SUScriptsOldLogs%" EXIT /B 32767
 
-CALL :GetDir ConfigDir "%DefaultsSource%"
+CALL :GetDir configDir "%DefaultsSource%"
 )
-CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
+CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
 :NextArg
 (
 IF "%~1"=="" GOTO :NoMoreArgs

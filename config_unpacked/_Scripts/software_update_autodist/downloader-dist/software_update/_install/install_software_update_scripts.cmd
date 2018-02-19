@@ -35,6 +35,7 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
     IF NOT DEFINED localStatus (
 	IF NOT EXIST "%SUScriptsStatus%" MKDIR "%SUScriptsStatus%"
 	IF NOT EXIST "%SUScriptsStatus%" SET "localStatus=1"
+	RD "%SUScriptsStatus%"
     )
     
     REM use user named admin-task-scheduler with random password, write password to an encrypted local file, use this password for tasks creation
