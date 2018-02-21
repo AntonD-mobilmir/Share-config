@@ -37,7 +37,7 @@ FileReadLine AhkDistVer, %officeDistSrvPath%\Soft\Keyboard Tools\AutoHotkey\ver.
 If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc))
     AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
 Else
-    AhkDistVer		:= "1.1.26.01"
+    AhkDistVer		:= "1.1.28.00"
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
@@ -70,6 +70,8 @@ If (A_IsAdmin) {
 
 runAhkUpdate := A_AhkVersion < AhkDistVer
 AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист. " AhkDistVer ")"), !runAhkUpdate)
+If (runAhkUpdate)
+    RunRsyncAutohotkey(0)
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
 global DefaultConfigDir := chkDefConfigDir.path
@@ -674,22 +676,34 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
 
 finished := 1
 
-If (runAhkUpdate && A_IsAdmin) {
-    subdirDistAutoHotkey := "Soft\Keyboard Tools\AutoHotkey"
+RunRsyncAutohotkey(wait := 1) {
+    static subdirDistAutoHotkey := "Soft\Keyboard Tools\AutoHotkey"
+	    , dirDistAhk := ""
     
-    baseDirsDistAhk := [ "D:\Distributives" ]
-    If (!(SubStr(lDistributives, 1, 2)=="\\"))
-	baseDirsDistAhk.Push(lDistributives)
+    If (dirDistAhk) {
+	baseDirsDistAhk := [ dirDistAhk ]
+	dirDistAhk := ""
+    } Else {
+	baseDirsDistAhk := [ "D:\Distributives" ]
+	If (!(SubStr(lDistributives, 1, 2)=="\\"))
+	    baseDirsDistAhk.Push(lDistributives)
+    }
+    
     For i, baseDir in baseDirsDistAhk 
 	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
 	    Try {
-		RunRSync(baseDir "\" subdirDistAutoHotkey)
-		RunRSync(baseDir "\Soft\PreInstalled\auto")
+		RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
+		RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
 		dirDistAhk := baseDir "\" subdirDistAutoHotkey
 		break
 	    }
 	}
-    If (!dirDistAhk)
+    
+    return dirDistAhk
+}
+
+If (runAhkUpdate && A_IsAdmin) {
+    If (!(dirDistAhk := RunRsyncAutohotkey()))
 	dirDistAhk := officeDistSrvPath "\" subdirDistAutoHotkey
     AddLog("Обновление AutoHotkey из " AbbreviatePath(dirDistAhk))
     
