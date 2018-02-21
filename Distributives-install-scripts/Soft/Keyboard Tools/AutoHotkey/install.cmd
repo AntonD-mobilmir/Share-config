@@ -14,7 +14,10 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     CALL :FindAutohotkeyExe
 )
 (
-    IF DEFINED AutohotkeyExe FOR %%A IN (%AutohotkeyExe%) DO CALL :UnlockByMoving "%%~A" "%%~tA %RANDOM%.bak"
+    IF DEFINED AutohotkeyExe FOR %%A IN (%AutohotkeyExe%) DO (
+	DEL "%%~dpA*.bak"
+	CALL :UnlockByMoving "%%~A" "%%~tA %RANDOM%.bak"
+    )
     FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%srcpath%AutoHotkey_*_setup.exe"`) DO (
 	"%srcpath%%%~I" /s
 	rem to extract without associating: /D="%ProgramFiles%\AutoHotkey" /E

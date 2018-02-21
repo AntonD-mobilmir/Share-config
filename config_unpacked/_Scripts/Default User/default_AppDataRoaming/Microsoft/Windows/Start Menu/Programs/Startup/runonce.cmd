@@ -26,7 +26,7 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
 CALL :GetDir ConfigDir "%DefaultsSource%"
 (
     CALL "%ConfigDir%_Scripts\find7zexe.cmd"
-    CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd" "%ConfigDir%_Scripts\cleanup\uninstall\050 OneDrive.ahk"
+    rem CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd" "%ConfigDir%_Scripts\cleanup\uninstall\050 OneDrive.ahk"
     FOR %%A IN ("\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%ConfigDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\DefaultUserRegistrySettings.7z" (
 	SET "regDfltNewUser=%%~A\DefaultUserRegistrySettings.7z"
 	SET "dirNewUserDefaults=%%~A"
@@ -54,13 +54,15 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
     
     FOR %%A IN ("%dirNewUserDefaults%\RunOnce\*.cmd" "%dirNewUserDefaults%\RunOnce\*.ahk") DO (
 	IF /I "%%~xA"==".cmd" (
-	    CALL "%%~A"
+	    START "" /B /WAIT %comspec% /C "%%~A"
 	) ELSE IF /I "%%~xA"==".ahk" (
 	    %AutohotkeyExe% "%%~fA"
+	) ELSE (
+	    START "" "%%~fA"
 	)
     )
     
-    IF NOT "%srcpath:~0,2%"=="\\" DEL "%~f0"
+    IF NOT ERRORLEVEL 1 IF NOT "%srcpath:~0,2%"=="\\" DEL "%~f0"
     EXIT /B
 )
 :GetDir

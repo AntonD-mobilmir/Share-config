@@ -29,7 +29,7 @@ IF DEFINED PROCESSOR_ARCHITEW6432 "%SystemRoot%\SysNative\cmd.exe" /C "%0 %*" & 
     ECHO %DATE% %TIME% Удаление ПО и добавление в очередь установки...
     CALL "%~dp0uninstall_soft.cmd"
 
-    START "BleachBit" /WAIT %comspec% /C "%~dp0BleachBit-auto.cmd"
+    START "BleachBit" /WAIT %comspec% /C "%~dp0BleachBit-auto.cmd" /ProfileOnSystemDrive
     IF EXIST "%SystemDrive%\bootsqm.dat" (
 	ECHO %DATE% %TIME% Удаление bootsqm.dat
 	DEL "%SystemDrive%\bootsqm.dat"

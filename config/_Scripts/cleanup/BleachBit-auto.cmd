@@ -1,23 +1,35 @@
-@REM coding:OEM
+@(REM coding:CP866
+REM by LogicDaemon <www.logicdaemon.ru>
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 SETLOCAL ENABLEEXTENSIONS
-IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || PAUSE
-SET relpath=Soft\PreInstalled\manual\BleachBit-Portable-RUN.cmd
-CALL :FindBleachBit Distributives "%~d0\Distributives" "%~dp0..\..\..\Distributives" D:\Distributives W:\Distributives \\Srv0.office0.mobilmir\Distributives
-
-CALL "%Distributives%\%relpath%"
-ECHO BleachBit finished
-rem BleachBit, бывает работает, через планировщик. В этом случае explorer.exe закрывается у пользователя! TASKKILL /F /IM explorer.exe
-ENDLOCAL
+    SET "relpath=PreInstalled\manual\BleachBit-Portable-RUN.cmd"
+    
+    IF NOT "%~1"=="" CALL :ProcessArgs %* || EXIT /B
+    
+    IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || EXIT /B
+    IF NOT DEFINED Distributives CALL "%~dp0..\FindSoftwareSource.cmd"
+)
+(
+    IF NOT EXIST "%SoftSourceDir%\%relpath%" EXIT /B
+    CALL "%SoftSourceDir%\%relpath%" %BleachBitArgs%
+    ECHO BleachBit finished
+    rem BleachBit, бывает работает, через планировщик. В этом случае explorer.exe закрывается у пользователя! TASKKILL /F /IM explorer.exe
+    ENDLOCAL
 EXIT /B
-
 rem CALL "\\Srv0.office0.mobilmir\profiles$\Share\Programs\BleachBit-Portable\_run_from_localtemp.cmd" -c --no-uac --preset
-
-:FindBleachBit
-  IF EXIST "%~2\%relpath%" (
-    SET "%~1=%~2"
-    EXIT /B 0
-  )
-
-  SHIFT /2
-IF NOT "%~2"=="" GOTO :FindBleachBit
-EXIT /B 1
+)
+:ProcessArgs
+@(
+    IF /I "%~1"=="/ProfileOnSystemDrive" (
+	CALL :SameDrive "%SystemDrive%" "%USERPROFILE%" || EXIT /B
+    ) ELSE SET "BleachBitArgs=%BleachBitArgs% %1"
+    
+    IF "%~2"=="" EXIT /B 0
+    SHIFT
+    GOTO :ProcessArgs
+)
+:SameDrive <path1> <path2>
+@(
+    IF /I "%~d1"=="%~d2" EXIT /B 0
+    EXIT /B 1
+)

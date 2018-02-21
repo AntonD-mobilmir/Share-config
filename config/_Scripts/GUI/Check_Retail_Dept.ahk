@@ -18,22 +18,22 @@ arg1=%1%
 ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
 
 reqdConfigName		:= "Apps_dept.7z"
-ServerPath		:= "\\Srv0.office0.mobilmir"
-ServerDistPath		:= ServerPath . "\Distributives"
-configDirSrv0		:= "\\Srv0.office0.mobilmir\profiles$\Share\config"
-pathSrvConfigUpdater	:= configDirSrv0 "\update local config.cmd"
+officeDistSrvNetName	:= "\\Srv0.office0.mobilmir"
+officeDistSrvPath	:= officeDistSrvNetName . "\Distributives"
+dirConfigDistSrv	:= "\\Srv0.office0.mobilmir\profiles$\Share\config"
+pathSrvConfigUpdater	:= dirConfigDistSrv "\update local config.cmd"
 maxAgeSavedInvReport	:= 1
 ;tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
 scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
-serverScriptPath	:= configDirSrv0 "\_Scripts\GUI\" . A_ScriptName
+serverScriptPath	:= dirConfigDistSrv "\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting(A_ScriptDir "\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 
 regsvr32exe		:= FirstExisting(SystemRoot "\SysWOW64\regsvr32.exe", SystemRoot "\System32\regsvr32.exe")
 If (!regsvr32exe)
     regsvr32exe		:= "regsvr32.exe"
 
-FileReadLine AhkDistVer, %ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
+FileReadLine AhkDistVer, %officeDistSrvPath%\Soft\Keyboard Tools\AutoHotkey\ver.txt, 1
 If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc))
     AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
 Else
@@ -401,14 +401,12 @@ Distributives := EnvGetAfterScript(gsussScript, "Distributives")
 SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
 If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
     AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
-    Distributives := ServerDistPath
-    usingServerDist := 1
+    Distributives := officeDistSrvPath
+    usingOfficeSrv := 1
 }
-If (usingServerDist && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
+If (usingOfficeSrv && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
     lDistributives := "D:\Distributives"
-    AddLog("Запуск rSync_DistributivesFromSrv0.cmd PreInstalled")
-    Run %comspec% /C ""%DefaultConfigDir%\_Scripts\rSync_DistributivesFromSrv0.cmd" "%lDistributives%\Soft\PreInstalled"", %lDistributives%, Min UseErrorLevel, pidRsyncPreinstalled
-    SetLastRowStatus(ErrorLevel, !ErrorLevel)
+    rsyncPreinstalled := RunRSync(lDistributives "\Soft\PreInstalled", 0)
 } Else
     lDistributives := Distributives
 
@@ -419,7 +417,7 @@ ver7z_ := StrSplit(ver7z, ".")
 If (ver7z_[1] < 15) {
     SetLastRowStatus(ver7z, 0)
     AddLog("Требуется 7-Zip версии ≥15. Запуск обновления с Srv0.office0.mobilmir.")
-    RunWait %comspec% /C "%ServerDistPath%\Soft\Archivers Packers\7Zip\install.cmd",,Min UseErrorLevel
+    RunWait %comspec% /C "%officeDistSrvPath%\Soft\Archivers Packers\7Zip\install.cmd",,Min UseErrorLevel
     If (ErrorLevel) {
 	MsgBox Ошибка "%ErrorLevel%" при обновлении 7-Zip. Автоматическое продолжение невозможно.
 	ExitApp
@@ -470,7 +468,7 @@ Loop Files, %A_ScriptDir%\..\..\..\software_update\scripts\_TeamViewerSecurityPa
 }
 
 ;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
-;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, ServerDistPath . tv5settingsSubPath)
+;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, officeDistSrvPath . tv5settingsSubPath)
 ;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
 ;SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
 
@@ -558,7 +556,7 @@ If (IsObject(softUpdScripts)) {
 }
 If (IsObject(softUpdScripts)) { ; если обновлять скрипты software_update не надо, объект будет удален в блоке выше
     If (!IsObject(distSoftUpdScripts))
-	distSoftUpdScripts := CheckPath(configDirSrv0 "\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
+	distSoftUpdScripts := CheckPath(dirConfigDistSrv "\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
     If (IsObject(distSoftUpdScripts)) {
 	distSoftUpdScripts.path := DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z"
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
@@ -567,14 +565,9 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
     }
 }
 
-If (pidRsyncPreinstalled) {
+If (IsObject(rsyncPreinstalled)) { ; pidRsyncPreinstalled
     AddLog("Ожидание завершения rsync PreInstalled")
-    Loop
-    {
-	Sleep 1000
-	Process Exist, %pidRsyncPreinstalled%
-    } Until !ErrorLevel
-    SetLastRowStatus()
+    RunRSync(rsyncPreinstalled)
 }
 If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) ; Если IsObject(softUpdScripts), SysUtils уже были обновлены выше
     RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
@@ -682,34 +675,30 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
 finished := 1
 
 If (runAhkUpdate && A_IsAdmin) {
-    AddLog("Обновление AutoHotkey с Srv0.office0.mobilmir.")
-    If (aclSetupLine) {
-	Loop
-	{
-	    Process Exist, %aclSetupPID%
-	    If (!ErrorLevel) {
-		SetRowStatus(aclSetupLine, "Завершено")
+    subdirDistAutoHotkey := "Soft\Keyboard Tools\AutoHotkey"
+    
+    baseDirsDistAhk := [ "D:\Distributives" ]
+    If (!(SubStr(lDistributives, 1, 2)=="\\"))
+	baseDirsDistAhk.Push(lDistributives)
+    For i, baseDir in baseDirsDistAhk 
+	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
+	    Try {
+		RunRSync(baseDir "\" subdirDistAutoHotkey)
+		RunRSync(baseDir "\Soft\PreInstalled\auto")
+		dirDistAhk := baseDir "\" subdirDistAutoHotkey
 		break
 	    }
-	    If (A_Index=1)
-		SetLastRowStatus("ожидание заверш. настр. ACL")
-	    Sleep 1000
 	}
-	SetLastRowStatus("Запущено")
-    }
-    ;ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-    ;If (ReRunAsAdmin) {
-    ;	Run %comspec% /C "TITLE Ожидание обновления AutoHotkey, перезапуск %A_ScriptName% & (PING 127.0.0.1 -n 30 >NUL) & (ECHO Нажмите любую клавишу в этом окне, когда завершится обнолвление.) & (PAUSE >NUL) & %ScriptRunCommand% /NoAdminRun"
-    ;	Run *RunAs %comspec% /C "CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
-    ;} Else {
-    ;	Run %comspec% /C "PING Srv0.office0.mobilmir -n 5 >NUL & CALL "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd" & CALL "%ServerDistPath%\Soft\PreInstalled\auto\AutoHotkey_Lib.cmd" & %ScriptRunCommand%"
-    ;}
-    Run %comspec% /C "%ServerDistPath%\Soft\Keyboard Tools\AutoHotkey\install.cmd"
+    If (!dirDistAhk)
+	dirDistAhk := officeDistSrvPath "\" subdirDistAutoHotkey
+    AddLog("Обновление AutoHotkey из " AbbreviatePath(dirDistAhk))
+    
+    Run %comspec% /C "%dirDistAhk%\install.cmd",,Min UseErrorLevel
     If (ErrorLevel) {
-	SetLastRowStatus(ErrorLevel, 0)
+	SetLastRowStatus("Ошибка " ErrorLevel, 0)
 	MsgBox Ошибка "%ErrorLevel%" при запуске обновления AutoHotkey. Автоматическое продолжение невозможно.
     } Else {
-	SetLastRowStatus()
+	SetLastRowStatus("Запущено")
     }
     ;ExitApp
 } Else {
@@ -729,8 +718,69 @@ ButtonCancel:
     }
     ExitApp
 
+RunRSync(dir, wait := 1) {
+    global DefaultConfigDir
+    static    runningRsyncs := {}
+	    , rsyncScript := ""
+	    , maxLineLength := 100
+    
+    If (IsObject(dir)) {
+	runningRsync := dir
+	dir := runningRsync.dir
+    } Else {
+	If (!rsyncScript)
+	    If (!FileExist(rsyncScript := "D:\Distributives\rSync_DistributivesFromSrv0.cmd"))
+		rsyncScript := DefaultConfigDir "\_Scripts\rSync_DistributivesFromSrv0.cmd"
+	If (SubStr(dir, 1, 2) == "\\")
+	    Throw Exception("rsync работает только с локальными папками",, dir)
+	
+	If (runningRsyncs.HasKey(dir)) {
+	    runningRsync := runningRsyncs[dir]
+	} Else {
+	    Random rnd, 0, 0xFFFF
+	    rndid := Format("{:.5i}-{:.4x}", A_TickCount, rnd)
+	    row := AddLog("rSync_DistributivesFromSrv0.cmd " AbbreviatePath(dir), rndid)
+	    For i, fname in [ ".sync.excludes", ".sync.includes", ".sync" ]
+		FileDelete %dir%\%fname%
+	    Run %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel, rsyncPID
+	    
+	    runningRsync := {row: row, rndid: rndid, pid: rsyncPID, dir: dir}
+	}
+    
+	runningRsyncs[dir] := runningRsync
+    }
+    If (wait) {
+	If (!rsyncPID)
+	    rsyncPID := runningRsync.pid
+	Loop
+	{
+	    Sleep 300
+	    Process Exist, %rsyncPID%
+	} Until !ErrorLevel
+	runningRsyncs.Delete(dir)
+	
+	If (!row)
+	    row := runningRsync.row
+	logf := FileOpen(logpath := A_ScriptName "." rndid ".rsync.log", "r")
+	logf.Seek(-3) ; 3 bytes from end, Origin is end by default when position is negative
+	flag := logf.Read(3)
+	If (InStr(flag, "!")) {
+	    logf.Seek(-maxLineLength)
+	    lastStatus := logf.Read(maxLineLength)
+	    lastStatus := SubStr(lastStatus, InStr(lastStatus, "`n",, 0) + 1) ; from last `n to end of line
+	    SetRowStatus(row, lastStatus, 0)
+	    logf.Close()
+	    Throw Exception("rsync returned error",, "see " logpath)
+	} Else
+	    SetRowStatus(row)
+	logf.Close()
+    }
+    
+    return runningRsync
+}
+
 RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
-    global ServerDistPath, Distributives, lDistributives
+    global officeDistSrvPath, Distributives, lDistributives
     latestFlagTime:=0
 
     If (!title)
@@ -738,7 +788,7 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
     AddLog(title, "Проверка")
     FindLatest(lDistributives "\" distSubpath,, mtimelocal)
     FindLatest(Distributives "\" distSubpath,, mtimelocal)
-    FindLatest(ServerDistPath "\" distSubpath,, mtimeSrv0)
+    FindLatest(officeDistSrvPath "\" distSubpath,, mtimeSrv0)
     
     If (flagMask)
 	FindLatest(flagMask, optnLoopFlag, latestFlagTime)
@@ -753,8 +803,8 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
 	    SetLastRowStatus("Обновление из " Distributives,0)
 	    RunWait %comspec% /C "%Distributives%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
         } Else {
-	    SetLastRowStatus("Обновление с " ServerDistPath,0)
-	    RunWait %comspec% /C "%ServerDistPath%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
+	    SetLastRowStatus("Обновление с " officeDistSrvPath,0)
+	    RunWait %comspec% /C "%officeDistSrvPath%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
 	}
         SetLastRowStatus(ErrorLevel,!ErrorLevel)
     } Else {
@@ -763,9 +813,9 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
 }
 
 RunFromConfigDir(ByRef subPath, ByRef logLineText:="", ByRef args:="") {
-    global DefaultConfigDir, configDirSrv0
+    global DefaultConfigDir, dirConfigDistSrv
     
-    runSc := LatestExisting(DefaultConfigDir "\" subPath, configDirSrv0 "\" subPath)
+    runSc := LatestExisting(DefaultConfigDir "\" subPath, dirConfigDistSrv "\" subPath)
     return RunScript(runSc.Path, logLineText, args)
 }
 

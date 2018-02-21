@@ -132,29 +132,4 @@ MailCreationScriptNotFound(csPath:="") {
     }
 }
 
-ReadSetVarFromBatchFile(filename, varname) {
-    Loop Read, %filename%
-    {
-	trimmedReadLine:=Trim(A_LoopReadLine)
-	If (SubStr(trimmedReadLine, 1, 4) = "SET ") {
-	    splitter := InStr(trimmedReadLine, "=")
-	    If (splitter && Trim(SubStr(trimmedReadLine, 5, splitter-5), """`t ") = varname) {
-		return Trim(SubStr(trimmedReadLine, splitter+1), """`t ")
-	    }
-	}
-    }
-}
-
-getDefaultConfig() {
-    EnvGet SystemDrive, SystemDrive
-    defaultConfig := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd", "DefaultsSource")
-    If (!defaultConfig)
-	defaultConfig := ReadSetVarFromBatchFile(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd", "DefaultsSource")
-    return defaultConfig
-}
-
-getDefaultConfigDir() {
-    defaultConfig := getDefaultConfig()
-    SplitPath defaultsSource,,OutDir
-    return OutDir
-}
+#include <getDefaultConfig>
