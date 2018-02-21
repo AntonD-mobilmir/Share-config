@@ -3,38 +3,69 @@
 #NoEnv
 FileEncoding UTF-8
 
-FileRead jsoncards, %A_ScriptDir%\..\trello-accounting\board-dump\computer-accounting.json
-cards := JSON.Load(jsoncards)
-jsoncards=
-FileRead jsonlists, %A_ScriptDir%\..\trello-accounting\board-dump\lists.json
-lists := JSON.Load(jsonlists)
-jsonlists=
+cards := JSONLoadFromFile(A_ScriptDir "\..\trello-accounting\board-dump\computer-accounting.json")
 
-listNames := {}
-For i, list in lists
-    listNames[list.id] := list.name
+ColFuncs := [ Func("GetListName"), Func("GetLabels"), Func("GetUrlWithShortId") ]
+Cols := [ 1, "name", 3, "closed", 2 ]
 
-Cols := [ 1, "name", "shortUrl", "idShort" ]
-
-out =
-Loop % Cols.Length()
-    out .= Cols[A_Index] A_Tab
+out := "Список" A_Tab "Название" A_Tab "Ссылка" A_Tab "Заархивирована" A_Tab "Метки"
 
 For i, card in cards {
+    out .= "`n"
     Loop % Cols.Length()
     {
 	tcol := Cols[A_Index]
-	If (tcol == 1)
-	    vcol := listNames[card.idList]
+	If tcol is integer
+	    vcol := ColFuncs[tcol].Call(card)
 	Else
 	    vcol := card[tcol]
 	out .= vcol A_Tab
     }
-    out .= "`n"
 }
 
 fnameout = %A_Temp%\%A_ScriptName%.%A_Now%.tsv
 FileAppend %out%, %fnameout%
-Run %fnameout%
+Try {
+    Run "%fnameout%"
+} Catch e {
+    Run explorer.exe /select`,"%fnameout%"
+}
+
+ExitApp
+
+GetListName(card) {
+    static listNames := ""
+    If (!IsObject(listNames)) {
+	lists := JSONLoadFromFile(A_ScriptDir "\..\trello-accounting\board-dump\lists.json")
+	listNames := {}
+	For i, list in lists
+	    listNames[list.id] := list.name
+    }
+
+    return listNames[card.idList]
+}
+
+GetLabels(card) {
+    out := ""
+    For i, objlabel in card.labels
+	out .= objlabel.name ", "
+    return SubStr(out, 1, -2)
+}
+
+GetUrlWithShortId(card) {
+    return card.shortUrl "/" card.idShort
+}
+
+JSONLoadFromFile(ByRef path) {
+    Try {
+	FileRead fjson, %path%
+	
+	o := JSON.Load(fjson)
+	If (!IsObject(o))
+	    Throw Exception("Cannot read file as json",, path)
+	return o
+    } Catch e
+	Throw e
+}
 
 #include <JSON>
