@@ -47,7 +47,7 @@ Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log*.errflag
 If (foundErrFlags)
     foundErrFlags := "Флаги ошибок: " SubStr(foundErrFlags, 1, -2) "."
 unsentCounts:={}
-For mask, name in {"OutgoingText\*.txt": "уведомления", "OutgoingFiles\*.*": "выгрузки"}
+For mask, name in {"OutgoingText\*.txt": "уведомления", "OutgoingFiles\*.7z": "выгрузки"}
     Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\%mask%
     {
 	age=
