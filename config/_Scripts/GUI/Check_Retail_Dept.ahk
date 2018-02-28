@@ -38,6 +38,7 @@ If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc))
     AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
 Else
     AhkDistVer		:= "1.1.28.00"
+runAhkUpdate := A_AhkVersion < AhkDistVer
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
@@ -50,6 +51,8 @@ Gui Show
 OSVersionObj := RtlGetVersion()
 AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
+
+AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист. " AhkDistVer ")"), !runAhkUpdate)
 
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
@@ -66,12 +69,10 @@ If (A_IsAdmin) {
 ;    } Else {
 ;	SetLastRowStatus("Скрипт есть", 1)
 ;    }
+    If (runAhkUpdate)
+	RunRsyncAutohotkey(0)
 }
 
-runAhkUpdate := A_AhkVersion < AhkDistVer
-AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист. " AhkDistVer ")"), !runAhkUpdate)
-If (runAhkUpdate)
-    RunRsyncAutohotkey(0)
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
 global DefaultConfigDir := chkDefConfigDir.path
@@ -408,7 +409,7 @@ If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
 }
 If (usingOfficeSrv && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
     lDistributives := "D:\Distributives"
-    rsyncPreinstalled := RunRSync(lDistributives "\Soft\PreInstalled", 0)
+    rsyncPreinstalled := RunRSyncWithAddLog(lDistributives "\Soft\PreInstalled", 0)
 } Else
     lDistributives := Distributives
 
@@ -569,7 +570,7 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 
 If (IsObject(rsyncPreinstalled)) { ; pidRsyncPreinstalled
     AddLog("Ожидание завершения rsync PreInstalled")
-    RunRSync(rsyncPreinstalled)
+    RunRSyncWithAddLog(rsyncPreinstalled)
 }
 If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) ; Если IsObject(softUpdScripts), SysUtils уже были обновлены выше
     RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
@@ -676,32 +677,6 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
 
 finished := 1
 
-RunRsyncAutohotkey(wait := 1) {
-    static subdirDistAutoHotkey := "Soft\Keyboard Tools\AutoHotkey"
-	    , dirDistAhk := ""
-    
-    If (dirDistAhk) {
-	baseDirsDistAhk := [ dirDistAhk ]
-	dirDistAhk := ""
-    } Else {
-	baseDirsDistAhk := [ "D:\Distributives" ]
-	If (!(SubStr(lDistributives, 1, 2)=="\\"))
-	    baseDirsDistAhk.Push(lDistributives)
-    }
-    
-    For i, baseDir in baseDirsDistAhk 
-	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
-	    Try {
-		RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
-		RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
-		dirDistAhk := baseDir "\" subdirDistAutoHotkey
-		break
-	    }
-	}
-    
-    return dirDistAhk
-}
-
 If (runAhkUpdate && A_IsAdmin) {
     If (!(dirDistAhk := RunRsyncAutohotkey()))
 	dirDistAhk := officeDistSrvPath "\" subdirDistAutoHotkey
@@ -732,6 +707,44 @@ ButtonCancel:
     }
     ExitApp
 
+RunRsyncAutohotkey(wait := 1) {
+    static subdirDistAutoHotkey := "Soft\Keyboard Tools\AutoHotkey"
+	 , baseDirsDistAhk := ""
+    
+    If (!baseDirsDistAhk) {
+	baseDirsDistAhk := [ "D:\Distributives" ]
+	If (!(SubStr(lDistributives, 1, 2)=="\\"))
+	    baseDirsDistAhk.Push(lDistributives)
+    }
+    
+    AddLog("rsync AutoHotkey, PreInstalled" (wait ? "" : " в фоне"))
+    For i, baseDir in baseDirsDistAhk {
+	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
+	    Try {
+		RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
+		RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
+		dirDistAhk := baseDir "\" subdirDistAutoHotkey, baseDirsDistAhk := [ baseDir ], rsyncErr := ""
+		break
+	    } Catch e
+		rsyncErr := e
+	}
+    }
+    If (rsyncErr)
+	SetLastRowStatus(ObjectToText(e), 0)
+    Else
+	SetLastRowStatus()
+    return dirDistAhk
+}
+
+RunRSyncWithAddLog(dir, wait := 1) {
+    row := AddLog("rSync """ AbbreviatePath(dir) """" (wait ? "" : " в фоне"))
+    Try {
+	RunRSync(dir, wait)
+	SetLastRowStatus()
+    } Catch e
+	SetLastRowStatus(ObjectToText(e), 0)
+}
+
 RunRSync(dir, wait := 1) {
     global DefaultConfigDir
     static    runningRsyncs := {}
@@ -753,12 +766,11 @@ RunRSync(dir, wait := 1) {
 	} Else {
 	    Random rnd, 0, 0xFFFF
 	    rndid := Format("{:.5i}-{:.4x}", A_TickCount, rnd)
-	    row := AddLog("rSync_DistributivesFromSrv0.cmd " AbbreviatePath(dir), rndid)
 	    For i, fname in [ ".sync.excludes", ".sync.includes", ".sync" ]
-		FileDelete %dir%\%fname%
-	    Run %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel, rsyncPID
+		Try FileDelete %dir%\%fname%
+	    Run %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel, rsyncPID
 	    
-	    runningRsync := {row: row, rndid: rndid, pid: rsyncPID, dir: dir}
+	    runningRsync := {rndid: rndid, pid: rsyncPID, dir: dir}
 	}
     
 	runningRsyncs[dir] := runningRsync
@@ -771,24 +783,27 @@ RunRSync(dir, wait := 1) {
 	    Sleep 300
 	    Process Exist, %rsyncPID%
 	} Until !ErrorLevel
+	If (!runningRsync)
+	    runningRsync := runningRsyncs[dir]
 	runningRsyncs.Delete(dir)
 	
-	If (!row)
-	    row := runningRsync.row
-	logf := FileOpen(logpath := A_ScriptName "." rndid ".rsync.log", "r")
-	logf.Seek(-3) ; 3 bytes from end, Origin is end by default when position is negative
-	flag := logf.Read(3)
+	If (!rndid)
+	    rndid := runningRsync.rndid
+	logf := FileOpen(logpath := A_Temp "\" A_ScriptName "." rndid ".rsync.log", "r")
+	logf.Seek(-10) ; 3 bytes from end, Origin is end by default when position is negative
+	flag := logf.Read(10)
 	If (InStr(flag, "!")) {
 	    logf.Seek(-maxLineLength)
 	    lastStatus := logf.Read(maxLineLength)
 	    lastStatus := SubStr(lastStatus, InStr(lastStatus, "`n",, 0) + 1) ; from last `n to end of line
-	    SetRowStatus(row, lastStatus, 0)
 	    logf.Close()
-	    Throw Exception("rsync returned error",, "see " logpath)
-	} Else
-	    SetRowStatus(row)
+	    Throw Exception("rsync returned error",, "(last line) " lastStatus ", for more see " logpath)
+	}
 	logf.Close()
     }
+    
+    If (lastStatus)
+	runningRsync.lastStatus := lastStatus
     
     return runningRsync
 }
@@ -1090,4 +1105,5 @@ Expand(string) {
 #include %A_LineFile%\..\..\..\_Scripts\Lib\getDefaultConfig.ahk
 #include %A_LineFile%\..\..\..\_Scripts\Lib\find7zexe.ahk
 #include %A_LineFile%\..\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
+#include %A_LineFile%\..\..\..\_Scripts\Lib\ObjectToText.ahk
 ;#include %A_LineFile%\..\..\..\_Scripts\Lib\find_exe.ahk
