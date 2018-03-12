@@ -57,6 +57,8 @@ AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист.
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
     Run %SystemRoot%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
+    If (runAhkUpdate)
+	RunRsyncAutohotkey(0)
 } Else {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     
@@ -69,8 +71,6 @@ If (A_IsAdmin) {
 ;    } Else {
 ;	SetLastRowStatus("Скрипт есть", 1)
 ;    }
-    If (runAhkUpdate)
-	RunRsyncAutohotkey(0)
 }
 
 

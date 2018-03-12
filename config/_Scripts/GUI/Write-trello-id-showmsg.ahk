@@ -36,7 +36,7 @@ Loop Read, %pathTrelloID%
 	cardText .= A_LoopReadLine "`n"
 } Until A_Index >= 4
 
-Progress zh0 M, %cardText%`n`n[F1] – открыть %cardURL%`n[F2] – открыть trello-id.txt`nПодвинуть мышку после секундной паузы – скрыть окно, %cardTitle%, %cardHostname%
+Progress zh0 M, %cardText%`n`n[F1] Открыть %cardURL%`n[F2] Открыть trello-id.txt`nЧтобы закрыть окно`, подвиньте мышку после секундной паузы, %cardTitle%, %cardHostname%
 lastHotkeyTime := A_TickCount
 Loop
     Sleep 250
