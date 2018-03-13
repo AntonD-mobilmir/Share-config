@@ -3,13 +3,11 @@
 Menu Tray, Icon, shell32.dll,25,0
 Menu Tray, Tip, Запуск 1С-Рарус
 
-global	run1sexe:="1cv7s.exe"
-      , ExcessArcTimeLim:=5*60 ; s
-      , WaitArchivingStartTimeout := A_TickCount + 5*60*1000 ; ms
-      , lProgramFiles
-      , run1sDir
-      , params := ParseCommandLine()
-      , rarusWinTitle := "1С:Предприятие"
+rarusWinTitle := "1С:Предприятие"
+, run1sexe:="1cv7s.exe"
+, ArchivingStartWait := 60 ; s
+, ArchivingStartDeadline := A_TickCount + ArchivingStartWait*1000 ; ms
+, ExcessArcTimeLim := 5*60 ; s
 
 DailyArchiveFName = ShopBTS_%A_Year%-%A_MM%-%A_DD%.7z
 MonthlyArchiveFName = ShopBTS_%A_Year%-%A_MM%.7z
@@ -59,18 +57,19 @@ Loop Files, %rarusbackupflag%
     }
 }
 
-If (A_TickCount < WaitArchivingStartTimeout                    			; soon after script start
+If (A_TickCount < ArchivingStartDeadline                    			; soon after script start
 	&& !(  FileExist(rarusbackupflag)  		    			; and no: flag
 	    || FileExist(backupsDir . "\" . zpaqFName)  		    	; 	or zpaq archive
 	    || FileExist(backupsDir . "\" . DailyArchiveFName) 			; 	or daily backup
 	    || FileCreatedAfterBoot(backupsDir . "\" . DailyArchiveFName . ".tmp")	; 	or daily backup temp exist
 	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName . ".tmp")	; 	or temporary file of monthly archive exist
 	    || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) ) { 	;	or monthly backup created after last boot (e.g. just now) - because if it's created before last boot, we should wait daily archive instead
-    ResetProgress(WaitArchivingStartTimeout, A_TickCount)
+    ResetProgress(ArchivingStartDeadline, tickcnt_waitstart := A_TickCount)
+    HumanReadableArchivingStartWait := SecondsToDHMS(ArchivingStartWait)
     Loop {
-	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, A_TickCount//1000 . " / " . WaitArchivingStartTimeout//1000)
+	Notify("Архивация должна запускаться каждый день при первом включении компьютера, но ещё не запустилась.", A_TickCount, SecondsToDHMS((A_TickCount-tickcnt_waitstart)//1000) " / " HumanReadableArchivingStartWait)
 	Sleep 100
-    } Until (A_TickCount > WaitArchivingStartTimeout || FileExist(rarusbackupflag))
+    } Until (A_TickCount > ArchivingStartDeadline || FileExist(rarusbackupflag))
     Sleep 1000
 }
 
@@ -93,7 +92,7 @@ If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
     ; ToDo: рассчитать время создания архива по значениям в %rarusbackuplogfile%
     If (!FileExist(backupsDir . "\" . zpaqFName)) { ; но нет архива за текущий год
 	avgArchivingTime := 600
-	If (!WaitFile(rarusbackupflag, backupsDir . "\" . zpaqFName, WaitArchivingStartTimeout))
+	If (!WaitFile(rarusbackupflag, backupsDir . "\" . zpaqFName, ArchivingStartDeadline))
 	    BackupAppearanceTimeout("Вышло время ожидания появления архива zpaq (" avgArchivingTime " с)")
     } Else {
 	avgArchivingTime := 300
@@ -103,13 +102,13 @@ If (FileExist(backupsDir . "\*.zpaq")) { ; есть архивы zpaq
 	 || FileCreatedAfterBoot(backupsDir . "\" . MonthlyArchiveFName) ) { ;или ежемесяный архив уже существует и создан после загрузки (ежедневного архива не будет до следующей перезагрузки)
     ; то ожидание ежемесячного архива
     ; Ежемесячный архив может создаваться долго: 1-2 минуты перед появлением файла, и ещё 2-3 до создания архива. При этом r:\rarus-backup-start.log будет пустой с актуальной датой.
-    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . MonthlyArchiveFName, backupsDir . "\" . MonthlyArchiveFName . ".tmp"], WaitArchivingStartTimeout) ) {
+    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . MonthlyArchiveFName, backupsDir . "\" . MonthlyArchiveFName . ".tmp"], ArchivingStartDeadline) ) {
 	avgArchivingTime := CalcAvgWritingTime(backupsDir . "\ShopBTS_????-??.7z")
     } Else {
 	BackupAppearanceTimeout("Вышло время ожидания ежемесячного архива (" avgArchivingTime " с)")
     }
 } Else { ; ежесмесячный архив есть. Если архивация работает, будет создан ежедневный
-    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . DailyArchiveFName, backupsDir . "\" . DailyArchiveFName . ".tmp"], WaitArchivingStartTimeout) ) {
+    If ( WaitFile(rarusbackupflag, [backupsDir . "\" . DailyArchiveFName, backupsDir . "\" . DailyArchiveFName . ".tmp"], ArchivingStartDeadline) ) {
 	If (A_MM==1) {
 	    prevMonth := A_Year-1 . "-12"
 	} Else {
@@ -184,7 +183,8 @@ BackupAppearanceTimeout(t:="") {
 }
 
 Run1S() {
-    global run1sexe, params, run1sDir
+    global run1sexe, run1sDir
+    params := ParseCommandLine()
     ResetProgress()
     Run %run1sexe% ENTERPRISE %params%, %run1sDir%, UseErrorLevel, PID1S
     If ErrorLevel
@@ -340,9 +340,26 @@ ReadSetVarFromBatchFile(filename, varname) {
 ReloadScript() {
     CommandLine := DllCall( "GetCommandLine", "Str" )
     RunWait %CommandLine%
+    Sleep 1000
     ListLines
     MsgBox 0x10, Ошибка при перезапуске скрипта запуска 1С, При перезапуске скрипта запуска 1С старая копия должна автоматически выгружаться из памяти. Но это сообщение выводится из старой копии. Сообщите в службу ИТ!
     Pause
+}
+
+SecondsToDHMS(s) {
+    static dividers := [60*60*24, 60*60, 60, 1]
+	 , units := ["дн.", "ч.", "мин.", "с"]
+    
+    out=
+    Loop % units.Length() {
+	div := dividers[A_Index]
+	If (s > div) {
+	    amount := s//div
+	    out .= amount " " units[A_Index] " "
+	    s -= div*amount
+	}
+    }
+    return SubStr(out, 1, -1)
 }
 
 ParseCommandLine() {
