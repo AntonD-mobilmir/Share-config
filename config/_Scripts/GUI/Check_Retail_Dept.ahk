@@ -722,7 +722,7 @@ RunRsyncAutohotkey(wait := 1) {
 	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
 	    Try {
 		RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
-		RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
+		RunRSync(baseDir "\Soft\PreInstalled", wait)
 		dirDistAhk := baseDir "\" subdirDistAutoHotkey, baseDirsDistAhk := [ baseDir ], rsyncErr := ""
 		break
 	    } Catch e
