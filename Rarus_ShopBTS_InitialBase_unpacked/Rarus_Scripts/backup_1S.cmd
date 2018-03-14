@@ -42,7 +42,7 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 	MKDIR "%remoteDestDir%"
 	ECHO Y|XCOPY "%destdir%" "%remoteDestDir%" /M /E /I /G /H /Y /F
 	MOVE /Y "%remoteDestDir%-cleanup.log" "%remoteDestDir%-cleanup.log.bak"
-	START "" LOW %ahkexe% /ErrorStdOut "%~dp0backup_1S_RemoveOld.ahk" "%remoteDestDir%" >"%remoteDestDir%-cleanup.log" 2>&1
+	START "" /LOW %ahkexe% /ErrorStdOut "%~dp0backup_1S_RemoveOld.ahk" "%remoteDestDir%" >"%remoteDestDir%-cleanup.log" 2>&1
     )
     FOR %%A IN ("%rarusbackuplogfile%" "%destDir%-cleanup.log") DO IF %%~zA GTR 1048576 MOVE /Y "%%~A" "%%~A.bak"
     EXIT /B
