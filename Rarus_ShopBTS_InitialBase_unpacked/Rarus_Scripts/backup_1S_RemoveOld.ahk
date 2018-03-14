@@ -3,12 +3,11 @@
 #NoEnv
 
 global destdir
-destDir=%1%
-If (!destDir)
-    EnvGet destdir, destdir
 
 Try {
-
+    destDir=%1%
+    If (!destDir)
+	EnvGet destdir, destdir
     If !destdir
 	throw ("%destdir% not defined!")
 
@@ -16,30 +15,33 @@ Try {
     SplitPath destdir,,,,,destdrive
 
     FileDelete %destdir%\*.tmp
-    Loop %destdir%\*
-    {
-	If (MaxSize < A_LoopFileSizeMB)
-	    MaxSize:=A_LoopFileSizeMB
-	backupArchivesList .= A_LoopFileTimeModified . A_Tab . A_LoopFileName "`n"
+    For i, ext in ["7z", "zpaq"] {
+	maxSize%ext% := 0
+	Loop Files, %destdir%\*.7z
+	{
+	    If (maxSize%ext% < A_LoopFileSizeMB)
+		maxSize%ext% := A_LoopFileSizeMB
+	    backupArchivesList .= A_LoopFileTimeModified . A_Tab . A_LoopFileName "`n"
+	}
     }
     
-    If !MaxSize
+    If (!maxSize7z && !maxSizezpaq)
 	Throw ("In destdir, no files with size > 0")
 
     Sort backupArchivesList, C
 
-    Loop 100
-    {
-	DriveSpaceFree BackupsFreeSpace, %destdrive%\
-	; if free space is less than 100M or 10x MaxSize, remove, until free space is at least 20x
-	If ( BackupsFreeSpace < 100 || BackupsFreeSpace < (MaxSize * 10) )
+    DriveGet BackupsDriveSize, Capacity, %destdrive%\
+    freespaceMin := Max(100, BackupsDriveSize // 10, maxSize7z * 30, maxSizezpaq*2)
+    DriveSpaceFree freespaceAvail, %dedstdrive%\
+    ; if free space is less than 100M, 10% of drive size or 30x maxSize7z or 2x maxSizezpaq, remove, until free space is at least 2x of that value
+    If (freespaceAvail < freespaceMin) {
+	freespaceMin *= 2
+	Loop 100
 	{
-	    ; MsgBox % BackupsFreeSpace ", " BackupsFreeSpace " / " MaxSize " = " BackupsFreeSpace / MaxSize
 	    ; If there's no more differential backups to delete (considering bottom age limit), remove any other backups, starting from oldest
-	    DeleteOldestBackup(backupArchivesList, "ShopBTS_[0-9]{4}-[0-9]{2}-[0-9]{2}\.7z") || DeleteOldestBackup(backupArchivesList) || Throw "Found no files to delete"
-	    continue
-	}
-	break
+	    DeleteOldestBackup(backupArchivesList, "^ShopBTS_\d{4}-\d{2}-\d{2}\.7z$") || DeleteOldestBackup(backupArchivesList, "^ShopBTS_.*\.7z$") || DeleteOldestBackup(backupArchivesList) || Throw "Found no files to delete"
+	    DriveSpaceFree freespaceAvail, %dedstdrive%\
+	} Until freespaceAvail >= freespaceMin
     }
 } catch e {
     FileAppend % "[" . e . "] " . e.File . " (" . e.Line . "): " . e.What . " " . e.Message . " (" . e.Extra . ")" , *
@@ -62,7 +64,7 @@ DeleteOldestBackup(ByRef backupArchivesList, RegExpMask="", ageLimit=60) {
 	    ;quit probably infinite cycle, if file can't be deleted
 	    If (ErrorLevel) ; ErrorLevel is set to the number of files that failed to be deleted (if any) or 0 otherwise
 		throw ("Error deleting """ destdir "\" nameFile """" )
-	    FileAppend Removed %nameFile% matched regex %RegExpMask%`, date %dateFile%`n, *
+	    FileAppend Removed %nameFile% (regex %RegExpMask%`, date %dateFile%)`n, *
 	    return 1
 	}
     }
