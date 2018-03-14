@@ -1,0 +1,11 @@
+﻿[Фитнес клуб]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="School";
+ID=5f3b0e05-3dcd-42df-8115-12a2a1e97400
+OrderInList=22449
+Folder=/
+OrderInTree=164096
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3

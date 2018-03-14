@@ -1,0 +1,22 @@
+﻿[Бухгалтерия ИП]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="AccountingIP";
+ID=d950a54c-3716-4d8a-bc5a-515d81f7f9c1
+OrderInList=393472
+Folder=/
+OrderInTree=18432
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.2
+[Бухгалтерия ООО]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="AccountingOpt";
+ID=bafb9740-8e07-4b13-99f7-1b7da0826841
+OrderInList=672000
+Folder=/
+OrderInTree=65536
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.2

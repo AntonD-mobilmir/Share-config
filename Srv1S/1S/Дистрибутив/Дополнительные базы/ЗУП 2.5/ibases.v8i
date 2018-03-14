@@ -1,0 +1,11 @@
+﻿[Зарплата и управление персоналом 2.5]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRMNew";
+ID=6398d8ca-24be-417e-9662-8469fa42ad79
+OrderInList=114944
+Folder=/
+OrderInTree=20480
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.2

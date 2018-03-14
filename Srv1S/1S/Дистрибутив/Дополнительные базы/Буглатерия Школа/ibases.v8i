@@ -1,0 +1,11 @@
+﻿[Бухгалтерия предприятия Школа]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="AccountingSchool";
+ID=f96e96a4-1a32-4452-bc18-161ebcbc05c6
+OrderInList=33088
+Folder=/
+OrderInTree=180480
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3

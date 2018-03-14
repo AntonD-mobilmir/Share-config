@@ -1,0 +1,11 @@
+﻿[Зарплата и Управление Персоналом Школа]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRMSchool";
+ID=424c54cf-6da3-4cf8-b612-028a5e016798
+OrderInList=28515.55555555556
+Folder=/
+OrderInTree=147712
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3

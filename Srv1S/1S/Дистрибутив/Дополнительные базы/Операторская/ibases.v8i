@@ -1,0 +1,13 @@
+﻿[Управление торговлей Операторы 2015]
+Connect=Srvr="Srv1S.office0.mobilmir:1541";Ref="Operator2015";
+ID=
+OrderInList=1
+Folder=/
+OrderInTree=16384
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.2
+DefaultApp=ThickClient
+DefaultVersion=8.2.13.219
