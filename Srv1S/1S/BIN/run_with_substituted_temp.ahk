@@ -338,16 +338,17 @@ SetupLocalPlatformCachePermissions() {
 }
 
 SetupTemp() {
+    titleTrayTip := "Временная папка не настроена"
     If (temp := CheckSetTemp(origTemp)) {
 	Try {
 	    RunSetACL("-on ""%temp%"" -ot file -actn ace -ace ""n:S-1-1-0;s:y;p:change;i:so,sc;m:set;w:dacl""")
 	    return temp ;success
 	} Catch e {
-	    TrayTip Временная папка для не настроена, Не удалось настроить параметры доступа к временной папке.`nСообщите системным администраторам!,,2
+	    TrayTip %titleTrayTip%, При попытке запуска SetACL возникли ошибки. Не удалось настроить параметры доступа к временной папке.`nСообщите системным администраторам!,,2
 	    return 0
 	}
     } Else {
-	TrayTip Временная папка для не настроена, Не удалось создать временную папку для 1С.`nСообщите системным администраторам!,,2
+	TrayTip %titleTrayTip%, Не удалось создать временную папку для 1С.`nСообщите системным администраторам!,,2
 	return 0 ;failure
     }
 }
