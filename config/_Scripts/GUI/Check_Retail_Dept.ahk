@@ -28,6 +28,7 @@ scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\coll
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= dirConfigDistSrv "\_Scripts\GUI\" . A_ScriptName
 ShopBTS_InitialBaseDir	:= FirstExisting(A_ScriptDir "\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
+subdirDistAutoHotkey	:= "Soft\Keyboard Tools\AutoHotkey"
 
 regsvr32exe		:= FirstExisting(SystemRoot "\SysWOW64\regsvr32.exe", SystemRoot "\System32\regsvr32.exe")
 If (!regsvr32exe)
@@ -677,21 +678,13 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
 
 finished := 1
 
+If (A_IsAdmin)
+    RunScriptFromNewestDistDir("Soft com freeware\MultiMedia\Plugins Frameworks Components\Adobe Flash\uninstaller\*.exe"
+			     , "Soft com freeware\MultiMedia\Plugins Frameworks Components\Adobe Flash\uninstaller\uninstall_flash_player.cmd"
+			     , "Удаление Flash Player")
 If (runAhkUpdate && A_IsAdmin) {
-    If (!(dirDistAhk := RunRsyncAutohotkey()))
-	dirDistAhk := officeDistSrvPath "\" subdirDistAutoHotkey
-    AddLog("Обновление AutoHotkey из " AbbreviatePath(dirDistAhk))
-    
-    Run %comspec% /C "%dirDistAhk%\install.cmd",,Min UseErrorLevel
-    If (ErrorLevel) {
-	SetLastRowStatus("Ошибка " ErrorLevel, 0)
-	MsgBox Ошибка "%ErrorLevel%" при запуске обновления AutoHotkey. Автоматическое продолжение невозможно.
-    } Else {
-	SetLastRowStatus("Запущено")
-    }
-    ;ExitApp
-} Else {
-    SetLastRowStatus()
+    RunRsyncAutohotkey()
+    RunScriptFromNewestDistDir(subdirDistAutoHotkey "\*.exe", subdirDistAutoHotkey "\install.cmd", "Обновление Autohotkey")
 }
 AddLog("Готово", A_Now, 1)
 Sleep 300000
@@ -708,8 +701,8 @@ ButtonCancel:
     ExitApp
 
 RunRsyncAutohotkey(wait := 1) {
-    static subdirDistAutoHotkey := "Soft\Keyboard Tools\AutoHotkey"
-	 , baseDirsDistAhk := ""
+    global subdirDistAutoHotkey
+    static baseDirsDistAhk := ""
     
     If (!baseDirsDistAhk) {
 	baseDirsDistAhk := [ "D:\Distributives" ]
@@ -722,8 +715,9 @@ RunRsyncAutohotkey(wait := 1) {
 	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
 	    Try {
 		RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
-		RunRSync(baseDir "\Soft\PreInstalled", wait)
-		dirDistAhk := baseDir "\" subdirDistAutoHotkey, baseDirsDistAhk := [ baseDir ], rsyncErr := ""
+		RunRSync(baseDir "\Soft\PreInstalled\utils", wait)
+		RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
+		baseDirsDistAhk := [ baseDir ], rsyncErr := ""
 		break
 	    } Catch e
 		rsyncErr := e
@@ -733,7 +727,6 @@ RunRsyncAutohotkey(wait := 1) {
 	SetLastRowStatus(ObjectToText(e), 0)
     Else
 	SetLastRowStatus()
-    return dirDistAhk
 }
 
 RunRSyncWithAddLog(dir, wait := 1) {
@@ -810,35 +803,51 @@ RunRSync(dir, wait := 1) {
 
 RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
     global officeDistSrvPath, Distributives, lDistributives
+    static distDirs := ""
     latestFlagTime:=0
-
+    , chkMTimes    := []
+    , latestTime   := 0
+    
+    If (!IsObject(distDirs)) {
+	prevDir := ""
+	For i, dir in [lDistributives, Distributives, officeDistSrvPath] {
+	    If (dir && !(dir==prevDir) && InStr(FileExist(dir), "D")) {
+		distDirs.Push(dir)
+		prevDir := dir
+	    }
+	}
+    }
+    
     If (!title)
 	title := AbbreviatePath(flagMask ? flagMask : distSubpath)
     AddLog(title, "Проверка")
-    FindLatest(lDistributives "\" distSubpath,, mtimelocal)
-    FindLatest(Distributives "\" distSubpath,, mtimelocal)
-    FindLatest(officeDistSrvPath "\" distSubpath,, mtimeSrv0)
-    
-    If (flagMask)
-	FindLatest(flagMask, optnLoopFlag, latestFlagTime)
-    
-    If (latestFlagTime) {
-	timeDiff := mtimeSrv0
-	timeDiff -= latestFlagTime, Minutes
-    }
-    
-    If (!latestFlagTime || timeDiff > 5) { ; если архив на Srv0 новее всех файлов по маске больше, чем на 5 минут, – обновлять
-        If (mtimelocal==mtimeSrv0) {
-	    SetLastRowStatus("Обновление из " Distributives,0)
-	    RunWait %comspec% /C "%Distributives%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
-        } Else {
-	    SetLastRowStatus("Обновление с " officeDistSrvPath,0)
-	    RunWait %comspec% /C "%officeDistSrvPath%\%scriptSubpath%",%A_Temp%,Min UseErrorLevel
+    For i, distDir in distDirs
+	If (distDir) {
+	    FindLatest(distDir "\" distSubpath,, mtime := 0), chkMTimes[i] := mtime
+	    If (latestTime < mtime) {
+		latestTime := mtime
+		latestDist := distDir
+	    }
 	}
-        SetLastRowStatus(ErrorLevel,!ErrorLevel)
-    } Else {
-        SetLastRowStatus(TimeFormat(latestFlagTime), 1)
+    SetLastRowStatus(latestTime)
+    If (flagMask) { ; если флаг не старше самого свежего найденного файла в дистрибутивах, запускать скрипт не требуется
+	FindLatest(flagMask, optnLoopFlag, latestFlagTime)
+	If (latestFlagTime) {
+	    timeDiff := latestTime
+	    timeDiff -= latestFlagTime, Minutes
+	}
     }
+    
+    If (!latestFlagTime || timeDiff > 1) { ; если в дистрибутивах есть файл новоее флага больше, чем на 1 минуту, запускать скрипт
+	statusText := AbbreviatePath(latestDist)
+	SetLastRowStatus("Обновление из " AbbreviatePath(latestDist),0)
+	RunWait %comspec% /C "%latestDist%\%scriptSubpath%", %A_Temp%, Min UseErrorLevel
+	If (ErrorLevel)
+	    SetLastRowStatus(ErrorLevel,0)
+	Else
+	    SetLastRowStatus()
+    } Else
+        SetLastRowStatus(TimeFormat(latestFlagTime), 1)
 }
 
 RunFromConfigDir(ByRef subPath, ByRef logLineText:="", ByRef args:="") {
