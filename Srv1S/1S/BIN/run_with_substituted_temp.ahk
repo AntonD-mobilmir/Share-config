@@ -341,7 +341,7 @@ SetupTemp() {
     titleTrayTip := "Временная папка не настроена"
     If (temp := CheckSetTemp(origTemp)) {
 	Try {
-	    RunSetACL("-on ""%temp%"" -ot file -actn ace -ace ""n:S-1-1-0;s:y;p:change;i:so,sc;m:set;w:dacl""")
+	    RunSetACL("-on """ A_Temp """ -ot file -actn ace -ace ""n:" A_UserName ";s:n;p:change;i:so,sc;m:set;w:dacl""")
 	    return temp ;success
 	} Catch e {
 	    TrayTip %titleTrayTip%, При попытке запуска SetACL возникли ошибки. Не удалось настроить параметры доступа к временной папке.`nСообщите системным администраторам!,,2
