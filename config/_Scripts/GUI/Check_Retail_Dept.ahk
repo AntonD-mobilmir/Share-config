@@ -761,28 +761,29 @@ RunRSync(dir, wait := 1) {
 	    rndid := Format("{:.5i}-{:.4x}", A_TickCount, rnd)
 	    For i, fname in [ ".sync.excludes", ".sync.includes", ".sync" ]
 		Try FileDelete %dir%\%fname%
-	    Run %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel, rsyncPID
+	    If (wait)
+		RunWait %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel
+	    Else
+		Run %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel
 	    
-	    runningRsync := {rndid: rndid, pid: rsyncPID, dir: dir}
+	    runningRsync := {rndid: rndid, dir: dir}
 	}
     
 	runningRsyncs[dir] := runningRsync
     }
     If (wait) {
-	If (!rsyncPID)
-	    rsyncPID := runningRsync.pid
+	If (!rndid)
+	    rndid := runningRsync.rndid
+	logpath := A_Temp "\" A_ScriptName "." rndid ".rsync.log"
 	Loop
 	{
 	    Sleep 300
-	    Process Exist, %rsyncPID%
-	} Until !ErrorLevel
+	    Try logf := FileOpen(logpath, "r-")
+	} Until IsObject(logf) || !FileExist(logpath)
 	If (!runningRsync)
 	    runningRsync := runningRsyncs[dir]
 	runningRsyncs.Delete(dir)
 	
-	If (!rndid)
-	    rndid := runningRsync.rndid
-	logf := FileOpen(logpath := A_Temp "\" A_ScriptName "." rndid ".rsync.log", "r")
 	logf.Seek(-10) ; 3 bytes from end, Origin is end by default when position is negative
 	flag := logf.Read(10)
 	If (InStr(flag, "!")) {
