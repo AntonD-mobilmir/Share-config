@@ -49,15 +49,20 @@ IF DEFINED deptSector (
     REM но по умолчанию в группу может отправлять кто угодно, так что всё ок
     
     rem gam update group <group email> add owner|member|manager [notsuspended] {user <email address> | group <group address> | ou|ou_and_children <org name> | file <file name> | all users} 
-    ECHO Добавление dept-forwarding-setup
+    ECHO Добавление dept-forwarding-setup в depts-co-%deptLogin%
     CALL gam update group "depts-co-%deptLogin%" add member user dept-forwarding-setup ||PAUSE
-    ECHO Настройте веб-интерфейс и пересылку из ящика отдела на адрес depts-co-%deptLogin%@status.%pd%
+    ECHO.
+    ECHO Настройте пересылку из ящика отдела на адрес depts-co-%deptLogin%@status.%pd%
+    ECHO ^(см. https://trello.com/c/T65sBlNF/7-e-mail^)
     PAUSE
-    ECHO Удаление dept-forwarding-setup
+    ECHO Удаление dept-forwarding-setup из depts-co-%deptLogin%
     CALL gam update group "depts-co-%deptLogin%" remove user dept-forwarding-setup ||PAUSE
     ECHO Добавление %monAddr%
     CALL gam update group "depts-co-%deptLogin%" add member user "%monAddr%" ||PAUSE
-    IF NOT ERRORLEVEL 1 PAUSE
+    IF NOT ERRORLEVEL 1 (
+	ECHO Всё готово!
+	PAUSE
+    )
 EXIT /B
 )
 
