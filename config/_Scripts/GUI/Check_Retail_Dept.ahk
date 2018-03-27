@@ -805,7 +805,7 @@ RunRSync(dir, wait := 1) {
 RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", flagMask:="", optnLoopFlag:="") {
     global officeDistSrvPath, Distributives, lDistributives
     static distDirs := ""
-    latestFlagTime:=0
+    latestFlagTime := 0
     , chkMTimes    := []
     , latestTime   := 0
     
