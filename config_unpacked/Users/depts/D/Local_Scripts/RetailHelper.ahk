@@ -6,6 +6,7 @@
 #Persistent
 Thread NoTimers
 
+minAgeForSendLogs := 2 ; days
 idletimeDisconnectVPN := 30 * 60 * 1000 ; 30 min in ms
 idletimeRarusCheckAutoLoad := 3 * 60 * 1000 ; 3 min in ms
 doublepressRarusTimeout := 20 * 60 * 1000 ; 20 min in ms
@@ -41,8 +42,12 @@ RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\P
 foundErrFlags=
 Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log*.errflag
 {
-    FileReadLine errLine, %A_LoopFileFullPath%, 1
-    foundErrFlags .= A_LoopFileName ": " errLine ", "
+    age=
+    age -= A_LoopFileTimeCreated, Days
+    If (age > minAgeForSendLogs) {
+	FileReadLine errLine, %A_LoopFileFullPath%, 1
+	foundErrFlags .= A_LoopFileName ": " errLine ", "
+    }
 }
 If (foundErrFlags)
     foundErrFlags := "Флаги ошибок: " SubStr(foundErrFlags, 1, -2) "."
@@ -52,16 +57,26 @@ For mask, name in {"OutgoingText\*.txt": "уведомления", "OutgoingFile
     {
 	age=
 	age -= A_LoopFileTimeModified, Days
-	If (!unsentCounts.HasKey(name))
-	    unsentCounts[name] := 0
-	unsentCounts[name] += age > 2
+	If (age > minAgeForSendLogs) {
+	    If (!unsentCounts.HasKey(name))
+		unsentCounts[name] := {}
+	    If (!unsentCounts[name].HasKey(age))
+		unsentCounts[name][age] := 1
+	    Else
+		unsentCounts[name][age]++
+	}
     }
 unsentCountsText=
-For name, c in unsentCounts
-    If (c)
-	unsentCountsText .= name " (" c "), "
+For name, counts in unsentCounts {
+    unsentCountsLine=
+    For age, c in counts
+	If (c)
+	    unsentCountsLine .= " (" c ") в течение " age " дн.,"
+    If (unsentCountsLine)
+	unsentCountsText .= name . unsentCountsLine
+}
 If (unsentCountsText)
-    foundErrFlags := "Есть не отправленные в течение двух дней " SubStr(unsentCountsText, 1, -2) ". " foundErrFlags
+    foundErrFlags := "Есть не отправленные " SubStr(unsentCountsText, 1, -1) ". " foundErrFlags
 If (foundErrFlags) {
     ;\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\RetailStatusReport.ahk  <Module> <Status> <Extended info …>
     Try Run % """" A_AhkPath """ """ getDefaultConfigDir() "\_Scripts\Lib\RetailStatusReport.ahk"" """ A_ScriptName """ ""Rarus email system malfunction"" """ StrReplace(StrReplace(foundErrFlags, """", "'"), "`n", "; ") """"
