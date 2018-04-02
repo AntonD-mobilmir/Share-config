@@ -7,7 +7,7 @@ TrelloAPI1(ByRef method, ByRef req, ByRef jsonresp, jsondata:="") {
     ; req:	/members/me/boards
     ; URL:	https://api.trello.com/1/members/me/boards?key=[application_key]&token=[optional_auth_token]
     ;jsonresp: will contain full response text (usually json)
-    ;	If any Object() passed in jsonresp, function returns Object parsed from Trello reponse data (jsonresp is still overwritten with response text), useful for immediate fields checking: For i, card in TrelloAPI1("GET", "…/cards") {…}
+    ;	If any Object() passed in jsonresp, function returns Object parsed from Trello reponse data (jsonresp is still overwritten with response text), useful for immediate fields checking: For i, card in TrelloAPI1("GET", "…/cards", Object()) {…}
     ;jsondata: additional request data
     
     authToken:=GetTrelloAuthToken(APIkey:="")

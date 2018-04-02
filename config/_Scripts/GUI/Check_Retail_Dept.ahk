@@ -76,7 +76,7 @@ If (A_IsAdmin) {
 
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
-global DefaultConfigDir := chkDefConfigDir.path
+DefaultConfigDir := chkDefConfigDir.path
 
 xlnexe := findexe("xln.exe", "C:\SysUtils")
 DriveGet drives, List, FIXED
@@ -232,12 +232,8 @@ For Key, KeyName in envProxyKeys
     For ValName, ValDisp in envProxyValNames {
 	RegRead proxyVal, %Key%, %ValName%
 	If (proxyVal)
-	    proxystatus .= ", " KeyName ":" ValDisp "=" proxyLMServer
+	    proxystatus .= ", env" KeyName ":" ValDisp "=" proxyLMServer
     }
-RegRead envCUHttp_proxy, HKEY_CURRENT_USER\Environment, 
-RegRead envCUHttps_proxy, HKEY_CURRENT_USER\Environment, 
-RegRead envLMHttp_proxy, , http_proxy
-RegRead envLMHttps_proxy, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment, https_proxy
 If (proxystatus := Trim(proxystatus, ", ")) {
     SetLastRowStatus(proxystatus,0)
     RunWait "%A_AhkPath%" "%A_ScriptDir%\..\SetProxy.ahk" "",, Min UseErrorLevel
@@ -701,8 +697,9 @@ ButtonCancel:
     ExitApp
 
 RunRsyncAutohotkey(wait := 1) {
-    global subdirDistAutoHotkey
-    static baseDirsDistAhk := ""
+    global subdirDistAutoHotkey, lDistributives, officeDistSrvPath
+    static upToDate := 0, baseDirsDistAhk := ""
+    
     
     If (!baseDirsDistAhk) {
 	baseDirsDistAhk := [ "D:\Distributives" ]
@@ -710,23 +707,40 @@ RunRsyncAutohotkey(wait := 1) {
 	    baseDirsDistAhk.Push(lDistributives)
     }
     
-    AddLog("rsync AutoHotkey, PreInstalled" (wait ? "" : " в фоне"))
+    bakWorkDir = %A_WorkingDir%
+    SetWorkingDir %officeDistSrvPath%\%subdirDistAutoHotkey%
     For i, baseDir in baseDirsDistAhk {
-	If (InStr(FileExist(baseDir "\" subdirDistAutoHotkey), "D")) {
-	    Try {
-		RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
-		RunRSync(baseDir "\Soft\PreInstalled\utils", wait)
-		RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
-		baseDirsDistAhk := [ baseDir ], rsyncErr := ""
-		break
-	    } Catch e
-		rsyncErr := e
+	If (InStr(FileExist(localDist := baseDir "\" subdirDistAutoHotkey), "D")) {
+	    needSync := 0
+	    Loop Files, *.*, R
+	    {
+		srvMT := A_LoopFileTimeModified, srvSz := A_LoopFileSize
+		Loop Files, %localDist%\%A_LoopFileFullPath%
+		    If (!(srvMT == A_LoopFileTimeModified && srvSz == A_LoopFileSize)) {
+			needSync := 1
+			break
+		    }
+	    } Until needSync
+	    
+	    If (needSync) {
+		AddLog("rsync AutoHotkey, PreInstalled → " baseDir . (wait ? "" : " в фоне"))
+		Try {
+		    RunRSync(baseDir "\" subdirDistAutoHotkey, wait)
+		    RunRSync(baseDir "\Soft\PreInstalled\utils", wait)
+		    RunRSync(baseDir "\Soft\PreInstalled\auto", wait)
+		    baseDirsDistAhk := [ baseDir ], rsyncErr := ""
+		    break
+		} Catch e
+		    rsyncErr := e
+	    } Else
+		AddLog("AutoHotkey @ " baseDir " актуальный")
 	}
     }
     If (rsyncErr)
 	SetLastRowStatus(ObjectToText(e), 0)
     Else
 	SetLastRowStatus()
+    SetWorkingDir %bakWorkDir%
 }
 
 RunRSyncWithAddLog(dir, wait := 1) {
@@ -810,6 +824,7 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
     , latestTime   := 0
     
     If (!IsObject(distDirs)) {
+	distDirs := []
 	prevDir := ""
 	For i, dir in [lDistributives, Distributives, officeDistSrvPath] {
 	    If (dir && !(dir==prevDir) && InStr(FileExist(dir), "D")) {
@@ -818,10 +833,11 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
 	    }
 	}
     }
+    ;MsgBox % ObjectToText(distDirs)
     
     If (!title)
 	title := AbbreviatePath(flagMask ? flagMask : distSubpath)
-    AddLog(title, "Проверка")
+    logline := AddLog(title, "Проверка")
     For i, distDir in distDirs
 	If (distDir) {
 	    FindLatest(distDir "\" distSubpath,, mtime := 0), chkMTimes[i] := mtime
@@ -830,7 +846,8 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
 		latestDist := distDir
 	    }
 	}
-    SetLastRowStatus(latestTime)
+    ;MsgBox latestTime: %latestTime%`nmtime: %mtime%`nlatestDist: %latestDist%
+    SetRowStatus(logline, latestTime)
     If (flagMask) { ; если флаг не старше самого свежего найденного файла в дистрибутивах, запускать скрипт не требуется
 	FindLatest(flagMask, optnLoopFlag, latestFlagTime)
 	If (latestFlagTime) {
@@ -840,15 +857,11 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
     }
     
     If (!latestFlagTime || timeDiff > 1) { ; если в дистрибутивах есть файл новоее флага больше, чем на 1 минуту, запускать скрипт
-	statusText := AbbreviatePath(latestDist)
-	SetLastRowStatus("Обновление из " AbbreviatePath(latestDist),0)
+	SetRowStatus(logline, "← " AbbreviatePath(latestDist), 0)
 	RunWait %comspec% /C "%latestDist%\%scriptSubpath%", %A_Temp%, Min UseErrorLevel
-	If (ErrorLevel)
-	    SetLastRowStatus(ErrorLevel,0)
-	Else
-	    SetLastRowStatus()
+	return {run: 1, ErrorLevel: ErrorLevel, latestDist: latestDist, logline: logline} ; , (ErrorLevel ? SetLastRowStatus(ErrorLevel, 0) : SetLastRowStatus())
     } Else
-        SetLastRowStatus(TimeFormat(latestFlagTime), 1)
+        return {run: 0, latestFlagTime: latestFlagTime, logline: logline}, SetRowStatus(logline, TimeFormat(latestFlagTime), 1)
 }
 
 RunFromConfigDir(ByRef subPath, ByRef logLineText:="", ByRef args:="") {
@@ -1026,6 +1039,7 @@ FindLatest(mask, loopOptn:="", ByRef latestTime:=0) {
 }
 
 AbbreviatePath(path) {
+    global DefaultConfigDir
     path := RegExReplace(path, "i)^\\\\Srv0(\.office0\.mobilmir)?\\(profiles\$(\\Share)?|Distributives)?\\","{Srv0}")
     If (DefaultConfigDir)
 	path := RegExReplace(path,"\Q" . DefaultConfigDir . "\E", "{configDir}")
