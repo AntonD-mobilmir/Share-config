@@ -46,10 +46,9 @@ ExitApp -1
 
 ProcessDir(ByRef srcDir) {
     static SuffixesToQueries := {".json": "fp", ".txt": "", " TVID.txt": {1: "TVID:"}, " trello-id.txt": {1: "url:", 4: "/id "}}
-	 , nameRegexes :=   [ "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2} {1,2}\d{5,6}\.\d\d)(?P<Suffix>.*)"
-			    , "S)^(?P<Hostname>[^ .]+)(?P<Suffix>.*)" ]
     
-    For i, nameRegex in nameRegexes {
+    For i, nameRegex in [ "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2}\s{1,2}\d+(\.\d+)?)(?P<Suffix>.*)"
+			, "S)^(?P<Hostname>[^ .]+)(?P<Suffix>.*)" ] {
 	hostNames := {}
 	Loop Files, %srcDir%\*.json
 	    If (RegexMatch(A_LoopFileName, nameRegex, m))
@@ -122,7 +121,7 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 
     If (nMatches==1) {
 	For i in lastMatch {
-	    card := TrelloAPI1("GET", "/cards/" cards[i].id, respTrelloAPI := Object()) ; card := cards[i].id to save API calls
+	    card := TrelloAPI1("GET", "/cards/" cards[i].id, respTrelloAPI := Object()) ; card := cards[i] to save API calls
 	    cardID := card.id 
 	    If (!cardID)
 		Throw Exception("Карточка без ID получена от Trello",,{query: "/cards/" cards[i].id, response: respTrelloAPI, lastMatch: lastMatch})
@@ -131,10 +130,12 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
 	    textfp=
 	    If (pathtextfp := options.txt)
 		FileRead textfp, %pathtextfp%
-	    If ((!textfp || textfp ~= "^\w:\w" ) && IsObject(fp))
-		textfp := GetFingerprint_Object_To_Text(fp)
-	    Else
-		Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
+	    If (!textfp) { ; txt option is not specified, or file is empty or can't be read
+		If (IsObject(fp))
+		    textfp := GetFingerprint_Object_To_Text(fp)
+		Else
+		    Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
+	    }
 	    
 	    lfo.WriteLine("Текст отпечатка: " textfp)
 	    Loop Parse, textfp, `n
@@ -197,7 +198,8 @@ ShowError(ByRef text) {
 }
 
 LogError(ByRef msg, ByRef morepaths*) {
-    static pathCommonErrorLog := A_ScriptDir "\..\trello-accounting\update-queue\errors.log"
+    static ferrlog := ""
+    pathCommonErrorLog := A_ScriptDir "\..\trello-accounting\update-queue\errors.log"
     logTime := A_Now
     If (IsObject(msg))
 	text := ObjectToText(msg)
@@ -205,10 +207,13 @@ LogError(ByRef msg, ByRef morepaths*) {
 	text := msg
     
     Try stderr.WriteLine(logTime " " A_UserName "@" A_ComputerName A_Tab text)
-    Try FileGetSize logsize, %pathCommonErrorLog%, M
-    If (logsize)
-	Try FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
-    Try FileAppend %logTime% %text%`n, %pathCommonErrorLog%
+    If (!IsObject(ferrlog)) {
+	Try FileGetSize logsize, %pathCommonErrorLog%, M
+	If (logsize)
+	    Try FileMove %pathCommonErrorLog%, %pathCommonErrorLog%.bak, 1
+	ferrlog := FileOpen(pathCommonErrorLog, "a")
+    }
+    ferrlog.WriteLine(logTime " " text)
     For i, path in morepaths
 	Try FileAppend %logTime% %text%`n, %path%
 }
