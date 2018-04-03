@@ -1,0 +1,11 @@
+﻿[Бухгалтерия 3 Демо]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="Accounting3_Demo";
+ID=61a25e51-1a38-48fe-9b83-9524d366b5d8
+OrderInList=71729.77777777778
+Folder=/
+OrderInTree=246016
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3

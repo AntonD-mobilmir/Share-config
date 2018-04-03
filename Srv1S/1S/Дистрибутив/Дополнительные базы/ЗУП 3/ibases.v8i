@@ -1,0 +1,11 @@
+﻿[Зарплата и управление персоналом 3.1]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRM3";
+ID=2297a61d-f4ce-43a9-b58e-1b1eaaa31da1
+OrderInList=93273.13888888889
+Folder=/
+OrderInTree=-1
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3
