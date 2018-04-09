@@ -30,7 +30,7 @@ FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
     IF NOT EXIST %gpgexe% CALL "\\Srv0.office0.mobilmir\Distributives\Soft FOSS\PreInstalled\manual\SysUtils_GPG.cmd"
     IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
     rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
-    IF NOT DEFINED AutohotkeyExe CALL "%configDir%FindAutoHotkeyExe.cmd"
+    IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 
     SET "schedUserName=%USERNAME%" & REM https://redbooth.com/a/#!/projects/59756/tasks/31466273
     rem IF NOT DEFINED schedUserName CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
@@ -59,7 +59,6 @@ FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
 (
 %SystemRoot%\System32\icacls.exe "%dirDest%" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
 %SystemRoot%\System32\icacls.exe "D:\1S\Rarus\ShopBTS\ExtForms\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
-
 IF NOT "%verPrevStunnel%"=="%verStunnel%" (
     %System32%\schtasks.exe /End /TN "mobilmir.ru\stunnel"
     %System32%\taskkill.exe /F /IM tstunnel.exe
@@ -68,7 +67,6 @@ IF NOT "%verPrevStunnel%"=="%verStunnel%" (
     %exe7z% x -aoa -o"%dirDest%\stunnel" -x!bin/openssl.exe -x!bin/stunnel.exe -x!*/*.pdb -x!$PLUGINSDIR -x!uninstall.exe "%distStunnel%" || %ErrorCmd%
     rem /grant "*%sidCREATOR_OWNER%:(OI)(CI)F"
 )
-
 IF NOT "%timePrevDistBin%"=="%timeDistBin%" %exe7z% x -y -aoa -o"%dirDest%" -- "%~dp0dist-bin.7z" || %ErrorCmd%
 rem IF NOT "%timePrevDist%"=="%timeDist%"
 %exe7z% x -y -aoa -o"D:\1S\Rarus" -- "%~dp0dist.7z" || %ErrorCmd%

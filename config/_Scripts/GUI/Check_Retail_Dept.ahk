@@ -840,7 +840,7 @@ RunScriptFromNewestDistDir(ByRef distSubpath, ByRef scriptSubpath, title:="", fl
     logline := AddLog(title, "Проверка")
     For i, distDir in distDirs
 	If (distDir) {
-	    FindLatest(distDir "\" distSubpath,, mtime := 0), chkMTimes[i] := mtime
+	    FindLatest(distDir "\" distSubpath,, mtime := -1), chkMTimes[i] := mtime
 	    If (latestTime < mtime) {
 		latestTime := mtime
 		latestDist := distDir
@@ -1021,7 +1021,7 @@ LatestExisting(paths*) {
     return curFound
 }
 
-FindLatest(mask, loopOptn:="", ByRef latestTime:=0) {
+FindLatest(mask, loopOptn := "", ByRef latestTime := 0) { ; FindLatest(,, -1) to avoid adding missing masks to log
     Loop Files, %mask%, %loopOptn%
     {
 	If (A_LoopFileTimeModified > latestTime) {
@@ -1033,7 +1033,7 @@ FindLatest(mask, loopOptn:="", ByRef latestTime:=0) {
     If (latestPath) {
 	objLatest := {"path": latestPath, "attr": FileExist(latestPath), "mtime": latestTime}
 	return objLatest
-    } Else If (!latestTime) {
+    } Else If (latestTime == 0) {
 	AddLog(AbbreviatePath(mask), "Не найдено подходящих файлов")
     }
 }
