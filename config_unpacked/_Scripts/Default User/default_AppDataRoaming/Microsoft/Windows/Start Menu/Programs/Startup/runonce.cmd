@@ -72,7 +72,9 @@ EXIT /B
 :CheckTempProfile
 SET "profileDirName=%~nx1"
 (
-    IF NOT DEFINED tempProfileDir IF /I "%profileDirName%"=="TEMP" EXIT /B 1
-    IF NOT DEFINED tempProfileDir IF /I "%profileDirName:~0,5%"=="TEMP" EXIT /B 1
+    IF NOT DEFINED tempProfileDir (
+	IF /I "%profileDirName%"=="TEMP" EXIT /B 1
+	IF /I "%profileDirName:~0,5%"=="TEMP." EXIT /B 1
+    )
     EXIT /B 0
 )
