@@ -40,9 +40,9 @@ Install(runFromURL="") {
     }
     
     ;https://msdn.microsoft.com/en-us/library/aa767914(v=vs.85).aspx
-    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Classes\%Proto%,,URL:%Proto% Protocol
-    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Classes\%Proto%,URL Protocol,
-    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Classes\%Proto%\shell\open\command,,"%A_AhkPath%" "%urlHandler%" "`%l"
+    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Classes\%Proto% ,, URL:%Proto% Protocol
+    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Classes\%Proto% ,URL Protocol ,
+    RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Classes\%Proto%\shell\open\command ,, "%A_AhkPath%" "%urlHandler%" "`%l"
     
     TrayTip,, Протокол установлен:`n"%A_AhkPath%" "%urlHandler%" "`%l"
     Sleep 3000
@@ -50,6 +50,7 @@ Install(runFromURL="") {
 
 CheckRun(path, recur=0) {
     Loop Files, %path%
+    {
 	If (A_LoopFileExt="ahk") {
 	    Run "%A_AhkPath%" "%A_LoopFileLongPath%" "%1%", %A_LoopFileDir%, UseErrorLevel
 	    return UseErrorLevel != "ERROR"
@@ -58,8 +59,10 @@ CheckRun(path, recur=0) {
 		MsgBox Ошибка в конфигурации`, превышен предел количества ссылок на другие файлы конфигурации.`n`nПоследний прочитанный файл: %path%.
 		ExitApp
 	    }
-	    FileReadLine path, A_LoopFileLongPath, 1
-	    return CheckRun(path, recur+1)
+	    Loop Read, %A_LoopFileLongPath%
+		If (r := CheckRun(A_LoopReadLine, recur+1))
+		    return r
 	}
-	return 0
+    }
+    return 0
 }

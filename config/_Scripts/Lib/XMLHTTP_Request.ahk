@@ -4,7 +4,7 @@
 GetURL(ByRef URL, tries := 20, delay := 3000) {
     While (!XMLHTTP_Request("GET", URL,, resp))
 	If (A_Index > tries)
-	    Throw Exception("Error downloading URL",, resp.status)
+	    Throw Exception("Error downloading URL", A_ThisFunc, resp.status)
 	Else
 	    sleep delay
     
@@ -31,6 +31,7 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
     If (useObjName) {
 	xhr := ComObjCreate(useObjName)
     } Else {
+	errLog=
 	objNames := [ "Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP", "Microsoft.XMLHTTP" ]
 	For i, objName in objNames {
 	    ;xhr=XMLHttpRequest
@@ -43,12 +44,14 @@ XMLHTTP_Request(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, 
 		If (IsObject(debug))
 		    FileAppend Done!`n, **
 		break
+	    } Else {
+		errLog .= objName ": " A_LastError "`n"
 	    }
 	    If (IsObject(debug))
 		FileAppend nope`n, **
 	}
 	If (!useObjName)
-	    Throw "Не удалось создать объект XMLHTTP"
+	    Throw Exception("Не удалось создать объект XMLHTTP", A_ThisFunc, SubStr(errLog, 1, -1))
     }
     ;xhr.open(bstrMethod, bstrUrl, varAsync, varUser, varPassword);
     xhr.open(method, URL, false)
