@@ -18,7 +18,7 @@ rem logsDir - baseLogsDir with relpath (or nothing)
 IF NOT DEFINED logsDir SET "logsDir=%workdir%"
 )
 (
-CALL "%baseScripts%\_DistDownload.cmd" https://www.stunnel.org/downloads.html *.exe -ml1 -nd -A.exe
-CALL "%baseScripts%\_DistDownload.cmd" https://www.stunnel.org/downloads.html *.exe.asc -ml1 -nd -A.exe.asc
-CALL "%baseScripts%\_DistDownload.cmd" https://www.stunnel.org/downloads.html *.exe.sha256 -ml1 -nd -A.exe.sha256
+CALL "%baseScripts%\_DistDownload.cmd" https://www.stunnel.org/downloads.html -win32-installer.exe -ml1 -nd -A.exe
+CALL "%baseScripts%\_DistDownload.cmd" https://www.stunnel.org/downloads.html -win32-installer.exe.asc -ml1 -nd -A.exe.asc
+CALL "%baseScripts%\_DistDownload.cmd" https://www.stunnel.org/downloads.html -win32-installer.exe.sha256 -ml1 -nd -A.exe.sha256
 )
