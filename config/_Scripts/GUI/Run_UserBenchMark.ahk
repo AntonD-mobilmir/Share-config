@@ -331,27 +331,38 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
     ;RegRead Domain, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
 
     Notify(stageTitle . "`nПроверка дубликатов…")
-    If (InStr(res := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vSCtCE_IBuSaHQcTs0pNZEGq2PbbiTotNr1Br75Lrhu9Y-SfdDCuB7gTRrSLNixNxmlB_z2GU-uxhjh/pub?gid=178521167&single=true&output=tsv")
-	    , "`n" ResultsURL A_Tab Hostname)) {
-	Progress Off    
-	MsgBox 0x124, %stageTitle%, Эта ссылка уже есть в таблице. Отправить повторно?, 300
+    Try resList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vSCtCE_IBuSaHQcTs0pNZEGq2PbbiTotNr1Br75Lrhu9Y-SfdDCuB7gTRrSLNixNxmlB_z2GU-uxhjh/pub?gid=178521167&single=true&output=tsv")
+    If (!resList)
+	dupcheckerr=Список предыдущих результатов не загрузился`, не получится проверить на дубликаты.`n`nОтправить всё равно?
+    Else If (InStr(resList, "`n" ResultsURL A_Tab Hostname))
+	dupcheckerr=Эта ссылка уже есть в таблице. Отправить повторно?
+    Else
+	dupcheckerr=
+    Progress Off
+    If (dupcheckerr) {
+	MsgBox 0x124, %stageTitle%, %dupcheckerr%, 300
 	IfMsgBox No
 	    return
 	IfMsgBox Timeout
 	    return
     }
 
-    Notify(stageTitle . "`nПолучение GeoIP…")
     If (!geoLocation) {
+	Notify(stageTitle . "`nПолучение GeoIP…")
 	;API The HTTP API takes GET requests in the following schema:
 	;freegeoip.net/{format}/{IP_or_hostname}
 	;Supported formats are: csv, xml, json and jsonp. If no IP or hostname is provided, then your own IP is looked up.
 	;Examples: CSV freegeoip.net/csv/8.8.8.8	XML freegeoip.net/xml/4.2.2.2	JSON freegeoip.net/json/github.com
-	XMLHTTP_Request("GET", "http://freegeoip.net/json/", , geoLocation)
+	Try geoLocation := GetURL("http://freegeoip.net/json/")
     }
     
-    FileReadLine trelloURL, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 1
-    FileReadLine trelloCardName, %A_AppDataCommon%\mobilmir.ru\trello-id.txt, 3
+    Notify(stageTitle . "`nЧтение trello-id.txt…")
+    readvars := ["trelloURL", "", "trelloCardName"]
+    Loop Read, %A_AppDataCommon%\mobilmir.ru\trello-id.txt
+    {
+	If (varName := readvars[A_Index])
+	    %varName% := A_LoopReadLine
+    } Until A_Index > readvars.Length()
     nameShtnr = CutTrelloCardURL
     If (IsFunc(nameShtnr))
 	trelloURL := %nameShtnr%(trelloURL)
@@ -374,16 +385,21 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
 		  : "" )
 
     Notify(stageTitle . "`nОтправка формы…")
-    stageDetails := "Запись ссылки " . ResultsURL . (IsObject(perfResultsObj) ? " и текста результатов" ) . " в таблицу результатов"
+    stageDetails := "Запись ссылки " . ResultsURL . (IsObject(perfResultsObj) ? " и текста результатов" : "") . " в таблицу результатов"
     ;Results posted to https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo
     Menu Tray, Tip, %stageDetails%`n
     FileAppend %A_Now% %stageDetails%`n,*,CP866
     
     While (!XMLHTTP_Post("https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse", POSTDATA)) {
 	Progress Off
-	MsgBox 53, %stageTitle%, При отправке произошла ошибка`, HTTP-код %statusHTTP%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
+	errText = При отправке произошла ошибка`, HTTP-код %statusHTTP%
+	FileAppend %A_Now% %errText%`n,*,CP866
+	MsgBox 53, %stageTitle%, %errText%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
 	IfMsgBox Cancel
-	    return
+	{
+	    FileAppend % ResultsURL "`n" POSTDATA "`n",%A_Desktop%\UserBenchmark unposted %A_Now%.txt
+	    return 0
+	}
     }
     
     return 1
