@@ -6,20 +6,20 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-SET "dirDest=D:\1S\Rarus\MailLoader"
-SET "sidCREATOR_OWNER=S-1-3-0"
-SET "ErrorOccured="
+    SET "dirDest=D:\1S\Rarus\MailLoader"
+    SET "sidCREATOR_OWNER=S-1-3-0"
+    SET "ErrorOccured="
 
-IF EXIST "%SystemRoot%\SysNative\cmd.exe" (SET "System32=%SystemRoot%\SysNative") ELSE SET "System32=%SystemRoot%\System32"
-rem --debug-- SET "ErrorCmd=PAUSE"
-IF NOT DEFINED ErrorCmd SET "ErrorCmd=SET ErrorOccured=1"
-IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe"
+    IF EXIST "%SystemRoot%\SysNative\cmd.exe" (SET "System32=%SystemRoot%\SysNative") ELSE SET "System32=%SystemRoot%\System32"
+    rem --debug-- SET "ErrorCmd=PAUSE"
+    IF NOT DEFINED ErrorCmd SET "ErrorCmd=SET ErrorOccured=1"
+    IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+    IF NOT DEFINED gpgexe SET gpgexe="%SystemDrive%\SysUtils\gnupg\gpg.exe"
 
-IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
-FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
-FOR %%A IN ("%~dp0dist.7z") DO SET "timeDist=%%~tA"
-FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
+    IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
+    FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+    FOR %%A IN ("%~dp0dist.7z") DO SET "timeDist=%%~tA"
+    FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
 )
 (
     SET "verFile=%dirDest%\getmail_dist_ver.txt"
@@ -59,7 +59,7 @@ FOR %%A IN ("%~dp0dist-bin.7z") DO SET "timeDistBin=%%~tA"
 (
 %SystemRoot%\System32\icacls.exe "%dirDest%" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
 %SystemRoot%\System32\icacls.exe "D:\1S\Rarus\ShopBTS\ExtForms\MailLoader" /grant "%schedUserName%:(OI)(CI)M" /C /L || %ErrorCmd%
-IF NOT "%verPrevStunnel%"=="%verStunnel%" (
+IF DEFINED distStunnel IF NOT "%verPrevStunnel%"=="%verStunnel%" (
     %System32%\schtasks.exe /End /TN "mobilmir.ru\stunnel"
     %System32%\taskkill.exe /F /IM tstunnel.exe
     MOVE /Y "%dirDest%\stunnel" "%dirDest%\stunnel.bak" && RD /S /Q "%dirDest%\stunnel.bak"
