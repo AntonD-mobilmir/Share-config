@@ -1,0 +1,12 @@
+﻿[Сервисный Центр Копия]
+Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="complex_service";
+ID=f233a82a-16b5-4c6a-beaf-f1a0120e9243
+OrderInList=104044.8194444444
+Folder=/
+OrderInTree=295168
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3
+DefaultApp=ThickClient
