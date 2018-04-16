@@ -38,7 +38,8 @@ SETLOCAL ENABLEEXTENSIONS
     %regexe% ADD "HKLM\SOFTWARE\JavaSoft\Java Update\Policy" /v EnableAutoUpdateCheck /t REG_DWORD /d 0 /f
     %regexe% ADD "HKLM\SOFTWARE\JavaSoft\Java Update\Policy" /v NotifyDownload /t REG_DWORD /d 0 /f
     %regexe% ADD "HKLM\SOFTWARE\JavaSoft\Java Update\Policy" /v NotifyInstall /t REG_DWORD /d 0 /f
-    %regexe% DELETE "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v SunJavaUpdateSched /f
+
+    FOR %%A IN (32 64) DO %regexe% DELETE "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "SunJavaUpdateSched" /f /reg:%%~A
 
     REM Uninstall updater
     IF NOT ERRORLEVEL 1 CALL "%~dp0run_msiexec.cmd" "%SystemRoot%\System32\msiexec.exe" /x "{4A03706F-666A-4037-7777-5F2748764D10}" /qn
