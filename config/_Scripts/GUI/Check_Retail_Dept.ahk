@@ -1081,7 +1081,7 @@ TimeFormat(ByRef time) {
 	age = %age% дн.
     Else
 	age = сегодня
-    FormatTime ft, %status%, yyyy-MM-dd HH:mm '(%age%)'
+    FormatTime ft, %time%, yyyy-MM-dd HH:mm '(%age%)'
     return ft
 }
 
