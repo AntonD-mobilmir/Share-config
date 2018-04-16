@@ -16,7 +16,7 @@ global WinVer := GetWinVer()
      , SystemRoot
 EnvGet SystemRoot, SystemRoot
 
-PlatformExecutiveRelativePath=bin\1cv8.exe
+PlatformExecutiveRelativePath := "bin\1cv8.exe"
 localPlatformCache := LocalAppData "\Programs\1C\PlatformCache"
 If (FileExist(LocalAppData "\1C\PlatformCache"))
     FileMoveDir %LocalAppData%\1C\PlatformCache, %localPlatformCache%
@@ -33,16 +33,15 @@ Loop %0%
 If (PlatformVersionName)
     GoTo SelectedPlatform
 
-
 Gui Add, Text, w500, У нас используются разные версии платформы для разных конфигураций 1С. Если попытаться запустить конфигурацию`, не соответствующую платформе`, 1С покажет ошибку и не запустится. Причем окно списка конфигураций показывает платформа`, так что выбрать`, какую запускать платформу`, надо до выбора конфигурации.
 Gui Add, ListView, -Multi LV-E0x200 r3 w500 AltSubmit gSelectPlatform, Платформа|Примечание
 Gui Add, Button, Default vbtnOK, OK
 For platfVer, platfName in PlatformNames
     LV_Add("", platfVer, platfName)
 GuiShowAgain:
-Gui Show,, Выбор платформы 1С
-;GuiControl Choose, ControlID, 1
-;Exit
+    Gui Show,, Выбор платформы 1С
+    ;GuiControl Choose, ControlID, 1
+    ;Exit
 
 SelectPlatform:
     If (selRow := LV_GetNext())
@@ -58,93 +57,92 @@ ButtonOK:
     Gui Submit
     LV_GetText(PlatformVersionName, selRow)
 SelectedPlatform:
-    
-params := SubStr(CommandLine, InStr(CommandLine := DllCall( "GetCommandLine", "Str" ),A_ScriptName,1)+StrLen(A_ScriptName)+2)
-PlatformSource=%A_ScriptDir%\%PlatformVersionName%
-PlatformSourceArc=%A_ScriptDir%\%PlatformVersionName%.7z
+   
+    params := SubStr(CommandLine, InStr(CommandLine := DllCall( "GetCommandLine", "Str" ),A_ScriptName,1)+StrLen(A_ScriptName)+2)
+    PlatformSource=%A_ScriptDir%\%PlatformVersionName%
+    PlatformSourceArc=%A_ScriptDir%\%PlatformVersionName%.7z
 
-ProcIDStorage=%origTemp%\1sprocesses.ini
+    ProcIDStorage=%origTemp%\1sprocesses.ini
 
-Menu Tray, Icon, shell32.dll,25,0
-Menu Tray, Tip, Запуск 1С
+    Menu Tray, Icon, shell32.dll,25,0
+    Menu Tray, Tip, Запуск 1С
 
-If (!GetKeyState("Shift", "P")) {
-;    GroupAdd 1s, ahk_exe 1cv8.exe
-;    GroupAdd 1s, ahk_exe 1cv8s.exe
-;    GroupAdd 1s, ahk_exe 1cv8l.exe
+    If (!GetKeyState("Shift", "P")) {
+	;GroupAdd 1s, ahk_exe 1cv8.exe
+	;GroupAdd 1s, ahk_exe 1cv8s.exe
+	;GroupAdd 1s, ahk_exe 1cv8l.exe
 
-    IniRead PID1S, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
-    IfWinExist ahk_pid %PID1S% ahk_exe 1cv8.exe
-    {
-	WinGet MinMaxState, MinMax
-	GroupAdd Running1S, ahk_pid %PID1S%
-	If MinMax=-1
-	    PostMessage 0x112, 0xF120 ; 0x112 = WM_SYSCOMMAND, 0xF120 = SC_RESTORE
-;	    WinRestore
-	WinActivateBottom ahk_pid %PID1S%
-	WinActivate
-;	WinGet PID1S, PID
-	TrayTip Активация запущенной 1С, Активирован экземпляр 1С`, запущенный с теми же параметрами`, что и вновь вызываемый.`n`nДля запуска нового`, при запуске удерживайте Shift.,,1
-	ToolTip Активирована ранее запущенная 1С. Для запуска новой`, удерживайте Shift при запуске.
-	Sleep 3000
-	ExitApp %PID1S%
+	IniRead PID1S, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
+	If (WinExist("ahk_pid " PID1S " ahk_exe 1cv8.exe")) {
+	    WinGet MinMaxState, MinMax
+	    GroupAdd Running1S, ahk_pid %PID1S%
+	    If (MinMax=-1)
+		PostMessage 0x112, 0xF120 ; 0x112 = WM_SYSCOMMAND, 0xF120 = SC_RESTORE
+    	    ;WinRestore
+	    WinActivateBottom ahk_pid %PID1S%
+	    WinActivate
+	    ;WinGet PID1S, PID
+	    TrayTip Активация запущенной 1С, Активирован экземпляр 1С`, запущенный с теми же параметрами`, что и вновь вызываемый.`n`nДля запуска нового`, при запуске удерживайте Shift.,,1
+	    ToolTip Активирована ранее запущенная 1С. Для запуска новой`, удерживайте Shift при запуске.
+	    Sleep 3000
+	    ExitApp %PID1S%
+	}
     }
-}
 
-TrayTip Запуск 1С, Настройка временной папки…
-SetupTemp()
-TrayTip
+    TrayTip Запуск 1С, Настройка временной папки…
+    SetupTemp()
+    TrayTip
 
-TrayTip Запуск 1С, Проверка локального кэша платформы...
-PlatformRunPath := CachePlatformLocally(PlatformVersionName) "\" PlatformExecutiveRelativePath
-TrayTip
+    TrayTip Запуск 1С, Проверка локального кэша платформы...
+    PlatformRunPath := CachePlatformLocally(PlatformVersionName) "\" PlatformExecutiveRelativePath
+    TrayTip
 
-TrayTip Запуск 1С, Запуск нового процесса 1С
+    TrayTip Запуск 1С, Запуск нового процесса 1С
 tryRunAgain:
 
-Loop %PlatformRunPath%,,1
-    Try {
-	;TrayTip Запуск "%A_LoopFileFullPath%" %params%, Запуск 1С
-	Run "%A_LoopFileFullPath%" %params%, %A_LoopFileDir%, UseErrorLevel, PID1S
-	break
+    Loop %PlatformRunPath%,,1
+	Try {
+	    ;TrayTip Запуск "%A_LoopFileFullPath%" %params%, Запуск 1С
+	    Run "%A_LoopFileFullPath%" %params%, %A_LoopFileDir%, UseErrorLevel, PID1S
+	    break
+	}
+
+    RunTry:=0
+    If (ErrorLevel="ERROR") {
+	RunTry++
+	If (A_LastError=5) {
+	    If (RunTry=1) {
+		TrayTip Ошибка запуска из кэша, Не удалось запустить 1С из кэша`, сейчас будут исправлены настройки доступа и выполнена повторная попытка.
+		SetupLocalPlatformCachePermissions()
+		GoTo tryRunAgain
+	    } Else If (RunTry=2) {
+		TrayTip Ошибка запуска из кэша, Не удалось запустить 1С из кэша`, вместо этого будет выполнена попытка запуска из сети.`nСообщите в службу ИТ!,,2
+		PlatformRunPath = %PlatformSource%\%PlatformExecutiveRelativePath%
+		Sleep 1000
+		GoTo tryRunAgain
+	    }
+	}
+	MsgBox 16, Не удалось запустить 1С., Код системной ошибки: %A_LastError%. Обратитесь в службу ИТ.
+	ExitApp %A_LastError%
+    } Else {
+	IniWrite %PID1S%, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
     }
 
-RunTry:=0
-If (ErrorLevel="ERROR") {
-    RunTry++
-    If (A_LastError=5) {
-	If (RunTry=1) {
-	    TrayTip Ошибка запуска из кэша, Не удалось запустить 1С из кэша`, сейчас будут исправлены настройки доступа и выполнена повторная попытка.
-	    SetupLocalPlatformCachePermissions()
-	    GoTo tryRunAgain
-	} Else If (RunTry=2) {
-	    TrayTip Ошибка запуска из кэша, Не удалось запустить 1С из кэша`, вместо этого будет выполнена попытка запуска из сети.`nСообщите в службу ИТ!,,2
-	    PlatformRunPath = %PlatformSource%\%PlatformExecutiveRelativePath%
-	    Sleep 1000
-	    GoTo tryRunAgain
+    ToolTip
+    ToolTip Платформа 1С: Предприятие запущена`, ожидание появления окна
+    Loop
+    {
+	WinWait ahk_pid %PID1S%,,3 ;WinWait WinTitle, WinText, Seconds
+	If (ErrorLevel) {
+	    Process Exist, %PID1S%
+	    If (!ErrorLevel) {
+		MsgBox 16, Не удалось запустить 1C., Процесс 1С завершился до появления окна. Обратитесь в службу ИТ.
+		ExitApp 1
+	    }
 	}
-    }
-    MsgBox 16, Не удалось запустить 1С., Код системной ошибки: %A_LastError%. Обратитесь в службу ИТ.
-    ExitApp %A_LastError%
-} Else {
-    IniWrite %PID1S%, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
-}
-
-ToolTip
-ToolTip Платформа 1С: Предприятие запущена`, ожидание появления окна
-Loop
-{
-    WinWait ahk_pid %PID1S%,,3 ;WinWait WinTitle, WinText, Seconds
-    If (ErrorLevel) {
-	Process Exist, %PID1S%
-	If (!ErrorLevel) {
-	    MsgBox 16, Не удалось запустить 1C., Процесс 1С завершился до появления окна. Обратитесь в службу ИТ.
-	    ExitApp 1
-	}
-    }
-} Until !ErrorLevel
-ToolTip
-Sleep 3000
+    } Until !ErrorLevel
+    ToolTip
+    Sleep 3000
 
 ExitApp
 ;-- Functions and procedures
