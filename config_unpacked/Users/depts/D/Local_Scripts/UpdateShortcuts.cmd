@@ -27,7 +27,11 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 (
     CALL :GetDir configDir "%DefaultsSource%"
     IF NOT EXIST "%scriptConfDir%" MKDIR "%scriptConfDir%"
-    FOR /F "usebackq delims=" %%A IN ("%scriptConfDir%\lastUnpacked.txt") DO IF DEFINED lastShortcutsTime (SET "lastShortcuts_64bitTime=%%~A") ELSE SET "lastShortcutsTime=%%~A"
+    
+    SET "foundShortcuts="
+    FOR /D %%A IN ("%~dp0Shortcuts\*.*") DO IF EXIST "%%~A\*.lnk" SET "foundShortcuts=1"
+    
+    IF DEFINED foundShortcuts FOR /F "usebackq delims=" %%A IN ("%scriptConfDir%\lastUnpacked.txt") DO IF DEFINED lastShortcutsTime (SET "lastShortcuts_64bitTime=%%~A") ELSE SET "lastShortcutsTime=%%~A"
 )
 (
     IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
@@ -45,7 +49,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 	ECHO Даты архивов не изменились, выход
 	EXIT /B
     )
-
+    
     IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
     
     CALL :unpack7zs "%~dp0Shortcuts.new"
