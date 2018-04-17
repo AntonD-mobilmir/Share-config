@@ -323,7 +323,7 @@ ParsePerfResults(txt) {
 
 PostResults(ByRef ResultsURL, perfResultsObj:="") {
     static stageTitle := "Запись результатов в таблицу"
-	 , geoLocation := 0
+	 , extIP := 0
 	 , Hostname
 
     If (!Hostname)
@@ -347,13 +347,9 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
 	    return
     }
 
-    If (!geoLocation) {
-	Notify(stageTitle . "`nПолучение GeoIP…")
-	;API The HTTP API takes GET requests in the following schema:
-	;freegeoip.net/{format}/{IP_or_hostname}
-	;Supported formats are: csv, xml, json and jsonp. If no IP or hostname is provided, then your own IP is looked up.
-	;Examples: CSV freegeoip.net/csv/8.8.8.8	XML freegeoip.net/xml/4.2.2.2	JSON freegeoip.net/json/github.com
-	Try geoLocation := GetURL("http://freegeoip.net/json/")
+    If (!extIP) {
+	Notify(stageTitle . "`nОпределение внешнего IP…")
+	Try extIP := GetURL("https://api.ipify.org")
     }
     
     Notify(stageTitle . "`nЧтение trello-id.txt…")
@@ -371,7 +367,7 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
 	    . "&entry.1905065751="	. UriEncode(A_UserName)
 	    . "&entry.293033176="	. UriEncode(trelloURL)
 	    . "&entry.56786602="	. UriEncode(trelloCardName)
-	    . "&entry.157476182="	. UriEncode(Trim(geoLocation, " `t`n`r"))
+	    . "&entry.157476182="	. UriEncode(Trim(extIP, " `t`n`r"))
 	    . "&entry.1781068882="	. UriEncode(ResultsURL)
 	    . ( IsObject(perfResultsObj)
 		? ( "&entry.1510085348=" . UriEncode(perfResultsObj.Desktop)

@@ -33,8 +33,9 @@ If (!configPost) { ; it may be defined when this script is included in "%USERPRO
     }
 }
 
-If (!geoLocation := getURL("http://freegeoip.net/json/")) 
-    getURLWinHTTP("http://freegeoip.net/json/", , reqStatus, geoLocation)
+Try extIP := getURL("https://api.ipify.org")
+If (!extIP)
+    getURLWinHTTP("https://api.ipify.org", , reqStatus, extIP)
 
 SetRegView 32
 Loop {
@@ -57,7 +58,7 @@ Loop 4
 POSTDATA := "entry.1137503626="  . UriEncode(Hostname)
 	  . "&entry.1756894160=" . UriEncode(ClientID)
 	  . "&entry.287789183="  . UriEncode(configPost)
-	  . "&entry.1477798008=" . UriEncode(Trim(trelloLocation . geoLocation, " `t`n"))
+	  . "&entry.1477798008=" . UriEncode(Trim(trelloLocation . extIP, " `t`n"))
 	  . "&entry.1221721146=" . UriEncode(trelloCardName ? trelloCardName : A_UserName)
 	  . "&entry.1999739813=" . UriEncode(Trim(trelloURL "`n" Trim(Domain " " IPAddresses) "`n" textfp, " `t`n`r"))
 	  . "&submit=%D0%93%D0%BE%D1%82%D0%BE%D0%B2%D0%BE"

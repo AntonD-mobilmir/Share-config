@@ -68,7 +68,7 @@ ExpandIDFunc(idFunc) {
 		      , Hostname:	Func("Cached_GetTcpipParameters").Bind("Hostname")
 		      , Domain:		Func("Cached_GetTcpipParameters").Bind("Domain")
 		      , HostnameDomain:	Func("GetHostnameDomain")
-		      , geoLocation:	Func("getURL").Bind("http://freegeoip.net/json/") }
+		      , ipify:		Func("getURL").Bind("https://api.ipify.org/") }
     
     If (idFunc) {
 	If (funcIDs.HasKey(idFunc))
