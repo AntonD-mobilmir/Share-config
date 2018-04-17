@@ -38,7 +38,7 @@
   <UserFolder>%USERPROFILE%\Downloads</UserFolder>
   <UserFolder>%USERPROFILE%\Favorites</UserFolder>
   <UserFolder>%USERPROFILE%\Links</UserFolder>
-  <UserFolder>%USERPROFILE%\Mail</UserFolder>
+  <UserFolder>%USERPROFILE%\Mail\Thunderbird\profile\Mail\Local Folders</UserFolder>
   <UserFolder>%USERPROFILE%\Music</UserFolder>
   <UserFolder>%USERPROFILE%\OneDrive</UserFolder>
   <UserFolder>%USERPROFILE%\Pictures</UserFolder>
@@ -50,7 +50,7 @@
   <FolderExclude>%USERPROFILE%\Contacts</FolderExclude>
   <FolderExclude>%USERPROFILE%\Downloads</FolderExclude>
   <FolderExclude>%USERPROFILE%\Favorites</FolderExclude>
-  <FolderExclude>%USERPROFILE%\Mail</FolderExclude>
+  <!--<FolderExclude>%USERPROFILE%\Mail</FolderExclude>-->
   <FolderExclude>%USERPROFILE%\OneDrive</FolderExclude>
   <FolderExclude>%USERPROFILE%\Saved Games</FolderExclude>
   <FolderExclude>%USERPROFILE%\Searches</FolderExclude>
