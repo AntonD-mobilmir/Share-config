@@ -21,6 +21,7 @@ PostGoogleForm(URL, ByRef kv, tries:=20, retryDelay:=20000) {
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     FileEncoding UTF-8
     kv := Object()
+    debug := Object()
     Loop %0%
     {
 	arg:=%A_Index%
