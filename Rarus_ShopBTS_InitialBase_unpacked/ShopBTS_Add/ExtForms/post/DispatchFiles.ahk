@@ -40,12 +40,12 @@ If (!sendemailexe || !tailexe) {
     Reload
 }
 
-logfile=%A_ScriptFullPath%.log
+logfilePath=%A_ScriptFullPath%.log
 OutgoingFilesQueueDir=%A_ScriptDir%\OutgoingFiles
 OutgoingTextsQueueDir=%A_ScriptDir%\OutgoingText
 arcDir=%A_ScriptDir%\Arc
 
-FileGetTime logfileDate,%logfile%
+FileGetTime logfileDate,%logfilePath%
 If (logfileDate) {
     logfileAge -= logfileDate, Seconds
     If (logfileAge < 60) {
@@ -55,9 +55,15 @@ If (logfileDate) {
     }
 }
 
-FileGetSize logfileSize, %logfile%, M
+FileGetSize logfileSize, %logfilePath%, M
 If (logfileSize > 5) ; megabytes
-    FileMove %logfile%, %logfile%.bak, 1
+    FileMove %logfilePath%, %logfilePath%.bak, 1
+While (!IsObject(logfile := FileOpen(logfilePath, "a-w"))) {
+    If (A_Index < 10)
+	Sleep 1000 * A_Index
+    Else
+	Throw Exception("Не удалось открыть журнал",, logfilePath)
+}
 
 If (!InStr(FileExist(A_ScriptDir "\Arc"), "D")) {
     FileMove %arcDir%, %arcDir%.bak, 1
@@ -78,25 +84,26 @@ Try {
 	Loop %0%
 	    DispatchSingleFile(%A_Index%)
     } Else {
-	Loop %OutgoingFilesQueueDir%\*.7z
+	Loop Files, %OutgoingFilesQueueDir%\*.7z
 	    DispatchSingleFile(A_LoopFileFullPath)
-	Loop %OutgoingTextsQueueDir%\*.txt
+	Loop Files, %OutgoingTextsQueueDir%\*.txt
 	    DeliverOneEmail(A_LoopFileFullPath)
     }
 } Catch e
-    Panic(e)
+    Panic(e, 0)
 
 Sleep 3000
 If (!errorsOccured)
-    FileDelete %logfile%.errflag
+    FileDelete %logfilePath%.errflag
 Exit %ReturnError%
 
-Panic(e) {
-    errorsOccured=1
+Panic(e, showmsg := 1) {
+    errorsOccured := errorsOccured ? errorsOccured : 1
     If (!IsObject(e))
 	e := Exception(e, -2)
     AppendError(ObjectToText(e))
-    MsgBox 0x30, Отправка выгрузок и/или уведомлений из 1С-Рарус не работает, % e.Message "`n" e.Extra (e.What ? "`n(" e.What ")" : "")
+    If (showmsg)
+	MsgBox 0x30, Отправка выгрузок и/или уведомлений из 1С-Рарус не работает, % e.Message "`n" e.Extra (e.What ? "`n(" e.What ")" : "")
     ExitApp ReturnError ? ReturnError : -1
 }
 
@@ -110,10 +117,10 @@ DispatchSingleFile(pathFileToSend) {
     
     If (!exchangeSrvrDest) {
 	For i, exchangeSrvr in ["Srv1S.office0.mobilmir", "Rarus-Exchange-Server.office.mobilmir.ru"] {
-	    FileAppend `n%A_Now% Проверка прямого доступа к %exchangeSrvr%…`t, %logfile%
+	    logfile.Write("`n" A_Now " Проверка прямого доступа к " exchangeSrvr "…`t")
 	    exchangeSrvrDest := "\\" exchangeSrvr "\Exchange\LAN\In\arc" 
 	    If (moveFileInsteadOfEmail := InStr(FileExist(exchangeSrvrDest), "D"))
-		FileAppend к "%exchangeSrvrDest%" доступ есть!, %logfile%
+		logfile.WriteLine("к " exchangeSrvrDest " доступ есть!")
 	} Until moveFileInsteadOfEmail
     }
 
@@ -151,7 +158,7 @@ DispatchSingleFile(pathFileToSend) {
 	    Throw Exception("Не настроена отправка выгрузок 1С-Рарус", A_ScriptDir "\sendemail.cfg", "Не прочиталось имя пользователя или пароль.")
 	}
     }
-    FileAppend %A_Now% %trayMsgText%…`t, %logfile%
+    logfile.Write(A_Now " " trayMsgText "…`n")
     SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -600000
@@ -260,7 +267,7 @@ DeliverOneEmail(EmailFileName) {
     fBody.Close()
     
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Отправка письма")
-    FileAppend %A_Now% Отправка письма "%plainSubj%" на %addrlistTo%…`t, %logfile%
+    logfile.Write(A_Now " Отправка письма """ plainSubj """ на " addrlistTo "…`t")
     tempDir := SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -600000
@@ -285,7 +292,7 @@ DeliverOneEmail(EmailFileName) {
 
 	return ReturnError
     }
-    
+    logfile.WriteLine("OK")
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Письмо отправлено", 5, 0x31)
     FileMove %EmailFileName%, %arcDir%, 1
     Loop Files, %dirAttachments%, D
@@ -303,11 +310,11 @@ RemovePerlTemp() {
 AppendError(ByRef logText, ByRef flagText := "") {
     global logfile, errorsOccured
     errorsOccured := 1
-    FileAppend %logText%`n, %logfile%
-    If (flagText)
-	FileAppend %A_Now% %flagText%`n, %logfile%.errflag
-    Else
-	FileAppend %A_Now% %logText%`n, %logfile%.errflag
+    logfile.WriteLine(logText)
+    If (IsObject(errflag := FileOpen(A_ScriptFullPath ".log.errflag", "a-w"))) {
+	errflag.WriteLine(A_Now " " (flagText == "" ? logText : flagText))
+	errflag.Close()
+    }
 }
 
 FilterRecipients(ByRef rcptList, ByRef filteredOut := "", ByRef allowedRegex := 0) {
