@@ -128,11 +128,13 @@ DispatchSingleFile(pathFileToSend) {
 	CheckTrayIcon("Перемещение выгрузки напрямую на сервер без отправки по почте…")
 	Try {
 	    FileMove %pathFileToSend%, %exchangeSrvrDest%\
-	    If (FileExist(exchangeSrvrDest "\" nameExtToSend))
+	    If (FileExist(exchangeSrvrDest "\" nameExtToSend)) {
+		FileAppend Moved to "%exchangeSrvrDest%\"`n, %pathNote%
+		FileMove %pathNote%, %arcDir%, 1
 		return
+	    }
 	}
     }
-
     
     If (SubStr(note, 1, 2) = "ST") {
 	trayMsgText := "Отправка выгрузки " . note
@@ -162,10 +164,14 @@ DispatchSingleFile(pathFileToSend) {
     SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -600000
+    sendemaillogpath=%A_ScriptFullPath%.log.tmp
     sendemailerr=
-    RunWait %sendemailexe% -f "%emailUserName%" -t "gl@k.mobilmir.ru" -u "%encSubj%" -s "smtp.k.mobilmir.ru:587" -xu "%emailUserName%" -xp "%emailPassword%" -l "%logfile%" -o "message-charset=cp-1251" -o "timeout=3" -m "%EmailBody%" -a "%pathFileToSend%",%A_Temp%,Hide UseErrorLevel, pidSendEmail
+    Try FileDelete %sendemaillogpath%
+    RunWait %sendemailexe% -f "%emailUserName%" -t "gl@k.mobilmir.ru" -u "%encSubj%" -s "smtp.k.mobilmir.ru:587" -xu "%emailUserName%" -xp "%emailPassword%" -l "%sendemaillogpath%" -o "message-charset=cp-1251" -o "timeout=3" -m "%EmailBody%" -a "%pathFileToSend%",%A_Temp%,Hide UseErrorLevel, pidSendEmail
     sendemailerr := ErrorLevel
     SetTimer killSendEmail, Off
+    AppendLogFromFile(sendemaillogpath)
+    FileDelete %sendemaillogpath%
     If (sendemailerr || killedSendEmail) {
 	If (killedSendEmail) {
 	    errText = sendemail.exe завершен по таймауту
@@ -267,15 +273,19 @@ DeliverOneEmail(EmailFileName) {
     fBody.Close()
     
     CheckTrayIcon("Тема: " plainSubj "`nКому: " addrlistTo, "Отправка письма")
-    logfile.Write(A_Now " Отправка письма """ plainSubj """ на " addrlistTo "…`t")
+    logfile.Write(A_Now " Отправка письма """ plainSubj """ на " addrlistTo "…`n")
     tempDir := SetupTemp()
     killedSendEmail := pidSendEmail := 0
     SetTimer killSendEmail, % -600000
+    sendemaillogpath=%A_ScriptFullPath%.log.tmp
     sendemailerr=
-    RunWait %sendemailexe% -o message-file="%bodyFName%" -f "%encodedFrom%" -t "%addrlistTo%" %replyToHeader% -u "%encSubj%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 %bccHeader% -l "%logfile%" %Attachments%,,Hide UseErrorLevel, pidSendEmail
+    Try FileDelete %sendemaillogpath%
+    RunWait %sendemailexe% -o message-file="%bodyFName%" -f "%encodedFrom%" -t "%addrlistTo%" %replyToHeader% -u "%encSubj%" -s "%smtpServer%" -xu "%smtpLogin%" -xp "%smtpPassword%" -o message-charset=utf-8 -o timeout=3 %bccHeader% -l "%sendemaillogpath%" %Attachments%,,Hide UseErrorLevel, pidSendEmail
     If (sendemailErr := ErrorLevel)
 	sendemailLastErr := A_LastError
     SetTimer killSendEmail, Off
+    AppendLogFromFile(sendemaillogpath)
+    FileDelete %sendemaillogpath%
     FileDelete %bodyFName%
     
     If (sendemailerr || killedSendEmail) {
@@ -304,6 +314,26 @@ RemovePerlTemp() {
 	FileRemoveDir %A_Temp%\perl, 1
 	Loop Files, %A_Temp%\pdk*, D
 	    FileRemoveDir %A_LoopFileFullPath%, 1
+    }
+}
+
+AppendLogFromFile(ByRef logpathToRead, readtries := 5, delay := 1000) {
+    Loop
+    {
+	Try {
+	    FileRead sendemaillog, *P0 %logpathToRead%
+	    logfile.WriteLine(sendemaillog)
+	    return true
+	} Catch e {
+	    If (A_Index < readtries) {
+		e.LastError := A_LastError
+		logfile.WriteLine(A_Now " [" A_Index "/" readtries "] Ошибка " ObjectToText(e) " при попытке прочитать " logpathToRead """, пауза " delay "мс")
+		Sleep delay
+	    } Else {
+		logfile.WriteLine(A_Now " " readtries " попыток исчерпано")
+		return false
+	    }
+	}
     }
 }
 
@@ -394,6 +424,7 @@ ResetTrayTip() {
 }
 
 SetTrayIcon() {
+    Menu Tray, Icon
     Menu Tray, Icon, %A_WinDir%\system32\shell32.dll,69,0
 }
 
