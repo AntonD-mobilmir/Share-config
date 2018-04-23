@@ -4,6 +4,7 @@
 #SingleInstance force
 
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+EnvGet SystemDrive, SystemDrive
 EnvGet ProgramFiles32bit, ProgramFiles(x86)
 If (!ProgramFiles32bit)
     ProgramFiles32bit := A_ProgramFiles
@@ -60,18 +61,19 @@ If (A_IsAdmin) {
     Run %SystemRoot%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
     If (runAhkUpdate)
 	RunRsyncAutohotkey(0)
+    If (FileExist(SystemDrive "\Sun")) {
+	AddLog("Удаление " SystemDrive "\Sun")
+	FileRemoveDir %SystemDrive%\Sun, 1
+	SetLastRowStatus(ErrorLevel, !ErrorLevel)
+    }
 } Else {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     
     AddLog("Скрипт RetailHelper")
     shortcutPath=%A_Startup%\RetailHelper.lnk
-;    If (!FileExist(shortcutPath)) {
-	SetLastRowStatus("Добавление в автозагрузку", 0)
-	FileCreateShortcut D:\Local_Scripts\RetailHelper.ahk, %shortcutPath%
-	SetLastRowStatus(ErrorLevel, !ErrorLevel)
-;    } Else {
-;	SetLastRowStatus("Скрипт есть", 1)
-;    }
+    SetLastRowStatus("Добавление в автозагрузку", 0)
+    FileCreateShortcut D:\Local_Scripts\RetailHelper.ahk, %shortcutPath%
+    SetLastRowStatus(ErrorLevel, !ErrorLevel)
 }
 
 
@@ -388,7 +390,6 @@ CheckUpdateDefaultConfigName(reqdConfigName)
 ;}
 
 ; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
-EnvGet SystemDrive, SystemDrive
 AddLog("Distributives", "Поиск _get_SoftUpdateScripts_source.cmd")
 gsussScript := FirstExisting(A_AppDataCommon . "\mobilmir.ru\_get_SoftUpdateScripts_source.cmd", SystemDrive . "\Local_Scripts\_get_SoftUpdateScripts_source.cmd")
 If (gsussScript) {
