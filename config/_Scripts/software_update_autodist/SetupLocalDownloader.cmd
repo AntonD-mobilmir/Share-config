@@ -62,12 +62,12 @@
 SET "schtaskPassSw=" & IF DEFINED schedUserPwd SET schtaskPassSw=/RP "%schedUserPwd%"
 IF NOT DEFINED schedUserName SET /P "schedUserName=Имя пользователя для задачи обновления дистрибутивов: "
 (
-SET "retaskq=0"
-CALL "%~dp0..\CheckWinVer.cmd" 6 || ( CALL :SchTasksXP & GOTO :checkSchtasksError )
-IF NOT ERRORLEVEL 1 (
-    rem "%SystemRoot%\System32\schtasks.exe" /Delete /TN "mobilmir\Update_Distributives" /F
-    "%SystemRoot%\System32\schtasks.exe" /Create /TN "mobilmir.ru\Update_Distributives" /XML "%~dp0Update_Distributives.xml" /RU "%schedUserName%" %schtaskPassSw% /NP /F
-)
+    SET "retaskq=0"
+    CALL "%~dp0..\CheckWinVer.cmd" 6 || ( CALL :SchTasksXP & GOTO :checkSchtasksError )
+    IF NOT ERRORLEVEL 1 (
+	rem "%SystemRoot%\System32\schtasks.exe" /Delete /TN "mobilmir\Update_Distributives" /F
+	"%SystemRoot%\System32\schtasks.exe" /Create /TN "mobilmir.ru\Update_Distributives" /XML "%~dp0Update_Distributives.xml" /RU "%schedUserName%" %schtaskPassSw% /NP /F
+    )
 )
 :checkSchtasksError
 IF ERRORLEVEL 1 (
@@ -76,50 +76,50 @@ IF ERRORLEVEL 1 (
 )
 IF NOT DEFINED configDir CALL :getconfigDir
 (
-IF "%retaskq%"=="1" GOTO :addTask
-IF /I "%retaskq:~0,1%"=="y" GOTO :addTask
-%SetACLexe% -on "%InstDest%" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
-%SystemRoot%\System32\takeown.exe /F "d:\Distributives" /A /R /D Y
-%SetACLexe% -on "d:\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
-%SetACLexe% -on "%USERPROFILE%\BTSync\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
+    IF "%retaskq%"=="1" GOTO :addTask
+    IF /I "%retaskq:~0,1%"=="y" GOTO :addTask
+    %SetACLexe% -on "%InstDest%" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
+    %SystemRoot%\System32\takeown.exe /F "d:\Distributives" /A /R /D Y
+    %SetACLexe% -on "d:\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
+    %SetACLexe% -on "%USERPROFILE%\BTSync\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
 
-%sedexe% -i "s/"{$SUSHost$}/"%SUSHost%/g" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd" || %ErrorCmd%
+    %sedexe% -i "s/"{$SUSHost$}/"%SUSHost%/g" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd" || %ErrorCmd%
 
-START "install_software_update_scripts.cmd" /MIN %comspec% /C "%InstDest%\software_update\_install\install_software_update_scripts.cmd"
+    START "install_software_update_scripts.cmd" /MIN %comspec% /C "%InstDest%\software_update\_install\install_software_update_scripts.cmd"
 
-ECHO N|%SystemRoot%\System32\net.exe SHARE "Distributives" /DELETE
-%SystemRoot%\System32\net.exe SHARE "Distributives=d:\Distributives"
-ECHO Y|%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$" /DELETE
-%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Everyone,CHANGE
-%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Все,CHANGE
-%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update"
+    ECHO N|%SystemRoot%\System32\net.exe SHARE "Distributives" /DELETE
+    %SystemRoot%\System32\net.exe SHARE "Distributives=d:\Distributives"
+    ECHO Y|%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$" /DELETE
+    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Everyone,CHANGE
+    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Все,CHANGE
+    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update"
 
-CALL :updateSysUtils
+    CALL :updateSysUtils
 
-CALL :checkProxy
-START "Copying download-scripts" /MIN %comspec% /C "%~dp0..\CopyDistributives_Downloaders.cmd"
+    CALL :checkProxy
+    START "Copying download-scripts" /MIN %comspec% /C "%~dp0..\CopyDistributives_Downloaders.cmd"
 
-IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z") DO (
-    (ECHO %%~tI)>"%InstDest%\ver.flag"
-    SET "instVersion=%%~tI"
-)
+    IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z") DO (
+	(ECHO %%~tI)>"%InstDest%\ver.flag"
+	SET "instVersion=%%~tI"
+    )
 
-ECHO Готово.
-ECHO.
-ECHO Отправка информации в форму...
+    ECHO Готово.
+    ECHO.
+    ECHO Отправка информации в форму...
 
-CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
-IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
+    CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
+    IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 )
 (
-ECHO "MailUserId=%MailUserId%"
-ECHO "instVersion=%instVersion%"
-FOR /F "usebackq delims=" %%A IN ("%~dp0..\pseudo-secrets\%~nx0.txt") DO (
-    START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
-    EXIT /B
-)
+    ECHO "MailUserId=%MailUserId%"
+    ECHO "instVersion=%instVersion%"
+    FOR /F "usebackq delims=" %%A IN ("%~dp0..\pseudo-secrets\%~nx0.txt") DO (
+	START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
+	EXIT /B
+    )
 
-EXIT /B
+    EXIT /B
 )
 :CheckCreateDir
 (
@@ -204,19 +204,19 @@ EXIT /B
 )
 :updateSysUtils
 (
-IF NOT DEFINED configDir CALL :getconfigDir
-IF DEFINED SysutilsUpdated EXIT /B 32767
-SET "SysutilsUpdated=1"
-CALL :ensureRsyncReady
-ECHO Waiting for PreInstalled to be copied...
+    IF NOT DEFINED configDir CALL :getconfigDir
+    IF DEFINED SysutilsUpdated EXIT /B 32767
+    SET "SysutilsUpdated=1"
+    CALL :ensureRsyncReady
+    ECHO Waiting for PreInstalled to be copied...
 )
 (
-( %comspec% /C ""%configDir%_Scripts\rSync_DistributivesFromSrv0.cmd" "D:\Distributives\Soft\PreInstalled"" ) && GOTO :distSysUtilsUpdated
-XCOPY "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled" "D:\Distributives\Soft\PreInstalled" /D /E /C /I /H /K /Y && GOTO :distSysUtilsUpdated
+    ( %comspec% /C ""%configDir%_Scripts\rSync_DistributivesFromSrv0.cmd" "D:\Distributives\Soft\PreInstalled"" ) && GOTO :distSysUtilsUpdated
+    XCOPY "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled" "D:\Distributives\Soft\PreInstalled" /D /E /C /I /H /K /Y && GOTO :distSysUtilsUpdated
 EXIT /B 32767
 )
 :distSysUtilsUpdated
 (
-START "Cleaning up SysUtils and reinstalling PreInstalled" /MIN /WAIT %comspec% /C "D:\Distributives\Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd"
+    START "Cleaning up SysUtils and reinstalling PreInstalled" /MIN /WAIT %comspec% /C "D:\Distributives\Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd"
 EXIT /B
 )
