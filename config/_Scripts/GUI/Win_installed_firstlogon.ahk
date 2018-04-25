@@ -9,14 +9,16 @@ If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
     sysNative := SystemRoot "\System32"
 
 configScriptsDir = %A_ScriptDir%\..
-configDir = %configScriptsDir%\..
+If (!InStr(FileExist(configDir := "\\Srv0.office0.mobilmir\profiles$\Share\config"), "D"))
+    configDir = %configScriptsDir%\..
 
 If (!A_IsAdmin) {
     RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
 }
 
-FileCreateShortcut %configDir%\, %A_Desktop%\config.lnk
+FileCreateShortcut explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
+FileCreateShortcut explorer.exe, %A_Desktop%\config@Srv0.lnk,, /open`,"\\Srv0.office0.mobilmir\profiles$\Share\config"
 
 OSVersionObj := RtlGetVersion()
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
