@@ -16,6 +16,8 @@ global WinVer := GetWinVer()
      , SystemRoot
 EnvGet SystemRoot, SystemRoot
 
+menuCreated := 0
+
 PlatformExecutiveRelativePath := "bin\1cv8.exe"
 localPlatformCache := LocalAppData "\Programs\1C\PlatformCache"
 If (FileExist(LocalAppData "\1C\PlatformCache"))
@@ -35,7 +37,9 @@ If (PlatformVersionName)
 
 Gui Add, Text, w500, У нас используются разные версии платформы для разных конфигураций 1С. Если попытаться запустить конфигурацию`, не соответствующую платформе`, 1С покажет ошибку и не запустится. Причем окно списка конфигураций показывает платформа`, так что выбрать`, какую запускать платформу`, надо до выбора конфигурации.
 Gui Add, ListView, -Multi LV-E0x200 r3 w500 AltSubmit gSelectPlatform, Платформа|Примечание
-Gui Add, Button, Default vbtnOK, OK
+Gui Add, Button, Default vbtnOK Section, OK
+Gui Add, Button, ys gShowMenu vbtnMenu, ...
+
 For platfVer, platfName in PlatformNames
     LV_Add("", platfVer, platfName)
 GuiShowAgain:
@@ -150,6 +154,25 @@ ExitApp
 GuiClose:
 GuiEscape:
     ExitApp
+
+ShowMenu:
+    If (!menuCreated) {
+        menuCreated := 1
+        Menu ext, Add, Удалить кэши баз данных, remove1scaches
+        Menu ext, Add, Удалить локальные копии платформы, removelocalplatform
+    }
+    Gui +LastFound
+    GuiControlGet btnMenu, Pos
+    CoordMode Menu, Client
+    Menu ext, Show, % btnMenuX + btnMenuW, % btnMenuY + btnMenuH
+return
+
+remove1scaches:
+    FileRemoveDir %LocalAppData%\1C\1cv8, 1
+    return
+removelocalplatform:
+    FileRemoveDir %localPlatformCache%, 1
+    return
 
 CachePlatformLocally(PlatformVersionName) {
     global localPlatformCache, PlatformSource, PlatformSourceArc
