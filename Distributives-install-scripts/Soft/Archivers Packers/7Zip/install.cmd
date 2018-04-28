@@ -16,8 +16,10 @@ CALL "%~dp0Find7zDir.cmd"
 IF NOT DEFINED dest7zinst SET "dest7zinst=%ProgramFiles%\7-Zip"
 )
 SET "distDir=%srcpath%"
-FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%distDir%7z*.exe"`) DO CALL :SetIfSameWordSizeAsSystem distrib_main "%distDir%%%~I" && GOTO :ExitDistLookupFor
-:ExitDistLookupFor
+FOR /F "usebackq delims=" %%I IN (`DIR /B /S /O-D "%distDir%7z*.exe"`) DO (
+    CALL :SetIfSameWordSizeAsSystem distrib_main "%%~I" && GOTO :breakDistLookup
+)
+:breakDistLookup
 (
 ECHO distrib_main=%distrib_main%
 IF NOT DEFINED distrib_main %ErrorCmd%
