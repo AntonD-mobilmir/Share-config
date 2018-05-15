@@ -39,7 +39,7 @@ FileReadLine AhkDistVer, %officeDistSrvPath%\Soft\Keyboard Tools\AutoHotkey\ver.
 If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc))
     AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
 Else
-    AhkDistVer		:= "1.1.28.00"
+    AhkDistVer		:= "1.1.28.02"
 runAhkUpdate := A_AhkVersion < AhkDistVer
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
