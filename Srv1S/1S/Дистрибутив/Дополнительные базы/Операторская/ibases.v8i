@@ -8,6 +8,5 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.2
-DefaultApp=ThickClient
-DefaultVersion=8.2.13.219
+Version=8.3.4.408
+
