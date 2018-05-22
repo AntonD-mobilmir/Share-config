@@ -1,6 +1,10 @@
 ﻿#NoEnv
 #SingleInstance ignore
-Menu Tray, Tip, LibreOffice uninstall and cleanup
+
+global ScriptTitle := "LibreOffice uninstall and cleanup"
+     , silent
+
+Menu Tray, Tip, %ScriptTitle%
 
 EnvGet RunInteractiveInstalls,RunInteractiveInstalls
 If (!A_IsAdmin && RunInteractiveInstalls!="0") {
@@ -8,64 +12,84 @@ If (!A_IsAdmin && RunInteractiveInstalls!="0") {
     ExitApp
 }
 
-regViews := [32]
-If (A_Is64bitOS)
+If (RunInteractiveInstalls=="0")
+    silent := 1
+Else
+    argsmsiexec = /passive
+
+Loop %0%
+{
+    arg := %A_Index%
+    If (arg = "/q")
+	silent := 1
+}
+
+regViews := [32], baseDirs := {(A_ProgramFiles): ""}
+If (A_Is64bitOS) {
     regViews.Push(64)
+    For i, envVar in ["ProgramFiles", "ProgramFiles(x86)", "ProgramW6432"] {
+        EnvGet evValue, envVar
+        baseDirs[evValue] := ""
+    }
+}
+
+If (silent)
+    argsmsiexec = /quiet
+
 uninstCount := 0
 For i, regView in regViews {
     SetRegView %regView%
     InstallLocation=
-
+    
     ;see http://wpkg.org/LibreOffice for list of GUIDs
     Loop Reg, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, K
     {
 	RegRead DisplayName, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, DisplayName
 	If (SubStr(DisplayName, 1, 12)!="LibreOffice ")
 	    Continue
-	
 	RegRead URLInfoAbout, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLInfoAbout
-	If URLInfoAbout != http://www.documentfoundation.org
+	If (!(URLInfoAbout == "http://www.documentfoundation.org" || URLInfoAbout == "https://www.documentfoundation.org"))
 	    Continue
 
 	RegRead InstallLocation, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, InstallLocation
-	If (!CompareSubstr(InstallLocation,"C:\Program Files\LibreOffice") && !CompareSubstr(InstallLocation, "C:\Program Files (x86)\LibreOffice") )
-	    Continue
-	TrayTip Uninstalling LibreOffice, Found %DisplayName% (GUID %A_LoopRegName%)`, uninstalling,,16
-    TryUninstallAgain:
-	RunWait "%A_WinDir%\System32\MsiExec.exe" /X%A_LoopRegName% /quiet /norestart,,UseErrorLevel
-	If (ErrorLevel) {
-	    If (ErrorLevel==1618) { ; Another install is currently in progress
-		TrayTip %A_ScriptName%, Error 1618: Another install currently in progress`, waiting 30 sec to repeat
-		Sleep 30000
-		GoTo TryUninstallAgain
-	    } Else If (ErrorLevel!=3010) { ;3010: restart required
-		If (RunInteractiveInstalls!="0")
-		    MsgBox Error %ErrorLevel% uninstalling %DisplayName% (GUID %A_LoopRegName%)
-		Exit %ErrorLevel%
-	    }
-	} Else {
-	    TrayTip Uninstalling LibreOffice, Removing %InstallLocation%,,16
-	    FileRemoveDir %InstallLocation%, 1
-	    uninstCount++
-	}
+	baseDirFound := 0
+	For baseDir in baseDirs
+            If (StartsWith(InstallLocation, baseDir)) {
+                baseDirFound := 1
+                break
+            }
+        If (!baseDirFound)
+            continue
+        Loop
+        {
+            TrayTip %ScriptTitle%, Найден %DisplayName% (GUID %A_LoopRegName%)`, удаление,,16
+            RunWait "%A_WinDir%\System32\MsiExec.exe" /X"%A_LoopRegName%" %argsmsiexec% /norestart,,UseErrorLevel
+            If (ErrorLevel) {
+                If (ErrorLevel==1618) { ; Another install is currently in progress
+                    TrayTip %A_ScriptName%, Ошибка %ErrorLevel%: В данный момент выполняется другая установка`, ожидание 30 с перед повтором.`n`n[попытка %A_Index%]
+                    Sleep 30000
+                    continue
+                } Else If (ErrorLevel!=3010) { ;3010: restart required
+                    If (!silent)
+                        MsgBox Ошибка %ErrorLevel% при удалении %DisplayName% (GUID %A_LoopRegName%)
+                    Exit %ErrorLevel%
+                }
+            } Else {
+                TrayTip %ScriptTitle%, Удаление папки %InstallLocation%,,16
+                FileRemoveDir %InstallLocation%, 1
+                uninstCount++
+            }
+            break
+        }
     }
 }
 If (!uninstCount) {
-    If (RunInteractiveInstalls!="0")
-	MsgBox LibreOffice не найден в списке установки и удаления программ.
+    If (!silent)
+	MsgBox 0x30, %ScriptTitle%, LibreOffice не найден в списке установки и удаления программ., 120
     ExitApp 1
 }
 ExitApp 0
 
-CompareSubstr(str1,str2) {
-    l1:=StrLen(str1)
-    l2:=StrLen(str2)
-    
-    If (l1>l2)
-	ml:=l2
-    Else
-	ml:=l1
-    
-    return SubStr(str1,1,ml)=SubStr(str2,1,ml)
-    return SubStr(str1,1,ml)=SubStr(str2,1,ml)
+StartsWith(ByRef long, ByRef short) {
+    return SubStr(long,1,StrLen(short))=short
 }
