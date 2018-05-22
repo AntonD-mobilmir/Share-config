@@ -44,7 +44,7 @@ If (FileExist(listpath)) {
 	}
     }
 } Else {
-    logPath = %A_ScriptName%.log
+    logPath = %A_ScriptName% %A_YYYY%-%A_MM%-%A_DD% %A_Hour%_%A_Min%_%A_Sec%.log
     reqFieldsSeq := ["login", "domain", "FirstName", "LastName"]
     argC = %0%
     argN := 1
