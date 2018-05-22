@@ -8,7 +8,7 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.10.2466
+Version=8.3.10.2753
 [ЗУП 3.1 Сервисный Центр]
 Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRM3Service";
 ID=13c1f9e6-82b7-4dba-9ad4-00e0bdf470f3
@@ -19,4 +19,4 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.10.2466
+Version=8.3.10.2753
