@@ -16,7 +16,7 @@ SET "deptLastName=(розничный отдел)"
 SET "org=/Розничные отделы"
 )
 IF DEFINED deptSector (
-    SET "sectGroup=depts%deptSector%1@%pd%"
+    SET "sectGroup=depts%deptSector%@%pd%"
     SET "monAddr=depts%deptSector%-co@status.%pd%"
 ) ELSE (
     SET "sectGroup=retail-depts@%pd%"
