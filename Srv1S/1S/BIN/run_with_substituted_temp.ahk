@@ -3,7 +3,7 @@
 #SingleInstance force
 
 platfSrv1S	:=	"8.3.4.408"
-platfSrv1SB	:=	"8.3.10.2466"
+platfSrv1SB	:=	"8.3.10.2753"
 
 ServerPlaforms := { "Srv1S" : platfSrv1S
 		  , "Srv1S-B" : platfSrv1SB }
@@ -604,6 +604,14 @@ GetAppPathFromRegShellKey(exename, regsubKeyShell) {
     Throw
 }
 
+GetWinVer() {
+    return ((r := DllCall("GetVersion") & 0xFFFF) & 0xFF) "." (r >> 8)
+}
+
+StartsWith(long, short) {
+    return SubStr(long, 1, StrLen(short)) = short
+}
+
 ;-- Fast 64- and 128-bit hash functions
 ;http://www.autohotkey.com/board/topic/14040-fast-64-and-128-bit-hash-functions/
 
@@ -657,8 +665,4 @@ TEA(ByRef y,ByRef z, k0,k1,k2,k3, n = 32) { ; n = #Rounds
 	  k := "k" . s >> 11 & 3
 	  z := 0xFFFFFFFF & (z + ((y << 4 ^ y >> 5) + y  ^  s + %k%))
    }
-}
-
-GetWinVer() {
-    return ((r := DllCall("GetVersion") & 0xFFFF) & 0xFF) "." (r >> 8)
 }
