@@ -10,9 +10,10 @@ IF DEFINED PROCESSOR_ARCHITEW6432 (
 
 
 "%SystemRoot%\System32\Dism.exe" /Online /NoRestart /Disable-Feature /FeatureName:"Windows-Defender-Default-Definitions" /FeatureName:"FaxServicesClientPackage"
+"%SystemRoot%\System32\Dism.exe" /Online /NoRestart /Disable-Feature /FeatureName:"SMB1Protocol-Deprecation"
 
 rem +useful components
-"%SystemRoot%\System32\Dism.exe" /Online /NoRestart /Enable-Feature /FeatureName:"TelnetClient" /FeatureName:"TFTP"
+"%SystemRoot%\System32\Dism.exe" /Online /NoRestart /Enable-Feature /FeatureName:"SMB1Protocol" /FeatureName:"SMB1Protocol-Client" /FeatureName:"TelnetClient" /FeatureName:"TFTP"
 rem "%SystemRoot%\System32\Dism.exe" /Online /NoRestart /Enable-Feature /FeatureName:"TelnetServer" /FeatureName:"ScanManagementConsole" /FeatureName:"Printing-XPSServices-Features" /FeatureName:"TIFFIFilter"
 
 EXIT /B
