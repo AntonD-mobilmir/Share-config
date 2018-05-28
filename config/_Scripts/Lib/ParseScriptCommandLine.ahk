@@ -4,7 +4,7 @@
 
 ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:="") {
     CommandLine := DllCall( "GetCommandLine", "Str" )
-    ; ["]%A_AhkPath%["] [args] ["][%A_ScriptDir%\]%A_ScriptName%["] [args]
+    ; ["]%A_AhkPath%["] [ahkArgs] ["][%A_ScriptDir%\]%A_ScriptName%["] [args]
     ; If IsByRef(cmdlPrms), cmdlArgs returned – array with all script arguments, with cmdlArgs[""] = number of arguments and cmdlArgs[0] := script path from command line
     ; otherwise, all script parameters returned as one string (unparsed)
     

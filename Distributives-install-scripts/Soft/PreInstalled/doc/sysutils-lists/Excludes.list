@@ -1,11 +1,15 @@
 *.log
+.wget-hsts
+COPYING
+curl.exe.txt
+curl-manpage.html
 fsm.ini
 HwId\pci.ids.bz2
 HwId\usb.ids.bz2
 HxD.ini
 nirsoft\*.cfg
-nirsoft\*.exe
 nirsoft\*.chm
+nirsoft\*.exe
 RegCmd\Bookmarks.bmk
 RegCmd\config.ini
 RegCmd\SearchRes.bmk

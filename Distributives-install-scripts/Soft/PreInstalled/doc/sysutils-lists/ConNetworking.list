@@ -1,5 +1,6 @@
 ﻿curl.exe
 curl.html
 curl-ca-bundle.crt
+curl-ca-bundle-update.cmd
 wget.exe
 wget.ini
