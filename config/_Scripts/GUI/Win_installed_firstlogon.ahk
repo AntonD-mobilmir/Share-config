@@ -8,17 +8,23 @@ EnvGet SystemRoot,SystemRoot
 If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
     sysNative := SystemRoot "\System32"
 
+defaultConfigDir = \\Srv0.office0.mobilmir\profiles$\Share\config
 configScriptsDir = %A_ScriptDir%\..
-If (!InStr(FileExist(configDir := "\\Srv0.office0.mobilmir\profiles$\Share\config"), "D"))
-    configDir = %configScriptsDir%\..
+If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
+    FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config@Srv0.lnk,, /open`,"\\Srv0.office0.mobilmir\profiles$\Share\config"
+    Loop Files, %configScriptsDir%\.., D
+        configDir := A_LoopFileLongPath
+}
+FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
 
 If (!A_IsAdmin) {
     RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
 }
 
-FileCreateShortcut explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
-FileCreateShortcut explorer.exe, %A_Desktop%\config@Srv0.lnk,, /open`,"\\Srv0.office0.mobilmir\profiles$\Share\config"
+RunWait %sysNative%\bcdedit.exe /set nx optout, %A_Temp%
+RunWait %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%
+Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%
 
 OSVersionObj := RtlGetVersion()
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
@@ -32,10 +38,6 @@ Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cm
 ;ToDo: сначал тихий поиск карточки, и, если карточка не найдена, проверка/запрос смены hostname.
 ; стандартный hostname в Win10: DESKTOP-*
 ;Run "%A_AhkPath" "%configScriptsDir%\Write-trello-id.ahk"
-
-Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%
-RunWait %sysNative%\bcdedit.exe /set nx optout, %A_Temp%
-RunWait %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%
 
 ExitApp
 
