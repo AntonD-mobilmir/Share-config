@@ -50,7 +50,6 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 	FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 	CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
 	FOR %%A IN ("D:\Local_Scripts\RetailHelper.ahk") DO SET "RetailHelperAhkTime=%%~tA"
-	FOR %%A IN ("D:\dealer.beeline.ru\bin\criacx.cab") DO SET "criacxcabTime=%%~tA"
 	CALL :PostForm
     )
     CALL "%~dp0ScriptUpdater_dist\InstallScriptUpdater.cmd" "D:\Local_Scripts\ScriptUpdater" && START "UpdateShortcuts.cmd" /MIN %comspec% /C "d:\Local_Scripts\UpdateShortcuts.cmd"
@@ -58,7 +57,7 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 )
 :PostForm
 FOR /F "usebackq delims=" %%A IN ("%~dp0pseudo-secrets\%~nx0.txt") DO (
-    START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "%%~A" "entry.1278320779=%MailUserId%" "entry.1958374743=%Hostname%" "entry.2091378917=%RetailHelperAhkTime%" "entry.1721351309=%criacxcabTime%"
+    START "" %AutohotkeyExe% "%~dp0Lib\PostGoogleForm.ahk" "%%~A" "entry.1278320779=%MailUserId%" "entry.1958374743=%Hostname%" "entry.2091378917=%RetailHelperAhkTime%"
 EXIT /B
 )
 EXIT /B
