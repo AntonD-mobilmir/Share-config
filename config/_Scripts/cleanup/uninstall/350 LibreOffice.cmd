@@ -4,8 +4,8 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF NOT DEFINED ProgramFiles32 CALL "%~dp0..\uninstall_soft_init.cmd"
 )
 (
-    FOR /D %%I IN ("%ProgramFiles32%\LibreOffice*") DO IF EXIST "%%~I\program\soffice.exe" CALL :CheckMSI "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\32-bit\LibreOffice_*_Win_x86.msi" "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\LibreOffice_*.msi" && GOTO :UninstallLO
-    FOR /D %%I IN ("%ProgramFiles64%\LibreOffice*") DO IF EXIST "%%~I\program\soffice.exe" CALL :CheckMSI "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\64-bit\LibreOffice_*_Win_x64.msi" "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\LibreOffice_*.msi" && GOTO :UninstallLO
+    FOR /D %%I IN ("%ProgramFiles32%\LibreOffice*") DO IF EXIST "%%~I\program\soffice.exe" CALL :CheckMSIInSubdirs "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\32-bit\LibreOffice_*_Win_x86.msi" "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\LibreOffice_*.msi" && GOTO :UninstallLO
+    FOR /D %%I IN ("%ProgramFiles64%\LibreOffice*") DO IF EXIST "%%~I\program\soffice.exe" CALL :CheckMSIInSubdirs "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\64-bit\LibreOffice_*_Win_x64.msi" "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\LibreOffice_*.msi" && GOTO :UninstallLO
 
     ECHO LibreOffice не найден
 EXIT /B 1
