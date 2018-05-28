@@ -15,15 +15,24 @@ PathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
 
 boardDumpDirs := [ A_LineFile "\..\..\..\Inventory\trello-accounting\board-dump"
 	         , A_ScriptDir "\board-dump"
-	         , A_ScriptDir ]
+	         , A_ScriptDir
+	         , "\\Srv1S-B.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump"
+	         , "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump" ]
 
+pathTrelloID=%A_AppDataCommon%\mobilmir.ru\trello-id.txt
+regpathAutorun=HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+regKNAutorun=%A_ScriptName%
+
+EnvGet envParams, Write-trello-id.ahk-params
 ; ToDo: save fingerprint on request to avoid double-fingerprinting in Inventory\collector-script\SaveJsonFingerprint.cmd
 argc=%0%
-If (argc) {
-    FileEncoding UTF-8
+arg1=%1%
+nag := arg1="/nag" || envParams="/nag"
+If (argc && !nag) {
     query := CommandLineArgs_to_FindTrelloCardQuery()
     FileAppend % JSON.Dump(query) "`n", *, CP1
 } Else {
+    RegWrite REG_SZ, %regpathAutorun%, %regKNAutorun%, "%A_AhkPath%" "%A_ScriptFullPath%"
     writeSavedID := 1
     If (FileExist(PathSavedID)) {
 	lineVarNames := ["txtshortUrl", "txtID", "oldHostname"]
@@ -99,6 +108,7 @@ If (writeSavedID && nMatches==1) {
 	    }
 	}
 	FileMove %newPathSavedID%, %PathSavedID%, 1
+        RegDelete %regpathAutorun%, %regKNAutorun%
 	If (!(RunInteractiveInstalls == "0"))
 	    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
     }

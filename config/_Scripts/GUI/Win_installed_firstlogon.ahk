@@ -34,10 +34,10 @@ If (AppXSupported)
 
 Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%
 
+EnvSet Write-trello-id.ahk-params, /nag
 Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
 ;ToDo: сначал тихий поиск карточки, и, если карточка не найдена, проверка/запрос смены hostname.
 ; стандартный hostname в Win10: DESKTOP-*
-;Run "%A_AhkPath" "%configScriptsDir%\Write-trello-id.ahk"
 
 ExitApp
 
