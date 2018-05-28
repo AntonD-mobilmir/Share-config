@@ -18,7 +18,7 @@ out := lastID := prevLastID := ""
 Loop
 {
     maxIndex := 0
-    For i, actn in TrelloAPI1("GET", query := "/members/me/actions/?action_memberCreator=false&action_member=false&actions_limit=1000&since=" actions_since . (lastID ? "&before=" lastID : ""), lastresp := Object()) {
+    For i, actn in TrelloAPI1("GET", query := "/boards/Fx0VjHI7/actions/?action_memberCreator=false&action_member=false&actions_limit=1000&since=" actions_since . (lastID ? "&before=" lastID : ""), lastresp := Object()) {
 	If (i > maxIndex)
 	    maxIndex := i, lastID := actn.id
 	
@@ -41,7 +41,7 @@ Run %reportName%
 ExitApp
 
 updateCard(data) {
-    out := ""
+    out := "", listName := data.list.name
     For field, value in data.old
 	If field in desc,due,pos,name,idLabels,idAttachmentCover
 	    continue
@@ -49,15 +49,18 @@ updateCard(data) {
 	    If (value == 1)
 		out .= "завершено, "
 	} Else If (field == "closed") {
+            ;MsgBox 0x104, %A_ScriptName%, % "closed: " value "`nshortLink: " data.card.shortLink "`n`nОткрыть?"
+            ;IfMsgBox Yes
+            ;    Run % "https://trello.com/c/" data.card.shortLink
 	    If (value == 0) ; это старое значение, а не новое
 		out .= "закрыто, "
 	} Else If (field == "idList") {
-	    If (data.listAfter.name = "Готово")
-		out .= "готово, "
+	    If (data.listAfter.name = "Акт выполненных работ")
+		out .= "Добавлено в акт, ", listName := data.listAfter.name
 	} Else
 	    return JSON.Dump(data)
     If (out)
-	return data.board.name A_Tab data.list.name A_Tab data.card.name A_Tab SubStr(out, 1, -2)
+	return listName A_Tab SubStr(out, 1, -2) A_Tab StrReplace(data.card.name, " | ", A_Tab)
     return SubStr(out, 1, -1)
 }
 
