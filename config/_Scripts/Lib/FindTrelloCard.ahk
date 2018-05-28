@@ -143,13 +143,13 @@ FingerprintSNs_to_Regexes(ByRef fp, withHeaders := 1) {
 }
 
 ExtractSNsFromCardText() {
-    Throw Exception("Not implemented")
+    Throw Exception("Not implemented", A_LineFile, A_ThisFunc)
     rs := { "IdentifyingNumber": "\w+"
 	  , "UUID": "[A-F\-]{36}"
 	  , "SerialNumber": "\w+" }
 }
 
-CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "") {
+CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "", ByRef othersw := "") {
     If (!IsObject(query))
 	query := Object()
     
@@ -167,10 +167,18 @@ CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "") {
 		option := SubStr(argv, 2)
 		continue
 	    } Else {
-		If (!colon := InStr(argv, ":"))
-		    Throw Exception("Param name should end with a colon",,argv)
-		parmName := Trim(SubStr(argv, 1, colon-1))
-		parmValue := Trim(SubStr(argv, colon+1)) ; if "", this arg is just a param name, next arg is parm value
+		If (!colon := InStr(argv, ":")) {
+                    If (IsByRef(othersw)) {
+                        If(IsObject(othersw))
+                            othersw.Push(argv)
+                        Else
+                            othersw .= argv
+                    } Else
+                        Throw Exception("Param name should end with a colon", A_LineFile ": " A_ThisFunc, argv)
+                } Else {
+                    parmName := Trim(SubStr(argv, 1, colon-1))
+                    parmValue := Trim(SubStr(argv, colon+1)) ; if "", this arg is just a param name, next arg is parm value
+                }
 	    }
 	}
 	If (parmValue) { 
