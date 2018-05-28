@@ -43,9 +43,6 @@ Else
 runAhkUpdate := A_AhkVersion < AhkDistVer
 
 RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-DOL2SettingsRegRoot=HKEY_CURRENT_USER\Software\VIMPELCOM\InternetOffice\Dealer_On_Line
-DOL2SettingsKey=%DOL2SettingsRegRoot%\Contract\Dirs
-DOL2ReqdBaseDir=d:\dealer.beeline.ru\DOL2
 
 Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R35 w600 vLogListView, Операция|Статус
 Gui Show
@@ -315,14 +312,6 @@ For i,regview in regViews {
 }
 SetRegView Default
 
-If (!A_IsAdmin) {
-    RegRead dol2regRootDir, %DOL2SettingsKey%, RootDir
-    If (!ErrorLevel && dol2regRootDir != DOL2ReqdBaseDir) {
-	keepOpen:=1
-	AddLog("Неправильная корневая папка DOL2", dol2regRootDir)
-    }
-}
-
 If (ReRunAsAdmin) {
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
     If (removeAppXPID)
@@ -339,9 +328,6 @@ If (ReRunAsAdmin) {
     ExitApp
 }
 
-FileDelete C:\ScriptUpdaterDir.txt
-FileDelete D:\ScriptUpdaterDir.txt
-
 For i,regview in regViews {
     SetRegView %regview%
     RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
@@ -352,6 +338,44 @@ For i,regview in regViews {
 	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     }
 }
+
+If (A_OSVersion == "WIN_7") {
+    SetRegView 64
+    ;[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsBackup\ScheduleParams\Rules\2]
+    ;"Root"="D:\\Users\\Продавец\\Mail\\Thunderbird\\profile\\Mail\\Local Folders\\"
+    ;"UniqueId"=""
+    ;"Flags"=dword:c000016f
+    rkWin7backup = HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsBackup\ScheduleParams\Rules
+    dirSuffixTBLocalFolders = \Mail\Thunderbird\profile\Mail\Local Folders
+    setupMailBackup := 1, ruleMaxIdx := 0
+    Loop Reg, %rkWin7backup%, K
+    {
+        If (A_LoopRegName > ruleMaxIdx)
+            ruleMaxIdx := A_LoopRegName
+        RegRead bkpDirRoot, %rkWin7backup%\%A_LoopRegName%, Root
+        If (EndsWith(bkpDirRoot, dirSuffixTBLocalFolders) || EndsWith(bkpDirRoot, dirSuffixTBLocalFolders "\")) {
+            setupMailBackup := 0
+            break
+        }
+    }
+    If (setupMailBackup) {
+        ruleMaxIdx++
+        bkpruleRoot := ""
+        For i, dir in ["D:\Users\Продавец", "D:\Users\Пользователь", "D:"]
+            If (FileExist(dir . dirSuffixTBLocalFolders . "\Archives.sbd")) {
+                bkpruleRoot = dir . dirSuffixTBLocalFolders
+                break
+            }
+        If (bkpruleRoot) {
+            AddLog("Добавление правила архивации " dir "\…\Local Folders")
+            RegWrite REG_DWORD, %rkWin7backup%\%ruleMaxIdx%, Flags, 0xc000016f
+            RegWrite REG_SZ, %rkWin7backup%\%ruleMaxIdx%, Root, %bkpruleRoot%
+            RegWrite REG_SZ, %rkWin7backup%\%ruleMaxIdx%, UniqueId,
+            SetLastRowStatus(ErrorLevel,!ErrorLevel)
+        }
+    }
+}
+
 SetRegView Default
 
 If (IsObject(sendemailcfg)) {
@@ -989,6 +1013,10 @@ EnvGetAfterScript(batch, varName) {
 
 StartsWith(longstr, shortstr) {
     return SubStr(longstr, 1, StrLen(shortstr)) = shortstr
+}
+
+EndsWith(longstr, shortstr) {
+    return SubStr(longstr, 1-StrLen(shortstr)) = shortstr
 }
 
 CheckPath(path, logTime:=1, checkboxIfExist:=1) {
