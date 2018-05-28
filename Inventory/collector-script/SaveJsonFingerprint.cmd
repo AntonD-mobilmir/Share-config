@@ -18,7 +18,9 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     SET "cDate=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%"
     IF NOT EXIST "%ProgramData%\mobilmir.ru\Fingerprint" MKDIR "%ProgramData%\mobilmir.ru\Fingerprint"
     SET "destDir=%ProgramData%\mobilmir.ru\Fingerprint"
-    IF EXIST "%~dp0..\trello-accounting\update-queue" (
+    IF EXIST "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\trello-accounting\update-queue" (
+	SET "copyDir=\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\trello-accounting\update-queue"
+    ) ELSE IF EXIST "%~dp0..\trello-accounting\update-queue" (
 	SET "copyDir=%~dp0..\trello-accounting\update-queue"
     ) ELSE IF EXIST "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\update-queue" (
 	SET "copyDir=\\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\update-queue"
@@ -47,7 +49,7 @@ SET "destFName=%Hostname% %cDate% %cTime:,=.%"
 	MOVE /Y "%destDir%\%destFName%.json" "%destDir%\%Hostname%.json" 
 	MOVE /Y "%destDir%\%destFName%.txt" "%destDir%\%Hostname%.txt" 
 
-	%AutohotkeyExe% %ahkOptions% "%~dp0..\..\config\_Scripts\Write-trello-id.ahk" >"%destDir%\%Hostname% Write-trello-id.log" 2>&1
+	%AutohotkeyExe% %ahkOptions% "%~dp0..\..\config\_Scripts\Write-trello-id.ahk" %Write-trello-id.ahk-params% >"%destDir%\%Hostname% Write-trello-id.log" 2>&1
 	FOR %%A IN ("%destDir%\%Hostname% Write-trello-id.log") DO IF EXIST "%%~A" IF "%%~zA"=="0" DEL "%%~A"
     )
     IF DEFINED tvID (ECHO %tvID%)>"%destDir%\%Hostname% TVID.txt"
