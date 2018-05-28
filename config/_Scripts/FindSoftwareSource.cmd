@@ -18,7 +18,7 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
 CALL :CheckSetSoftSource "%ConfigDir%.." && GOTO :found
 
 REM fallback to localhost and Srv0
-CALL :CheckSetSoftSource "%~d0\Distributives" || CALL :CheckSetSoftSource "%~dp0..\.." || CALL :CheckSetSoftSource "D:\Distributives" || CALL :CheckSetSoftSource "\\Srv0.office0.mobilmir\Distributives" || CALL :AskSoftSource || EXIT /B
+CALL :CheckSetSoftSource "%~d0\Distributives" || CALL :CheckSetSoftSource "%~dp0..\.." || CALL :CheckSetSoftSource "D:\Distributives" || CALL :CheckSetSoftSource "\\Srv0.office0.mobilmir\Distributives" || CALL :CheckSetSoftSource "\\Srv1S-B.office0.mobilmir\Distributives" || CALL :AskSoftSource || EXIT /B
 )
 :found
 (
