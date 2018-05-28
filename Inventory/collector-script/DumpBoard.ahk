@@ -6,17 +6,20 @@ FileEncoding UTF-8
 boardID := "5732cc3d0a8bee805cab7f11" ; Учёт системных блоков
 dumpDir = %A_ScriptDir%\..\trello-accounting\board-dump
 olddumpsDir = %A_ScriptDir%\..\old\board-dumps
+If (A_ComputerName=="SRV0")
+    copyDump = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\trello-accounting\board-dump
+Else
+    copyDump = \\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump
 
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk
 
 Try {
-    Try FileRead jsonsavedBoard, %dumpDir%\board.json
+    FileRead jsonsavedBoard, %dumpDir%\board.json
     savedBoard := JSON.Load(jsonsavedBoard)
     savedActionDate := savedBoard.lastActionDate
-    
-    If (savedActionDate != (lastActionDate := TrelloAPI1("GET", "/boards/" . boardID "/actions?limit=1&fields=date", jsonActions := Object())[1].date)) {
-	;MsgBox % "savedActionDate: " savedActionDate "`nlastActionDate: " lastActionDate "`n" jsonActions
-	
+}
+Try {
+    If (savedActionDate != (lastActionDate := TrelloAPI1("GET", "/boards/" boardID "/actions?limit=1&fields=date", jsonActions := Object())[1].date)) {
 	If (board := TrelloAPI1("GET", "/boards/" . boardID, Object())) {
 	    board.lastActionDate := lastActionDate
 	    If (IsObject(fout := FileOpen(dumpDir "\board.json.new", "w")) && fout.Write(JSON.Dump(board)), fout.Close())
@@ -34,17 +37,30 @@ Try {
 			Loop Files, %dumpDir%\%fnameCurDmp%
 			    FileMove %A_LoopFileFullPath%, % olddumpsDir "\" SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)) . A_LoopFileTimeModified "." A_LoopFileExt, 1
 			FileMove %dumpDir%\%dumpFName%.new, %dumpDir%\%fnameCurDmp%
+			Loop Files, %dumpDir%\*.*
+			{
+			    FileCopy %A_LoopFileFullPath%, %copyDump%\%A_LoopFileName%.new, 1
+			    FileMove %copyDump%\%A_LoopFileName%.new, %copyDump%\%A_LoopFileName%, 1
+			}
 		    }
 		}
 	    }
-	FileDelete %dumpDir%\dump.7z.new
+	Try FileDelete %dumpDir%\dump.7z.new
 	RunWait %exe7z% a -mx=9 -- "%dumpDir%\dump.7z.new" %arcFiles%, %dumpDir%, Min UseErrorLevel
 	If (ErrorLevel)
 	    ExitApp %ErrorLevel%
 	Else
 	    FileMove %dumpDir%\dump.7z.new, %dumpDir%\dump.7z, 1
     }
-} Catch
+} Catch e {
+    If (!IsObject(e))
+	e := {Extra: e}
+    e.debug := debug
+    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+    If (RunInteractiveInstalls=="1")
+	Throw e
     ExitApp 1
+}
 
+#include %A_LineFile%\..\..\..\config\_Scripts\Lib\ObjectToText.ahk
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\TrelloAPI1.ahk
