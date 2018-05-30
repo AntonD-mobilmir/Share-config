@@ -235,7 +235,6 @@ EXIT /B
     SET "remotesystem=\\%desthost%"
     IF DEFINED wgetexe (
 	START "" /B /WAIT /D"%TEMP%" %wgetexe% -N --no-check-certificate http://live.sysinternals.com/psexec.exe || EXIT /B 1
-	rem REG ADD "HKEY_CURRENT_USER\Software\Sysinternals\PsExec" /v "EulaAccepted" /t REG_DWORD /d 1 /f
 	SET PreExecCmd="%TEMP%\psexec.exe" %remotesystem% -accepteula -nobanner -w "%SystemRoot%\Temp\%TempDirName%"
     )
 EXIT /B

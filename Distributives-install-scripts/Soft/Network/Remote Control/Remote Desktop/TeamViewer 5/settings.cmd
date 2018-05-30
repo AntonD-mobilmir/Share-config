@@ -141,7 +141,7 @@ EXIT /B
 )
 :GetFirstArg
 (
-    SET "%~1=%~2"
+    SET "%1=%2"
 EXIT /B
 )
 :find7zexe
