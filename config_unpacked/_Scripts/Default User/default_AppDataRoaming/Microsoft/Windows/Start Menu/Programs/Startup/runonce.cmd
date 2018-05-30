@@ -7,10 +7,6 @@ SETLOCAL ENABLEEXTENSIONS
     SET "srcpath=%~dp0"
     SET "RegTmpDir=%TEMP%\%~n0-reg"
     rem IF NOT DEFINED DefaultsSource EXIT /B 32010
-
-    rem TeamViewer Settings
-    ECHO N|REG ADD "HKEY_CURRENT_USER\Software\TeamViewer\Version5.1" /v Username /t REG_SZ /d "%UserName% \\%COMPUTERNAME%"
-    REG ADD "HKEY_CURRENT_USER\Software\TeamViewer\Version5.1" /v ShowTaskbarInfoOnMinimize /t REG_DWORD /d 0 /f
     
     IF /I "%USERNAME%"=="Продавец" SET "RemoveAllAppX=1"
     IF /I "%USERNAME%"=="Пользователь" SET "RemoveAllAppX=1"
@@ -21,12 +17,12 @@ SETLOCAL ENABLEEXTENSIONS
 	PAUSE
     )
 )
-:GetDefaultConfigDirAgain
+:GetDefaultconfigDirAgain
 CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
-CALL :GetDir ConfigDir "%DefaultsSource%"
+CALL :GetDir configDir "%DefaultsSource%"
 (
-    CALL "%ConfigDir%_Scripts\find7zexe.cmd"
-    FOR %%A IN ("\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%ConfigDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\DefaultUserRegistrySettings.7z" (
+    CALL "%configDir%_Scripts\find7zexe.cmd"
+    FOR %%A IN ("\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%configDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\DefaultUserRegistrySettings.7z" (
 	SET "regDfltNewUser=%%~A\DefaultUserRegistrySettings.7z"
 	SET "dirNewUserDefaults=%%~A"
 	GOTO :NewUserDefaultsFound
@@ -34,10 +30,10 @@ CALL :GetDir ConfigDir "%DefaultsSource%"
     ECHO Не найдена папка с настройками по умолчанию.
     ECHO Нажмите любую клавишу, чтобы повторить поиск, или закройте окно, чтобы отложить.
     PAUSE>NUL
-    GOTO :GetDefaultConfigDirAgain
+    GOTO :GetDefaultconfigDirAgain
 )
 :NewUserDefaultsFound
-IF NOT DEFINED AutoHotkeyExe CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd"
+IF NOT DEFINED AutoHotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 (
     IF EXIST "%regDfltNewUser%" (
 	IF DEFINED exe7z %exe7z% x -o"%RegTmpDir%" -- "%regDfltNewUser%"
@@ -46,12 +42,12 @@ IF NOT DEFINED AutoHotkeyExe CALL "%ConfigDir%_Scripts\FindAutoHotkeyExe.cmd"
 	IF NOT "%regDfltNewUser:~0,2%"=="\\" DEL "%regDfltNewUser%"
     )
     IF DEFINED RemoveAllAppX (
-	START "Удаление всех Metro-приложений" %comspec% /C ""%ConfigDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon"
+	START "Удаление всех Metro-приложений" %comspec% /C ""%configDir%_Scripts\cleanup\AppX\Remove All AppX Apps for current user.cmd" /firstlogon"
     ) ELSE (
-	START "Удаление Metro-приложений, кроме разрешенных" %comspec% /C ""%ConfigDir%_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /firstlogon"
+	START "Удаление Metro-приложений, кроме разрешенных" %comspec% /C ""%configDir%_Scripts\cleanup\AppX\Remove AppX Apps except allowed.cmd" /firstlogon"
     )
     
-    FOR %%A IN ("%dirNewUserDefaults%\RunOnce\*.cmd" "%dirNewUserDefaults%\RunOnce\*.ahk") DO (
+    FOR /F "usebackq delims=" %%A IN (`DIR /S /B /O "%dirNewUserDefaults%\RunOnce\"`) DO (
 	IF /I "%%~xA"==".cmd" (
 	    START "" /B /WAIT %comspec% /C "%%~A"
 	) ELSE IF /I "%%~xA"==".ahk" (
