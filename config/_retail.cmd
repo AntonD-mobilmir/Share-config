@@ -39,11 +39,11 @@ TITLE Initial config
 IF NOT DEFINED instBTSyncandSoftUpdScripts CALL :AskAboutBTSync
 IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF "%Inst1S%"=="1" (
-    NET USER Продавец /ADD /passwordchg:no /passwordreq:no
-    wmic path Win32_UserAccount where Name='Продавец' set PasswordExpires=false
+    %SystemRoot%\System32\NET.exe USER Продавец /ADD /passwordchg:no /passwordreq:no
+    %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Продавец' set PasswordExpires=false
 ) ELSE (
-    NET USER Пользователь /ADD /passwordchg:no /passwordreq:no
-    wmic path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
+    %SystemRoot%\System32\NET.exe USER Пользователь /ADD /passwordchg:no /passwordreq:no
+    %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
 )
 (
 START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
@@ -55,9 +55,8 @@ CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd" Apps_dept.7z
 TITLE Running _business_config.cmd
 POWERCFG -h off & POWERCFG /H OFF
 CALL "%~dp0_Scripts\_business_config.cmd"
-WMIC computersystem where name="%COMPUTERNAME%" call joindomainorworkgroup name="OFFICE0"
-REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Domain" /d "office0.mobilmir" /f
-REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain" /d "office0.mobilmir" /f
+rem REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Domain" /d "office0.mobilmir" /f
+rem REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain" /d "office0.mobilmir" /f
 )
 :All
 (
@@ -121,14 +120,14 @@ IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF NOT "%Inst1S%"=="1" GOTO :Skip1SAndRelated
 )
 :r1SAndRelated
-SET "RarusInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
-(
-    IF NOT EXIST "%RarusInstallScript%" (
-	ECHO Дистрибутив Рарус недоступен по стандартному пути [%RarusInstallScript%]. Укажите полный путь к файлу ShopBTS_InitialBase\_install_ask_parm.cmd
-	SET /P RarusInstallScript=^>
-    )
-    START "Installing Rarus" /I /WAIT %comspec% /C "%RarusInstallScript%"
-)
+rem SET "RarusInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
+rem (
+rem     IF NOT EXIST "%RarusInstallScript%" (
+rem 	ECHO Дистрибутив Рарус недоступен по стандартному пути [%RarusInstallScript%]. Укажите полный путь к файлу ShopBTS_InitialBase\_install_ask_parm.cmd
+rem 	SET /P RarusInstallScript=^>
+rem     )
+rem     START "Installing Rarus" /I /WAIT %comspec% /C "%RarusInstallScript%"
+rem )
 :Skip1SAndRelated
 (
 IF NOT DEFINED instBTSyncandSoftUpdScripts CALL :AskAboutBTSync

@@ -8,6 +8,9 @@ SET "dismLockFile=%TEMP%\WindowsComponentsSetup.lock"
 )
 (
 START "Setting up Windows components" %comspec% /C ""%~dp0Windows Components\WindowsComponentsSetup.cmd">"%dismLockFile%""
+%SystemRoot%\System32\reg.exe ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Domain" /d "office0.mobilmir" /f
+rem %SystemRoot%\System32\reg.exe ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain" /d "office0.mobilmir" /f
+%SystemRoot%\System32\wbem\wmic.exe computersystem where name="%COMPUTERNAME%" call joindomainorworkgroup name="OFFICE0"
 
 CALL "%~dp0DisablePasswordExpiration.cmd"
 CALL "%~dp0TimeSync-settings.cmd"

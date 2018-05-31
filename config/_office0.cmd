@@ -45,8 +45,8 @@ SET "DefaultsSource=%~dp0Apps_office.7z"
 
 REM Executing _business_config.cmd
 CALL "%~dp0_Scripts\_business_config.cmd"
-WMIC computersystem where name="%COMPUTERNAME%" call joindomainorworkgroup name="OFFICE0"
-REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Domain" /d "office0.mobilmir" /f
+rem WMIC computersystem where name="%COMPUTERNAME%" call joindomainorworkgroup name="OFFICE0"
+rem REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Domain" /d "office0.mobilmir" /f
 
 :All
 REM Common procedure
@@ -56,9 +56,7 @@ CALL "%~dp0_all.cmd" %arg%
 :AfterAll
 rem Without running ahk as an app (just starting .ahk), START /I misbehaves, ignoring the switch
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
-
 CALL "%~dp0_Scripts\ChangeNXOptInToOptOut.cmd"
-
 CALL "%~dp0_Scripts\defrag in background.cmd"
 
 :SchTasks
