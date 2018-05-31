@@ -1,2 +1,0 @@
-rsend.ahk add to outbox, try to dispatch once
-DispatchFiles.ahk dispatch files from arguments or queue
