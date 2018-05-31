@@ -7,35 +7,24 @@ SetRegView 64
 
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-ProxySettingsRegRoot	= HKEY_CURRENT_USER
-ProxySettingsIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
-EnvironmentRegKey	= Environment
+regrootsProxy	:= ["HKEY_LOCAL_MACHINE", "HKEY_CURRENT_USER"]
+regKeysEnv	:= ["SYSTEM\CurrentControlSet\Control\Session Manager\Environment", "Environment"]
+;regKeyEnv	= Environment
+proxyIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
 
 ProxyOverride		= <local>
 
 If (A_IsAdmin) {
-    SystemProxy=1
+    SystemProxy:=1
 
-    If A_OSVersion in WIN_2003,WIN_XP,WIN_2000
-    {
-	UseNetShForWinHTTP=0
-    } Else {
-	UseNetShForWinHTTP=1
-	If ( A_Is64bitOS ) { ; at least on Windows 10 single run of netsh.exe modifies settings for bot 64-bit and 32-bit winhttp; if this is case for Vista/7/8, if is not needed and only Else can be executes without negative side-effects
-	    netsh32exe=%SystemRoot%\SysWOW64\netsh.exe
-	    If ( A_PtrSize == 4 ) { ;32-bit AutoHotkey on 64-bit system
-		netsh64exe=%SystemRoot%\SysNative\netsh.exe
-	    } Else {
-		netsh64exe=%SystemRoot%\System32\netsh.exe
-	    }
-	} Else {
-	    netsh32exe=%SystemRoot%\System32\netsh.exe
-	}
-    }
-
+    If ( A_Is64bitOS ) { ; at least on Windows 10 single run of netsh.exe modifies settings for bot 64-bit and 32-bit winhttp; if this is case for Vista/7/8, if is not needed and only Else can be executes without negative side-effects
+        netsh32exe := SystemRoot "\SysWOW64\netsh.exe"
+        netsh64exe := SystemRoot "\" (( A_PtrSize == 4 ) ? "SysNative" : "System32") "\netsh.exe" ; ;32-bit AutoHotkey on 64-bit system?
+    } Else
+        netsh32exe := SystemRoot "\System32\netsh.exe"
 }
 
-RegRead ProxySettingsPerUser, HKEY_LOCAL_MACHINE, SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings, ProxySettingsPerUser
+RegRead ProxySettingsPerUser, HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings, ProxySettingsPerUser
 If (ProxySettingsPerUser != "0")
     ProxySettingsPerUser=1
 
@@ -57,7 +46,9 @@ If %0%
 	}
     }
     
-    RegRead proxy, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyServer
+    For i, regrootProxy in regrootsProxy
+	RegRead proxy, %regrootProxy%\%proxyIEKey%, ProxyServer
+    Until proxy
     
     If (!proxy)
 	proxy:="192.168.127.1:3128"
@@ -105,8 +96,7 @@ If (proxy) {
 }
 
 If (SystemProxy) {
-    ProxySettingsRegRoot=HKEY_LOCAL_MACHINE
-    EnvironmentRegKey=SYSTEM\CurrentControlSet\Control\Session Manager\Environment
+    ;regKeyEnv=SYSTEM\CurrentControlSet\Control\Session Manager\Environment
     
     If (ProxySettingsPerUser)
 	RegDelete HKEY_LOCAL_MACHINE, SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings, ProxySettingsPerUser
@@ -115,34 +105,32 @@ If (SystemProxy) {
 }
 
 If (proxy) {
-    If (SystemProxy) {
-	If (UseNetShForWinHTTP) {
-	    netshargs=winhttp set proxy proxy-server="http=%proxy%;https=%proxy%;ftp=%proxy%" bypass-list="%ProxyOverride%"
-	} Else {
-	    RunWait %SystemRoot%\System32\proxycfg.exe -p %proxy% %ProxyOverride%,,Min UseErrorLevel
-	}
-    }
-
-    ; envvars: for gpg, wget and other unix utils
-    RegWrite REG_SZ, %ProxySettingsRegRoot%, %EnvironmentRegKey%, http_proxy, http://%proxy%/
-    RegWrite REG_SZ, %ProxySettingsRegRoot%, %EnvironmentRegKey%, https_proxy, http://%proxy%/
-
-    ;Internet Explorer
-    RegWrite REG_SZ, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyServer, %proxy%
-    RegWrite REG_SZ, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyOverride, %ProxyOverride%
-    RegWrite REG_SZ, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyEnable, 1
-} Else {
-    RegDelete %ProxySettingsRegRoot%, %EnvironmentRegKey%, http_proxy
-    RegDelete %ProxySettingsRegRoot%, %EnvironmentRegKey%, https_proxy
+    If (SystemProxy)
+        netshargs=winhttp set proxy proxy-server="http=%proxy%;https=%proxy%;ftp=%proxy%" bypass-list="%ProxyOverride%"
     
-    If (SystemProxy) {
-	netshargs=winhttp reset proxy
-    } Else {
-	RunWait %SystemRoot%\System32\proxycfg.exe -d,,Min UseErrorLevel
-    }
+    regrootProxy := regrootsProxy[2-SystemProxy]
+    regKeyEnv    := regKeysEnv[2-SystemProxy]
+    ; envvars: for gpg, wget and other unix utils
+    RegWrite REG_SZ, %regrootProxy%\%regKeyEnv%, http_proxy, http://%proxy%/
+    RegWrite REG_SZ, %regrootProxy%\%regKeyEnv%, https_proxy, http://%proxy%/
 
     ;Internet Explorer
-    RegWrite REG_SZ, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyEnable, 0
+    RegWrite REG_SZ, %regrootProxy%\%proxyIEKey%, ProxyServer, %proxy%
+    RegWrite REG_SZ, %regrootProxy%\%proxyIEKey%, ProxyOverride, %ProxyOverride%
+    RegWrite REG_SZ, %regrootProxy%\%proxyIEKey%, ProxyEnable, 1
+} Else {
+    For i, regrootProxy in regrootsProxy {
+        regKeyEnv := regKeysEnv[i]
+	RegDelete %regrootProxy%\%regKeyEnv%, http_proxy
+	RegDelete %regrootProxy%\%regKeyEnv%, https_proxy
+	
+	;Internet Explorer
+	RegWrite REG_SZ, %regrootProxy%\%proxyIEKey%, ProxyEnable, 0
+    }
+    
+    If (SystemProxy)
+	netshargs=winhttp reset proxy
+    RunWait %SystemRoot%\System32\proxycfg.exe -d,,Min UseErrorLevel
 }
 
 If (netshargs) {
