@@ -59,7 +59,7 @@ XMLHTTP_Request_CreateXHRObject() {
 	return ComObjCreate(useObjName)
     } Else {
 	errLog=
-	For i, objName in ["Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] {
+	For i, objName in ["Microsoft.XMLHTTP", "Msxml2.XMLHTTP", "Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP.6.0"] {
 	    ;xhr=XMLHttpRequest
 	    If (IsObject(debug))
 		debug.XMLHTTPObjectName := objName, XMLHTTP_Request_DebugMsg("`tTrying to create object " objName "…")

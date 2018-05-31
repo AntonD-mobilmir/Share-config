@@ -170,9 +170,9 @@ CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "", ByRef o
 		If (!colon := InStr(argv, ":")) {
                     If (IsByRef(othersw)) {
                         If(IsObject(othersw))
-                            othersw.Push(argv)
+                            othersw[A_Index] := argv
                         Else
-                            othersw .= argv
+                            othersw .= argv " "
                     } Else
                         Throw Exception("Param name should end with a colon", A_LineFile ": " A_ThisFunc, argv)
                 } Else {
