@@ -28,7 +28,6 @@ maxAgeSavedInvReport	:= 1
 scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
 serverScriptPath	:= dirConfigDistSrv "\_Scripts\GUI\" . A_ScriptName
-ShopBTS_InitialBaseDir	:= FirstExisting(A_ScriptDir "\..\..\..\..\..\1S\ShopBTS_InitialBase", "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase")
 subdirDistAutoHotkey	:= "Soft\Keyboard Tools\AutoHotkey"
 
 regsvr32exe		:= FirstExisting(SystemRoot "\SysWOW64\regsvr32.exe", SystemRoot "\System32\regsvr32.exe")
@@ -129,89 +128,6 @@ If (FileExist(UserProfile . "\fullprofile.*.sddl")) {
     FileMove %UserProfile%\fullprofile.*.sddl, %UserProfile%\AppData\Local\ACL-backup\*.*
     If (!ErrorLevel)
 	SetLastRowStatus()
-}
-
-If (IsObject(sendemailcfg := CheckPath("d:\1S\Rarus\ShopBTS\ExtForms\post\sendemail.cfg"))) {
-    ;If (!A_IsAdmin) {
-    ;    ShopBTS_AddInstArg:=" /install"
-    ;    ShopBTS_AddInstTextSuffix:=" с добавлением задачи в планировщик"
-    ;}
-    AddLog("ShopBTS_Add.install.ahk" . ShopBTS_AddInstTextSuffix, "Запуск")
-    RunWait "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\D_1S_Rarus_ShopBTS\ShopBTS_Add.install.ahk" /skipSchedule %ShopBTS_AddInstArg%,, Min UseErrorLevel
-    statusShopBTS_Add := ErrorLevel
-    If (!statusShopBTS_Add)
-	FileReadLine verShopBTS_Add, d:\1S\Rarus\ShopBTS\ExtForms\post\ShopBTS_Add_ver.txt, 1
-    SetLastRowStatus(errShopBTS_Add ? errShopBTS_Add : verShopBTS_Add,!errShopBTS_Add)
-    
-    If (FileExist(rarusnotifcfgFile := "d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles-NotificationsAccount.pwd")) {
-	AddLog("DispatchFiles-NotificationsAccount.pwd")
-	rarusnotifCurcfg := []
-	;currentConfigFieldNames := ["server", "login", "password"]
-	Loop Read, %rarusnotifcfgFile%
-	    rarusnotifCurcfg.Push(A_LoopReadLine)
-	rarusnotifsmtpsrvr := rarusnotifCurcfg[1]
-	SetLastRowStatus(rarusnotifsmtpsrvr, rarusnotifsmtpsrvrOK := (rarusnotifsmtpsrvr=="smtp.yandex.ru:587"))
-	If (rarusnotifsmtpsrvrOK) {
-	    rarusnotifLogin := SubStr(rarusnotifCurcfg[2], 1, InStr(rarusnotifCurcfg[2], "@") - 1)
-	} Else {
-	    rarusnotifLogin := SubStr(A_ComputerName, 1, InStr(A_ComputerName, "-") - 1)
-	    rarusnotifMiscfg := rarusnotifsmtpsrvr
-	}
-	FileRead allPass, \\IT-Head.office0.mobilmir\d$\Users\LogicDaemon\Google Drive\IT\Ограниченный доступ\Аккаунты почтовых ящиков для 1С-Рарус\rarus.robots.mobilmir.ru.txt
-	If (allPass) {
-	    Loop Parse, allPass, `n, `r
-	    {
-		found:=""
-		Loop Parse, A_LoopField, `t
-		{
-		    If (A_Index==1) {
-			If (found := A_LoopField = rarusnotifLogin)
-			    rarusnotifLogin := A_LoopField
-		    } Else If (A_Index==2 && found) {
-			rarusnotifPass := A_LoopField
-			break
-		    } Else
-			break
-		}
-		
-		If (found)
-		    break
-	    }
-	    allPass=
-	    
-	    If (found) {
-		If (rarusnotifPass == rarusnotifCurcfg[3])
-		    SetLastRowStatus()
-		Else
-		    rarusnotifMiscfg .= ", пароль"
-	    } Else {
-		rarusnotifMiscfgFatal := "Логин " rarusnotifLogin " не найден в файле учетных записей"
-	    }
-	} Else If (!rarusnotifsmtpsrvrOK) {
-	    rarusnotifMiscfgFatal := "Неправильный сервер/нет доступа к списку"
-	}
-	
-	If (rarusnotifMiscfgFatal) {
-	    SetLastRowStatus(rarusnotifMiscfgFatal, 0)
-	} Else If (rarusnotifMiscfg && rarusnotifMiscfg := Trim(rarusnotifMiscfg, ", ")) {
-	    SetLastRowStatus("не совпадает: " rarusnotifMiscfg, 0)
-	    Run "%A_AhkPath%" "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\D_1S_Rarus_ShopBTS\ShopBTS_Add.Fill_DispatchFiles-NotificationsAccount.pwd.ahk"
-	} Else
-	    SetLastRowStatus(rarusnotifLogin)
-    }
-    
-    BIN1Cv77_on_D := FileExist("d:\1S\1Cv77\BIN\1cv7s.exe")
-    BIN1Cv77_on_C := FileExist(ProgramFiles32bit "\1Cv77\BIN\1cv7s.exe")
-    If (BIN1Cv77_on_D) {
-	If (BIN1Cv77_on_C)
-	    AddLog("1Cv77\BIN есть и в D:\1S, и в ProgramFiles")
-    } Else If (A_IsAdmin && BIN1Cv77_on_C) {
-	AddLog("1Cv77\BIN в d:\1S", "Копирование")
-	FileCopyDir %ProgramFiles32bit%\1Cv77, d:\1S\1Cv77
-	SetLastRowStatus("Регистрация COM")
-	RunWait %comspec% /C "d:\1S\1Cv77\BIN\register_all_components.cmd",,Min UseErrorLevel
-	SetLastRowStatus(ErrorLevel,!ErrorLevel)
-    }
 }
 
 AddLog("Прокси")
@@ -378,15 +294,6 @@ If (A_OSVersion == "WIN_7") {
 
 SetRegView Default
 
-If (IsObject(sendemailcfg)) {
-    AddLog("MailLoader\install.cmd", "Запуск")
-    RunWait %comspec% /C "%ShopBTS_InitialBaseDir%\MailLoader\install.cmd",,Min UseErrorLevel
-    errMailLoader := ErrorLevel
-    If (!errMailLoader)
-	FileReadLine verGetMail, D:\1S\Rarus\MailLoader\getmail_dist_ver.txt, 1
-    SetLastRowStatus(errMailLoader ? errMailLoader : verGetMail,!errMailLoader)
-}
-
 If (FileExist(scriptInventoryReport)) {
     prevSavedInvReport := FindLatest(maskInventoryReport)
     If (IsObject(prevSavedInvReport)) {
@@ -477,13 +384,6 @@ If (FileExist("D:\Credit")) {
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-If (FileExist("D:\1S\Rarus\ShopBTS\*.dbf")) {
-    AddLog("Найден Рарус, замена Rarus_Scripts")
-    Run "%A_AhkPath%" "%ShopBTS_InitialBaseDir%\Rarus_Scripts_unpack.ahk",,UseErrorLevel
-    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-    EnvSet Inst1S,1
-}
-
 Loop Files, %A_ScriptDir%\..\..\..\software_update\scripts\_TeamViewerSecurityPasswordAES *.ahk
 {
     tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
@@ -516,25 +416,6 @@ If (FileExist("c:\squid")) {
 	    SetLastRowStatus("Папка удалена")
     }
 }
-
-backup_1S_baseTask := CheckPath(FirstExisting(SystemRoot . "\System32\Tasks\mobilmir.ru\backup_1S_base", SystemRoot . "\SysNative\Tasks\mobilmir.ru\backup_1S_base", SystemRoot . "\System32\Tasks\mobilmir\backup_1S_base", SystemRoot . "\SysNative\Tasks\mobilmir\backup_1S_base"), 0, 0)
-If (IsObject(backup_1S_baseTask)) {
-    AddLog("Задача резервного копирования 1С-Рарус", backup_1S_baseTask.mtime)
-    Loop 2
-    {
-	FileGetTime xmlmtime, %ShopBTS_InitialBaseDir%\Tasks\backup_1S_base.xml
-	xmlmtime -= % backup_1S_baseTask.mtime, Days
-	If (xmlmtime) {
-	    SetLastRowStatus("Обновление", 0)
-	    RunWait %comspec% /C "%ShopBTS_InitialBaseDir%\_shedule_backup1Sbase.cmd",,Min UseErrorLevel
-	    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-	} Else {
-	    SetLastRowStatus()
-	    break
-	}
-    }
-}
-
 
 AddLog("Журналы скриптов обновления")
 suSettingsScript=%A_AppDataCommon%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd
