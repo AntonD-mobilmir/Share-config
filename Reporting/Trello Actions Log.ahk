@@ -7,13 +7,15 @@ EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 EnvGet UserProfile, UserProfile
 
+GetTrelloAuthToken(,, "read", A_Scriptname)
+
 actionsToLog := {"updateCard": "updateCard"} ; "updateCheckItemStateOnCard": ""
 
 actions_since := SubStr(A_Now, 1, 6) "01" ; YYYYMM01 – первое число текущего месяца
 actions_since += -1, Days ; последнее число предыдущего
 actions_since := SubStr(actions_since, 1, 4) "-" SubStr(actions_since, 5, 2) "-01" ; YYYYMM01 – первое число предыдущего
 
-flog := FileOpen(A_Temp "\Actions Log.queries-responces.log", "w")
+flog := FileOpen(A_Temp "\" A_ScriptName ".queries-responces.log", "w")
 out := lastID := prevLastID := ""
 Loop
 {

@@ -9,18 +9,12 @@ EnvGet UserProfile, UserProfile
 
 GetTrelloAuthToken(,, "read", A_Scriptname)
 
-actionsToLog := {"updateCard": "updateCard"} ; "updateCheckItemStateOnCard": ""
-
-actions_since := SubStr(A_Now, 1, 6) "01" ; YYYYMM01 – первое число текущего месяца
-actions_since += -1, Days ; последнее число предыдущего
-actions_since := SubStr(actions_since, 1, 4) "-" SubStr(actions_since, 5, 2) "-01" ; YYYYMM01 – первое число предыдущего
-
 flog := FileOpen(A_Temp "\" A_ScriptName ".queries-responces.log", "w")
 out := lastID := prevLastID := ""
 Loop
 {
     maxIndex := 0
-    For i, actn in TrelloAPI1("GET", query := "/boards/Fx0VjHI7/actions/?action_memberCreator=false&action_member=false&actions_limit=1000&since=" actions_since . (lastID ? "&before=" lastID : ""), lastresp := Object()) {
+    For i, actn in TrelloAPI1("GET", query := "/boards/Fx0VjHI7/cards/", lastresp := Object()) {
 	If (i > maxIndex)
 	    maxIndex := i, lastID := actn.id
 	
