@@ -12,7 +12,7 @@ FileCopy %A_AppData%\gnupg\*.gpg, %GNUPGHOME%\
 EnvGet SystemDrive, SystemDrive
 gpgexe := findexe("gpg.exe", SystemDrive "\SysUtils\gnupg\pub")
 fpubkeys := FileOpen(tmp "\pubkeys.asc", "w", "CP1")
-Loop Files, \\Srv0.office0.mobilmir\profiles$\Share\gpg\*.asc
+Loop Files, \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\gpg\*.asc
 {
     Status(A_LoopFileName, "Loading keys")
     rcptList .= " -r """ SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)-1) """"

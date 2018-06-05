@@ -7,7 +7,7 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application Data" SET "APPDATA=%USERPROFILE%\Local Settings\Application Data"
 
-    SET "pubkeysDest=\\Srv0.office0.mobilmir\profiles$\Share\gpg"
+    SET "pubkeysDest=\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\gpg"
     SET "fnameTest=%DATE% %TIME::=% access test from %COMPUTERNAME%.tmp"
     SET "schTaskName=ScriptUpdater-autoupdate"
 )
