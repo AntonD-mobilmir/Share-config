@@ -7,59 +7,59 @@ SetRegView 64
 
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+RunInteractiveInstalls := RunInteractiveInstalls != "0"
 regrootsProxy	:= ["HKEY_LOCAL_MACHINE", "HKEY_CURRENT_USER"]
 regKeysEnv	:= ["SYSTEM\CurrentControlSet\Control\Session Manager\Environment", "Environment"]
-;regKeyEnv	= Environment
 proxyIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
 
 ProxyOverride		= <local>
 
 If (A_IsAdmin) {
-    SystemProxy:=1
-
     If ( A_Is64bitOS ) { ; at least on Windows 10 single run of netsh.exe modifies settings for bot 64-bit and 32-bit winhttp; if this is case for Vista/7/8, if is not needed and only Else can be executes without negative side-effects
         netsh32exe := SystemRoot "\SysWOW64\netsh.exe"
-        netsh64exe := SystemRoot "\" (( A_PtrSize == 4 ) ? "SysNative" : "System32") "\netsh.exe" ; ;32-bit AutoHotkey on 64-bit system?
+        netsh64exe := SystemRoot "\" (( A_PtrSize == 4 ) ? "SysNative" : "System32") "\netsh.exe" ;32-bit AutoHotkey on 64-bit system?
     } Else
         netsh32exe := SystemRoot "\System32\netsh.exe"
 }
 
 RegRead ProxySettingsPerUser, HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings, ProxySettingsPerUser
-If (ProxySettingsPerUser != "0")
-    ProxySettingsPerUser=1
+ProxySettingsPerUser := ProxySettingsPerUser != "0"
+SystemProxy:=!ProxySettingsPerUser
 
 If %0%
 { ; %0% – var with name "0", contains nr. of command line arguments
     proxy=%1%
     ProxySettingsPerUser=%2%
-    RunInteractiveInstalls=0
-} Else If (RunInteractiveInstalls != "0") {
-    If (ProxySettingsPerUser == "0" && !SystemProxy) {
-	MsgBox 51, Включен общесистемный прокси, Скрипт запущен без прав администратора`, но настроено использование общесистемного прокси сервера`, и пользовательские настройки будут игнорироваться.`n`nПерезапустить скрипт от имени администратора?
-	IfMsgBox Cancel
-	    Exit
-	IfMsgBox Yes
-	{
-	    ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-	    Run *RunAs %ScriptRunCommand% ; Requires v1.0.92.01+
-	    ExitApp
-	}
+} Else If (RunInteractiveInstalls) {
+    For i, regrootProxy in regrootsProxy {
+        RegRead ProxyEnable, %regrootProxy%\%proxyIEKey%, ProxyEnable
+        If (ProxyEnable) {
+            RegRead proxy, %regrootProxy%\%proxyIEKey%, ProxyServer
+            proxySrc = `nТекущее значение прочитано из %regrootProxy%\%proxyIEKey%: ProxyServer
+            SystemProxy := 2-i
+            break
+        }
     }
-    
-    For i, regrootProxy in regrootsProxy
-	RegRead proxy, %regrootProxy%\%proxyIEKey%, ProxyServer
-    Until proxy
-    
-    If (!proxy)
-	proxy:="192.168.127.1:3128"
-    
+
     If (SystemProxy) {
+        If (!A_IsAdmin) {
+            MsgBox 51, Включен общесистемный прокси, Скрипт запущен без прав администратора`, но настроено использование общесистемного прокси сервера`, и пользовательские настройки будут игнорироваться.`n`nПерезапустить скрипт от имени администратора?
+            IfMsgBox Cancel
+                Exit
+            IfMsgBox Yes
+            {
+                ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+                Run *RunAs %ScriptRunCommand% ; Requires v1.0.92.01+
+                ExitApp
+            }
+        }
+            
 	ProxyQueryText=системные настройки прокси (HKLM)
     } else {
 	ProxyQueryText=настройки IE текущего пользователя
     }
     
-    InputBox proxy, Адрес прокси сервера, Будет записан в %ProxyQueryText%.`nПустая строка = без прокси.п`n`nформат: сервер:порт, , , , , , , 300, %proxy%
+    InputBox proxy, Адрес прокси сервера, Будет записан в %ProxyQueryText%.`nПустая строка = без прокси.п`nформат: сервер:порт%proxySrc%, , , , , , , 300, %proxy%
     If (ErrorLevel)
 	Exit
 } Else {
@@ -69,7 +69,7 @@ If %0%
 
 If (proxy) {
     If ( !InStr(proxy,":") ) {
-	If (RunInteractiveInstalls != "0") {
+	If (RunInteractiveInstalls) {
 	    MsgBox 35, В строке прокси не указан порт, В адресе прокси-сервера "%proxy%" не указан порт через двоеточие.`nБез номера порта работать не будет!`n`nДобавить :3128 к адресу?
 	    IfMsgBox Cancel
 		Exit
@@ -83,7 +83,7 @@ If (proxy) {
     }
 } else { ; No proxy
     If (ProxySettingsPerUser == "0") {
-	If (RunInteractiveInstalls != "0") {
+	If (RunInteractiveInstalls) {
 	    MsgBox 35, Системные настройки прокси.,Сейчас системный прокси будет выключен`, но включенный режим общесистемных настроек не позволит пользователям указать свои адреса прокси.`n`nВыключить переопределение пользовательских настроек?
 	    IfMsgBox Cancel
 		Exit

@@ -13,7 +13,6 @@ IF NOT DEFINED xlnexe CALL "%~dp0_Scripts\find_exe.cmd" xlnexe xln.exe || PAUSE
 )
 (
 %AutohotkeyExe% "%~dp0_Scripts\EjectCDDrivesIfNotEmpty.ahk"
-%AutoHotkeyExe% "%~dp0_Scripts\SetProxy.ahk" 192.168.127.1:3128
 rem @ECHO Самое время настроить прокси, если это ещё не сделано
 rem rundll32.exe shell32.dll,Control_RunDLL inetcpl.cpl,,4
 )
