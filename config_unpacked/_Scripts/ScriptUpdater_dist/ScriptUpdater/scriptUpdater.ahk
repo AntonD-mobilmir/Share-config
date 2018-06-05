@@ -308,7 +308,13 @@ Check7zDir(exename,dir7z) {
 find7zaexe(paths:="") {
     If(paths=="")
 	paths := []
-    paths.push("\Distributives\Soft\PreInstalled\utils", "D:\Distributives\Soft\PreInstalled\utils","W:\Distributives\Soft\PreInstalled\utils", "\\localhost\Distributives\Soft\PreInstalled\utils", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils","\\192.168.1.80\Distributives\Soft\PreInstalled\utils")
+    paths.push("\Distributives\Soft\PreInstalled\utils"
+             , "D:\Distributives\Soft\PreInstalled\utils"
+             , "W:\Distributives\Soft\PreInstalled\utils"
+             , "\\localhost\Distributives\Soft\PreInstalled\utils"
+             , "\\Srv1S-B.office0.mobilmir\Distributives\Soft\PreInstalled\utils"
+             , "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils"
+             , "\\192.168.1.80\Distributives\Soft\PreInstalled\utils")
     return find7zexe("7za.exe",paths*)
 }
 
