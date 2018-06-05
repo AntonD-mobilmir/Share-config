@@ -10,7 +10,7 @@
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
     IF NOT DEFINED ErrorCmd SET "ErrorCmd=@(ECHO  & (PING 127.0.0.1 -n 30 >NUL) & EXIT /B 32767)"
-
+    
     REM following path is hardcoded inside Update_Distributives.job and in a lot of cmd scripts.
     SET "InstDest=d:\Scripts"
     REM Distributives are hardcoded in Distributives_Update_Run.cmd as "%~d0\Distributives"
@@ -111,15 +111,13 @@ IF NOT DEFINED configDir CALL :getconfigDir
     CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
     IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 )
-(
-    ECHO "MailUserId=%MailUserId%"
-    ECHO "instVersion=%instVersion%"
-    FOR /F "usebackq delims=" %%A IN ("%~dp0..\pseudo-secrets\%~nx0.txt") DO (
-	START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
-	EXIT /B
-    )
-
+FOR /F "usebackq delims=" %%A IN ("%~dp0..\pseudo-secrets\%~nx0.txt") DO (
+    START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
     EXIT /B
+)
+(
+    ECHO Couldn't find URL to post the form
+    EXIT /B 1
 )
 :CheckCreateDir
 (
@@ -176,7 +174,7 @@ EXIT /B
     IF "%http_proxy%"=="http://127.0.0.1:3128/" EXIT /B
 )
 (
-    %AutohotkeyExe% "%~dp0..\SetProxy.ahk" ""
+    %AutohotkeyExe% "%~dp0..\GUI\SetProxy.ahk" ""
     EXIT /B
 )
 :getconfigDir
