@@ -21,17 +21,35 @@ EXIT /B
     SET "findExeTestExecutionOptions=%findExeTestExecutionOptions%"
     EXIT /B
 )
-:CheckAutohotkeyExe <path>
-(
-    IF NOT EXIST %1 EXIT /B 1
-    SET AutohotkeyExe=%1
-    EXIT /B 0
-)
 :tryutilsdir
     IF NOT DEFINED utilsdir CALL "%~dp0FindSoftwareSource.cmd" || EXIT /B 1
 (
     CALL :CheckAutohotkeyExe "%utilsdir%AutoHotkey.exe"
 EXIT /B
+)
+:CheckAutohotkeyExe <path>
+(
+    IF NOT EXIST %1 EXIT /B 1
+    SET AutohotkeyExe=%1
+)
+(
+    IF "%AutohotkeyExe:~0,2%"=="\\" (
+        MKDIR "%LOCALAPPDATA%\Programs\AutoHotkey"
+        %SystemRoot%\System32\icacls.exe "%LOCALAPPDATA%\Programs\AutoHotkey" /grant "*S-1-1-0:(OI)(CI)RX"
+        COPY /B %1 "%LOCALAPPDATA%\Programs\AutoHotkey\%~nx1"
+        IF EXIST "%~dp1Lib\*.*" (
+            MKDIR "%LOCALAPPDATA%\Programs\AutoHotkey\Lib"
+            XCOPY "%~dp1Lib\*.*" "%LOCALAPPDATA%\Programs\AutoHotkey\Lib\" /E /C /I /Q /H /R /Y
+        )
+        IF EXIST "%~dp1..\auto\AutoHotkey_Lib.7z" CALL :Unpack "%~dp1..\auto\AutoHotkey_Lib.7z" "%LOCALAPPDATA%\Programs\AutoHotkey\Lib"
+    )
+    EXIT /B 0
+)
+:Unpack <arch> <dest>
+IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
+(
+    %exe7z% x -o%2 -- %1
+    EXIT /B
 )
 :RunAhkScript
 (
