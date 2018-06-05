@@ -91,10 +91,10 @@ IF NOT "%runcmd:~262,1%"=="" (
     IF NOT EXIST "%abDir%\business_contacts.mab" IF %waitCount% GTR 0 GOTO :waitAB
     FOR %%A IN ("%abDir%\business_contacts.mab") DO SET "timeCurrentMAB=%%~tA"
 
-    IF DEFINED MailUserId IF DEFINED MailDomain IF NOT EXIST "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" (
-	ECHO Файла "\\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" не существует.
+    IF DEFINED MailUserId IF DEFINED MailDomain IF NOT EXIST "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" (
+	ECHO Файла "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc" не существует.
 	ECHO ScriptUpdater установлен, но, пока адресная книга, зашифрованная открытым ключом для этого компьютера, не выгружена в Dropbox, на этом компьютере она не расшифруется.
-	SET KeyNotFound="Файл не найден: \\Srv0.office0.mobilmir\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc"
+	SET KeyNotFound="Файл не найден: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\gpg\%MailUserId%@%MailDomain%.asc"
     )
 )
 (
