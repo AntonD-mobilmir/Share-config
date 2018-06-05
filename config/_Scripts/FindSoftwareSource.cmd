@@ -13,11 +13,11 @@ IF DEFINED Distributives CALL :CheckSetSoftSource "%Distributives%" && GOTO :fou
 REM then %configDir%..
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 )
-CALL :GetDir ConfigDir "%DefaultsSource%"
+CALL :GetDir configDir "%DefaultsSource%"
 (
-CALL :CheckSetSoftSource "%ConfigDir%.." && GOTO :found
+CALL :CheckSetSoftSource "%configDir%.." && GOTO :found
 
-REM fallback to localhost and Srv0
+REM fallback to localhost, Srv0 and Srv1S-B
 CALL :CheckSetSoftSource "%~d0\Distributives" || CALL :CheckSetSoftSource "%~dp0..\.." || CALL :CheckSetSoftSource "D:\Distributives" || CALL :CheckSetSoftSource "\\Srv0.office0.mobilmir\Distributives" || CALL :CheckSetSoftSource "\\Srv1S-B.office0.mobilmir\Distributives" || CALL :AskSoftSource || EXIT /B
 )
 :found
@@ -27,7 +27,7 @@ ECHO SoftSourceDir: %SoftSourceDir%
 EXIT /B
 )
 :CheckSetSoftSource
-    IF EXIST "%~1\Soft\PreInstalled\utils\autohotkey.exe" (
+    IF EXIST "%~1\Soft\PreInstalled\utils\7za.exe" (
 	SET "DistSourceDir=%~f1"
 	SET "SoftSourceDir=%~f1\Soft"
 	EXIT /B 0
