@@ -21,12 +21,8 @@ POSTDATA := { "entry.1427319477" : Hostname
 
 ReadURLs := []
 Loop Read, %A_LineFile%\..\..\pseudo-secrets\%A_ScriptName%.txt
-{
     ReadURLs[A_Index] := A_LoopReadLine
-    If (A_Index>2)
-	break
-}
-FileReadLine URL, %A_LineFile%\..\..\secrets\%A_ScriptName%.txt, 1
+Until A_Index>2
 ExitApp !PostGoogleFormWithPostID(ReadURLs, POSTDATA) ; PostGoogleFormWithPostID(ByRef URLs, ByRef kv, ByRef postID:="", ByRef trelloURL:="")
 
 #Include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk
