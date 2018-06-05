@@ -82,7 +82,7 @@ EXIT /B
     IF DEFINED gpgUserID (
 	MKDIR "%dirGPGout%"
 	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
-	SET gpgServerCopy="\\Srv0.office0.mobilmir\profiles$\Administrators\%NewUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
+	SET gpgServerCopy="\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\%NewUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
     )
 )
 @(
@@ -97,7 +97,7 @@ EXIT /B
     IF DEFINED gpgexe (
 	DEL %gpgencOut% 2>NUL
 	%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%"
-	START "Copying gpg-encrypted password to Srv0" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
+	START "Copying gpg-encrypted password to Srv1S-B" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
 	IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
 	START "" %AutoHotkeyExe% "%~dp0Add_Admins_PostPasswordToForm.ahk" "%NewUsername%" %gpgencOut%
     )
