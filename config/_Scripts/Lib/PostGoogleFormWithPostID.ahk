@@ -2,6 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 PostGoogleFormWithPostID(ByRef URLs, ByRef kv) {
+    global debug
     ; (, ByRef postID:="", ByRef trelloURL:="") {
     
     ; URLs : 	"https://form_address"
@@ -32,14 +33,12 @@ PostGoogleFormWithPostID(ByRef URLs, ByRef kv) {
 	    break
 	} Else {
 	    If (IsObject(debug)) {
-		debugtxt=
-		For n,v in debug
-		    debugtxt .= n ": " SubStr(v, 1, 100) "`n"
-	    } Else
-		debugtxt=При отправке формы произошла ошибка.
-	    MsgBox 53, %A_ScriptName%, %debugtxt%`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
-	    IfMsgBox Cancel
-		break
+		debugtxt := ObjectToText(debug)
+                MsgBox 53, %A_ScriptName%, %debugtxt%`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
+                IfMsgBox Cancel
+                    break
+	    } Else ;включение отладки
+		debug := {}
 	}
     }
     return success
@@ -47,17 +46,15 @@ PostGoogleFormWithPostID(ByRef URLs, ByRef kv) {
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     FileEncoding UTF-8
-    kv := Object()
-    postIDfieldFound := 0
-    Loop %0%
-    {
-	arg:=%A_Index%
-	If (URL) {
+    kv := {}, postIDfieldFound := 0
+    For i, arg in A_Args {
+	If (i>1) {
 	    If (!foundPos := InStr(arg, "="))
 		Throw Exception("Не удалось разрбрать параметр на ключ-значение", "([^=]+)=(.+)", arg)
 	    lastKey := SubStr(arg, 1, foundPos-1)
-	    If (!kv[lastKey] := SubStr(arg, foundPos+1) && !postIDfieldFound)
-		kv[lastKey] := Object(), postIDfieldFound := 1 ; first empty value will be used for postID
+	    kv[lastKey] := SubStr(arg, foundPos+1)
+	    If (!(postIDfieldFound || kv[lastKey]))
+		kv[lastKey] := {}, postIDfieldFound := 1 ; first empty value will be used for postID
 	} Else
 	    URL:=arg
     }
@@ -67,3 +64,4 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 #include %A_LineFile%\..\PostGoogleForm.ahk
 #include %A_LineFile%\..\CutTrelloCardURL.ahk
 #include %A_LineFile%\..\ExpandPostIDs.ahk
+#include %A_LineFile%\..\ObjectToText.ahk
