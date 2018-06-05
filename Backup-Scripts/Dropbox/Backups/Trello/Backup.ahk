@@ -3,12 +3,11 @@
 ;    ключи (в любом порядке):
 ;	/org	не запрашивать доски пользователя для добавления в список резервного копирования
 ;	/me	не запрашивать доски организации для добавления в список резервного копирования
-;	    по умолчанию запрашиваются и те, и те, но каждая доска будет скопирована только один раз;
-;	    если указать оба ключа, резервное копирование не будет выполняться
+;	    по умолчанию запрашиваются и те, и те, и каждая доска будет скопирована только один раз;
 ;	путь	папка, куда сохранять резервные копии, список досок и журнал. Должна существовать или должен быть указан путь с "\", иначе скрипт будет считать, что это доп. параметры запроса.
 ;	доп. параметры запроса	см. https://developers.trello.com/v1.0/reference#boards-nested-resource. Например, boards=open
 
-; arrow mnemonics:
+; что значат стрелочки в логе:
 ; 	trello  
 ; 	  ↓↑
 ; 	script ← → disk
@@ -111,16 +110,16 @@ QueueBackupBoards(ByRef query := "") {
 	backupListHasContents := 0
 	For boardid in backupBoards {
 	    backupListHasContents := 1
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid)))
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/actions/")))
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/checklists/")))
-	    ;Routes do not exist: /1/boards/577f529fbf5d7ba0ec804c7a/tags/ – WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/tags/"))
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/labels/")))
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/lists/")))
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/members/")))
-	    WriteoutBatch(batchPath, ObjToNEJson(BatchRequest("/boards/" boardid "/plugins?filter=enabled")))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid)))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/actions/")))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/checklists/")))
+	    ;Routes do not exist: /1/boards/577f529fbf5d7ba0ec804c7a/tags/ – WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/tags/"))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/labels/")))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/lists/")))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/members/")))
+	    WriteoutBatch(batchPath, JSON.Dump(BatchRequest("/boards/" boardid "/plugins?filter=enabled")))
 	}
-	WriteoutBatch(batchPath, ObjToNEJson(BatchRequest()))
+	WriteoutBatch(batchPath, JSON.Dump(BatchRequest()))
 	
 	; backup Checklists
 	
@@ -140,15 +139,6 @@ WriteoutBatch(ByRef dest, ByRef contents) {
 	    ia[key] := 0
 	return TransactWrite(StrReplace(dest, "*", Format("{:.4i}", ++ia[key])), contents)
     }
-}
-
-ObjToNEJson(objOrVal) {
-    If (IsObject(objOrVal)) {
-	txt := ""
-	For i,v in objOrVal
-	    txt .= (A_Index > 1 ? ", " : "") . """" i """: " . ObjToNEJson(v)
-	return "{" txt "}"
-    } Else return objOrVal
 }
 
 BatchRequest(ByRef req := "") {
@@ -191,7 +181,7 @@ GetBoardFields() {
 
 TransactWrite(ByRef path, ByRef contents) {
     global log
-    If (file := FileOpen(path ".tmp", "w")) {
+    If (file := FileOpen(path ".tmp", "w", "UTF-8-RAW")) {
 	If (IsObject(contents)) {
 	    For k,v in contents
 		file.Write(v)
@@ -240,7 +230,7 @@ Log(text, status := 0) {
 		For textSubstr, status in statusAutoObj
 		    If (text ~= textSubstr)
 			statusChar := statusChars[status]
-	return lfo.WriteLine("[" statusChar "] " A_Now A_Tab (text == "" ? ObjectToText("LastError: " A_LastError ", ErrorLevel: " ErrorLevel) : text))
+	return lfo.WriteLine("[" statusChar "] " A_Now A_Tab (text == "" ? JSON.Dump("LastError: " A_LastError ", ErrorLevel: " ErrorLevel) : text))
     }
 }
 
@@ -307,7 +297,5 @@ TEA(ByRef y,ByRef z, k0,k1,k2,k3, n = 32) { ; n = #Rounds
    }
 }
 
-#include *i \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\ObjectToText.ahk
-
-;#include *i %A_ScriptDir%\..\..\Backups\profiles$\Share\config\_Scripts\Lib\JSON.ahk
 #include *i \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\TrelloAPI1.ahk
+;#include *i %A_ScriptDir%\..\..\Backups\profiles$\Share\config\_Scripts\Lib\JSON.ahk
