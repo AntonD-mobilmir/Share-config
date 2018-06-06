@@ -2,6 +2,9 @@
 #SingleInstance force
 FileEncoding UTF-8
 
+If A_OSVersion in WIN_VISTA,WIN_7,WIN_8,WIN_8.1
+    ExitApp
+
 timelimit := A_TickCount + 3*60000 ; 3 minutes
 
 Progress R%A_TickCount%-%timelimit% M A, Ожидание появления записи OneDrive в реестре…`n, Удаление OneDrive, Удаление OneDrive
