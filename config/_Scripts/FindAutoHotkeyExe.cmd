@@ -31,12 +31,14 @@ EXIT /B
 (
     IF NOT EXIST %1 EXIT /B 1
     SET AutohotkeyExe=%1
+    SET "AutohotkeyUnquotedExe=%~1"
 )
 (
-    IF "%AutohotkeyExe:~0,2%"=="\\" (
+    IF "%AutohotkeyUnquotedExe:~0,2%"=="\\" (
         MKDIR "%LOCALAPPDATA%\Programs\AutoHotkey"
         %SystemRoot%\System32\icacls.exe "%LOCALAPPDATA%\Programs\AutoHotkey" /grant "*S-1-1-0:(OI)(CI)RX"
         COPY /B %1 "%LOCALAPPDATA%\Programs\AutoHotkey\%~nx1"
+        SET AutohotkeyExe="%LOCALAPPDATA%\Programs\AutoHotkey\%~nx1"
         IF EXIST "%~dp1Lib\*.*" (
             MKDIR "%LOCALAPPDATA%\Programs\AutoHotkey\Lib"
             XCOPY "%~dp1Lib\*.*" "%LOCALAPPDATA%\Programs\AutoHotkey\Lib\" /E /C /I /Q /H /R /Y
