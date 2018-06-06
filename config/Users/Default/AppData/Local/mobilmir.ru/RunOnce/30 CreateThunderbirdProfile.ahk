@@ -1,6 +1,14 @@
 ﻿#NoEnv
 #SingleInstance force
 
+Try {
+    FindThunderbirdProfile()
+    ExitApp
+}
+
+EnvGet UserProfile,UserProfile
+global MTProfileInUserProfileDir := UserProfile "\Mail\Thunderbird\profile"
+
 If A_UserName In Install,Admin,Administrator,Guest,Гость
     Finish()
 
@@ -8,24 +16,19 @@ Try DefaultConfigDir:=getDefaultConfigDir()
 If (!DefaultConfigDir)
     DefaultConfigDir:="\\Srv0.office0.mobilmir\profiles$\Share\config"
 
-If A_UserName In Продавец,Пользователь
-{
-    SharedUserActions()
-} Else {
-    FileEncoding cp1 ; OEM
-    FileRead fullAdminList, %DefaultConfigDir%\_Scripts\AddUsers\Add_Admins_list.txt
-    
-    If (SubStr(A_LoopReadLine,1,1)!=";") {
-	len := 0
-	Loop Parse, A_LoopReadLine
-	{
-	    If A_LoopField in /,%A_Tab%,%A_Space%
-		break
-	    len++
-	}
-	If (len && A_UserName=SubStr(A_LoopReadLine, 1, len))
-	    Finish()
+FileEncoding cp1 ; OEM
+FileRead fullAdminList, %DefaultConfigDir%\_Scripts\AddUsers\Add_Admins_list.txt
+
+If (SubStr(A_LoopReadLine,1,1)!=";") {
+    len := 0
+    Loop Parse, A_LoopReadLine
+    {
+        If A_LoopField in /,%A_Tab%,%A_Space%
+            break
+        len++
     }
+    If (len && A_UserName=SubStr(A_LoopReadLine, 1, len))
+        Finish()
 }
 
 Loop Parse, A_UserName
@@ -43,8 +46,7 @@ Finish()
 
 SharedUserActions() {
     SharedMTProfileDirPath:="D:\Mail\Thunderbird\profile"
-    IfNotExist %SharedMTProfileDirPath%\prefs.js
-    {
+    If (!FileExist(SharedMTProfileDirPath "\prefs.js")) {
 	MsgBox 36, Текущий пользователь должен использовать общий профиль Thunderbird, Имя текущего пользователя - %A_UserName%`, но общий профиль почты (в %SharedMTProfileDirPath%) не существует.`nСоздать?
 	IfMsgBox No
 	    Finish()
@@ -53,16 +55,12 @@ SharedUserActions() {
 	Sleep 15000
     }
     
-    IfExist %SharedMTProfileDirPath%
-    {
-	EnvGet UserProfile,UserProfile
-	MTProfileInUserProfileDir=%UserProfile%\Mail\Thunderbird\profile
-	IfNotExist %MTProfileInUserProfileDir%\*.*
-	{
+    If (FileExist(SharedMTProfileDirPath)) {
+	If (!FileExist(MTProfileInUserProfileDir "\*.*")) {
 	    FileCreateDir %MTProfileInUserProfileDir%
 	    ; user have no permission for SharedMTProfileDirPath, so linking back won't work. Must move only directory contents, and then link back.
 	    FileMove %SharedMTProfileDirPath%\*, %MTProfileInUserProfileDir%\*
-	    Loop %SharedMTProfileDirPath%\*, 2
+	    Loop Files, %SharedMTProfileDirPath%\*, D
 		FileMoveDir %A_LoopFileFullPath%,%MTProfileInUserProfileDir%\%A_LoopFileName%,2
 	    EnvGet SystemDrive,SystemDrive
 	    RunWait %SystemDrive%\SysUtils\xln.exe -n "%MTProfileInUserProfileDir%" "%SharedMTProfileDirPath%",,Min
@@ -76,6 +74,7 @@ SharedUserActions() {
 RunCreateMTProfile(subpath:="") {
     global DefaultConfigDir
     For i, basePath in [  DefaultConfigDir
+			, "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config"
 			, "\\Srv0.office0.mobilmir\profiles$\Share\config"
 			, "D:\Distributives\config"
 			, A_AppDataCommon "\mobilmir.ru\config" ]
@@ -132,4 +131,49 @@ MailCreationScriptNotFound(csPath:="") {
     }
 }
 
+FindThunderbirdProfile() {
+    Encodings=UTF-8 UTF-16 CP1251
+
+    profilesini=%A_AppData%\Thunderbird\profiles.ini
+
+    Loop Parse, Encodings, %A_Space%
+    {
+	FileEncoding %A_LoopField%
+	Loop Read, %profilesini%
+	{
+	    If (RegExMatch(Trim(A_LoopReadLine), "^\[Profile[0-9]+\]$")) {
+		ProfileName:=SubStr(A_LoopReadLine, 2, -1)
+		ProfilePathIsRelative=0
+		Try {
+		    ProfilePath := IniReadUnicode(profilesini,ProfileName,"Path")
+		    ProfilePathIsRelative := IniReadUnicode(profilesini,ProfileName,"IsRelative")
+		} catch
+		    continue
+		
+		If ProfilePathIsRelative
+		    ProfilePath = %A_AppData%\Thunderbird\%ProfilePath%
+		
+		ProfileDefault=0
+		IfExist %ProfilePath%\prefs.js
+		{
+		    LastFoundProfilePath=%ProfilePath%
+		    Try {
+			ProfileDefault := IniReadUnicode(profilesini,ProfileName,"Default")
+			If ProfileDefault
+			    return %ProfilePath%
+		    }
+		}
+	    }
+	}
+    }
+    
+    If LastFoundProfilePath
+	return LastFoundProfilePath
+    Else
+	Throw Exception("Профиль не найден", -1, "Ни одна из папок профилей, прочитанных из profiles.ini, не содержит prefs.js")
+}
+
+
+
 #include <getDefaultConfig>
+#Include <IniFilesUnicode>
