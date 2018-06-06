@@ -6,10 +6,6 @@ FileEncoding UTF-8
 boardID := "5732cc3d0a8bee805cab7f11" ; Учёт системных блоков
 dumpDir = %A_ScriptDir%\..\trello-accounting\board-dump
 olddumpsDir = %A_ScriptDir%\..\old\board-dumps
-If (A_ComputerName=="SRV0")
-    copyDump = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\trello-accounting\board-dump
-Else
-    copyDump = \\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump
 
 #include %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk
 
@@ -37,11 +33,6 @@ Try {
 			Loop Files, %dumpDir%\%fnameCurDmp%
 			    FileMove %A_LoopFileFullPath%, % olddumpsDir "\" SubStr(A_LoopFileName, 1, -StrLen(A_LoopFileExt)) . A_LoopFileTimeModified "." A_LoopFileExt, 1
 			FileMove %dumpDir%\%dumpFName%.new, %dumpDir%\%fnameCurDmp%
-			Loop Files, %dumpDir%\*.*
-			{
-			    FileCopy %A_LoopFileFullPath%, %copyDump%\%A_LoopFileName%.new, 1
-			    FileMove %copyDump%\%A_LoopFileName%.new, %copyDump%\%A_LoopFileName%, 1
-			}
 		    }
 		}
 	    }

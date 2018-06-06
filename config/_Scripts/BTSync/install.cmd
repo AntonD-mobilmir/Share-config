@@ -1,5 +1,5 @@
 @(REM coding:CP866
-START "Copying config" /WAIT %comspec% /C "\\Srv0.office0.mobilmir\profiles$\Share\config\update local config.cmd"
+START "Copying config" /WAIT %comspec% /C "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\update local config.cmd"
 IF NOT DEFINED exe7z CALL "%~dp0..\find7zexe.cmd" || PAUSE
 )
 (

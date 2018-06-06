@@ -77,8 +77,8 @@ IF "%runNotebookScript%"=="1" (
     POWERCFG -h off & POWERCFG /H OFF
 )
 
-START "Software Update Scripts Installer" /I "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
+START "Software Update Scripts Installer" /I "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
+START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 
-START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 @ECHO Установка закончена. Окно остаётся открытым для возможности проверки журнала.
 PAUSE

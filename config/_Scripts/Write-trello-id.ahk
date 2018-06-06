@@ -16,8 +16,7 @@ PathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
 boardDumpDirs := [ A_LineFile "\..\..\..\Inventory\trello-accounting\board-dump"
 	         , A_ScriptDir "\board-dump"
 	         , A_ScriptDir
-	         , "\\Srv1S-B.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump"
-	         , "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump" ]
+	         , "\\Srv1S-B.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump" ]
 
 pathTrelloID=%A_AppDataCommon%\mobilmir.ru\trello-id.txt
 regpathAutorun=HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run

@@ -40,6 +40,6 @@ CALL :DefineLogName "%runscript%"
 :DefineLogName <path>
     SET "logname=%TEMP%\%~nx1.log"
 (
-    START "%logname%" "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils\tail.exe" -v -F -c +0 "%logname%"
+    START "%logname%" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\PreInstalled\utils\tail.exe" -v -F -c +0 "%logname%"
 EXIT /B
 )

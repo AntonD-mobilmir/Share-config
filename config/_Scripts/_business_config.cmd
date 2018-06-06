@@ -1,7 +1,7 @@
 @(REM coding:CP866
 ECHO %DATE% %TIME% Running %0
 
-START "Collecting inventory information" /MIN /I %comspec% /C ""\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd" >"%TEMP%\SaveArchiveReport.cmd.lock" 2>&1 & DEL "%TEMP%\SaveArchiveReport.cmd.lock""
+START "Collecting inventory information" /MIN /I %comspec% /C ""\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd" >"%TEMP%\SaveArchiveReport.cmd.lock" 2>&1 & DEL "%TEMP%\SaveArchiveReport.cmd.lock""
 IF NOT DEFINED AutoHotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 
 SET "dismLockFile=%TEMP%\WindowsComponentsSetup.lock"

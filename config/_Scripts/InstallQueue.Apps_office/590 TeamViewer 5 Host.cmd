@@ -10,7 +10,7 @@ IF NOT DEFINED DistSourceDir CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
     PING 127.0.0.1 -n 10>NUL
     %SystemRoot%\System32\sc.exe start TeamViewer5
 
-    START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
+    START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 EXIT /B
 )
 

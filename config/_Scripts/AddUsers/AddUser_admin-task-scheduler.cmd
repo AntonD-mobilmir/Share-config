@@ -3,19 +3,20 @@ rem user named admin-task-scheduler with random password, write password to an e
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
-%SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-IF NOT DEFINED ErrorCmd SET "ErrorCmd=ECHO "
-SET "PasswdPart1=0000%RANDOM%"
-SET "PasswdPart2=0000%RANDOM%"
-SET "PasswdPart3=0000%RANDOM%"
+    %SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
+    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 
-SET "ManagedUserName=admin-task-scheduler"
+    IF NOT DEFINED ErrorCmd SET "ErrorCmd=ECHO "
+    SET "PasswdPart1=0000%RANDOM%"
+    SET "PasswdPart2=0000%RANDOM%"
+    SET "PasswdPart3=0000%RANDOM%"
 
-SET passwdexe="%~dp0..\..\..\Programs\passwd.exe"
-rem SET passwdexe="\\Srv0.office0.mobilmir\profiles$\Share\Programs\passwd.exe"
+    SET "ManagedUserName=admin-task-scheduler"
+
+    CALL "%~dp0..\find_exe.cmd" passwdexe "%SystemRoot%\SysUtils\UnxUtils\Uri\passwd.exe" "%~dp0..\..\..\Programs\passwd.exe" \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs\passwd.exe || (
+        ECHO passwd.exe not found. Trying to reset the password.
+        GOTO :ExistingUserResetPwd
+    )
 )
 SET "PassFileDir=%PROGRAMDATA%\mobilmir.ru"
 @(

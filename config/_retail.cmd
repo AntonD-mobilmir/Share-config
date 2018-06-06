@@ -36,7 +36,7 @@ IF /I "%argflag%"==":" (
 
 TITLE Initial config
 %AutoHotkeyExe% /ErrorStdOut "%~dp0_Scripts\GUI\AcquireAndRecordMailUserId.ahk"
-IF NOT DEFINED instBTSyncandSoftUpdScripts CALL :AskAboutBTSync
+IF NOT DEFINED instSoftUpdScripts CALL :AskAboutBTSync
 IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF "%Inst1S%"=="1" (
     %SystemRoot%\System32\NET.exe USER Продавец /ADD /passwordchg:no /passwordreq:no
@@ -66,7 +66,7 @@ CALL "%~dp0_all.cmd" %arg%
 :AfterAll
 (
 TITLE AfterAll
-START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv0\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
+START "Collecting inventory information with TeamViewer ID" /I %comspec% /C "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
 
 rem Without running ahk as an app (just starting .ahk), START /I misbehaves, ignoring the switch
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
@@ -120,7 +120,7 @@ IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF NOT "%Inst1S%"=="1" GOTO :Skip1SAndRelated
 )
 :r1SAndRelated
-rem SET "RarusInstallScript=\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
+rem SET "RarusInstallScript=\\*.office0.mobilmir\1S\ShopBTS_InitialBase\_install_ask_parm.cmd"
 rem (
 rem     IF NOT EXIST "%RarusInstallScript%" (
 rem 	ECHO Дистрибутив Рарус недоступен по стандартному пути [%RarusInstallScript%]. Укажите полный путь к файлу ShopBTS_InitialBase\_install_ask_parm.cmd
@@ -130,11 +130,8 @@ rem     START "Installing Rarus" /I /WAIT %comspec% /C "%RarusInstallScript%"
 rem )
 :Skip1SAndRelated
 (
-IF NOT DEFINED instBTSyncandSoftUpdScripts CALL :AskAboutBTSync
-IF /I "%instBTSyncandSoftUpdScripts%"=="1" (
-    START "Установка скрипта авто-обновления ПО" %comspec% /C "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
-    START "Установка скиптов BTSync" %comspec% /C "\\AcerAspire7720G\Projects\BTSync\Install_BTSync.cmd"
-)
+IF NOT DEFINED instSoftUpdScripts CALL :AskAboutBTSync
+IF /I "%instSoftUpdScripts%"=="1" START "Установка скрипта авто-обновления ПО" %comspec% /C "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
 
 ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUSE & EXIT /B
 )
@@ -156,6 +153,6 @@ EXIT /B
 )
 :AskAboutBTSync
 (
-    ECHO /P "instBTSyncandSoftUpdScripts=Запустить установку BTSync и скриптов автообновления ПО? [1=да]"
+    ECHO /P "instSoftUpdScripts=Запустить установку скриптов автообновления ПО? [1=да]"
 EXIT /B
 )
