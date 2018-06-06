@@ -27,19 +27,19 @@ PostGoogleFormWithPostID(ByRef URLs, ByRef kv) {
     Loop
     {
 	If (success:=PostGoogleForm(URL, kv, 2, A_Index * 1000)) { ;PostGoogleForm(URL, kv, tries, retryDelay)
-	    ;If (verifyURL) {
+	    If (verifyURL) {
 		;ToDo: загружать verifyURL и проверять, добавилась ли строчка с postID
-	    ;}
+	    }
 	    break
-	} Else {
-	    If (IsObject(debug)) {
-		debugtxt := ObjectToText(debug)
-                MsgBox 53, %A_ScriptName%, %debugtxt%`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
-                IfMsgBox Cancel
-                    break
-	    } Else ;включение отладки
-		debug := {}
 	}
+	; если всё ok, сюда выполнение не дойдёт – выше есть break
+        If (IsObject(debug)) {
+            debugtxt := ObjectToText(debug)
+        Else ;включение отладки
+            debugtxt := "(отладка выключена, дополнительная информация недоступна)"
+        MsgBox 53, %A_ScriptName%, Ошибка при отправке.`n[Попытка %A_Index%`, автоповтор – 5 минут]`n`n%debugtxt%, 300
+        IfMsgBox Cancel
+            break
     }
     return success
 }

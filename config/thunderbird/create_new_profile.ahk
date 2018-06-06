@@ -74,7 +74,7 @@ If (FileExist(mailProfileDir . "\prefs.js")) {
     {
 	FileMoveDir %mailProfileDir%, %mailProfileDir%.%A_Now%, R
 	If ErrorLevel
-	    Throw "Can't move existing profile"
+	    Throw Exception("Существующий профиль не удалось переименовать",, """" mailProfileDir """ → """  mailProfileDir "." A_Now)
     }
 }
 

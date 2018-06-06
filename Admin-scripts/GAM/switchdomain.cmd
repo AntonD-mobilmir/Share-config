@@ -37,7 +37,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 @IF NOT "%origname:~0,7%"=="oauth2 " SET "origname=oauth2 %origname::=%"
 @IF NOT "%origname:~-4%"==".txt" SET "origname=%origname%.txt"
 :SkiporignameProc
-(
+@(
     IF EXIST "%authpath%\%origname%" (
 	ECHO N|COMP "%GAMpath%\oauth2.txt" "%authpath%\%origname%" >NUL
 	IF NOT ERRORLEVEL 2 IF ERRORLEVEL 1 MOVE /Y "%authpath%\%origname%" "%authpath%\%origname% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%.bak"
