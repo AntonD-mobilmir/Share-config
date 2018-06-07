@@ -1,5 +1,0 @@
-REGEDIT4
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\policies\Explorer]
-"NoDriveTypeAutoRun"=dword:000000FF
-

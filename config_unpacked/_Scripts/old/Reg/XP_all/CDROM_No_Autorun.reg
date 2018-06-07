@@ -1,4 +1,0 @@
-REGEDIT4
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Cdrom]
-"Autorun"=dword:00000000
