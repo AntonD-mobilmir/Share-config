@@ -33,7 +33,7 @@ PostGoogleFormWithPostID(ByRef URLs, ByRef kv) {
 	    break
 	}
 	; если всё ok, сюда выполнение не дойдёт – выше есть break
-        If (IsObject(debug)) {
+        If (IsObject(debug))
             debugtxt := ObjectToText(debug)
         Else ;включение отладки
             debugtxt := "(отладка выключена, дополнительная информация недоступна)"
