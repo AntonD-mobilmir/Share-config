@@ -13,6 +13,7 @@ ProxySettingsRegRoot	 = HKEY_CURRENT_USER
 ProxySettingsIEKey	 = Software\Microsoft\Windows\CurrentVersion\Internet Settings
 EnvironmentRegKey	 = Environment
 ProxyOverride		 = <local>
+RunKey                   = SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 minFreeSpace		:= 1024 * 5 ; мегабайт
 
 arg1=%1%
@@ -21,7 +22,7 @@ ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
 reqdConfigName		:= "Apps_dept.7z"
 officeDistSrvNetName	:= "\\Srv0.office0.mobilmir"
 officeDistSrvPath	:= officeDistSrvNetName . "\Distributives"
-dirConfigDistSrv	:= "\\Srv0.office0.mobilmir\profiles$\Share\config"
+dirConfigDistSrv	:= "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config"
 pathSrvConfigUpdater	:= dirConfigDistSrv "\update local config.cmd"
 maxAgeSavedInvReport	:= 1
 ;tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
@@ -41,15 +42,12 @@ Else
     AhkDistVer		:= "1.1.29.00"
 runAhkUpdate := A_AhkVersion < AhkDistVer
 
-RunKey=SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-
 Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R35 w600 vLogListView, Операция|Статус
 Gui Show
 
 OSVersionObj := RtlGetVersion()
 AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
-
 AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист. " AhkDistVer ")"), !runAhkUpdate)
 
 If (A_IsAdmin) {
@@ -60,6 +58,14 @@ If (A_IsAdmin) {
     If (FileExist(SystemDrive "\Sun")) {
 	AddLog("Удаление " SystemDrive "\Sun")
 	FileRemoveDir %SystemDrive%\Sun, 1
+	SetLastRowStatus(ErrorLevel, !ErrorLevel)
+    }
+    
+    Loop Files, %A_AhkPath%
+        AhkDir := A_LoopFileDir
+    If (FileExist(AhkDir "\*.bak")) {
+	AddLog("Удаление " AhkDir "\*.bak")
+	FileDelete %AhkDir%\*.bak, 1
 	SetLastRowStatus(ErrorLevel, !ErrorLevel)
     }
 } Else {
@@ -249,7 +255,6 @@ For i,regview in regViews {
     RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
     If (unCR) {
 	AddLog("Удаление Crystal Reports")
-	;RunWait "%A_AhkPath%" "%DefaultConfigDir%\_Scripts\cleanup\uninstall\050 Crystal Reports.ahk"
 	RunWait "%A_AhkPath%" "%A_ScriptDir%\..\cleanup\uninstall\050 Crystal Reports.ahk"
 	SetLastRowStatus(ErrorLevel,!ErrorLevel)
     }
@@ -310,15 +315,6 @@ If (FileExist(scriptInventoryReport)) {
 }
 
 CheckUpdateDefaultConfigName(reqdConfigName)
-
-;If (A_OSVersion=="WIN_7") {
-;    netshexe := findexe("netsh.exe", SystemRoot . "\SysNative", SystemRoot . "\System32")
-;    AddLog("Отключение Teredo")
-;    RunWait %netshexe% interface ipv6 set teredo disable,,Min UseErrorLevel
-;    err1netsh:=ErrorLevel
-;    RunWait %netshexe% interface teredo set state disable,,Min UseErrorLevel
-;    SetLastRowStatus("ipv6 STD: " . err1netsh . " / TSSD: " . ErrorLevel,!(err1netsh || ErrorLevel))
-;}
 
 ; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
 AddLog("Distributives", "Поиск _get_SoftUpdateScripts_source.cmd")
@@ -951,6 +947,7 @@ FindLatest(mask, loopOptn := "", ByRef latestTime := 0) { ; FindLatest(,, -1) to
 AbbreviatePath(path) {
     global DefaultConfigDir
     path := RegExReplace(path, "i)^\\\\Srv0(\.office0\.mobilmir)?\\(profiles\$(\\Share)?|Distributives)?\\","{Srv0}")
+    path := RegExReplace(path, "i)^\\\\Srv1S-B(\.office0\.mobilmir)?\\(Users\\Public\\Shares\\profiles\$(\\Share)?|Distributives)?\\","{Srv0}")
     If (DefaultConfigDir)
 	path := RegExReplace(path,"\Q" . DefaultConfigDir . "\E", "{configDir}")
     return path

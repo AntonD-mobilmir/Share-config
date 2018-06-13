@@ -65,7 +65,7 @@ EXIT /B
 	ECHO passwd.exe not found. Trying to reset the password.
 	GOTO :ExistingUserResetPwd
     )
-    SET /A TryNo=0
+    SET /A "TryNo=0"
 )
 :ExistingUserNextTry
 (
