@@ -1,51 +1,53 @@
-@REM coding:CP866
+@(REM coding:CP866
+REM by LogicDaemon <www.logicdaemon.ru>
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 SETLOCAL ENABLEEXTENSIONS
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-SET utilsdir=%srcpath%..\..\..\PreInstalled\utils\
-
-SET InstSource=%srcpath%AdbeRdr*.*
-IF EXIST "%srcpath%AdbeRdr*.msi" SET InstSource=%srcpath%AdbeRdr*.msi
-SET MSITransformArchive=%srcpath%transform.7z
-SET MSITransformFile=AdbeRdr.mst
-
-FOR %%I IN ("%InstSource%") DO SET InstSource=%%~I
-
-IF "%InstSource%"=="" EXIT /B 2
-SET TempDir=%TEMP%\Adobe Reader
-MKDIR "%TempDir%"
-PUSHD "%TempDir%"||EXIT /B
-    CALL :checkunpack "%InstSource%" 
-    IF ERRORLEVEL 1 (
-	CALL :unpack "%InstSource%"
-	FOR %%I IN (*.MSI) DO SET InstSource=%%~I
-    )
-    CALL :unpack "%MSITransformArchive%"
-    IF NOT DEFINED logmsi CALL :GetLogName logmsi "%InstSource%"
+    IF NOT DEFINED exe7z CALL :RunFromConfig "_Scripts\find7zexe.cmd" || CALL :SetFirstExistingExe exe7z "%~dp0..\..\PreInstalled\utils\7za.exe" || EXIT /B
+    
+    SET "unpackDst=%TEMP%\AcroReadDC-%~n0.tmp"
+    IF NOT DEFINED logmsi SET "logmsi=%TEMP%\AcroReadDC-%~n0.log"
+)
+(
+    %exe7z% x -aoa -y -o"%unpackDst%.tmp" -- "%~dp0AcroReadDC.7z"
+    RD /S /Q "%unpackDst%"
+    MOVE /Y "%unpackDst%.tmp" "%unpackDst%"
+    FOR %%A IN ("%unpackDst%\*.mst") DO SET MSITransformSwitch=/t"%%~A"
+)
 :retrymsiexec
-    %SystemRoot%\System32\msiexec.exe /i "%InstSource%" /t"%MSITransformFile%" /qn /norestart /l+* "%logmsi%"
+(
+    %SystemRoot%\System32\msiexec.exe /i "%unpackDst%\AcroRead.msi" %MSITransformSwitch% /qn /norestart /l+* "%logmsi%"
     IF ERRORLEVEL 1618 IF NOT ERRORLEVEL 1619 ( PING 127.0.0.1 -n 30 >NUL & GOTO :retrymsiexec ) & rem another install in progress, wait and retry
-POPD
-
-CALL "%srcpath%install_updates.cmd"
-
-rem --- inside install_updates.cmd --- CALL "%~dp0RemoveUnneededAutorunAndServices.cmd"
-RD /S /Q "%TempDir%"
-
+    
+    CALL "%~dp0install_updates.cmd"
+    RD /S /Q "%unpackDst%"
 EXIT /B
-
-:GetLogName
-    SET %1=%TEMP%\%~n2.log
+)
+:RunFromConfig
+IF NOT DEFINED configDir CALL :findconfigDir
+(
+    IF "%~x1"==".cmd" (
+        CALL "%configDir%"%*
+    ) ELSE "%configDir%"%*
+    EXIT /B
+)
+:SetFirstExistingExe <varname> <path1> <path2> <...>
+(
+    IF EXIST %2 (
+        SET %1=%2
+        EXIT /B
+    )
+    IF "%~3"="" EXIT /B 1
+    SHIFT /2
+    GOTO :SetFirstExistingExe
+)
+:findconfigDir
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+(
+    CALL :GetDir configDir "%DefaultsSource%"
 EXIT /B
-
-:checkunpack
-    IF "%~x1"==".msi" EXIT /B 0
-EXIT /B 1
-
-:unpack
-IF /I "%~x1" EQU ".exe" GOTO :unpack.exe
-SET exe7z="%srcpath%..\..\..\PreInstalled\utils\7za.exe"
-%exe7z% x -aoa -- %1
+)
+:GetDir
+(
+    SET "%~1=%~dp2"
 EXIT /B
-:unpack.exe
-%1 -nos_ne -nos_o.
-EXIT /B
+)
