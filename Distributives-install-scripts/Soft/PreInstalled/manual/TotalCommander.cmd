@@ -15,18 +15,24 @@ IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
     SET OS64Bit=
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
     IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
-
-    SET "dist7zDir=%~dp0..\..\Archivers Packers\7Zip"
-    SET "distzpaqDir=%~dp0..\..\..\Soft FOSS\Archivers Packers\zpaq"
+    SET "exe7zlocal="
     SET "distNotepad2Mask=Notepad2-mod.*"
     IF DEFINED OS64Bit ( SET "Notepad2DistSuffix=_x64.zip" ) ELSE SET "Notepad2DistSuffix=_x86.zip"
-    SET "distNotepad2Dir=%~dp0..\..\..\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod"
+    FOR %%A IN ("%~dp0..\.." "\\Srv1S-B.office0.mobilmir\Distributives\Soft" "\\Srv0.office0.mobilmir\Distributives\Soft") DO (
+        SET "findMoreDist="
+        IF NOT DEFINED dist7zDir SET "findMoreDist=1" & IF EXIST "%%~A\Archivers Packers\7Zip" SET "dist7zDir=%%~A\Archivers Packers\7Zip"
+        IF NOT DEFINED distzpaqDir SET "findMoreDist=1" & IF EXIST "%%~A\..\Soft FOSS\Archivers Packers\zpaq" SET "distzpaqDir=%%~A\..\Soft FOSS\Archivers Packers\zpaq"
+        IF NOT DEFINED distNotepad2Dir SET "findMoreDist=1" & IF EXIST "%%~A\..\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod" SET "distNotepad2Dir=%%~A\..\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod"
+        
+        IF NOT DEFINED findMoreDist GOTO :foundAllDist
+    )
 )
+:foundAllDist
 (
     SET "TCDir=%LOCALAPPDATA%\Programs\Total Commander"
     SET exe7z="%utilsdir%7za.exe"
     REM exe7z will be redefined in next CALL
-    FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%dist7zDir%\7z*.exe"`) DO CALL :Unpack7ZipDist "%dist7zDir%\%%~N"
+    FOR /F "usebackq delims=" %%N IN (`DIR /S /B /A-D "%dist7zDir%\7z*.exe"`) DO CALL :Unpack7ZipDist "%%~N"
 )
 IF NOT DEFINED exe7zlocal (
     MKDIR "%TCDir%\PlugIns\wcx\Total7zip" >NUL
@@ -35,12 +41,12 @@ IF NOT DEFINED exe7zlocal (
     SET "exe7zlocal=2"
 )
 (
-    %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.7z"
+    %exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.7z"
     IF "%exe7zlocal%"=="2" "%TCDir%\xln.exe" "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe" "%TCDir%\PlugIns\wcx\Total7zip\7z.exe" || (ECHO N|COPY /B "%TCDir%\PlugIns\wcx\Total7zip\7zg.exe" "%TCDir%\PlugIns\wcx\Total7zip\7z.exe")    
-    %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.Plugins.7z"
+    %exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.Plugins.7z"
     IF DEFINED OS64Bit (
-	%exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.64bit.7z"
-	%exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.Plugins64bit.7z"
+	%exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.64bit.7z"
+	%exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.Plugins64bit.7z"
     )
     "%SystemDrive%\SysUtils\SetACL.exe" -on "%TCDir%" -ot file -actn ace -ace "n:%UIDCreatorOwner%;p:change;i:so,sc;m:set;w:dacl"
     rem this causes weird permissions after profile permission reset --- "%utilsdir%xln.exe" %AutohotkeyExe% "%TCDir%\AutoHotkey.exe" || 
@@ -50,14 +56,9 @@ IF NOT DEFINED exe7zlocal (
     )
 )
 (
-    IF NOT EXIST "%dist7zDir%" SET "dist7zDir=\\Srv0.office0.mobilmir\Distributives\Soft\Archivers Packers\7Zip"
-    IF NOT EXIST "%distzpaqDir%" SET "distzpaqDir=\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Archivers Packers\zpaq"
-    IF NOT EXIST "%distNotepad2Dir%" SET "distNotepad2Dir=\\Srv0.office0.mobilmir\Distributives\Soft FOSS\Office Text Publishing\Text Documents\Notepad2\Special and Custom Editions\notepad2-mod"
-)
-(
     CALL :UnpackNotepad2Mod
     REM unpacking config after notepad2.zip to overwrite notepad2.ini
-    %exe7z% x -r -aoa -o"%TCDir%" -- "%~dpn0.config.7z"
+    %exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.config.7z"
     REM Autohotkey.exe копируется в %TCDir% выше
     IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" "%TCDir%\Autohotkey.exe" "%TCDir%\_copy_config.ahk"
     
@@ -65,29 +66,31 @@ IF NOT DEFINED exe7zlocal (
     @ECHO zpaq not unpacked!
 EXIT /B
 )
-:Unpack7ZipDist
-(
-    rem SET "dist7zPath=%~1"
-    SET "dist7zNameNoExt=%~n1"
+:Unpack7ZipDist <7-zip distributive>
+SET "dist7zNameNoExt=%~n1"
+IF "%dist7zNameNoExt:~-4%"=="-x64" (
+    IF NOT DEFINED OS64Bit EXIT /B
+    SET "outSubdir=\64"
+    SET "flagVar=Unpacked64bit7Zip"
+    SET "newlocal7zType=64"
+) ELSE (
     SET "outSubdir="
     SET "flagVar=Unpacked32bit7Zip"
+    SET "newlocal7zType=32"
 )
 (
-    IF "%dist7zNameNoExt:~-4%"=="-x64" (
-	IF NOT DEFINED OS64Bit EXIT /B
-	SET "outSubdir=\64"
-	SET "flagVar=Unpacked64bit7Zip"
+    IF NOT DEFINED %flagVar% %exe7z% x -aoa -y -o"%TCDir%\PlugIns\wcx\Total7zip%outSubdir%" -- %1 Lang\* 7z.dll 7z.sfx 7zg.exe 7z.exe && SET "%flagVar%=1"
+    IF DEFINED exe7zlocal IF %newlocal7zType% GEQ %exe7zlocal%. (
+        ECHO Already unpacked %exe7zlocal%-bit 7-Zip locally, ignoring %newlocal7zType%-bit one from %1
+        EXIT /B
     )
-)
-(
-    IF NOT DEFINED %flagVar% %exe7z% x -r -aoa -o"%TCDir%\PlugIns\wcx\Total7zip%outSubdir%" -- %1 Lang\* 7z.dll 7z.sfx 7zg.exe 7z.exe && SET "%flagVar%=1"
-    IF NOT DEFINED exe7zlocal CALL :FindFirstExisting exe7z "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7z.exe" "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7zg.exe" && SET "exe7zlocal=1"
+    CALL :FindFirstExisting exe7z "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7z.exe" "%TCDir%\PlugIns\wcx\Total7zip%outSubdir%\7zg.exe" && SET "exe7zlocal=1"
     EXIT /B
 )
 :FindFirstExisting var <path> <path...>
 (
     IF "%~2"=="" EXIT /B 1
-    IF EXIST %2 (
+    IF EXIST "%~2" (
 	SET %~1="%~2"
 	EXIT /B
     )
@@ -97,10 +100,10 @@ EXIT /B
 :Unpackzpaq
 (
     IF DEFINED OS64Bit (
-	%exe7z% x -r -aoa -o"%TCDir%\zpaq" -- %1 zpaq64.exe readme.txt
+	%exe7z% x -aoa -y -o"%TCDir%\zpaq" -- %1 zpaq64.exe readme.txt
 	MOVE /Y "%TCDir%\zpaq\zpaq64.exe" "%TCDir%\zpaq64.exe"
     ) ELSE (
-	%exe7z% x -r -aoa -o"%TCDir%\zpaq" -- %1 zpaq.exe readme.txt
+	%exe7z% x -aoa -y -o"%TCDir%\zpaq" -- %1 zpaq.exe readme.txt
 	MOVE /Y "%TCDir%\zpaq\zpaq.exe" "%TCDir%\zpaq.exe"
     )
     MOVE /Y "%TCDir%\zpaq\readme.txt" "%TCDir%\zpaq-readme.txt"
@@ -110,7 +113,7 @@ EXIT /B
 :UnpackNotepad2Mod
 (
     FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%distNotepad2Dir%\%distNotepad2Mask%%Notepad2DistSuffix%"`) DO (
-	%utilsdir%7za.exe x -aoa -o"%TCDir%\notepad2" -- "%distNotepad2Dir%\%%~A"
+	%utilsdir%7za.exe x -aoa -y -o"%TCDir%\notepad2" -- "%distNotepad2Dir%\%%~A"
 	FOR %%B IN ("%TCDir%\notepad2\notepad2*.*") DO MOVE "%%~B" "%TCDir%\"
 	FOR %%B IN ("%TCDir%\notepad2\*.*") DO MOVE "%%~B" "%TCDir%\notepad2-%%~nxB"
 	RD /S /Q "%TCDir%\notepad2"

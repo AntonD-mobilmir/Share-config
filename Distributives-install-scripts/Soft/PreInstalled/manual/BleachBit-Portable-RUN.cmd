@@ -11,7 +11,7 @@ IF NOT DEFINED exe7z SET exe7z="%utilsdir%7za.exe"
 SET "dest=%LOCALAPPDATA%\Programs\BleachBit-Portable"
 )
 (
-%exe7z% x -aoa -o"%dest%" -- "%~dp0BleachBit-Portable.7z"
+%exe7z% x -aoa -y -o"%dest%" -- "%~dp0BleachBit-Portable.7z"
 "%SystemDrive%\SysUtils\SetACL.exe" -on "%dest%" -ot file -actn ace -ace "n:%UIDEveryone%;p:change;i:so,sc;m:set;w:dacl"
 
 PUSHD "%dest%" && (

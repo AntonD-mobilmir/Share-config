@@ -23,7 +23,7 @@ IF DEFINED ProgramFiles^(x86^) (
 )
 )
 (
-"%exe7z%" x -r -aoa -o"%lProgramFiles%\Notepad2" -- "%srcpath%%~n0.7z" || %ErrorCmd%
+"%exe7z%" x -aoa -y -o"%lProgramFiles%\Notepad2" -- "%srcpath%%~n0.7z" || %ErrorCmd%
 
 ASSOC .txt=notepad2-txtfile
 FTYPE notepad2-txtfile=^"%%%RunPathVar%%%\Notepad2\Notepad2.exe^" %%1
