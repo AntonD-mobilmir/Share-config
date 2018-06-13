@@ -1,7 +1,7 @@
 @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-    IF NOT DEFINED ProgramFiles32 CALL "%~dp0..\uninstall_soft_init.cmd"
+    IF NOT DEFINED ProgramFiles32 CALL "%~dp0Lib\_init.cmd"
 )
 (
     FOR /D %%I IN ("%ProgramFiles32%\LibreOffice*") DO IF EXIST "%%~I\program\soffice.exe" CALL :CheckMSIInSubdirs "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\32-bit\LibreOffice_*_Win_x86.msi" "%SoftSourceDir%\Office Text Publishing\Office Suites\LibreOffice\LibreOffice_*.msi" && GOTO :UninstallLO
