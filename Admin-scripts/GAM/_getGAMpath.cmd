@@ -17,7 +17,7 @@
 
 :FoundPy
 @(
-    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-N /AD "%LOCALAPPDATA%\Programs\WinPython\python-*"`) DO (
+    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-N /AD "%LOCALAPPDATA%\Programs\WinPython\python-*"`) DO @(
 	SET GAMexe="%LOCALAPPDATA%\Programs\WinPython\%%~A\python.exe" %GAMpy%
 	EXIT /B
     )
