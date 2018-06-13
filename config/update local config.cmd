@@ -1,41 +1,36 @@
 @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
-REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-
+REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 SETLOCAL ENABLEEXTENSIONS
-SET "srcpath=%~dp0"
+    SET "srcpath=%~dp0"
 
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-CALL "%~dp0_Scripts\move Local_Scripts to ProgramData_mobilmir.cmd"
-CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
+    rem IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+    rem CALL "%~dp0_Scripts\move Local_Scripts to ProgramData_mobilmir.cmd"
+    CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
 
-IF NOT "%~1"=="" SET "configDir=%~1"
-SET "rsyncHost=192.168.1.80"
-)
+    IF NOT "%~1"=="" SET "configDir=%~1"
+    SET "rsyncHost=Srv0.office0.mobilmir"
     IF NOT DEFINED configDir (
-	IF DEFINED DefaultsSource CALL :getconfigDirFromDefaultsSource "%DefaultsSource%"
-	IF NOT DEFINED configDir CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd"
-	IF NOT DEFINED configDir ECHO Место назначения не определено. Сначала стоит установить _get_defaultconfig_source.cmd & PAUSE & EXIT /B
+        IF DEFINED DefaultsSource CALL :getconfigDirFromDefaultsSource "%DefaultsSource%"
+        IF NOT DEFINED configDir CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd"
+        IF NOT DEFINED configDir ECHO Место назначения не определено. Сначала стоит установить _get_defaultconfig_source.cmd & PAUSE & EXIT /B
     )
 )
 (
     IF "%configDir:~0,2%"=="\\" ECHO Папка конфигурации - в сети, обновлять можно только локальную папку! & PAUSE & EXIT /B
     IF NOT EXIST "%configDir%" MKDIR "%configDir%" || EXIT /B
-
     IF EXIST "%SystemDrive%\SysUtils\cygwin\cygpath.exe" IF EXIST "%SystemDrive%\SysUtils\cygwin\rsync.exe" (
 	CALL "%ProgramData%\mobilmir.ru\Common_Scripts\waithost.cmd" %rsyncHost% 1 && CALL :RunRsync && EXIT /B
     )
 
+    REM rsync failed, try xcopy
     REM needed for XCOPY %Distributives%\config
-    CALL "%ProgramData%\mobilmir.ru_get_SoftUpdateScripts_source.cmd"
+    CALL "%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd"
     IF NOT DEFINED Distributives IF "%srcpath:~0,2%"=="\\" SET "Distributives=%srcpath%.."
     IF NOT DEFINED Distributives CALL "%~dp0_Scripts\FindSoftwareSource.cmd"
 )
 (
-    IF EXIST "%Distributives%\*.*" (
-	REM rsync failed, try xcopy
-	XCOPY "%Distributives%\config" "%configDir%" /D /E /C /I /H /K /Y && EXIT /B
-    )
+    IF EXIST "%Distributives%\*.*" XCOPY "%Distributives%\config" "%configDir%" /D /E /C /I /R /H /K /Y && EXIT /B
 
     REM only continuing here if both rsync and xcopy failed or unavailable
     ECHO Локальная конфигурация не обновлена!>&2
