@@ -15,7 +15,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 (
     IF DEFINED AutohotkeyExe FOR %%A IN (%AutohotkeyExe%) DO (
-	DEL "%%~dpA*.bak"
+	ECHO Y|DEL "%%~dpA*.bak"
 	CALL :UnlockByMoving "%%~A" "%%~tA %RANDOM%.bak"
     )
     FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%srcpath%AutoHotkey_*_setup.exe"`) DO (
@@ -26,12 +26,13 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 )
 :InstalledSuccessfully
 (
-REM Hiding shortcuts
-%AutohotkeyExe% /ErrorStdOut "%~dp0HideStartMenuShortcuts.ahk"
-REM unpacking Lib
-IF NOT DEFINED AutoHotkey_Lib_reentrance (
-    SET /A "AutoHotkey_Lib_reentrance=1"
-    CALL "%~dp0..\..\PreInstalled\auto\AutoHotkey_Lib.cmd"
+    IF DEFINED AutohotkeyExe FOR %%A IN (%AutohotkeyExe%) DO ECHO Y|DEL "%%~dpA*.bak"
+    REM Hiding shortcuts
+    %AutohotkeyExe% /ErrorStdOut "%~dp0HideStartMenuShortcuts.ahk"
+    REM unpacking Lib
+    IF NOT DEFINED AutoHotkey_Lib_reentrance (
+        SET /A "AutoHotkey_Lib_reentrance=1"
+        CALL "%~dp0..\..\PreInstalled\auto\AutoHotkey_Lib.cmd"
 )
 EXIT /B
 )

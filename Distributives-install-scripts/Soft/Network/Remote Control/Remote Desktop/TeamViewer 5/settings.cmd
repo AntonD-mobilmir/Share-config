@@ -31,7 +31,7 @@ IF "%argflag%"=="/" (
     )
     IF NOT EXIST "%RegConfigName%" (
 	SET "del=1"
-	%exe7z% e -aoa -o"%TEMP%" -- "%DefaultsSource%" "TeamViewer\%RegConfigName%"
+	%exe7z% e -aoa -y -o"%TEMP%" -- "%DefaultsSource%" "TeamViewer\%RegConfigName%"
 	SET "RegConfigName=%TEMP%\%RegConfigName%"
     )
     (

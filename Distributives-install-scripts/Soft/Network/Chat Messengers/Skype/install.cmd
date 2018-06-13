@@ -13,11 +13,17 @@ IF NOT DEFINED logmsi CALL :DefineLogMSI
 rem с 2017-03-01, Skype требует MSVCP140.DLL
 rem 2018-01-10, Updates\Windows\wsusoffline\cpp\vcredist2015_x86.exe переименован в vcredist2017_x86.exe
 "%~dp0..\..\..\..\Updates\Windows\wsusoffline\cpp\vcredist2017_x86.exe" /q /norestart
-%SystemRoot%\System32\msiexec.exe /i "%~dp0%MSIFileName%" /qn /norestart /l+* "%logmsi%" TRANSFORMS=:RemoveStartup.mst;:RemoveDesktopShortcut.mst
+CALL :runMsiExec /i "%~dp0%MSIFileName%" /qn /norestart /l+* "%logmsi%" TRANSFORMS=:RemoveStartup.mst;:RemoveDesktopShortcut.mst
 EXIT /B
 )
 :DefineLogMSI
 (
 SET "logmsi=%TEMP%\%MSIFileName%.%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=%.log"
+EXIT /B
+)
+:runMsiExec
+(
+    %SystemRoot%\System32\msiexec.exe %*
+    IF ERRORLEVEL 1618 IF NOT ERRORLEVEL 1619 ( PING 127.0.0.1 -n 30 >NUL & GOTO :runMsiExec ) & rem another install in progress, wait and retry
 EXIT /B
 )

@@ -2,20 +2,28 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
-CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
-IF NOT DEFINED DefaultsSource EXIT /B 129
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 SET "LocalPSSettingRel=Yandex\Punto Switcher"
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
+IF NOT DEFINED DefaultsSource EXIT /B 129
+IF NOT DEFINED exe7z CALL :find7zexe
 )
-CALL :GetDir ConfigDir "%DefaultsSource%"
-IF NOT DEFINED exe7z CALL "%ConfigDir%_Scripts\find7zexe.cmd"
 (
-%exe7z% x -aoa -o"%APPDATA%" -- "%ConfigDir%_Scripts\Default User\default_AppDataRoaming.7z" "%LocalPSSettingRel%"
+%exe7z% x -aoa -o"%APPDATA%" -- "%configDir%_Scripts\Default User\default_AppDataRoaming.7z" "%LocalPSSettingRel%"
 IF NOT EXIST "%APPDATA%\%LocalPSSettingRel%" MKDIR "%APPDATA%\%LocalPSSettingRel%"
-XCOPY "%ConfigDir%Users\Default\AppData\Roaming\%LocalPSSettingRel%\*.*" "%APPDATA%\%LocalPSSettingRel%" /E /I /Q /G /H /K /Y
-%exe7z% x -aoa -o"%ProgramFiles%" -- "%DefaultsSource%" "%LocalPSSettingRel%"
+XCOPY "%configDir%Users\Default\AppData\Roaming\%LocalPSSettingRel%\*.*" "%APPDATA%\%LocalPSSettingRel%" /E /I /Q /G /H /K /Y
+%exe7z% x -aoa -y -o"%ProgramFiles%" -- "%DefaultsSource%" "%LocalPSSettingRel%"
 
+EXIT /B
+)
+:find7zexe
+IF NOT DEFINED configDir CALL :GetDir configDir "%DefaultsSource%"
+(
+    CALL "%configDir%_Scripts\find7zexe.cmd"
+    IF NOT DEFINED exe7z (
+        IF EXIST "%~dp0..\..\PreInstalled\utils\7za.exe" (
+            SET exe7z="%~dp0..\..\PreInstalled\utils\7za.exe"
+        ) ELSE SET "exe7z=7z.exe"
+    )
 EXIT /B
 )
 :GetDir

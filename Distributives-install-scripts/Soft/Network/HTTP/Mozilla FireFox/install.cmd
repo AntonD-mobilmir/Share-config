@@ -13,7 +13,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
 )
 (
-    IF DEFINED DefaultsSource CALL :GetDir ConfigDir "%DefaultsSource%"
+    IF DEFINED DefaultsSource CALL :GetDir configDir "%DefaultsSource%"
     IF "%winVer:~0,30%"=="Microsoft Windows [Версия 6.0." SET "winVista=1"
     IF "%winVer:~0,31%"=="Microsoft Windows [Version 6.0." SET "winVista=1"
     IF DEFINED winVista (
@@ -28,7 +28,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     FOR %%A IN ("%InstDistributive%") DO SET "InstDistributive=%%~A"
     COPY /B /Y "%srcpath%install.ini" "%TempIni%"
 
-    IF DEFINED ConfigDir SET "pathAppendSubpath=libs" & CALL "%ConfigDir%_Scripts\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\sed.exe"
+    IF DEFINED configDir SET "pathAppendSubpath=libs" & CALL "%configDir%_Scripts\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\sed.exe"
     )
 )
 IF DEFINED sedexe %sedexe% "s/;InstallDirectoryPath={InstallDirectoryPath}/InstallDirectoryPath=%cProgramFiles%\\Mozilla Firefox/" "%srcpath%install.ini">"%TempIni%"
@@ -43,9 +43,9 @@ CALL :HideDesktopShortcut
 EXIT /B %ErrorMemory%
 
 :UnpackDefaults
-    CALL "%ConfigDir%_Scripts\find7zexe.cmd" || EXIT /B
+IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd" || EXIT /B
 (
-    %exe7z% x -aoa -r0 -o"%lProgramFiles%\" -- "%DefaultsSource%" "Mozilla Firefox\"
+    %exe7z% x -aoa -y -r0 -o"%lProgramFiles%\" -- "%DefaultsSource%" "Mozilla Firefox\"
 EXIT /B
 )
 :HideDesktopShortcut

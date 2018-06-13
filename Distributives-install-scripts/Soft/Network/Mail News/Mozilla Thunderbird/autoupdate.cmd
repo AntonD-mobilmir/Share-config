@@ -16,7 +16,7 @@ IF NOT EXIST "%exeMT%" EXIT /B 2
 IF NOT EXIST "%exegetver%" GOTO :skipVerCheck
 
 SET "tempdir=%TEMP%\Thunderbird-update %DATE% %TIME::=%"
-%exe7z% e -aoa -o"%tempdir%" -- "%distFullPath%" core\thunderbird.exe
+%exe7z% e -aoa -y -o"%tempdir%" -- "%distFullPath%" core\thunderbird.exe
 
 FOR /F "usebackq tokens=1" %%V IN (`%exegetver% "%exeMT%"`) DO SET "mtversion=%%~V"
 FOR /F "usebackq tokens=1" %%V IN (`%exegetver% "%tempdir%\thunderbird.exe"`) DO SET "distversion=%%~V"
