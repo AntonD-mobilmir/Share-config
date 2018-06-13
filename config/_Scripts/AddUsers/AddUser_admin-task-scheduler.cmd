@@ -12,11 +12,6 @@ SETLOCAL ENABLEEXTENSIONS
     SET "PasswdPart3=0000%RANDOM%"
 
     SET "ManagedUserName=admin-task-scheduler"
-
-    CALL "%~dp0..\find_exe.cmd" passwdexe "%SystemRoot%\SysUtils\UnxUtils\Uri\passwd.exe" "%~dp0..\..\..\Programs\passwd.exe" \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs\passwd.exe || (
-        ECHO passwd.exe not found. Trying to reset the password.
-        GOTO :ExistingUserResetPwd
-    )
 )
 SET "PassFileDir=%PROGRAMDATA%\mobilmir.ru"
 @(
@@ -64,6 +59,13 @@ GOTO :SetVarsAndExit
 	SET "schedUserName=%ManagedUserName%"
 	EXIT /B
     )
+    SET "findExeTestExecutionOptions=-?"
+    CALL "%~dp0..\find_exe.cmd" passwdexe "%SystemRoot%\SysUtils\UnxUtils\Uri\passwd.exe" "%~dp0..\..\..\Programs\passwd.exe" "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs\passwd.exe" || (
+        ECHO passwd.exe not found. Trying to reset the password.
+        GOTO :ExistingUserResetPwd
+    )
+)
+(
     ECHO %ManagedUserName%	%newuserpwd%	%DATE% %TIME% Changing user password from "%OldPwd%">"%PassFilePath%"
     %passwdexe% -u "%ManagedUserName%" -c "%OldPwd%" "%newuserpwd%">>"%PassFilePath%" 2>&1
     IF NOT ERRORLEVEL 1 GOTO :SetVarsAndExit
