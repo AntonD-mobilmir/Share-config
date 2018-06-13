@@ -20,8 +20,9 @@ Try {
     }
 
     EnvSet RunInteractiveInstalls,RunInteractiveInstalls
-
-    RunWait "%A_AhkPath%" "%A_ScriptDir%\DumpBoard.ahk"
+    
+    argLog := options.log ? "/log """ options.log """" : ""
+    RunWait "%A_AhkPath%" /ErrorStdOut "%A_ScriptDir%\DumpBoard.ahk" 
     FileRead jsoncards, %A_ScriptDir%\..\trello-accounting\board-dump\computer-accounting.json
     cards := JSON.Load(jsoncards)
 
