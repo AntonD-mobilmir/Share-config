@@ -2,9 +2,9 @@
 REM Reads list of hostnames, outputs list of corresponding IP addresses.
 REM Lists all addresses of round-robing hosts (parses output of nslookup for each host).
 REM Requires unix-style find utility.
+REM
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
-ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 
 REM /Add to add new IPs to existing list
@@ -51,7 +51,7 @@ IF "%opt:~,1%"=="/" (
 (
     ECHO Resolving %1...>&2
     SET "CurrentHostname=%1"
-    SET "AddressEncountered=0"
+    SET "AddressEncountered="
     IF NOT "%~1"=="" FOR /F "usebackq skip=2 tokens=1*" %%J IN (`nslookup %1`) DO CALL :AddAfterFlag "%%~J" "%%K"
 EXIT /B
 )
@@ -59,13 +59,13 @@ EXIT /B
 (
     IF "%~1"=="Aliases:" (
 	rem No more addresses
-	SET "AddressEncountered=0"
+	SET "AddressEncountered="
 	EXIT /B
     )
     
     rem 1st address on >=2nd line in multi-line addresses string
     rem it can contain ", " at the end
-    IF "%AddressEncountered%"=="1" FOR /F "delims=," %%L IN (%1) DO CALL :AddIP%AddMode% %%~L
+    IF DEFINED AddressEncountered FOR /F "delims=," %%L IN (%1) DO CALL :AddIP%AddMode% %%~L
     
     IF %1=="Address:" (
 	rem Single Address follows
@@ -74,11 +74,18 @@ EXIT /B
     )
 
     rem First line for multi-IP host
-    IF %1=="Addresses:" SET AddressEncountered=1
+    IF %1=="Addresses:" SET "AddressEncountered=1"
     
     rem a line for multi-IP host
-    IF %AddressEncountered%==1 FOR /F "delims=," %%L IN (%2) DO CALL :AddIP%AddMode% %%~L
+    IF DEFINED AddressEncountered CALL :AddIPList %~2
 EXIT /B
+)
+:AddIPList
+(
+    CALL :AddIP%AddMode% %~1
+    IF "%~2"=="" EXIT /B
+    SHIFT
+GOTO :AddIPList
 )
 :AddIPDefault
 (
