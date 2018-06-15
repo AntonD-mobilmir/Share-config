@@ -2,7 +2,10 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 SETLOCAL ENABLEEXTENSIONS
+
+REM Adobe Reader XI
 CALL :runMsiExec /X{AC76BA86-7AD7-1049-7B44-AB0000000001} /qn
+REM Acrobat Reader DC
 CALL :runMsiExec /X{AC76BA86-7AD7-1049-7B44-AC0F074E4100} /qn
 EXIT /B
 )
