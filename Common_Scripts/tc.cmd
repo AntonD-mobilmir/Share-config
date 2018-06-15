@@ -40,7 +40,7 @@ IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application D
     CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
 (
     IF DEFINED SoftSourceDir CALL :InstallFirst "%SoftSourceDir%\%TCDistRelPath%" && GOTO :FindTCPath
-    CALL :InstallFirst "D:\Distributives\Soft\%TCDistRelPath%" "\\Srv0.office0.mobilmir\Distributives\Soft\%TCDistRelPath%" && GOTO :FindTCPath
+    CALL :InstallFirst "D:\Distributives\Soft\%TCDistRelPath%" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\%TCDistRelPath%" "\\Srv0.office0.mobilmir\Distributives\Soft\%TCDistRelPath%" && GOTO :FindTCPath
     ECHO Install failed!
     EXIT /B
 )

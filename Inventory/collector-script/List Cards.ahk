@@ -25,11 +25,10 @@ For i, card in cards {
 
 fnameout = %A_Temp%\%A_ScriptName%.%A_Now%.tsv
 FileAppend %out%, %fnameout%
-Try {
+Try
     Run "%fnameout%"
-} Catch e {
+Catch e
     Run explorer.exe /select`,"%fnameout%"
-}
 
 ExitApp
 
