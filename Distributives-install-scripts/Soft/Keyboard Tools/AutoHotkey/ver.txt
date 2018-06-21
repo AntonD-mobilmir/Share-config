@@ -1,1 +1,1 @@
-1.1.29.0	AutoHotkey_1.1.29.00_setup.exe
+1.1.29.1	AutoHotkey_1.1.29.01_setup.exe
