@@ -8,12 +8,11 @@ EnvGet SystemRoot,SystemRoot
 If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
     sysNative := SystemRoot "\System32"
 
-defaultConfigDir = \\Srv0.office0.mobilmir\profiles$\Share\config
+defaultConfigDir = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config
 configScriptsDir = %A_ScriptDir%\..
 If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
-    FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config@Srv0.lnk,, /open`,"\\Srv0.office0.mobilmir\profiles$\Share\config"
-    Loop Files, %configScriptsDir%\.., D
-        configDir := A_LoopFileLongPath
+    FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config@Srv1S-B.lnk,, /open`,"%defaultConfigDir%"
+    configDir := %configScriptsDir%\..
 }
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
 

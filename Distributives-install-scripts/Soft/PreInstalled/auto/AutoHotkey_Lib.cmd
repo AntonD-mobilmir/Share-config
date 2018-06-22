@@ -31,6 +31,6 @@ IF NOT DEFINED PrimaryDestination (
     REM install_silently will call this script, so do not continue
 ) ELSE (
     IF EXIST "%PrimaryDestination%" IF NOT EXIST "%PrimaryDestination%\*.*" RD "%PrimaryDestination%"
-    "%utilsdir%7za.exe" x -r -aoa -o"%PrimaryDestination%" -- "%srcpath%%~n0.7z"||%ErrorCmd%
+    "%utilsdir%7za.exe" x -aoa -y -o"%PrimaryDestination%" -- "%srcpath%%~n0.7z"||%ErrorCmd%
 )
 EXIT /B %ErrorPresence%
