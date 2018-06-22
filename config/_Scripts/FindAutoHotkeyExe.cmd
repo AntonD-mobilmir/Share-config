@@ -50,7 +50,7 @@ EXIT /B
 :Unpack <arch> <dest>
 IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
 (
-    %exe7z% x -o%2 -- %1
+    %exe7z% x -aoa -y -o%2 -- %1
     EXIT /B
 )
 :RunAhkScript
