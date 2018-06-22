@@ -4,8 +4,6 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
+SET "distcleanup=1"
 )
-(
-    CALL "%baseScripts%\_DistDownload_github.cmd" https://github.com/upx/upx/releases/latest upx w.zip
-EXIT /B
-)
+CALL "%baseScripts%\_DistDownload" https://rufus.akeo.ie/ *.exe -ml1 -A.exe

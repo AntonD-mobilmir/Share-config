@@ -2,73 +2,73 @@
 @REM Automated software update scripts
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-IF NOT DEFINED srcpath EXIT /B 32767
+    IF NOT DEFINED srcpath EXIT /B 32767
 
-IF "%~1"=="" (
-    ECHO Not enough arguments.
-    ECHO Usage:
-    ECHO %0 URL [disributiveFileMask ["wget parameters"] ]
-    EXIT /B 32767
-)
+    @REM usage: %0 URL [distmask|""] 
+    @REM input:
+    ECHO 	Arguments: %*
+    @REM 	%1	URL of page with links / or of file, in latter case use -N switch for wget
+    @REM 	%2	file mask of distributive
+    @REM 		if not set, %~nx1 is used (filename from URL)
+    @REM 		if distfmask is set, %2 is skipped (next argument is %2)
+    @REM 	%3*
+    @REM 		arguments for wget. First is unquoted before passing to wget, others are passed "as is"
+    @REM 		(disabled) if %3 begins with -N, "logfname=%~nx2.log" is added to wget arguments
+    @REM 		default: "-m -l 1 -nd -e robots=off --no-check-certificate"
+    ECHO 	srcpath="%srcpath%"
+    @REM 		mandatory, it's destination for distributive file
+    ECHO 	distcleanup="%distcleanup%"
+    @REM 		if set to 1, distcleanup procedures are executed
+    ECHO 	AddtoSUScripts="%AddtoSUScripts%", SUScripts="%SUScripts%", UseTimeAsVersion="%UseTimeAsVersion%"
+    @REM 		use 0 to disable calling "%%SUScripts%%\..\templates\_add_withVer.cmd". SUScripts must also be defined. If UseTimeAsVersion=1, _add_withVer will not try reading version of setup to determine version if installed software, and will use filename datetime instead.
+    ECHO 	findpath="%findpath%"
+    @REM 		relative path for unix find, which performed when seeking %distfmask% for files to link
+    ECHO 	findargs="%findargs%"
+    @REM		arguments for find. Default: -name %distfmask%
+    ECHO 	dstrename="%dstrename%"
+    @REM		new name for downloaded file. Default: %distfname%
+    ECHO 	logfname="%logfname%"
+    @REM		or determined from other args if not set
+    @REM 
+    ECHO 	baseDistUpdateScripts="%baseDistUpdateScripts%"
+    @REM 		and
+    ECHO 	baseDistributives="%baseDistributives%"
+    @REM 		determine relpath from srcpath and redirection of srcpath, and
+    ECHO 	baseWorkdir="%baseWorkdir%"
+    @REM 		and
+    ECHO 	baseLogsDir="%baseLogsDir%"
+    @REM 		are used with relpath for default values of workdir and logsDir
 
-@REM usage: %0 URL [distmask|""] 
-@REM input:
-ECHO 	Arguments: %*
-@REM 	%1	URL of page with links / or of file, in latter case use -N switch for wget
-@REM 	%2	file mask of distributive
-@REM 		if not set, %~nx1 is used (filename from URL)
-@REM 		if distfmask is set, %2 is skipped (next argument is %2)
-@REM 	%3*
-@REM 		arguments for wget. First is unquoted before passing to wget, others are passed "as is"
-@REM 		(disabled) if %3 begins with -N, "logfname=%~nx2.log" is added to wget arguments
-@REM 		default: "-m -l 1 -nd -e robots=off --no-check-certificate"
-ECHO 	srcpath="%srcpath%"
-@REM 		mandatory, it's destination for distributive file
-ECHO 	distcleanup="%distcleanup%"
-@REM 		if set to 1, distcleanup procedures are executed
-ECHO 	AddtoSUScripts="%AddtoSUScripts%", SUScripts="%SUScripts%", UseTimeAsVersion="%UseTimeAsVersion%"
-@REM 		use 0 to disable calling "%%SUScripts%%\..\templates\_add_withVer.cmd". SUScripts must also be defined. If UseTimeAsVersion=1, _add_withVer will not try reading version of setup to determine version if installed software, and will use filename datetime instead.
-ECHO 	findpath="%findpath%"
-@REM 		relative path for unix find, which performed when seeking %distfmask% for files to link
-ECHO 	findargs="%findargs%"
-@REM		arguments for find. Default: -name %distfmask%
-ECHO 	dstrename="%dstrename%"
-@REM		new name for downloaded file. Default: %distfname%
-ECHO 	logfname="%logfname%"
-@REM		or determined from other args if not set
-@REM 
-ECHO 	baseDistUpdateScripts="%baseDistUpdateScripts%"
-@REM 		and
-ECHO 	baseDistributives="%baseDistributives%"
-@REM 		determine relpath from srcpath and redirection of srcpath, and
-ECHO 	baseWorkdir="%baseWorkdir%"
-@REM 		and
-ECHO 	baseLogsDir="%baseLogsDir%"
-@REM 		are used with relpath for default values of workdir and logsDir
+    IF NOT DEFINED xlnexe (
+        IF EXIST %SystemDrive%\SysUtils\xln.exe (
+            SET xlnexe="%SystemDrive%\SysUtils\xln.exe"
+        ) ELSE IF EXIST "%~d0Distributives\Soft\PreInstalled\utils\xln.exe" (
+            SET xlnexe="%~d0Distributives\Soft\PreInstalled\utils\xln.exe"
+        ) ELSE SET "xlnexe=verify error"
+    )
 
-IF NOT DEFINED xlnexe (
-    IF EXIST %SystemDrive%\SysUtils\xln.exe (
-	SET xlnexe="%SystemDrive%\SysUtils\xln.exe"
-    ) ELSE IF EXIST "%~d0Distributives\Soft\PreInstalled\utils\xln.exe" (
-	SET xlnexe="%~d0Distributives\Soft\PreInstalled\utils\xln.exe"
-    ) ELSE SET "xlnexe=verify error"
-)
+    IF NOT DEFINED findexe IF EXIST "%SystemDrive%\SysUtils\UnxUtils\find.exe" SET "findexe=%SystemDrive%\SysUtils\UnxUtils\find.exe"
+    IF NOT DEFINED wgetexe IF EXIST "%SystemDrive%\SysUtils\wget.exe" SET wgetexe="%SystemDrive%\SysUtils\wget.exe"
 
-IF NOT DEFINED findexe IF EXIST "%SystemDrive%\SysUtils\UnxUtils\find.exe" SET "findexe=%SystemDrive%\SysUtils\UnxUtils\find.exe"
-IF NOT DEFINED wgetexe IF EXIST "%SystemDrive%\SysUtils\wget.exe" SET wgetexe="%SystemDrive%\SysUtils\wget.exe"
+    SETLOCAL ENABLEEXTENSIONS
+    CALL "%~dp0_GetWorkPaths.cmd"
+    rem srcpath with baseDistUpdateScripts replaced to baseDistributives
+    rem relpath is srcpath relatively to baseDistributives (no trailing backslash)
+    rem workdir - baseWorkdir with relpath (or %srcpath%temp if baseWorkdir isn't defined)
+    rem logsDir - baseLogsDir with relpath (or nothing)
 
-SETLOCAL ENABLEEXTENSIONS
-CALL "%~dp0_GetWorkPaths.cmd"
-rem srcpath with baseDistUpdateScripts replaced to baseDistributives
-rem relpath is srcpath relatively to baseDistributives (no trailing backslash)
-rem workdir - baseWorkdir with relpath (or %srcpath%temp if baseWorkdir isn't defined)
-rem logsDir - baseLogsDir with relpath (or nothing)
+    SET rdistpath=%1
 
-SET rdistpath=%1
+    @REM skiptokens: default suggestion is 1 argument for URL, and distmask is defined as env var (or distmask is "" on command line).
+    @REM 		even in worst scenario, if distmask will become one of arguments for wget, we'll just get one more query to non-existing host
+    SET "skiptokens=1"
 
-@REM skiptokens: default suggestion is 1 argument for URL, and distmask is defined as env var (or distmask is "" on command line).
-@REM 		even in worst scenario, if distmask will become one of arguments for wget, we'll just get one more query to non-existing host
-SET "skiptokens=1"
+    IF "%~1"=="" (
+        ECHO Not enough arguments.
+        ECHO Usage:
+        ECHO %0 URL [disributiveFileMask ["wget parameters"] ]
+        EXIT /B 32767
+    )
 )
 
 @REM skiptokens: but if distmast wasn't specified with variable, probably it's on command line
