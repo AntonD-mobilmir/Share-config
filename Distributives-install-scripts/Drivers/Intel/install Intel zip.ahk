@@ -1,11 +1,22 @@
-﻿#NoEnv
-global exe7z
+﻿;by LogicDaemon <www.logicdaemon.ru>
+;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
+#NoEnv
+FileEncoding UTF-8
+
+EnvGet LocalAppData,LOCALAPPDATA
+EnvGet SystemRoot,SystemRoot
+
 EnvGet exe7z, exe7z
-;fails for unknown reason. Works when TryInvokeFunc has no Try, but this causes unhandled exceptions -- exe7z := TryInvokeFunc({find7zGUIorAny: [ A_LineFile "\..\..\..\Soft\PreInstalled\utils" ]})
-If (!(exe7z || exe7z := TryInvokeFunc({find7zexe: ["7zg.exe"]}, {find7zexe: ["7z.exe"]}, {find7zaexe: [ A_LineFile "\..\..\..\Soft\PreInstalled\utils" ]}))) {
-    FileSelectFile exe7z, 3, 7z.exe, Путь к исполняемому файлу 7-Zip (7z.exe`, 7zg.exe либо 7za.exe), Portable Executable (*.exe)
-    If (!exe7z)
-	ExitApp -1
+If (exe7z) {
+    exe7z := Trim(exe7z, """")
+} Else {
+    ;fails for unknown reason. Works when TryInvokeFunc has no Try, but this causes unhandled exceptions -- exe7z := TryInvokeFunc({find7zGUIorAny: [ A_LineFile "\..\..\..\Soft\PreInstalled\utils" ]})
+    exe7z := TryInvokeFunc({find7zexe: ["7zg.exe"]}, {find7zexe: ["7z.exe"]}, {find7zaexe: [ A_LineFile "\..\..\..\Soft\PreInstalled\utils" ]})
+    If (!exe7z) {
+        FileSelectFile exe7z, 3, 7z.exe, Путь к исполняемому файлу 7-Zip (7z.exe`, 7zg.exe либо 7za.exe), Portable Executable (*.exe)
+        If (!exe7z)
+            ExitApp -1
+    }
 }
 ; 1st argument is always archive name
 ; 2nd arg could be either another archive (and so on) or 1st argument for setup executable
@@ -47,6 +58,7 @@ InstallLatestByMask(path,args="") {
 }
 
 Install(pathSrc,args="") {
+    global exe7z
     static CurrentScriptCopied=0
     
     IfNotExist %pathSrc%
@@ -172,5 +184,5 @@ TryInvokeFunc(fnNames*) {
 	    Try return rv
 }
 
-#include *i \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\find7zexe.ahk
-#include *i %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk
+#include *i %A_LineFile%\..\..\..\..\profiles$\Share\config\_Scripts\Lib\find7zexe.ahk ; only available when running from Srv0
+#include *i %A_LineFile%\..\..\..\config\_Scripts\Lib\find7zexe.ahk ; only available when running local copy (with Distributives\config)
