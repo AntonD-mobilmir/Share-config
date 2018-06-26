@@ -12,7 +12,7 @@ defaultConfigDir = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Shar
 configScriptsDir = %A_ScriptDir%\..
 If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
     FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config@Srv1S-B.lnk,, /open`,"%defaultConfigDir%"
-    configDir := %configScriptsDir%\..
+    configDir = %configScriptsDir%\..
 }
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
 
