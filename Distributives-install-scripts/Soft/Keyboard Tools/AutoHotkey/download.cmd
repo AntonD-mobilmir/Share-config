@@ -31,8 +31,8 @@ IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
     IF NOT DEFINED logsDir SET "logsDir=%workdir%"
     IF EXIST "%workdir%new.tmp" RD /S /Q "%workdir%new.tmp"
     MKDIR "%workdir%new.tmp"
-    c:\SysUtils\xln.exe "%curDistPath%" "%workdir%new.tmp\%curDistName%"
-    START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\wget.exe -N %url%
+    xln.exe "%curDistPath%" "%workdir%new.tmp\%curDistName%"
+    START "" /B /WAIT /D "%workdir%new.tmp" wget.exe -N %url%
     
     IF NOT EXIST "%workdir%new.tmp\*.*" (
 	rem CURL still ignores server filename. Have no idea what to do with it. So it'll be only used as backup.
@@ -47,8 +47,7 @@ IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
 	rem -R, --remote-time   Set the remote file's time on the local output
 	rem -z, --time-cond TIME   Transfer based on a time condition
 
-	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe -L -O -J -p -R %timeCond% %url% || CALL :ExitWithError running CURL & EXIT /B
-	rem c:\SysUtils\curl.exe -k -R -L -o "%workdir%%urlfname%" -z "%workdir%%urlfname%" -L %url% || EXIT /B
+	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe -LpR --remote-name-all %timeCond% %url% || CALL :ExitWithError running CURL & EXIT /B
     )
     rem without -o for CURL and -O for wget, filename is unknown
     FOR %%A IN ("%workdir%new.tmp\*.exe") DO (	
@@ -78,8 +77,7 @@ IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
     ( ECHO %ver%	%dstfname%
     ) > "%srcpath%newver.txt"
     rem SET "dstfname=AutoHotkey_%ver%_setup.exe"
-    CALL :movedst "%workdir%new.tmp\%dlfname%"
-    MOVE /Y "%srcpath%newver.txt" "%srcpath%ver.txt"
+    CALL :movedst "%workdir%new.tmp\%dlfname%" && MOVE /Y "%srcpath%newver.txt" "%srcpath%ver.txt"
     RD "%workdir%new.tmp"
 EXIT /B 0
 )
