@@ -602,12 +602,12 @@ RunRsyncAutohotkey(wait := 1) {
     global subdirDistAutoHotkey, lDistributives, officeDistSrvPath
     static upToDate := 0, baseDirsDistAhk := ""
     
-    
     If (!baseDirsDistAhk) {
 	baseDirsDistAhk := [ "D:\Distributives" ]
 	If (!(SubStr(lDistributives, 1, 2)=="\\"))
 	    baseDirsDistAhk.Push(lDistributives)
     }
+    AddLog("RunRsyncAutohotkey baseDirsDistAhk: " ObjectToText(baseDirsDistAhk))
     
     bakWorkDir = %A_WorkingDir%
     SetWorkingDir %officeDistSrvPath%\%subdirDistAutoHotkey%
