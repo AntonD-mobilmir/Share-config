@@ -8,6 +8,7 @@ If (ErrorLevel) {
 } Else {
     TrayTip,, OneDriveSetup в автозагрузке. Удаление.,, 1
     RegDelete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, OneDriveSetup
-    FileRemoveDir D:\Users\Пользователь\AppData\Local\Microsoft\OneDrive, 1
+    EnvGet LocalAppData, LocalAppData
+    FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
 }
 Sleep 3000
