@@ -38,6 +38,9 @@ SetTimer Periodic, %timerPeriod%
 EnvGet LocalAppData,LOCALAPPDATA
 RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C, %A_Temp%, Min UseErrorLevel
 
+; Удаление дистрибутивов OneDrive – иначе со временем их скачивается много версий и они занимают гигабайты
+FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
+
 ; Проверка флагов ошибок при отправке выгрузок
 foundErrFlags=
 Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log*.errflag
