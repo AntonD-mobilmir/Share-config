@@ -39,7 +39,9 @@ SETLOCAL ENABLEEXTENSIONS
     RD /S /Q "%DefaultUserProfile%\Desktop\Обмен (длинный путь)"
     RD /S /Q "%DefaultUserProfile%\AppData\Roaming\Opera"
     RD /S /Q "%DefaultUserProfile%\AppData\Roaming\DefaultUserRegistrySettings.7z"
-
+    
+    RD /S /Q "%DefaultUserProfile%\AppData\Local\mobilmir.ru"
+    
     XCOPY "%~dp0..\..\Users\Default\*.*" "%DefaultUserProfile%" /E /I /Q /G /H /K /Y
 
     %exe7z% x -aoa -y -o"%DefaultUserProfile%\AppData\Roaming" -- "%~dp0default_AppDataRoaming.7z"
