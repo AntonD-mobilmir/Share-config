@@ -22,7 +22,7 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
 CALL :GetDir configDir "%DefaultsSource%"
 (
     CALL "%configDir%_Scripts\find7zexe.cmd"
-    FOR %%A IN ("\\Srv0.office0.mobilmir\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%configDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\DefaultUserRegistrySettings.7z" (
+    FOR %%A IN ("\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\Users\Default\AppData\Local\mobilmir.ru" "%configDir%Users\Default\AppData\Local\mobilmir.ru" "%LOCALAPPDATA%\mobilmir.ru" "%USERPROFILE%\..\Default\AppData\Local\mobilmir.ru" "%SystemDrive%\Users\Default\AppData\Local\mobilmir.ru") DO IF EXIST "%%~A\DefaultUserRegistrySettings.7z" (
 	SET "regDfltNewUser=%%~A\DefaultUserRegistrySettings.7z"
 	SET "dirNewUserDefaults=%%~A"
 	GOTO :NewUserDefaultsFound
@@ -36,7 +36,7 @@ CALL :GetDir configDir "%DefaultsSource%"
 IF NOT DEFINED AutoHotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 (
     IF EXIST "%regDfltNewUser%" (
-	IF DEFINED exe7z %exe7z% x -o"%RegTmpDir%" -- "%regDfltNewUser%"
+	IF DEFINED exe7z %exe7z% x -aoa -y -o"%RegTmpDir%" -- "%regDfltNewUser%"
 	FOR /R %%I IN ("%RegTmpDir%\*.reg") DO REG IMPORT "%%~fI"
 	RD /S /Q "%RegTmpDir%"
 	IF NOT "%regDfltNewUser:~0,2%"=="\\" DEL "%regDfltNewUser%"
