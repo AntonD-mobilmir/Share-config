@@ -53,6 +53,13 @@ AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист.
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
     Run %SystemRoot%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
+
+    If (usingOfficeSrv && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
+        lDistributives := "D:\Distributives"
+        rsyncPreinstalled := RunRSyncWithAddLog(lDistributives "\Soft\PreInstalled", 0)
+    } Else
+        lDistributives := Distributives
+
     If (runAhkUpdate)
 	RunRsyncAutohotkey(0)
     If (FileExist(SystemDrive "\Sun")) {
@@ -332,11 +339,6 @@ If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
     Distributives := officeDistSrvPath
     usingOfficeSrv := 1
 }
-If (usingOfficeSrv && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
-    lDistributives := "D:\Distributives"
-    rsyncPreinstalled := RunRSyncWithAddLog(lDistributives "\Soft\PreInstalled", 0)
-} Else
-    lDistributives := Distributives
 
 exe7z:=find7zexe()
 AddLog("7-Zip: " . exe7z)
@@ -604,10 +606,10 @@ RunRsyncAutohotkey(wait := 1) {
     
     If (!baseDirsDistAhk) {
 	baseDirsDistAhk := [ "D:\Distributives" ]
-	If (!(SubStr(lDistributives, 1, 2)=="\\"))
+	If (lDistributives && !(SubStr(lDistributives, 1, 2)=="\\"))
 	    baseDirsDistAhk.Push(lDistributives)
     }
-    AddLog("RunRsyncAutohotkey baseDirsDistAhk: " ObjectToText(baseDirsDistAhk))
+    ;AddLog("RunRsyncAutohotkey baseDirsDistAhk: " ObjectToText(baseDirsDistAhk))
     
     bakWorkDir = %A_WorkingDir%
     SetWorkingDir %officeDistSrvPath%\%subdirDistAutoHotkey%
