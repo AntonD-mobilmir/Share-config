@@ -6,8 +6,13 @@ FileEncoding UTF-8
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 
+Loop Files, %A_LineFile%\..\..\Write-trello-id.ahk
+    pathWtiScript := A_LoopFileLongPath
+If (!pathWtiScript)
+    pathWtiScript := "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Write-trello-id.ahk"
+
 pathTrelloID=%A_AppDataCommon%\mobilmir.ru\trello-id.txt
-errTextSuffix=`n`nИсправьте карточку`, обновите дамп доски (или дождитесь автоматического обновления) и снова запустите на этом компьютере "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Write-trello-id.ahk"
+errTextSuffix=`n`nИсправьте карточку`, обновите дамп доски (или дождитесь автоматического обновления) и снова запустите на этом компьютере "%pathWtiScript%"
 
 Loop %0%
 {
