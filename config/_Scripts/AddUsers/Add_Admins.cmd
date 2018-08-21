@@ -91,7 +91,7 @@ EXIT /B
     (
 	rem Write password to file
 	ECHO %Hostname%\%NewUsername%	%pwd%
-	NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:YES /FULLNAME:"%FullName%" || CALL :SetUserAddError
+	NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:NO /FULLNAME:"%FullName%" || CALL :SetUserAddError
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
     
     IF DEFINED gpgexe (
