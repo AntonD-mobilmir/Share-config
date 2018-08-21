@@ -1,5 +1,5 @@
-﻿[Зарплата и управление персоналом 3.1]
-Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRM3";
+﻿[ЗУП 3.1]
+Connect=Srvr="Srv1S-R.office0.mobilmir:1541";Ref="HRM3";
 ID=2297a61d-f4ce-43a9-b58e-1b1eaaa31da1
 OrderInList=93273.13888888889
 Folder=/

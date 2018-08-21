@@ -1,5 +1,5 @@
-﻿[ЗУП Сервисный Центр]
-Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRMService";
+﻿[ЗУП 2.5 Сервисный Центр]
+Connect=Srvr="Srv1S-R.office0.mobilmir:1541";Ref="HRM2Service";
 ID=d9a360dc-1dda-4b36-a07d-bf5bc35e4a56
 OrderInList=27736.88888888889
 Folder=/
@@ -10,7 +10,7 @@ App=Auto
 WA=1
 Version=8.3.10.2753
 [ЗУП 3.1 Сервисный Центр]
-Connect=Srvr="Srv1S-B.office0.mobilmir:1541";Ref="HRM3Service";
+Connect=Srvr="Srv1S-R.office0.mobilmir:1541";Ref="HRM3Service";
 ID=13c1f9e6-82b7-4dba-9ad4-00e0bdf470f3
 OrderInList=128684.4444444444
 Folder=/
