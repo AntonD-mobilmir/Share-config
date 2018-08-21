@@ -24,10 +24,8 @@ regKNAutorun=%A_ScriptName%
 
 EnvGet envParams, Write-trello-id.ahk-params
 ; ToDo: save fingerprint on request to avoid double-fingerprinting in Inventory\collector-script\SaveJsonFingerprint.cmd
-argc=%0%
-arg1=%1%
-nag := arg1="/nag" || envParams="/nag"
-If (argc && !nag) {
+nag := A_Args[1]="/nag" || envParams="/nag"
+If (A_Args.Length() && !nag) {
     query := CommandLineArgs_to_FindTrelloCardQuery()
     FileAppend % JSON.Dump(query) "`n", *, CP1
 } Else {
@@ -86,7 +84,11 @@ lastMatch := ExtendedFindTrelloCard(query, cards, nMatches, fp, Func("CountSearc
 EnvGet RunInteractiveInstalls, RunInteractiveInstalls
 If (writeSavedID && nMatches==1) {
     For i, match in lastMatch {
+        SplitPath PathSavedID,,OutDir
+        FileCreateDir %OutDir%
 	newtxtf := FileOpen(newPathSavedID := PathSavedID ".tmp", "w`n")
+	If (!IsObject(newtxtf))
+            Throw Exception(ErrorLevel ? ErrorLevel : A_LastError,, "Ошибка при открытии файла для записи: """ newPathSavedID """")
 	newtxtf.WriteLine(cards[i].url								; 1
 		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))	; 2
 		   . "`n" cards[i].name								; 3
