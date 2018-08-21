@@ -36,11 +36,11 @@ IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
     IF NOT DEFINED logsDir SET "logsDir=%workdir%"
     
     PING -n 5 127.0.0.1 >NUL
-    DEL "%workdir%\%urlfname%" <NUL >NUL 2>&1
+    DEL "%workdir%%urlfname%" <NUL >NUL 2>&1
     rem CURL still ignores server filename. Have no idea what to do with it.
-    START "" /B /WAIT /D "%workdir%" curl -x socks://127.0.0.1:9150 %timeCond% -o "%workdir%\%urlfname%" -ORL %url% || CALL :ExitWithError running CURL & EXIT /B
+    START "" /B /WAIT /D "%workdir%" curl -x socks://127.0.0.1:9150 %timeCond% -o "%workdir%%urlfname%" -ORL %url% || CALL :ExitWithError running CURL & EXIT /B
     
-    IF EXIST "%workdir%\%urlfname%" FOR %%A IN ("%workdir%\%urlfname%") DO (	
+    IF EXIST "%workdir%%urlfname%" FOR %%A IN ("%workdir%%urlfname%") DO (	
 	SET "dlfname=%%~nxA"
 	FOR /F "usebackq tokens=1*" %%B IN (`c:\SysUtils\lbrisar\getver.exe "%%~A"`) DO (
 	    SET "ver=%%~B"
