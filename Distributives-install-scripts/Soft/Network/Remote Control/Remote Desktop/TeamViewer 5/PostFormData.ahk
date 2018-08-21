@@ -413,7 +413,8 @@ GetFingerprint_GetForgedValues() {
 			 , "SerNum2": ""
 			 , "SerNum3": ""
 			 , "Default string": ""
-			 , "N/A": "" }
+			 , "N/A": ""
+			 , "None": "" }
     return SkipValues
 }
 
