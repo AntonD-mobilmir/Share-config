@@ -1,0 +1,1 @@
+d:/Users/LogicDaemon/Dropbox/Backups/profiles$/Share/config/_Scripts/Lib/ObjectToText.ahk
