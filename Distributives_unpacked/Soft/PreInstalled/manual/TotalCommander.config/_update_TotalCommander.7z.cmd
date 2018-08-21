@@ -37,6 +37,8 @@ CALL :PackAddExcl plugins
 
 CALL :PackAddExcl 64bit
 
+CALL :PackAddExcl 32bit
+
 rem new block to let %excludes% update
 )
 (

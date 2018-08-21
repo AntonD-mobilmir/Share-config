@@ -47,6 +47,8 @@ IF NOT DEFINED exe7zlocal (
     IF DEFINED OS64Bit (
 	%exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.64bit.7z"
 	%exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.Plugins64bit.7z"
+    ) ELSE (
+	%exe7z% x -aoa -y -o"%TCDir%" -- "%~dpn0.32bit.7z"
     )
     "%SystemDrive%\SysUtils\SetACL.exe" -on "%TCDir%" -ot file -actn ace -ace "n:%UIDCreatorOwner%;p:change;i:so,sc;m:set;w:dacl"
     rem this causes weird permissions after profile permission reset --- "%utilsdir%xln.exe" %AutohotkeyExe% "%TCDir%\AutoHotkey.exe" || 
