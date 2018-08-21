@@ -193,6 +193,9 @@ If (ErrorLevel=="ERROR") {
     ExitApp
 }
 
+; ToDo: (someday) register own handler for http so UBM launches script and we don't have to Ctrl+C the URL from browser UI
+; https://stackoverflow.com/questions/13559915/registering-a-protocol-handler-in-windows-8
+
 FillGroups()
 
 Loop
