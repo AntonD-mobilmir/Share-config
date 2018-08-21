@@ -33,10 +33,28 @@ If (AppXSupported)
 
 Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%
 
-EnvSet Write-trello-id.ahk-params, /nag
-Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
-;ToDo: сначал тихий поиск карточки, и, если карточка не найдена, проверка/запрос смены hostname.
-; стандартный hostname в Win10: DESKTOP-*
+;ToDo: сначала тихий поиск карточки, и, если карточка не найдена, проверка/запрос смены hostname.
+RunWait %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
+If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
+    RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
+    ; стандартный hostname в Win10: DESKTOP-*
+    If (StartsWith(Hostname, "DESKTOP-")) {
+        InputBox newHostname, Hostname, Введите действительный Hostname,,,,,,,, %Hostname%
+        If (newHostname && newHostname != Hostname) {
+            MsgBox 0x24, Hostname изменён, Записать в реестр hostname "%newHostname%" вместо "%Hostname%"?
+            IfMsgBox Yes
+                RegWrite REG_SZ, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname, %newHostname%
+            
+        }
+    }
+    
+    EnvSet Write-trello-id.ahk-params, /nag
+    Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
+}
+
+MsgBox 0x24, Система на SSD?, Перенести индекс поиска Windows на D: ?
+IfMsgBox Yes
+    Run "%A_AhkPath%" "%A_ScriptDir%\Move Windows Search Index to D.ahk"
 
 ExitApp
 
@@ -45,3 +63,7 @@ ExitApp
 #include %A_LineFile%\..\..\..\_Scripts\Lib\find7zexe.ahk
 #include %A_LineFile%\..\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
 ;#include %A_LineFile%\..\..\..\_Scripts\Lib\find_exe.ahk
+
+StartsWith(ByRef long, ByRef short) {
+    return SubStr(long, 1, StrLen(short)) = short
+}
