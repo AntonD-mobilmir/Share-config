@@ -39,6 +39,8 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 	GetFingerprintTransactWriteout(JSON.Dump(fpo), outjson)
     ExitApp
 }
+; only needed for above
+#include %A_LineFile%\..\JSON.ahk
 
 GetFingerprint(ByRef textfp:=0, ByRef strComputer:=".") {
     static SkipValues := ""
@@ -116,7 +118,8 @@ GetFingerprint_GetForgedValues() {
 			 , "SerNum2": ""
 			 , "SerNum3": ""
 			 , "Default string": ""
-			 , "N/A": "" }
+			 , "N/A": ""
+			 , "None": "" }
     return SkipValues
 }
 
@@ -223,5 +226,3 @@ GetFingerprintTransactWriteout(ByRef text, ByRef fname := "*", encoding := "UTF-
 	}
     }
 }
-
-#include %A_LineFile%\..\JSON.ahk

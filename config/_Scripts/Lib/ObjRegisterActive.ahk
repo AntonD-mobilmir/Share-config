@@ -1,4 +1,4 @@
-/*
+﻿/*
     ObjRegisterActive(Object, CLSID, Flags:=0)
     
         Registers an object as the active object for a given class ID.

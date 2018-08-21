@@ -123,6 +123,7 @@ CleanupMTProfile(Dir) {
 	FileDelete tmprules.dat
 	FileDelete training.dat
 	FileDelete traits.dat
+	FileDelete update_Feeds.ahk
 	FileDelete update_pgprules.ahk
 	FileDelete update_profile.ahk
 	FileDelete update_profile.cmd
@@ -138,6 +139,7 @@ CleanupMTProfile(Dir) {
 	Loop Files, Cache.Trash*, D
 	    FileRemoveDir %A_LoopFileFullPath%, 1
 	
+	FileRemoveDir gmp, 1
 	FileRemoveDir Cache, 1
 	FileRemoveDir ABphotos, 1
 	FileRemoveDir crashes, 1
@@ -158,6 +160,7 @@ CleanupMTProfile(Dir) {
 	FileDelete gnupg\*.cmd
 	FileDelete gnupg\*.ahk
 	FileDelete gnupg\*.lock
+	FileDelete gnupg\gpg-agent.conf
 	FileDelete gnupg\random_seed
 	FileDelete gnupg\trust.asc
 	FileDelete gnupg\0xE91EA97A.asc

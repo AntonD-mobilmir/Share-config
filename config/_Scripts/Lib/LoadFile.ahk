@@ -1,4 +1,4 @@
-/*
+﻿/*
     LoadFile(Path [, EXE])
     
         Loads a script file as a child process and returns an object
