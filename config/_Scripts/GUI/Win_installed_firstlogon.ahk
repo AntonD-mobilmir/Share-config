@@ -43,8 +43,7 @@ If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
         If (newHostname && newHostname != Hostname) {
             MsgBox 0x24, Hostname изменён, Записать в реестр hostname "%newHostname%" вместо "%Hostname%"?
             IfMsgBox Yes
-                RegWrite REG_SZ, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname, %newHostname%
-            
+                UpdateHostname(newHostname)
         }
     }
     
@@ -63,6 +62,30 @@ ExitApp
 #include %A_LineFile%\..\..\..\_Scripts\Lib\find7zexe.ahk
 #include %A_LineFile%\..\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
 ;#include %A_LineFile%\..\..\..\_Scripts\Lib\find_exe.ahk
+
+UpdateHostname(newHostname) {
+    global sysNative
+    ; does not work RegWrite REG_SZ, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname, %newHostname%
+    
+    RunWait %sysNative%\wbem\wmic.exe computersystem where caption='%A_ComputerName%' rename '%newHostname%'
+    ;rename vbscript: https://docs.microsoft.com/ru-ru/windows/desktop/CIMWin32Prov/rename-method-in-class-win32-computersystem
+    
+    ;https://autohotkey.com/board/topic/60968-wmi-tasks-com-with-ahk-l/
+;    strComputer:="."
+;    objWMIService := ComObjGet("winmgmts:{impersonationLevel=impersonate}!\\" . strComputer . "\root\cimv2")
+;    objWMIService.ExecMethod("computersystem", "rename", newHostname)
+;    objWMIService :=
+    
+;    If (winUserFullName) {
+;	StringSplit sFIOpt, winUserFullName, %A_Space%
+;	If (sFIOpt0 == 3) ; Фамилия Имя Отчество
+;	    return sFIOpt2 " " sFIOpt1
+;	Else If (!ParsedParts) {
+;	    ParsedOnly := sFIOpt0
+;	    return winUserFullName
+;	}
+;    }
+}
 
 StartsWith(ByRef long, ByRef short) {
     return SubStr(long, 1, StrLen(short)) = short
