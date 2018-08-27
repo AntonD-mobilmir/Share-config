@@ -15,10 +15,8 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 )
 CALL :GetDir configDir "%DefaultsSource%"
 (
-CALL :CheckSetSoftSource "%configDir%.." && GOTO :found
-
-REM fallback to localhost, Srv0 and Srv1S-B
-CALL :CheckSetSoftSource "%~d0\Distributives" || CALL :CheckSetSoftSource "%~dp0..\.." || CALL :CheckSetSoftSource "D:\Distributives" || CALL :CheckSetSoftSource "\\Srv0.office0.mobilmir\Distributives" || CALL :CheckSetSoftSource "\\Srv1S-B.office0.mobilmir\Distributives" || CALL :AskSoftSource || EXIT /B
+REM first try configdir\.., then fallback to localhost, Srv0 and Srv1S-B
+CALL :CheckSetSoftSource "%configDir%.." && CALL :CheckSetSoftSource "%COMPUTERNAME:~0,-2%-K\Distributives" || CALL :CheckSetSoftSource "%~d0\Distributives" || CALL :CheckSetSoftSource "%~dp0..\.." || CALL :CheckSetSoftSource "D:\Distributives" || CALL :CheckSetSoftSource "\\localhost\Distributives" || CALL :CheckSetSoftSource "\\Srv0.office0.mobilmir\Distributives" || CALL :CheckSetSoftSource "\\Srv1S-B.office0.mobilmir\Distributives" || CALL :AskSoftSource || EXIT /B
 )
 :found
 (
