@@ -2,13 +2,14 @@
 #NoEnv
 #SingleInstance force
 
-platfSrv1S	:=	"8.3.4.408"
-platfSrv1SB	:=	"8.3.10.2753"
+platf_8_3_4	:=	"8.3.4.408"
+platf_8_3_10	:=	"8.3.10.2753"
 
-ServerPlaforms := { "Srv1S" : [platfSrv1S, "1cv8.exe"]
-		  , "Srv1S-B" : [platfSrv1SB, "1cv8s.exe"] }
-PlatformNames := { (platfSrv1S) : "Управление торговлей 2015, Операторы 2015 (УТ для SIM-карт) и Клиентская техника"
-		 , (platfSrv1SB) : "ЗУП, Бухгалтерия, Фитнес-клуб (Инсигма)" }
+ServerPlaforms := { "Srv1S" : [platf_8_3_4, "1cv8.exe"]
+		  , "Srv1S-B" : [platf_8_3_10, "1cv8s.exe"]
+		  , "Srv1S-R" : [platf_8_3_10, "1cv8s.exe"] }
+PlatformNames := { (platf_8_3_4) : "Управление торговлей 2015, Операторы 2015 (УТ для SIM-карт) и Клиентская техника"
+		 , (platf_8_3_10) : "ЗУП, Бухгалтерия, Фитнес-клуб (Инсигма)" }
 
 global WinVer := GetWinVer()
      , LocalAppData := FindLocalAppData()
@@ -22,12 +23,10 @@ localPlatformCache := LocalAppData "\Programs\1C\PlatformCache"
 If (FileExist(LocalAppData "\1C\PlatformCache"))
     FileMoveDir %LocalAppData%\1C\PlatformCache, %localPlatformCache%
 
-Loop %0%
-{
-    argv:=%A_Index%
+For i, argv in A_Args {
     For serverName, platfData in ServerPlaforms
     {
-	If (argv ~= "i)\/S" serverName "(\.office0\.mobilmir)?(:\d+)?\\") {
+        If (argv ~= "i)\/S" serverName "(?:\.office0\.mobilmir)?(?::\d+)?\\") {
 	    PlatformVersionName := platfData[1]
             PlatformExecutiveRelativePath := "bin\" platfData[2]
             ;MsgBox PlatformVersionName: %PlatformVersionName%`nPlatformExecutiveRelativePath: %PlatformExecutiveRelativePath%
@@ -195,7 +194,7 @@ CachePlatformLocally(PlatformVersionName) {
     
     ; ToDo: Clean unused platform versions
     ;Loop %localPlatformCache%\*, 2
-    ;    If (A_LoopFileName != PlatformVersionName && A_LoopFileName != platfSrv1SB && A_LoopFileName != platfSrv1S)
+    ;    If (A_LoopFileName != PlatformVersionName && A_LoopFileName != platf_8_3_10 && A_LoopFileName != platf_8_3_4)
     ;	FileRemoveDir %A_LoopFileFullPath%, 1
     
     unarchive:=PlatformSourceArc && (!InStr(FileExist(PlatformSourceArc),"D")) ; if true, use 7-Zip instead of copying files
