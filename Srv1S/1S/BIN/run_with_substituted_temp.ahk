@@ -5,8 +5,8 @@
 platfSrv1S	:=	"8.3.4.408"
 platfSrv1SB	:=	"8.3.10.2753"
 
-ServerPlaforms := { "Srv1S" : platfSrv1S
-		  , "Srv1S-B" : platfSrv1SB }
+ServerPlaforms := { "Srv1S" : [platfSrv1S, "1cv8.exe"]
+		  , "Srv1S-B" : [platfSrv1SB, "1cv8s.exe"] }
 PlatformNames := { (platfSrv1S) : "Управление торговлей 2015, Операторы 2015 (УТ для SIM-карт) и Клиентская техника"
 		 , (platfSrv1SB) : "ЗУП, Бухгалтерия, Фитнес-клуб (Инсигма)" }
 
@@ -18,7 +18,6 @@ EnvGet SystemRoot, SystemRoot
 
 menuCreated := 0
 
-PlatformExecutiveRelativePath := "bin\1cv8.exe"
 localPlatformCache := LocalAppData "\Programs\1C\PlatformCache"
 If (FileExist(LocalAppData "\1C\PlatformCache"))
     FileMoveDir %LocalAppData%\1C\PlatformCache, %localPlatformCache%
@@ -26,14 +25,21 @@ If (FileExist(LocalAppData "\1C\PlatformCache"))
 Loop %0%
 {
     argv:=%A_Index%
-    For serverName, platfVer in ServerPlaforms
+    For serverName, platfData in ServerPlaforms
+    {
 	If (argv ~= "i)\/S" serverName "(\.office0\.mobilmir)?(:\d+)?\\") {
-	    PlatformVersionName:=platfVer
+	    PlatformVersionName := platfData[1]
+            PlatformExecutiveRelativePath := "bin\" platfData[2]
+            ;MsgBox PlatformVersionName: %PlatformVersionName%`nPlatformExecutiveRelativePath: %PlatformExecutiveRelativePath%
 	    break
 	}
+    }
 }
+
 If (PlatformVersionName)
     GoTo SelectedPlatform
+
+PlatformExecutiveRelativePath := "bin\1cv8s.exe"
 
 Gui Add, Text, w500, У нас используются разные версии платформы для разных конфигураций 1С. Если попытаться запустить конфигурацию`, не соответствующую платформе`, 1С покажет ошибку и не запустится. Причем окно списка конфигураций показывает платформа`, так что выбрать`, какую запускать платформу`, надо до выбора конфигурации.
 Gui Add, ListView, -Multi LV-E0x200 r3 w500 AltSubmit gSelectPlatform, Платформа|Примечание
@@ -60,8 +66,8 @@ ButtonOK:
 	return
     Gui Submit
     LV_GetText(PlatformVersionName, selRow)
+
 SelectedPlatform:
-   
     params := SubStr(CommandLine, InStr(CommandLine := DllCall( "GetCommandLine", "Str" ),A_ScriptName,1)+StrLen(A_ScriptName)+2)
     PlatformSource=%A_ScriptDir%\%PlatformVersionName%
     PlatformSourceArc=%A_ScriptDir%\%PlatformVersionName%.7z
@@ -72,12 +78,12 @@ SelectedPlatform:
     Menu Tray, Tip, Запуск 1С
 
     If (!GetKeyState("Shift", "P")) {
-	;GroupAdd 1s, ahk_exe 1cv8.exe
-	;GroupAdd 1s, ahk_exe 1cv8s.exe
-	;GroupAdd 1s, ahk_exe 1cv8l.exe
-
 	IniRead PID1S, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
-	If (WinExist("ahk_pid " PID1S " ahk_exe 1cv8.exe")) {
+	GroupAdd 1s, ahk_pid %PID1S% ahk_exe 1cv8.exe
+	GroupAdd 1s, ahk_pid %PID1S% ahk_exe 1cv8s.exe
+	GroupAdd 1s, ahk_pid %PID1S% ahk_exe 1cv8l.exe
+
+	If (WinExist("ahk_group 1s")) {
 	    WinGet MinMaxState, MinMax
 	    GroupAdd Running1S, ahk_pid %PID1S%
 	    If (MinMax=-1)
@@ -140,7 +146,8 @@ tryRunAgain:
 	If (ErrorLevel) {
 	    Process Exist, %PID1S%
 	    If (!ErrorLevel) {
-		MsgBox 16, Не удалось запустить 1C., Процесс 1С завершился до появления окна. Обратитесь в службу ИТ.
+		TrayTip Не удалось запустить 1C., Процесс 1С завершился до появления окна. Обратитесь в службу ИТ.,, 0x22
+		Sleep 3000
 		ExitApp 1
 	    }
 	}
@@ -377,7 +384,10 @@ SetupTemp() {
 RunSetACL(ByRef args, ByRef dir := "") {
     static exeSetACL := ""
     If (exeSetACL=="")
-	For i, exeSetACL in [ "C:\SysUtils\SetACL.exe", "\\Srv0.office0.mobilmir\profiles$\Share\Programs\SetACL.exe", "" ]
+	For i, exeSetACL in [ "C:\SysUtils\SetACL.exe"
+                            , "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs\SetACL.exe"
+                            , "\\Srv0.office0.mobilmir\profiles$\Share\Programs\SetACL.exe"
+                            , "" ]
 	    If (FileExist(exeSetACL))
 		break
     If (exeSetACL)
@@ -604,14 +614,6 @@ GetAppPathFromRegShellKey(exename, regsubKeyShell) {
     Throw
 }
 
-GetWinVer() {
-    return ((r := DllCall("GetVersion") & 0xFFFF) & 0xFF) "." (r >> 8)
-}
-
-StartsWith(long, short) {
-    return SubStr(long, 1, StrLen(short)) = short
-}
-
 ;-- Fast 64- and 128-bit hash functions
 ;http://www.autohotkey.com/board/topic/14040-fast-64-and-128-bit-hash-functions/
 
@@ -665,4 +667,8 @@ TEA(ByRef y,ByRef z, k0,k1,k2,k3, n = 32) { ; n = #Rounds
 	  k := "k" . s >> 11 & 3
 	  z := 0xFFFFFFFF & (z + ((y << 4 ^ y >> 5) + y  ^  s + %k%))
    }
+}
+
+GetWinVer() {
+    return ((r := DllCall("GetVersion") & 0xFFFF) & 0xFF) "." (r >> 8)
 }
