@@ -1,4 +1,4 @@
 \\Srv0.office0.mobilmir\Distributives
--ignore "Name {*.7z,*.asc,*.bz2,*.cab,*.chm,*.cnt,*.dsc.txt,*.exe,*.gif,*.gz,*.h,*.html,*.htm,*.iso,*.jar,*.jpg,*.log,*.md5,*.mht,*.mhtml,*.msi,*.msp,*.odt,*.orig,*.oxt,*.patch,*.pdf,*.php,*.plgx,*.png,*.rar,*.sig,*.tar,*.tc,*.tgz,*.u3p,*.vbox-extpack,*.xpi,*.xz,*.zip,adlpackages*,Win@type=snapshots,temp,*.lin,.aftersync.cmd,.aftersync.cmd.sig,*.torrent}"
+-ignore "Name {*.7z,*.asc,*.bz2,*.cab,*.chm,*.cnt,*.dsc.txt,*.exe,*.gif,*.gz,*.h,*.html,*.htm,*.iso,*.jar,*.jpg,*.log,*.md5,*.mht,*.mhtml,*.msi,*.msp,*.odt,*.orig,*.oxt,*.patch,*.pdf,*.php,*.plgx,*.png,*.rar,*.sig,*.tar,*.tc,*.tgz,*.u3p,*.vbox-extpack,*.xpi,*.xz,*.zip,adlpackages*,Win@type=snapshots,temp,*.lin,.aftersync.cmd,.aftersync.cmd.sig,*.torrent,sync.ffs_db}"
 -ignore "Path {*/*}"
 -ignorenot "Path {Soft/*,Soft\ FOSS/*,Drivers/Intel,Drivers/Intel/*,Drivers/Realtek/*,Drivers/Canon/*,Drivers/other/*,Drivers/VIA/*}"
