@@ -65,6 +65,7 @@ EXIT /B
 (
     %SystemRoot%\System32\takeown.exe /A /R /D Y /F "%dst%"
     %SystemRoot%\System32\icacls.exe "%dst%" /reset /T /C /Q
+    ATTRIB -r -s -h "%dst%" /S /D /L
     
     rem -m, --prune-empty-dirs      prune empty directory chains from the file-list
     rem --modify-window=3601 
