@@ -48,9 +48,10 @@ For i, regView in regViews {
 	If (SubStr(DisplayName, 1, 12)!="LibreOffice ")
 	    Continue
 	RegRead URLInfoAbout, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLInfoAbout
-	If (!(URLInfoAbout == "http://www.documentfoundation.org" || URLInfoAbout == "https://www.documentfoundation.org"))
+	MsgBox %URLInfoAbout%
+	If (!(URLInfoAbout == "https://www.libreoffice.org/" || URLInfoAbout == "http://www.documentfoundation.org" || URLInfoAbout == "https://www.documentfoundation.org"))
 	    Continue
-
+        
 	RegRead InstallLocation, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, InstallLocation
 	baseDirFound := 0
 	For baseDir in baseDirs
