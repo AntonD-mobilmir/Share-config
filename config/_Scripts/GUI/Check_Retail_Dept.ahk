@@ -413,6 +413,10 @@ If (FileExist("c:\squid")) {
 	Else
 	    SetLastRowStatus("Папка удалена")
     }
+} Else {
+    RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "squid_logrorate" /F,, Min UseErrorLevel
+    RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "squid_reconfig" /F,, Min UseErrorLevel
+    RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "squid_start" /F,, Min UseErrorLevel
 }
 
 AddLog("Журналы скриптов обновления")
