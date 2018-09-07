@@ -2,31 +2,64 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 FileEncoding UTF-8
-uninstallList = %A_ScriptDir%\Known Uninstalls.tsv
-
 If (!A_IsAdmin) {
     Run % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
 }
 
+uninstallList = %A_ScriptDir%\Known Uninstalls.tsv
+EnvGet SystemRoot, SystemRoot
+
 CheckFileTimeChanged(uninstallList)
 Try {
-    uninstList := ReadTSV(uninstallList, "Uninstall String")
+    uninstList := ReadTSV(uninstallList, ["Quiet Uninstall String", "Uninstall String", "Registry Key", "Display Name"])
 } Catch e {
-    MsgBox % ObjectToText(e)
+    Throw Exception(ObjectToText(e))
 }
 
-For i, uninstStr in uninstList {
-    ;uninstall string for some programs looks like «MsiExec.exe /I{84D8451D-2ED6-3A59-ABA5-2A447F7C6310}»
-    If (StartsWith(uninstStr, "MsiExec.exe ")) {
-	If (SubStr(uninstStr, 13, 2) = "/I")
-	    uninstStr := "MsiExec.exe /X" SubStr(uninstStr, 15)
-	uninstStr .= " /passive /norestart"
+uninstCount := uninstList.Length()
+fhLog := FileOpen(A_Desktop "\" A_ScriptName "." A_Now ".txt", "a")
+Progress A M R0-%uninstCount%, `n`n`n, Uninstalling…
+For i, uninstStrArr in uninstList {
+    keyFound := 0
+    Loop Reg, % uninstStrArr[3]
+        keyFound := 1, break
+    If (!keyFound)
+        continue
+    uninstName := uninstStrArr[4]
+    ;showDetails := InStr(uninstName, "Cyberlink") || InStr(uninstName, "YouCam")
+    uninstStrArr.Delete(3,4)
+    Progress,, % uninstName
+    
+    For j, uninstStr in uninstStrArr {
+        If (!uninstStr)
+            continue
+        
+        uninstArgs := ParseCommandLine(uninstStr, A_Tab A_Space ",") ; comma for RunDll32
+        uninstApp := Trim(uninstArgs[0], """")
+        SplitPath uninstApp, uninstAppFileName, uninstAppDir
+        
+        If (uninstAppFileName = "MsiExec.exe") {
+            ;uninstall string for some programs looks like «MsiExec.exe /I{84D8451D-2ED6-3A59-ABA5-2A447F7C6310}»
+            If (RegexMatch(uninstStr, "(.*MsiExec.exe""?\s)/I(.+)", m))
+                uninstStr := m1 "/X" m2
+            uninstStr .= " /passive /norestart"
+        } Else If (uninstAppFileName = "RunDll32.EXE") {
+            If (!FileExist(Trim(uninstArgs[1], """")))
+                continue
+        }
+        ; Else If (!FileExist(uninstApp))
+        ;    continue
+        Try RunWait %uninstStr%, %uninstAppDir%, UseErrorLevel
+        errLvl := ErrorLevel
+        errTxt := errLvl ? (errLvl == "ERROR" ? " → Executable not found" : " → Error " errLvl) : " – OK"
+        fhLog.WriteLine((errLvl ? "[!]" : "[.]") " " uninstName ": " uninstStr . errTxt)
+        If (!errLvl)
+            break
     }
-    Try {
-	RunWait %uninstStr%, %A_Temp%, UseErrorLevel
-    }
+    Progress %A_Index%
 }
+fhLog.Close()
 
 ExitApp
 
@@ -118,3 +151,4 @@ StartsWith(ByRef long, ByRef short) {
 }
 
 #include %A_LineFile%\..\..\Lib\ReadCSV.ahk
+#include %A_LineFile%\..\..\Lib\ParseCommandLine.ahk
