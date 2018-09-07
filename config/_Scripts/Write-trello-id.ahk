@@ -10,8 +10,9 @@ FileEncoding UTF-8
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 
-Tmp = %A_Temp%\%A_ScriptName%
-PathSavedID = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
+dirTmp = %A_Temp%\%A_ScriptName%
+pathTrelloIDtxt = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
+pathTrelloCardDesctxt = %A_AppDataCommon%\mobilmir.ru\trello-card.txt
 
 boardDumpDirs := [ A_LineFile "\..\..\..\Inventory\trello-accounting\board-dump"
 	         , A_ScriptDir "\board-dump"
@@ -31,9 +32,9 @@ If (A_Args.Length() && !nag) {
 } Else {
     RegWrite REG_SZ, %regpathAutorun%, %regKNAutorun%, "%A_AhkPath%" "%A_ScriptFullPath%"
     writeSavedID := 1
-    If (FileExist(PathSavedID)) {
+    If (FileExist(pathTrelloIDtxt)) {
 	lineVarNames := ["txtshortUrl", "txtID", "oldHostname"]
-	Loop Read, %PathSavedID%
+	Loop Read, %pathTrelloIDtxt%
 	    If (varName := lineVarNames[A_Index])
 		%varName% := A_LoopReadLine
     }
@@ -59,8 +60,8 @@ If (A_Args.Length() && !nag) {
 
 For i, boardDumpDir in boardDumpDirs {
     If (!FileExist(boardDumpDir "\computer-accounting.json") && FileExist(boardDumpDir "\dump.7z") && (exe7z || exe7z := TryCallFunc("find7zexe") || exe7z := TryCallFunc("find7zaexe"))) {
-	RunWait %exe7z% x -y -aoa -o"%tmp%" -- "%boardDumpDir%\dump.7z" "computer-accounting.json" "lists.json", %tmp%, Min UseErrorLevel
-	boardDumpDir := tmp
+	RunWait %exe7z% x -y -aoa -o"%dirTmp%" -- "%boardDumpDir%\dump.7z" "computer-accounting.json" "lists.json", %dirTmp%, Min UseErrorLevel
+	boardDumpDir := dirTmp
     }
     FileRead jsonboard, %boardDumpDir%\computer-accounting.json
     FileRead jsonLists, %boardDumpDir%\lists.json
@@ -84,31 +85,36 @@ lastMatch := ExtendedFindTrelloCard(query, cards, nMatches, fp, Func("CountSearc
 EnvGet RunInteractiveInstalls, RunInteractiveInstalls
 If (writeSavedID && nMatches==1) {
     For i, match in lastMatch {
-        SplitPath PathSavedID,,OutDir
+        card := cards[i]
+        SplitPath pathTrelloIDtxt,,OutDir
         FileCreateDir %OutDir%
-	newtxtf := FileOpen(newPathSavedID := PathSavedID ".tmp", "w`n")
+	newtxtf := FileOpen(newpathTrelloIDtxt := pathTrelloIDtxt ".tmp", "w`n")
 	If (!IsObject(newtxtf))
-            Throw Exception(ErrorLevel ? ErrorLevel : A_LastError,, "Ошибка при открытии файла для записи: """ newPathSavedID """")
-	newtxtf.WriteLine(cards[i].url								; 1
-		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(cards[i].name))	; 2
-		   . "`n" cards[i].name								; 3
-		   . "`n" cards[i].id								; 4
-		   . "`n" lists[cards[i].idList] )						; 5
-		 ;. "`n`n" JSON.Dump(cards[i])
+            Throw Exception(ErrorLevel ? ErrorLevel : A_LastError,, "Ошибка при открытии файла для записи: """ newpathTrelloIDtxt """")
+	newtxtf.WriteLine(card.url								; 1
+		   . "`n" (Hostname ? Hostname : ExtractHostnameFromCardName(card.name))	; 2
+		   . "`n" card.name								; 3
+		   . "`n" card.id								; 4
+		   . "`n" lists[card.idList] )						; 5
+		 ;. "`n`n" JSON.Dump(card)
 	newtxtf.Close()
-	If (FileExist(PathSavedID)) {
-	    FileReadLine oldurl, %PathSavedID%, 1
-	    FileReadLine oldID, %PathSavedID%, 4
+	If (FileExist(pathTrelloIDtxt)) {
+	    FileReadLine oldurl, %pathTrelloIDtxt%, 1
+	    FileReadLine oldID, %pathTrelloIDtxt%, 4
 	    ;"shortLink":"6D5aO2qM"
-	    If (!(CutTrelloCardURL(oldurl, 1) == cards[i].shortLink && oldID == cards[i].id)) {
-		newcardname = %PathSavedID%.%A_Now%.txt
-		FileMove %newPathSavedID%, %newcardname%
+	    If (!(CutTrelloCardURL(oldurl, 1) == card.shortLink && oldID == card.id)) {
+		newcardname = %pathTrelloIDtxt%.%A_Now%.txt
+		FileMove %newpathTrelloIDtxt%, %newcardname%
 		If (!(RunInteractiveInstalls == "0"))
-		    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%A_AppDataCommon%\mobilmir.ru" "Карточка`, найденная для компьютера`, отличается ссылкой или ID от уже сохранённой. Найденная карточка записана в %newcardname%`, а файл %PathSavedID% остался без изменений."
+		    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%A_AppDataCommon%\mobilmir.ru" "Карточка`, найденная для компьютера`, отличается ссылкой или ID от уже сохранённой. Найденная карточка записана в %newcardname%`, а файл %pathTrelloIDtxt% остался без изменений."
 		ExitApp
 	    }
 	}
-	FileMove %newPathSavedID%, %PathSavedID%, 1
+	FileMove %newpathTrelloIDtxt%, %pathTrelloIDtxt%, 1
+	If (IsObject(fhDesc := FileOpen(pathTrelloCardDesctxt, "w"))) {
+            fhDesc.WriteLine(card.desc "`n" ObjectToText(card))
+            fhDesc.Close()
+	}
         RegDelete %regpathAutorun%, %regKNAutorun%
 	If (!(RunInteractiveInstalls == "0"))
 	    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
@@ -122,8 +128,10 @@ If (writeSavedID && nMatches==1) {
 		     . "`nПоследный выполненный способ поиска: " stageTitles[searchStage]
 		     . (searchStage > 1 ? "`n`tИспользованные регулярные выражения: " JSON.Dump(extSearchQuery) : "")
 		     . "`n`nИнформация о системе:`n" GetFingerprint_Object_To_Text(fp) "`n`n---")
-    For i, match in lastMatch
-	ffc.WriteLine("`nУ карточки " cards[i].name " " cards[i].shortUrl "/" cards[i].idShort "`n`tсовпало " JSON.Dump(match) "`n`t" cards[i].desc)
+    For i, match in lastMatch {
+        card := cards[i]
+	ffc.WriteLine("`nУ карточки " card.name " " card.shortUrl "/" card.idShort "`n`tсовпало " JSON.Dump(match) "`n`t" card.desc)
+    }
     ffc.Close()
     If (!(RunInteractiveInstalls == "0"))
 	Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%pathffc%" "Подходящих карточек: %nMatches% (когда всё в порядке`, должна быть одна)"
