@@ -89,13 +89,21 @@ EXIT /B
 	GOTO :GenKeyring
     )
     IF DEFINED LastTry EXIT /B 1
+    ECHO Папка "%pubkeysDest%" недоступна для записи.
+    SET "pubkeysDest=%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater-PubKeys"
 )
 (
-    ECHO Папка "%pubkeysDest%" недоступна для записи. Открытые ключи будут сохранены в "%LOCALAPPDATA%\mobilmir.ru\%~dp0-PubKeys", чтобы адресная книга обновлялась - скопируйте их на сервер.
-    MKDIR "%LOCALAPPDATA%\mobilmir.ru\%~dp0-PubKeys"
-    SET "pubkeysDest=%LOCALAPPDATA%\mobilmir.ru\%~dp0-PubKeys"
-    SET "LastTry=1"
-    GOTO :CheckGenKeyring
+    MKDIR "%pubkeysDest%"
+    IF EXIST "%pubkeysDest%" (
+        ECHO Открытые ключи будут сохранены в "%pubkeysDest%", чтобы адресная книга обновлялась - скопируйте их на сервер.
+        SET "LastTry=1"
+        GOTO :CheckGenKeyring
+    ) ELSE (
+        ECHO Не удалось создать папку "%pubkeysDest%"
+        ECHO Открытые ключи не сохранятся, выход.
+        PING -n 15 >NUL
+        EXIT /B 1
+    )
 )
 :GenKeyring
 (

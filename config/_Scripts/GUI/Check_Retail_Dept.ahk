@@ -5,6 +5,8 @@
 
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 EnvGet SystemDrive, SystemDrive
+EnvGet UserProfile, UserProfile
+EnvGet LocalAppData, LocalAppData
 EnvGet ProgramFiles32bit, ProgramFiles(x86)
 If (!ProgramFiles32bit)
     ProgramFiles32bit := A_ProgramFiles
@@ -133,12 +135,11 @@ Loop Files, %serverScriptPath%
     break
 }
 
-EnvGet UserProfile,UserProfile
 CheckRemove(UserProfile . "\pdk-" . A_UserName)
 CheckRemove(UserProfile . "\perl")
 If (FileExist(UserProfile . "\fullprofile.*.sddl")) {
     AddLog("Перемещение fullprofile.*.sddl из корня папки пользователя", "→AppData\Local\ACL-backup")
-    FileMove %UserProfile%\fullprofile.*.sddl, %UserProfile%\AppData\Local\ACL-backup\*.*
+    FileMove %UserProfile%\fullprofile.*.sddl, %LocalAppData%\ACL-backup\*.*
     If (!ErrorLevel)
 	SetLastRowStatus()
 }
@@ -197,7 +198,7 @@ RegRead OneDriveSetup, HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
 If (!ErrorLevel) {
     AddLog("OneDriveSetup в автозагрузке", "Удаление")
     RegDelete HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
-    FileRemoveDir D:\Users\Пользователь\AppData\Local\Microsoft\OneDrive, 1
+    FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
     keepOpen += !!ErrorLevel
     SetLastRowStatus(ErrorLevel)
 }

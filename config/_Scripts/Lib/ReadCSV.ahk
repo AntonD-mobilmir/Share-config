@@ -16,7 +16,7 @@ ReadCSV(ByRef tsvpath, ByRef reqHeaders := "", separator:="CSV") {
     ; integer – only single column (nr. integer) read from tsv, output is array of values
     ;
     ; ["requested column 1 title", "requested column 2 title", …] – output is array of arrays, each inner array is a row with data from columns requested in reqHeaders
-    ; [outputKey1Name: "requested column 1 title", outputKey1Name: "requested column 2 title", …] – output is array of objects, each inner object is a row with data from columns requested in reqHeaders
+    ; [outputKey1Name: "requested column 1 title", outputKey2Name: "requested column 2 title", …] – output is array of objects, each inner object is a row with data from columns requested in reqHeaders
     ;		key names in inner array of output = key names of columns in reqHeaders (no matter in which order it's in the file)
     ;		[[reqHeaderscol1row1data, reqHeaderscol2row1data, …], [reqHeaderscol1row2data, reqHeaderscol2row2data, …], …]
     ; 			or, if reqHeaders is non-array object,
