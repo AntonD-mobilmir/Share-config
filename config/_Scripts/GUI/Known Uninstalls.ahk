@@ -17,13 +17,19 @@ Try {
     Throw Exception(ObjectToText(e))
 }
 
+regViews := [32]
+If (A_Is64bitOS)
+    regViews.Push(64)
+
 uninstCount := uninstList.Length()
 fhLog := FileOpen(A_Desktop "\" A_ScriptName "." A_Now ".txt", "a")
 Progress A M R0-%uninstCount%, `n`n`n, Uninstalling…
 For i, uninstStrArr in uninstList {
     keyFound := 0
-    Loop Reg, % uninstStrArr[3]
-        keyFound := 1, break
+    For i, rv in regViews {
+        Loop Reg, % uninstStrArr[3]
+            keyFound := 1, break
+    } Until keyFound
     If (!keyFound)
         continue
     uninstName := uninstStrArr[4]
