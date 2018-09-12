@@ -11,15 +11,32 @@ Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
     RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
     
     If (Publisher == "Яндекс" && StartsWith(DisplayName, "Punto Switcher ")) {
+	Process Close, punto.exe
+	Process Close, yupdate.exe
+        FileMoveDir %A_AppData%\Yandex, %A_AppData%\Yandex_, R ; Иначе Punto Switcher иногда ругается, что не может прочитать настройки и они будут заменены
+        FileMoveDir %A_AppData%\Yandex\Punto Switcher, %A_AppData%\Yandex\Punto Switcher_, R
 	RunWait "%A_ScriptDir%\PuntoSwitcherSetup.exe" /quiet /norestart
 	Sleep 5000
 	Process Close, punto.exe
 	Process Close, yupdate.exe
-	RunWait %A_WinDir%\System32\MsiExec.exe /X "%A_LoopRegName%" /qn /norestart
+	
+	Loop
+	{
+            RunWait %A_WinDir%\System32\MsiExec.exe /X "%A_LoopRegName%" /qn /norestart
+            If (ErrorLevel==1618) { ; Another install is currently in progress
+                TrayTip %A_ScriptName%, Ошибка %ErrorLevel%: В данный момент выполняется другая установка`, ожидание 30 с перед повтором.`n`n[попытка %A_Index%]
+                Sleep 30000
+                continue
+            } Else If (ErrorLevel!=3010) ;3010: restart required
+                err := ErrorLevel
+            break
+	}	
+        FileMoveDir %A_AppData%\Yandex\Punto Switcher_, %A_AppData%\Yandex\Punto Switcher, 2
+        FileMoveDir %A_AppData%\Yandex_, %A_AppData%\Yandex, 2
     }
 }
 
-ExitApp
+ExitApp %err%
 
 StartsWith(longtext, shorttext) {
     return SubStr(longtext, 1, StrLen(shorttext)) == shorttext

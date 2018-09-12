@@ -7,9 +7,16 @@ SET "lProgramFiles=%ProgramFiles%"
 IF DEFINED ProgramFiles^(x86^) SET "lProgramFiles=%ProgramFiles(x86)%"
 )
 (
+REM Чтобы Punto Switcher не ругался при установке, что не может прочитать настройки и они будут заменены [потом можно]
+MOVE /Y "%AppData%\Yandex" "%AppData%\Yandex_"
+MOVE /Y "%AppData%\Yandex\Punto Switcher" "%AppData%\Yandex\Punto Switcher_"
 "%~dp0PuntoSwitcherSetup.exe" /quiet /norestart
 %SystemRoot%\System32\TASKKILL.exe /F /IM punto.exe
 %SystemRoot%\System32\TASKKILL.exe /F /IM ps64ldr.exe
+
+REM Можно вернуть возможно_битые настройки обратно
+MOVE /Y "%AppData%\Yandex_" "%AppData%\Yandex"
+MOVE /Y "%AppData%\Yandex\Punto Switcher_" "%AppData%\Yandex\Punto Switcher"
 
 CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" & IF NOT DEFINED DefaultsSource EXIT /B
 RD /S /Q "%ProgramFiles%\Yandex\Punto Switcher\Images" 
