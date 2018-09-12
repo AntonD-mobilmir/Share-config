@@ -102,7 +102,7 @@ BatchQueryCardMembers(idCard, cardMembers) {
 
 parse_updateCard(data) {
     global cardMembers
-    changeList := ""
+    changeList := "", listName := data.list.name
     For field, value in data.old
 	If field in desc,due,pos,name,idLabels,idAttachmentCover,idMembers
 	    continue
@@ -114,6 +114,8 @@ parse_updateCard(data) {
             newListName := data.listAfter.name
             If newListName in Готово,Выполнено,Завершено
 		changeList .= "перемещена в список " data.listAfter.name ", "
+            If (!listName) ; при изменении списка, в data.list.name пусто
+                listName := data.listAfter.name
 	} Else
 	    return "Изменено поле """ field """, обработка для него не прописана. Всё действие: " JSON.Dump(data)
     If (changeList)
