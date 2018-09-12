@@ -24,7 +24,8 @@ SETLOCAL ENABLEEXTENSIONS
 @(
     ECHO Installing %dstfname%
     COPY /Y "%~dpn0.cfg" "%TEMP%\%~n0.cfg"
-    CALL "%~dp0run_msiexec.cmd" "%SystemRoot%\System32\msiexec.exe" "%dstfname%" INSTALLCFG="%TEMP%\%~n0.cfg" %JREInstallLogParm%
+    REM msiexec not needed here, since the distributive is exe
+    CALL "%~dp0run_msiexec.cmd" "%dstfname%" INSTALLCFG="%TEMP%\%~n0.cfg" %JREInstallLogParm%
 
     SET regexe="%SYSTEMROOT%\System32\REG.EXE"
     REM if installing 32-bit JRE on 64-bit windows, must use 32-bit REG.EXE
