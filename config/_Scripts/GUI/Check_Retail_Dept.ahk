@@ -87,7 +87,6 @@ If (A_IsAdmin) {
     SetLastRowStatus(ErrorLevel, !ErrorLevel)
 }
 
-
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
 DefaultConfigDir := chkDefConfigDir.path
 
@@ -200,6 +199,31 @@ If (!ErrorLevel) {
     RegDelete HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
     FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
     keepOpen += !!ErrorLevel
+    SetLastRowStatus(ErrorLevel)
+}
+
+;[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\117d0af7dd935e33]
+;"ShortcutAppId"="https://dealer.beeline.ru/dealer/DOL2/DOL.application#DOL.application, Culture=neutral, PublicKeyToken=1f1396238a473719, processorArchitecture=x86"
+;"SupportShortcutFileName"="Техническая поддержка DOL"
+;"ShortcutFileName"="DOL"
+;"ShortcutFolderName"="Vimpelcom"
+;"UrlUpdateInfo"="https://dealer.beeline.ru/dealer/DOL2/DOL.application"
+;"UninstallString"="rundll32.exe dfshim.dll,ShArpMaintain DOL.application, Culture=neutral, PublicKeyToken=1f1396238a473719, processorArchitecture=x86"
+;"Publisher"="Vimpelcom"
+;"DisplayVersion"="11.5.0.15"
+;"DisplayIcon"="dfshim.dll,2"
+;"DisplayName"="DOL"
+;"ShortcutSuiteName"=""
+Loop 3
+{
+    RegRead DOL2Uninst, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\117d0af7dd935e33, UninstallString
+    If (!DOL2Uninst)
+        break
+    If (A_Index == 1)
+        AddLog("Удаление DOL2…")
+    Else
+        RunWait %SystemRoot%\System32\icacls.exe . /grant "%A_UserName%":(OI`,CI)M, %LocalAppData%\Apps, Min
+    RunWait %DOL2Uninst%, %SystemRoot%\System32, UseErrorLevel
     SetLastRowStatus(ErrorLevel)
 }
 
