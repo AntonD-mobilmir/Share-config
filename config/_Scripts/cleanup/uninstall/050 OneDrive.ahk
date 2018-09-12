@@ -19,7 +19,7 @@ Loop Files, %LocalAppData%\Microsoft\OneDrive\*, D
 {
     If (FileExist(oneDriveSetupExe := A_LoopFileLongPath "\OneDriveSetup.exe")) {
 	ResetACL(A_LoopFileLongPath)
-	RunWait "%oneDriveSetupExe%" /uninstall /qn, %A_LoopFileLongPath%
+	RunWait "%oneDriveSetupExe%" /uninstall /qn, %A_LoopFileLongPath%, UseErrorLevel
     }
 }
 ExitApp
