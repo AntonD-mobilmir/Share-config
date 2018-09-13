@@ -6,6 +6,13 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 IF NOT DEFINED LOCALAPPDATA IF EXIST "%USERPROFILE%\Local Settings\Application Data" SET "APPDATA=%USERPROFILE%\Local Settings\Application Data"
+
+    IF "%~1"=="/clean" (
+        RD /S /Q "%APPDATA%\GHISLER"
+        RD /S /Q "%LOCALAPPDATA%\Programs\Total Commander"
+        RD "%LOCALAPPDATA%\Programs"
+    )
+
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
     IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
     IF DEFINED OS64Bit (
