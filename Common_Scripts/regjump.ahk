@@ -17,4 +17,5 @@ regPath := RegExReplace(regPath, "^HKCC\\", "HKEY_CURRENT_CONFIG\",,1)
 Process Close, regedit.exe
 RegWrite REG_SZ, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Applets\Regedit, LastKey, %regPath%
 
-Run %A_WinDir%\regedit.exe
+EnvGet SystemRoot,SystemRoot
+Run "%SystemRoot%\regedit.exe"
