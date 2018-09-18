@@ -5,10 +5,11 @@
 platf_8_3_4	:=	"8.3.4.408"
 platf_8_3_10	:=	"8.3.10.2753"
 
-ServerPlaforms := { "Srv1S" : [platf_8_3_10, "1cv8.exe"]
+ServerPlaforms := { "Srv1S" : [platf_8_3_4, "1cv8.exe"]
 		  , "Srv1S-B" : [platf_8_3_10, "1cv8s.exe"]
 		  , "Srv1S-R" : [platf_8_3_10, "1cv8s.exe"] }
-PlatformNames := { (platf_8_3_10) : "Все базы" }
+PlatformNames := { (platf_8_3_4) : "Управление торговлей 2015, Операторы 2015 (УТ для SIM-карт) и Клиентская техника"
+		 , (platf_8_3_10) : "ЗУП, Бухгалтерия, Фитнес-клуб (Инсигма)" }
 
 global WinVer := GetWinVer()
      , LocalAppData := FindLocalAppData()

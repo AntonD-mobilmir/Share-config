@@ -8,7 +8,7 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.4.408
+Version=8.3.10.2753
 [Управление торговлей 2015]
 Connect=Srvr="Srv1S.office0.mobilmir:1541";Ref="trade2015";
 ID=7f4caaeb-a1a3-43ed-9a25-fc7550c1d89d
@@ -19,4 +19,4 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.4.408
+Version=8.3.10.2753
