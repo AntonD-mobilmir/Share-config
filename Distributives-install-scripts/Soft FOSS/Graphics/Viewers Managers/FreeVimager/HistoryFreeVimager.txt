@@ -1,7 +1,137 @@
 FREEVIMAGER HISTORY
 
+9.0.0 (September 9th 2018)
+
+- FreeVimager is now DONATIONWARE
+- Document tabs have got a close button
+- User interface clean up
+- Using better random generators
+- libpng updated to 1.2.59
+
+7.7.0 (February 18th 2018)
+
+- Bigger close buttons for dialogs (handy for tablets)
+- Replaced menu circles with check marks
+
+7.5.0 (October 18th 2017)
+
+- Better brightness, contrast, saturation and hue adjustment
+  (the Ansel Adams Zone System Histogram has been removed
+  because of incompatibility)
+- Tabbed document interface (TDI)
+- Dropped Windows XP and Windows 2003 support (ReactOS support has
+  also been dropped because it only implements the Windows 2003 API)
+
+7.0.0 (May 13th 2017)
+
+- Small fixes
+
+5.5.0 (February 18th 2017)
+
+- libpng updated to 1.2.57
+- Fixed memory leak of CRT threads under Windows XP
+
+5.3.0 (November 18th 2016)
+
+- Using the AVIR image resizing algorithm designed by Aleksey Vaneev
+  
+5.1.0 (September 20th 2016)
+
+- Made the application High DPI Aware (displays well on 4K monitors)
+- File association is now Windows 10 compliant: the user must
+  confirm the associations in an OS dialog opened from the
+  FreeVimager Global Settings dialog
+- Compiling with Visual Studio 2015 (FreeVimager runs on
+  Windows XP SP3 / Windows Server 2003 SP2 or higher)
+
+5.0.9 (June 25th 2016)
+
+- Enhanced the Sharpen dialog by using the unsharp mask method
+
+5.0.7 (May 9th 2016)
+
+- Bigger toolbar buttons
+- Fixed the recognition of the email client used to send pictures
+- Using UTF-8 encoding for JPEG/JFIF COM comment sections
+- Using UTF-8 encoding for GIF comments
+
+5.0.5 (January 8th 2016)
+
+- When sorting in Batch Processing dialog if the Date Taken doesn't
+  exist use the oldest between Date Created and Date Modified
+- Added crash dump support and verbose diagnostic logging
+- libpng updated to 1.2.56
+
+5.0.3 (November 18th 2015)
+
+- Jpeg loading is more fault tolerant: ignore missing SOI marker 
+- Show/hide commands for Statusbar and Toolbars
+- Removed fullscreen only slideshow mode as CD/DVD slideshows
+  are from the old days
+- Removed audio file opening support as we are a graphics viewer
+  and not an audio player
+
+5.0.1 (October 3rd 2015)
+
+- Small enhancements and fixes
+- Full Vietnamese language support (thanks to toan.nguyenk@gmail.com)
+
+5.0.0 (May 19th 2015)
+
+- Silently open all supported image types with wrong file extension
+  and when changes are saved the file content is converted to match
+  the file extension (thanks to Oleg A. Glushko which convinced me
+  to implement a solution for the wrong file extension problem)
+- Fixed the "Server Busy" error message popping-up while scanning
+- libpng updated to 1.2.52
+- Removed avi player as there are many modern players out there
+- Removed outdated audio CD player (cda file extension)
+- Removed zip file opening support as we are a graphics viewer
+  and not an archiver
+
+4.9.9 (November 3rd 2014)
+
+- Dropped DirectX (IDirectDraw7) drawing support because it is
+  obsolete and poses stability and in some cases even memory leaks
+  problems on Windows 8/8.1
+- Avi player has now an AAC codec
+- Licensed under GNU GENERAL PUBLIC LICENSE Version 3
+
+4.9.7 (August 25th 2014)
+
+- Faster transition to full-sized jpeg image
+- High Quality Stretch enabled by default
+- libpng updated to 1.2.51
+- icclib updated to 2.14
+- Simplified video encoding settings by removing the bitrate
+  parameter and dropped vorbis, flac and mp2 audio encoding support
+- In installation folder there is a new MasterConfig.ini file
+  which determines the configuration files location, the temporary
+  folder location and whether to use the registry or an ini file
+  
+4.9.5 (March 24th 2014)
+
+- Touch screen gesture support for print preview (pan & zoom)
+- In print preview the images are now correctly closed with
+  File - Close or when pressing the view's [X] button
+- Slideshow settings are now stored in a simple .ini file
+  instead of the more complicated .xml file
+- In Batch Processing dialog update thumbs when sorting columns
+  
+4.9.0 (November 19th 2013)
+
+- Updated touch screen gestures support for Windows 8 and added
+  next/previous tiff page/gif frame gestures (swipe up or down)
+- FreeVimager opens now all numeric extensions as tiff files
+  because some fax/scan devices/programs highlight the pages
+  count in the extension (.001, .002, .003, ...)
+- First version especially optimized for Windows XP SP2 and higher
+- Dropped support for theora encoding because many modern
+  players are not able to play avi files encoded in such a way
+  
 4.7.0 (May 30th 2013)
 
+- Last version with Win95, Win98, NT4, WinMe and Win2000 support
 - The crop tool permits now precise selections through the
   arrow keys (use the tab key to switch crop handle)
 
