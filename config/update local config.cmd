@@ -30,7 +30,8 @@ SETLOCAL ENABLEEXTENSIONS
     IF NOT DEFINED Distributives CALL "%~dp0_Scripts\FindSoftwareSource.cmd"
 )
 (
-    IF EXIST "%Distributives%\*.*" XCOPY "%Distributives%\config" "%configDir%" /D /E /C /I /R /H /K /Y && EXIT /B
+    MKDIR "%configDir%"
+    IF EXIST "%Distributives%\*.*" XCOPY "%Distributives%\config\*.*" "%configDir%" /D /E /C /I /R /H /K /Y && EXIT /B
 
     REM only continuing here if both rsync and xcopy failed or unavailable
     ECHO Локальная конфигурация не обновлена!>&2
