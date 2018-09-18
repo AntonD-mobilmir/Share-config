@@ -79,6 +79,8 @@ REM Add-AppxPackage -register "C:\Program Files\WindowsApps\******\AppxManifest.
 REM ex: Add-AppxPackage -register "C:\Program Files\WindowsApps\Microsoft.WindowsStore_8wekyb3d8bbwe\AppxManifest.xml" -DisableDevelopmentMode
 
 REM -!!! exceptions list: -
+windows.*
+Microsoft.Windows.*
 ;Microsoft.Advertising.Xaml_*
 Microsoft.PPIProjection_*
 ;Microsoft.CommsPhone_*
@@ -88,7 +90,7 @@ Microsoft.PPIProjection_*
 ;Microsoft.MicrosoftSolitaireCollection_*
 ;Microsoft.Office.OneNote_*
 ;Microsoft.Office.Sway_*
-;Microsoft.SkypeApp_*
+Microsoft.SkypeApp_*
 Microsoft.3DBuilder_*
 Microsoft.AAD.BrokerPlugin_*
 Microsoft.AccountsControl_*
@@ -103,7 +105,7 @@ Microsoft.BioEnrollment_*
 Microsoft.DesktopAppInstaller_*
 Microsoft.Getstarted_*
 Microsoft.LockApp_*
-;Microsoft.Messaging_* ;Skype messages
+Microsoft.Messaging_* ;Skype messages
 Microsoft.MicrosoftEdge_*
 ;Microsoft.MicrosoftSolitaireCollectionPreview_*
 Microsoft.MicrosoftStickyNotes_*
@@ -116,17 +118,16 @@ Microsoft.Office.OneNote_*
 Microsoft.Office.Sway_*
 Microsoft.People_*
 Microsoft.Reader_*
-Microsoft.SkypeApp_*
 Microsoft.StorePurchaseApp_*
 Microsoft.VCLibs.*
 Microsoft.WelcomeScreen_*
-Microsoft.Windows.Apprep.ChxApp_*
-Microsoft.Windows.AssignedAccessLockApp_*
-Microsoft.Windows.CloudExperienceHost_*
-Microsoft.Windows.ContentDeliveryManager_*
-Microsoft.Windows.Cortana_*
-Microsoft.Windows.Photos_*
-Microsoft.Windows.ShellExperienceHost_*
+;Microsoft.Windows.Apprep.ChxApp_*
+;Microsoft.Windows.AssignedAccessLockApp_*
+;Microsoft.Windows.CloudExperienceHost_*
+;Microsoft.Windows.ContentDeliveryManager_*
+;Microsoft.Windows.Cortana_*
+;Microsoft.Windows.Photos_*
+;Microsoft.Windows.ShellExperienceHost_*
 Microsoft.WindowsAlarms_*
 Microsoft.WindowsCalculator_*
 Microsoft.WindowsCamera_*
@@ -137,8 +138,8 @@ Microsoft.WindowsReadingList_*
 Microsoft.WindowsScan_*
 Microsoft.WindowsSoundRecorder_*
 Microsoft.WindowsStore_*
-Microsoft.Windows.SecureAssessmentBrowser_*
-Microsoft.Windows.WindowPicker_*
+;Microsoft.Windows.SecureAssessmentBrowser_*
+;Microsoft.Windows.WindowPicker_*
 ;Microsoft.Windows.HolographicFirstRun_*
 ;Microsoft.Windows.ParentalControls_*
 ;Microsoft.Windows.PeopleExperienceHost_*
@@ -152,4 +153,23 @@ Microsoft.Windows.WindowPicker_*
 Microsoft.ZuneMusic_*
 Microsoft.ZuneVideo_*
 ;windows.immersivecontrolpanel_*
-windows.*
+; 10:18 18.09.2018 Win10 [1803]
+1527c705-839a-4832-9118-54d4Bd6a0c89_10.0.17133.1_neutral_neutral_cw5n1h2txyewy
+c5e2524a-ea46-4f67-841f-6a9465d9d515_10.0.17133.1_neutral_neutral_cw5n1h2txyewy
+E2A4F912-2574-4A75-9BB0-0D023378592B_10.0.17133.1_neutral_neutral_cw5n1h2txyewy
+F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE_10.0.17133.1_neutral_neutral_cw5n1h2txyewy
+InputApp_*
+Microsoft.AsyncTextService_*
+Microsoft.CredDialogHost_*
+Microsoft.ECApp_*
+Microsoft.MicrosoftEdgeDevToolsClient_*
+Microsoft.Win32WebViewHost_*
+Microsoft.Windows.CapturePicker_*
+Microsoft.Windows.HolographicFirstRun_*
+Microsoft.Windows.OOBENetworkCaptivePortal_*
+Microsoft.Windows.OOBENetworkConnectionFlow_*
+Microsoft.Windows.ParentalControls_*
+Microsoft.Windows.PeopleExperienceHost_*
+Microsoft.Windows.PinningConfirmationDialog_*
+Microsoft.Windows.SecHealthUI_*
+;Microsoft.XboxGameCallableUI_*
