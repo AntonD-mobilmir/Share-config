@@ -349,10 +349,10 @@ If (FileExist(scriptInventoryReport)) {
 CheckUpdateDefaultConfigName(reqdConfigName)
 
 ; try reading Distributives source from _get_SoftUpdateScripts_source.cmd
-AddLog("Distributives", "Поиск _get_SoftUpdateScripts_source.cmd")
+AddLog("Distributives", "_get_SoftUpdateScripts_source.cmd")
 gsussScript := FirstExisting(A_AppDataCommon . "\mobilmir.ru\_get_SoftUpdateScripts_source.cmd", SystemDrive . "\Local_Scripts\_get_SoftUpdateScripts_source.cmd")
 If (gsussScript) {
-    LV_Modify(LV_GetCount(),,gsussScript)
+    SetLastRowStatus("(есть)", 1)
 } Else {
     SetLastRowStatus("Не установлен!", 0)
     keepOpen := 1

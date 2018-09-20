@@ -3,7 +3,7 @@
 #SingleInstance force
 
 platf_8_3_4	:=	"8.3.4.408"
-platf_8_3_10	:=	"8.3.10.2753"
+platf_8_3_10	:=	"8.3.10.2753.1"
 
 ServerPlaforms := { "Srv1S" : [platf_8_3_10, "1cv8.exe"]
 		  , "Srv1S-B" : [platf_8_3_10, "1cv8s.exe"]
