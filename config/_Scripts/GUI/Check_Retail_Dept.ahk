@@ -471,7 +471,9 @@ If (IsObject(softUpdScripts)) {
     If (FileExist("d:\Scripts\ver.flag")) {
 	;15.08.2016 20:09
 	FileRead verFlagSoftUpdScripts, *m16 d:\Scripts\ver.flag
-	SetLastRowStatus(verFlagSoftUpdScripts,0)
+	SetLastRowStatus(verFlagSoftUpdScripts, 0)
+	
+	runDistributivesCopy := true
     }
     
     distSoftUpdScripts := CheckPath(DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z")
@@ -487,6 +489,7 @@ If (IsObject(softUpdScripts)) {
 	SetRowStatus(softUpdScripts.line, , 0)
     }
 }
+
 If (IsObject(softUpdScripts)) { ; если обновлять скрипты software_update не надо, объект будет удален в блоке выше
     If (!IsObject(distSoftUpdScripts))
 	distSoftUpdScripts := CheckPath(dirConfigDistSrv "\_Scripts\software_update_autodist\downloader-dist.7z", 0, 0)
@@ -605,16 +608,21 @@ If (OSVersionObj[2] != 10 || OSVersionObj[3] != 0 || OSVersionObj[4] != 14393) {
     AddLog("Настройка ACL пропущена, т.к. на Windows 10 [1607] это вызывает проблемы")
 }
 
-finished := 1
-
-If (A_IsAdmin)
+If (A_IsAdmin) {
     RunScriptFromNewestDistDir("Soft com freeware\MultiMedia\Plugins Frameworks Components\Adobe Flash\uninstaller\*.exe"
 			     , "Soft com freeware\MultiMedia\Plugins Frameworks Components\Adobe Flash\uninstaller\uninstall_flash_player.cmd"
 			     , "Удаление Flash Player")
-If (runAhkUpdate && A_IsAdmin) {
-    RunRsyncAutohotkey()
-    RunScriptFromNewestDistDir(subdirDistAutoHotkey "\*.exe", subdirDistAutoHotkey "\install.cmd", "Обновление Autohotkey")
+
+    If (runDistributivesCopy)
+        RunFromConfigDir("_Scripts\CopyDistributives_AllSoft.cmd", "Обновление дистрибутивов ПО")
+
+    If (runAhkUpdate) {
+        RunRsyncAutohotkey()
+        RunScriptFromNewestDistDir(subdirDistAutoHotkey "\*.exe", subdirDistAutoHotkey "\install.cmd", "Обновление Autohotkey")
+    }
 }
+
+finished := 1
 AddLog("Готово", A_Now, 1)
 Sleep 300000
 ExitApp
