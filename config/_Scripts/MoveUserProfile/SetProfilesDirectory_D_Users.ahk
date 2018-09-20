@@ -54,7 +54,15 @@ If(IsFunc(findexefunc)) {
 } Else {
     SetACLexe:=SystemDrive . "\SysUtils\SetACL.exe"
 }
-Run "%SetACLexe%" -on %ProfilesDest% -ot file -actn clear -clr dacl -actn ace -ace "n:S-1-5-11;s:y;p:FILE_ADD_SUBDIRECTORY;i:np;m:set;w:dacl"
+
+UIDEveryone := "S-1-1-0;s:y"
+UIDAuthenticatedUsers := "S-1-5-11;s:y"
+UIDUsers := "S-1-5-32-545;s:y"
+UIDSYSTEM := "S-1-5-18;s:y"
+UIDCreatorOwner := "S-1-3-0;s:y"
+UIDAdministrators := "S-1-5-32-544;s:y"
+
+Run "%SetACLexe%" -on "%ProfilesDest%" -ot file -actn ace -ace "n:%UIDUsers%;p:read;i:np;m:set" -actn ace -ace "n:%UIDEveryone%;p:read;i:np;m:set" -actn ace -ace "n:%UIDSYSTEM%;p:full" -actn ace -ace "n:%UIDAdministrators%;p:full" -actn setowner -ownr "n:%UIDSYSTEM%"
 
 ExitApp
 
