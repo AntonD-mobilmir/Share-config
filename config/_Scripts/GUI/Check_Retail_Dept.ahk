@@ -17,21 +17,37 @@ EnvironmentRegKey	 = Environment
 ProxyOverride		 = <local>
 RunKey                   = SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 minFreeSpace		:= 1024 * 5 ; мегабайт
-
-arg1=%1%
-ReRunAsAdmin := !A_IsAdmin && arg1!="/NoAdminRun"
-
 reqdConfigName		:= "Apps_dept.7z"
-officeDistSrvNetName	:= "\\Srv0.office0.mobilmir"
-officeDistSrvPath	:= officeDistSrvNetName . "\Distributives"
-dirConfigDistSrv	:= "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config"
-pathSrvConfigUpdater	:= dirConfigDistSrv "\update local config.cmd"
-maxAgeSavedInvReport	:= 1
-;tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
-scriptInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
-maskInventoryReport	:= "\\Srv0.office0.mobilmir\profiles$\Share\Inventory\collector-script\Reports\" . A_ComputerName . " *.7z"
-serverScriptPath	:= dirConfigDistSrv "\_Scripts\GUI\" . A_ScriptName
 subdirDistAutoHotkey	:= "Soft\Keyboard Tools\AutoHotkey"
+maxAgeSavedInvReport	:= 14 ; дней
+
+Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R35 w600 vLogListView, Операция|Статус
+Gui Show
+
+OSVersionObj := RtlGetVersion()
+AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4], A_Now, 1)
+AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
+
+ReRunAsAdmin := !(A_IsAdmin || A_Args[1] = "/NoAdminRun")
+
+dirProfilesShare := FirstExisting( "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share"
+			   	 , "\\Srv0.office0.mobilmir\profiles$\Share"
+			   	 , "D:\Distributives" )
+If (!dirProfilesShare)
+    Throw "Папка с файлами и скриптами настройки не найдена"
+
+officeDistSrvNetName := FirstContaining( "Distributives", "\\Srv0.office0.mobilmir"
+                                                        , "\\Srv1S-B.office0.mobilmir"
+                                                        , "D:" )
+If (!officeDistSrvNetName)
+    Throw "Папка дистрибутивов не найдена"
+officeDistSrvPath := officeDistSrvNetName . "\Distributives"
+
+dirConfigDistSrv	:= dirProfilesShare "\config"
+scriptInventoryReport	:= dirProfilesShare "\Inventory\collector-script\SaveArchiveReport.cmd"
+maskInventoryReport	:= dirProfilesShare "\Inventory\collector-script\Reports\" A_ComputerName " *.7z"
+pathSrvConfigUpdater	:= dirConfigDistSrv "\update local config.cmd"
+serverScriptPath	:= dirConfigDistSrv "\_Scripts\GUI\" A_ScriptName
 
 regsvr32exe		:= FirstExisting(SystemRoot "\SysWOW64\regsvr32.exe", SystemRoot "\System32\regsvr32.exe")
 If (!regsvr32exe)
@@ -41,15 +57,8 @@ FileReadLine AhkDistVer, %officeDistSrvPath%\Soft\Keyboard Tools\AutoHotkey\ver.
 If (RegexMatch(AhkDistVer, "^(\d+)\.(\d+)\.(\d+)\.(\d+)\s", AhkVc))
     AhkDistVer		:= Format("{:01u}.{:01u}.{:02u}.{:02u}", AhkVc1, AhkVc2, AhkVc3, AhkVc4)
 Else
-    AhkDistVer		:= "1.1.29.00"
+    AhkDistVer		:= "1.1.29.01"
 runAhkUpdate := A_AhkVersion < AhkDistVer
-
-Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R35 w600 vLogListView, Операция|Статус
-Gui Show
-
-OSVersionObj := RtlGetVersion()
-AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4],A_Now,1)
-AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
 AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист. " AhkDistVer ")"), !runAhkUpdate)
 
 If (A_IsAdmin) {
@@ -415,6 +424,7 @@ Loop Files, %A_ScriptDir%\..\..\..\software_update\scripts\_TeamViewerSecurityPa
 	SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
 }
 
+;tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
 ;AddLog("Обновление настроек TeamViewer", StartsWith(tv5settingscmd, "\\Srv0") ? "Srv0" : SubStr(tv5settingscmd, 1, -StrLen(tv5settingsSubPath)))
 ;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, officeDistSrvPath . tv5settingsSubPath)
 ;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
@@ -1034,6 +1044,14 @@ TimeFormat(ByRef time) {
 FirstExisting(paths*) {
     for index,path in paths
 	If (FileExist(path))
+	    return path
+    
+    return
+}
+
+FirstContaining(subpath, paths*) {
+    for index,path in paths
+	If (FileExist(path "\" subpath))
 	    return path
     
     return
