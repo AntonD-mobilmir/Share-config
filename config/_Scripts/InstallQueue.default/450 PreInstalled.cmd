@@ -6,7 +6,7 @@ IF NOT DEFINED DistSourceDir CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
 (
 SET "xcopyargs=/Y"
 CALL "%SoftSourceDir%\PreInstalled\prepare.cmd"
-IF DEFINED biglogfile START "Installation log" "%SystemDrive%\SysUtils\UnxUtils\tail.exe" -f -n 100 %biglogfile%
+rem IF DEFINED biglogfile START "Installation log" "%SystemDrive%\SysUtils\UnxUtils\tail.exe" -f -n 100 %biglogfile%
 ) >>%logfile% 2>&1
 EXIT /B
 

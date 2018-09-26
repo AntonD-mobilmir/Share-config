@@ -50,7 +50,7 @@ If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFr
 		While (A_TimeIdlePhysical < wantUserIdle && !(ResultsURL && IsObject(perfResultsObj))) {
 		    If (A_Index==1) {
 			Progress Off
-			Progress R0-%wantUserIdle%, `n, Ожидание бездействия пользователя
+			Progress R0-%wantUserIdle% M, `n, Ожидание бездействия пользователя
 		    }
 		    Progress %A_TimeIdlePhysical%
 		    Sleep 100
@@ -435,7 +435,7 @@ WaitCPUIdle() {
     FileAppend %A_Now% Проверка нагрузки на процессор / ожидание освобождения ресурсов`n, *
     GetIdleTime()
     Progress Off
-    Progress A R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " секунд"
+    Progress A M R0-%cyclesLimit%, `n, % "Ожидание " . idleLimitPct . "% простоя процессора в течение " . cyclesLimit . " секунд"
     Loop
     {
 	Sleep %measurementTime%
