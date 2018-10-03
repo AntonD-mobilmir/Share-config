@@ -5,6 +5,27 @@ FileEncoding UTF-8
 
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
+
+If (!A_IsAdmin) {
+    RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
+    ExitApp
+}
+
+RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
+; стандартный hostname в Win10: DESKTOP-*
+If (StartsWith(Hostname, "DESKTOP-") || StartsWith(Hostname, "LAPTOP-")) {
+    InputBox newHostname, Hostname, Введите действительный Hostname,,,,,,,, %Hostname%
+    If (!ErrorLevel && newHostname && newHostname != Hostname) {
+        Progress ZH0 A M, Запись "%newHostname%" вместо "%Hostname%", Изменение Hostname, %A_ScriptName%
+        UpdateHostname(newHostname)
+    }
+}
+
+;EnvSet Write-trello-id.ahk-params, /nag
+RunWait %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
+;If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
+;}
+
 If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
     sysNative := SystemRoot "\System32"
 
@@ -15,11 +36,6 @@ If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
     configDir = %configScriptsDir%\..
 }
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
-
-If (!A_IsAdmin) {
-    RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
-    ExitApp
-}
 
 RunWait %sysNative%\bcdedit.exe /set nx optout, %A_Temp%
 RunWait %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%
@@ -33,27 +49,11 @@ If (AppXSupported)
 
 Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%
 
-;ToDo: сначала тихий поиск карточки, и, если карточка не найдена, проверка/запрос смены hostname.
-RunWait %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
-If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
-    RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
-    ; стандартный hostname в Win10: DESKTOP-*
-    If (StartsWith(Hostname, "DESKTOP-")) {
-        InputBox newHostname, Hostname, Введите действительный Hostname,,,,,,,, %Hostname%
-        If (newHostname && newHostname != Hostname) {
-            MsgBox 0x24, Hostname изменён, Записать в реестр hostname "%newHostname%" вместо "%Hostname%"?
-            IfMsgBox Yes
-                UpdateHostname(newHostname)
-        }
-    }
-    
-    EnvSet Write-trello-id.ahk-params, /nag
-    Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
+If (FileExist("D:\")) {
+    MsgBox 0x24, Система на SSD?, Перенести индекс поиска Windows на D: ?
+    IfMsgBox Yes
+        Run "%A_AhkPath%" "%A_ScriptDir%\Move Windows Search Index to D.ahk"
 }
-
-MsgBox 0x24, Система на SSD?, Перенести индекс поиска Windows на D: ?
-IfMsgBox Yes
-    Run "%A_AhkPath%" "%A_ScriptDir%\Move Windows Search Index to D.ahk"
 
 ExitApp
 
