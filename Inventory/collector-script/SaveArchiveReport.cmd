@@ -7,8 +7,8 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 
     SET "fnametime=%TIME::=%"
-    CALL :find7zexe
-
+    IF EXIST "%~dp07za.exe" ( SET exe7z="%~dp07za.exe" ) ELSE ( CALL :find7zexe || CALL :no7zip )
+    
     FOR /F "usebackq tokens=1 delims=[]" %%A IN (`%SystemRoot%\System32\find.exe /n "-!!! list of WMI paths to request" "%~0"`) DO SET "WMIListSkipLines=skip=%%A"
     FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID" /reg:32`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
     rem /reg:32 won't work on Vista and XP, so fall back
@@ -121,7 +121,7 @@ EXIT /B
 (
     ECHO 7-Zip не найден, продолжить не получится.
     PING 127.0.0.1 -n 15 >NUL
-EXIT /B
+EXIT /B %ERRORLEVEL%
 )
 :find7zexe
 (
