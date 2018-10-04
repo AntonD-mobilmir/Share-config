@@ -42,7 +42,8 @@ If (FileExist(listpath)) {
 ExitApp
 
 AddRetailDept(ByRef login, ByRef firstName, ByRef leftovers:="") {
-    static domains	:= {"k.mobilmir.ru": "(Обмен Рарус)", "rarus.robots.mobilmir.ru": "(Уведомления из Рарус)"}
+    ;static domains	:= {"k.mobilmir.ru": "(Обмен Рарус)", "rarus.robots.mobilmir.ru": "(Уведомления из Рарус)"}
+    static domains	:= {"rarus.robots.mobilmir.ru": "(Уведомления из 1С в рознице)"}
 	 , lists	:= ["all@k.mobilmir.ru"]
 
     ;If (!EndsWith(firstName, " " login "@"))
