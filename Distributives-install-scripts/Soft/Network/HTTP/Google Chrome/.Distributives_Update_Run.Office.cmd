@@ -14,6 +14,6 @@ rem logsDir - baseLogsDir with relpath (or nothing)
 IF NOT DEFINED logsDir SET "logsDir=%workdir%"
 SET "AddtoSUScripts=0"
 
-CALL "%baseScripts%\_DistDownload.cmd" 32-bit-msi *.msi --no-check-certificate -Ni "%~dp0GoogleChromeStandaloneEnterprise.msi.url.txt"
-CALL "%baseScripts%\_DistDownload.cmd" 64-bit-msi *.msi --no-check-certificate -Ni "%~dp0GoogleChromeStandaloneEnterprise64.msi.url.txt"
+CALL "%baseScripts%\_DistDownload.cmd" 32-bit-msi *.msi -Ni "%~dp0GoogleChromeStandaloneEnterprise.msi.url.txt"
+CALL "%baseScripts%\_DistDownload.cmd" 64-bit-msi *.msi -Ni "%~dp0GoogleChromeStandaloneEnterprise64.msi.url.txt"
 )
