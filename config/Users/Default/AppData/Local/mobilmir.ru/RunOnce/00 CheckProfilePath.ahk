@@ -15,11 +15,12 @@ SplitPath UserProfile,,profileBaseDir,,,profileDrive
 If (profileBaseDir != specBaseDir) {
     EnvGet SystemDrive,SystemDrive
     
+    
     If (profileDrive = SystemDrive && InStr(FileExist("D:\Users"), "D"))
 	errText := "Профиль пользователя находится на системном диске, но обычно после настройки по спецификации он должен создаваться в """ specBaseDir """."
     Else
 	errText := "Папка, в которой создан профиль, не соответствует спецификации."
     
-    RegRead ProfilesDirectory, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory
-    MsgBox 0x30, Проверка папки профилей при первом запуске, % errText "`n`nЕсли так не должно быть, ещё не поздно исправить.`n`nПрофиль пользователя: """ UserProfile """`nПапка для новых профилей (из реестра): """ ProfilesDirectory """`nСистемный диск: " SystemDrive
+    RegRead ProfilesDirectory, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory
+    MsgBox 0x30, Проверка папки профилей при первом запуске, % errText "`n`nЕсли так не должно быть, стоит исправить и удалить этот профиль, прежде чем продолжать.`n`nПрофиль пользователя: """ UserProfile """`nПапка для новых профилей в реестре: """ ProfilesDirectory """`nСистемный диск: " SystemDrive
 }

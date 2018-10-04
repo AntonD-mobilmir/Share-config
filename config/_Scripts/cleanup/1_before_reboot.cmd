@@ -36,7 +36,7 @@ SETLOCAL ENABLEEXTENSIONS
     )
     echo y | "%SystemRoot%\System32\chkdsk.exe" %SystemDrive% /f /x
     
-    REM https://support.microsoft.com/en-us/help/942974/
+    REM Удаление БД Offline-файлов https://support.microsoft.com/en-us/help/942974/
     %SystemRoot%\System32\REG.exe ADD "HKLM\System\CurrentControlSet\Services\CSC\Parameters" /v FormatDatabase /t REG_DWORD /d 1 /f 
 
     IF NOT "%reboot%"=="0" (
