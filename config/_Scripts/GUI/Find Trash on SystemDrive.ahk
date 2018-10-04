@@ -15,10 +15,11 @@ $Recycle.Bin
 BOOT
 Common_Scripts
 Documents and Settings
+Intel
 Local_Scripts
 PerfLogs
-Program Files (x86)
 Program Files
+Program Files (x86)
 ProgramData
 Recovery
 squid
