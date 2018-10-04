@@ -2,7 +2,10 @@
 @REM Automated software update scripts
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-    IF NOT DEFINED srcpath EXIT /B 32767
+    IF NOT DEFINED srcpath (
+        ECHO srcpath not defined, quitting.
+        EXIT /B 32767
+    )
 
     @REM usage: %0 URL [distmask|""] 
     @REM input:
