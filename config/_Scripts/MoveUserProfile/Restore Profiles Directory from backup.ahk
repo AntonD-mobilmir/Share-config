@@ -18,7 +18,7 @@ if not A_IsAdmin
 RegRead ProfilesDirectory, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory.bak
 If (ErrorLevel || !ProfilesDirectory) {
     MsgBox При чтении резервной копии из стандартного расположения произошла ошибка.
-    ExitApp
+    ExitApp 1
 }
 
 RegWrite REG_EXPAND_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList, ProfilesDirectory, %ProfilesDirectory%
