@@ -1,0 +1,11 @@
+﻿[Центральная розница]
+Connect=Srvr="Srv1S-R.office0.mobilmir:1541";Ref="Retail_Main";
+ID=
+OrderInList=540928
+Folder=/
+OrderInTree=377088
+External=0
+ClientConnectionSpeed=Normal
+App=Auto
+WA=1
+Version=8.3.10.2753
