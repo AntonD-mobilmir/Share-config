@@ -2,7 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 #NoEnv
 
-parse_updateCard(data, ByRef update := "") {
+parse_updateCard_onlyCompleted(data, ByRef update := "") {
     global cardMembers
     changeList := ""
     For field, value in data.old {
@@ -15,9 +15,10 @@ parse_updateCard(data, ByRef update := "") {
             changeList .= (value ? "раз" : "за") "архивирована, "
 	} Else If (field == "idList") {
             newListName := data.listAfter.name
-            changeList .= "перемещена из списка " data.listBefore.name ", "
+            If newListName in Готово,Выполнено,Завершено
+                changeList .= newListName ", "
             If (IsObject(update)) ; при изменении списка, в data.list.name пусто
-                update.list := data.listAfter.name
+                update.list :=  data.listBefore.name
 	} Else {
 	    changeList .= "изменено поле """ field """, обработка для него не прописана, "
         }

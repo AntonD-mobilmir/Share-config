@@ -24,7 +24,7 @@ TrelloActionsLogToFile(queryPrefix, actionsToLog := "", timeOffset := "", report
         actions_since := timeOffset
 
     FormatTime actions_since, %actions_since%, yyyy-MM-dd
-    MsgBox %actions_since%
+    Progress A M ZH0, Запрос изменений с (since) %actions_since%, Отчёт о действиях из Trello, %A_ScriptName%
     
     ;actions_since := SubStr(A_Now, 1, 6) "01" ; YYYYMM01 – первое число текущего месяца
     ;actions_since += -1, Days ; последнее число предыдущего
@@ -50,22 +50,39 @@ TrelloActionsLogToFile(queryPrefix, actionsToLog := "", timeOffset := "", report
     cardMembers := BatchQueryCardMembers("", cardMembers)
     flog.Close()
     
+    Progress 0, Запись файла отладки "%A_Temp%\%A_LineFile%.debug.txt"
     FileAppend % ObjectToText(cardMembers), %A_Temp%\%A_LineFile%.debug.txt
     
-    out := "Дата" A_Tab "Карточка" A_Tab "Доска" A_Tab "Список" A_Tab "Заголовок карточки" A_Tab "Кому назначена" A_Tab "Действие с карточкой" "`n"
+    Progress 0, Разбор списка изменений и формирование отчёта
+    out := "Дата" A_Tab
+         . "Карточка" A_Tab
+         . "Доска" A_Tab
+         . "Список" A_Tab
+         . "Заголовок карточки" A_Tab
+         . "Кому назначена" A_Tab
+         . "Действие с карточкой"
+         . "`n"
     For i, actn in actions {
-        If (IsFunc(fnName := actionsToLog[actn.type]))
-            curLn := Func(fnName).Call(actn.data)
-        Else
-            curLn := JSON.Dump(actn) "`t"
+        curLn := "", data := actn.data
+        If (IsFunc(fnName := actionsToLog[actn.type])) {
+            update := GetCommonFieldsFromTrelloUpdate(data)
+            If (IsObject(update := Func(fnName).Call(data, update)))
+                For i, field in ["board", "list", "card", "members", "status"]
+                    curLn .= ScreenUnsafeChars(update[field]) "`t"
+        } Else {
+            curLn := ScreenUnsafeChars(JSON.Dump(actn)) "`t"
+        }
         If (!curLn)
             continue
-        out .= actn.date "`thttps://trello.com/c/" actn.data.card.shortLink "`t" curLn "`n"
+        out .= actn.date "`t" ScreenUnsafeChars("https://trello.com/c/" data.card.shortLink) "`t" curLn "`n"
+        ;MsgBox % ObjectToText(update) "`n→" curLn "`n" out
     }
     
     If (!reportName)
         reportName = %A_TEMP%\%A_ScriptName%-%A_Now%.tsv
+    Progress 0, Запись отчёта "%reportName%"
     FileAppend %out%, %reportName%
+    Progress Off
     Try
         Run "%reportName%"
     Catch e
@@ -83,5 +100,17 @@ SubMonths(src, amount) {
     return SubStr(out, 1, 6) . SubStr(src, 7) ; предыдущий месяц минус один, тот же день месяца
 }
 
+GetCommonFieldsFromTrelloUpdate(data, ByRef out := "") {
+    global cardMembers
+    If (!IsObject(out))
+        out := {}
+    out.board :=   data.board.name
+    out.list :=    data.list.name
+    out.card :=    data.card.name
+    out.members := cardMembers[data.card.id]
+
+    return out
+}
+
 #include %A_LineFile%\..\parse_updateCard.ahk
-#include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\TrelloAPI1.ahk
+#include %A_LineFile%\..\TrelloAPI1.ahk
