@@ -5,6 +5,7 @@ SETLOCAL ENABLEEXTENSIONS
     SET "AddtoSUScripts=1"
 
     IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
+    SET "UpdateScriptName=7Zip"
     CALL :Download7zip "%~dp032-bit" *.exe
     CALL :Download7zip "%~dp064-bit" *-x64.exe
 EXIT /B

@@ -49,7 +49,7 @@ REM or install_silently.*/update.*/reinstall.*/install.* in caller directory
 	EXIT /B 2
     )
     
-    CALL :getLastComponentOfPath UpdateCallerName "%distDir:~0,-1%"
+    IF NOT DEFINED UpdateScriptName CALL :getLastComponentOfPath UpdateScriptName "%distDir:~0,-1%"
     ECHO %0 %DATE% %TIME%: Silent auto-update script will be written to SUScripts ^(=%SUScripts%^)
 )
 rem removing denied characters
@@ -59,59 +59,63 @@ SET "SU_Aversion=%SU_Aversion::=_%"
 (
 ECHO cleaned up SU_Aversion: %SU_Aversion%
 
-SET SU_AScript="%SUScripts%\%UpdateCallerName% %SU_Aversion%.cmd"
+SET SU_AScript="%SUScripts%\%UpdateScriptName% %SU_Aversion%.cmd"
 IF DEFINED SilentUpdater GOTO :ScriptCallingSilentUpdater
 
 REM Check if there is a template
-IF EXIST "%~dp0%UpdateCallerName%.*" GOTO :UpdaterFromTemplate
+IF EXIST "%~dp0%UpdateScriptName%.*" GOTO :UpdaterFromTemplate
 REM Or there is already installer for older version
-IF EXIST "%SUScripts%\%UpdateCallerName%*.*" GOTO :AtLeastThereIsPrevCaller
+IF EXIST "%SUScripts%\%UpdateScriptName%*.*" GOTO :AtLeastThereIsPrevCaller
 
 rem If any of previous would worked, script won't go till here. This is fallback variant.
-CALL :CheckForInstallerScript install_silently.* || CALL :CheckForInstallerScript update.* || CALL :CheckForInstallerScript reinstall.* || CALL :CheckForInstallerScript install.* || ECHO %0 %DATE% %TIME%: No Auto-update method found, nothing added to SUScripts!
+CALL :CheckForInstallerScript || ECHO %0 %DATE% %TIME%: No Auto-update method found, nothing added to SUScripts!
 EXIT /B
 )
 
 :CheckForInstallerScript
 (
-    IF EXIST "%distDir%%1" FOR %%I IN ("%distDir%%1") DO (
-	SET "installername=%%~nxI"
-	SET "installertype=%%~xI"
-	IF /I "%%~xI"==".ahk" GOTO :foundInstallerScript
-	IF /I "%%~xI"==".cmd" GOTO :foundInstallerScript
+    FOR /D %%A IN ("%distDir:~0,-1%" "%distDir%..") DO (
+        FOR %%B IN (update autoupdate) DO ( & REM install_silently update reinstall install
+            FOR %%C IN ("%%~A\%%~B.ahk" "%%~A\%%~B.cmd") DO IF EXIST "%%~C" (
+                SET "installerPath=%%~C"
+                SET "installertype=%%~xC"
+                GOTO :foundInstallerScript
+            )
+        )
     )
 EXIT /B 2
 )
 :foundInstallerScript
 (
     rem remove static component from distDir, replace with %%DIstributives%%
-    IF /I "%distDir:~1,16%"==":\Distributives\" (
-	SET SilentUpdater="%%Distributives%%\%distDir:~17%%installername%"
+    IF /I "%installerPath:~1,16%"==":\Distributives\" (
+	SET SilentUpdater="%%Distributives%%\%installerPath:~17%"
     ) ELSE (
-	SET SilentUpdater="%distDir%%installername%"
+	SET SilentUpdater="%installerPath%"
     )
 GOTO :ScriptCallingSilentUpdater
 )
 :ScriptCallingSilentUpdater
 (
-    MOVE /Y "%SUScripts%\%UpdateCallerName%*.*" "%SUScripts%\..\old\"
-    (ECHO @REM coding:OEM
-    ECHO @REM Automatically written with "%~f0" on %DATE% %TIME% as fallback
+    rem -cannot be here, checked before calling- MOVE /Y "%SUScripts%\%UpdateScriptName%*.*" "%SUScripts%\..\old\"
+    (ECHO @^(REM coding:OEM
+    ECHO REM Automatically written with "%~f0" on %DATE% %TIME% as fallback
     IF /I "%installertype%"==".ahk" (
-	ECHO %%AutohotkeyExe%% /ErrorStdOut "%SilentUpdater%"
+	ECHO %%AutohotkeyExe%% /ErrorStdOut %SilentUpdater%
     ) ELSE IF /I "%installertype%"==".cmd" (
-	ECHO CALL "%SilentUpdater%"
-    ) ELSE ECHO "%SilentUpdater%"
+	ECHO CALL %SilentUpdater%
+    ) ELSE ECHO %SilentUpdater%
+    ECHO ^)
     )>%SU_AScript%
 EXIT /B 0
 )
 :UpdaterFromTemplate
-    MOVE "%SUScripts%\%UpdateCallerName%*.*" "%SUScripts%\..\old\"
-    FOR %%I IN ("%~dp0%UpdateCallerName%.*") DO %xlnexe% "%%~I" %SU_AScript%||COPY /B /Y "%%~I" %SU_AScript%
+    MOVE "%SUScripts%\%UpdateScriptName%*.*" "%SUScripts%\..\old\"
+    FOR %%I IN ("%~dp0%UpdateScriptName%.*") DO %xlnexe% "%%~I" %SU_AScript%||COPY /B /Y "%%~I" %SU_AScript%
 EXIT /B
 
 :AtLeastThereIsPrevCaller
-    REN "%SUScripts%\%UpdateCallerName%*.*" "%UpdateCallerName% %SU_Aversion%.*"
+    REN "%SUScripts%\%UpdateScriptName%*.*" "%UpdateScriptName% %SU_Aversion%.*"
 EXIT /B
 
 :getLastComponentOfPath
