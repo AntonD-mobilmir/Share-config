@@ -98,7 +98,7 @@ IF EXIST d:\Users %AutohotkeyExe% "%~dp0_Scripts\MoveUserProfile\SetProfilesDire
 
 rem TODO: не работает, если запускать "!run without installing soft.cmd"
 REM Копирование дистрибутивов, поскольку новые отделы не подключены к офисной сети
-START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
+IF /I "%COMPUTERNAME:~-2%"=="-K" START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
 rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g\Projects\depts-commands\execscripts\install.cmd"
 )
 :MTMail
