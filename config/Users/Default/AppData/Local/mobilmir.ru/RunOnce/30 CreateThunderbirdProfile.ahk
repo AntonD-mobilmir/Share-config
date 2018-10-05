@@ -9,7 +9,7 @@ Try {
 EnvGet UserProfile,UserProfile
 global MTProfileInUserProfileDir := UserProfile "\Mail\Thunderbird\profile"
 
-If A_UserName In Install,Admin,Administrator,Guest,Гость
+If A_UserName In Install,Admin,Administrator,Администратор,Guest,Гость
     Finish()
 
 Try DefaultConfigDir:=getDefaultConfigDir()

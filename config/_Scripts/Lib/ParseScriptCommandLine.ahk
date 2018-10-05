@@ -5,7 +5,10 @@
 ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:="") {
     CommandLine := DllCall( "GetCommandLine", "Str" )
     ; ["]%A_AhkPath%["] [ahkArgs] ["][%A_ScriptDir%\]%A_ScriptName%["] [args]
-    ; If IsByRef(cmdlPrms), cmdlArgs returned – array with all script arguments, with cmdlArgs[""] = number of arguments and cmdlArgs[0] := script path from command line
+    ; If IsByRef(cmdlPrms),
+    ;     cmdlArgs returned – array with all script arguments,
+    ;     with cmdlArgs[""] = number of arguments, and
+    ;     cmdlArgs[0] := script path from command line
     ; otherwise, all script parameters returned as one string (unparsed)
     
     removeQuotes := cmdlPrms==""""

@@ -11,6 +11,9 @@ If (!A_IsAdmin) {
     ExitApp
 }
 
+If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
+    sysNative := SystemRoot "\System32"
+
 RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 ; стандартный hostname в Win10: DESKTOP-*
 If (StartsWith(Hostname, "DESKTOP-") || StartsWith(Hostname, "LAPTOP-")) {
@@ -25,9 +28,6 @@ If (StartsWith(Hostname, "DESKTOP-") || StartsWith(Hostname, "LAPTOP-")) {
 RunWait %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
 ;If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
 ;}
-
-If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
-    sysNative := SystemRoot "\System32"
 
 defaultConfigDir = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config
 configScriptsDir = %A_ScriptDir%\..
