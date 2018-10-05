@@ -17,6 +17,8 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     %SystemRoot%\System32\net.exe USER "%newUserName%" /LOGONPASSWORDCHG:NO
     %SystemRoot%\System32\net.exe LOCALGROUP "Пользователи удаленного рабочего стола" "%newUserName%" /Add
     %SystemRoot%\System32\net.exe LOCALGROUP "Remote Desktop Users" "%newUserName%" /Add
+    
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
 EXIT /B
 )
 
