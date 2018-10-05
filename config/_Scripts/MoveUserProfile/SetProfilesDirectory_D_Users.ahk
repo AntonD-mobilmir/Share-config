@@ -6,15 +6,9 @@ EnvGet SystemDrive, SystemDrive
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
 SetRegView 64
 
-if not A_IsAdmin
-{
-    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-    If RunInteractiveInstalls!=0
-    {
-	ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-	Run *RunAs %ScriptRunCommand% ; Requires v1.0.92.01+
-	ExitApp
-    }
+If (!A_IsAdmin) {
+    Func("InteractiveRunAs").Call()
+    ExitApp
 }
 
 ProfilesDest:="D:\Users"
@@ -48,22 +42,27 @@ RunWait %comspec% /C "%SystemRoot%\System32\net.exe SHARE Users /DELETE /Y & %Sy
 ;RunWait %SystemRoot%\System32\net.exe SHARE Users$="%ProfilesDirectory%" /GRANT:Все`,FULL
 ;RunWait %SystemRoot%\System32\net.exe SHARE Users$="%ProfilesDirectory%"
 
+SIDEveryone=S-1-1-0
+SIDAuthenticatedUsers=S-1-5-11
+SIDUsers=S-1-5-32-545
+SIDSYSTEM=S-1-5-18
+SIDCreatorOwner=S-1-3-0
+SIDAdministrators=S-1-5-32-544
+
 findexefunc:="findexe"
-If(IsFunc(findexefunc)) {
+If(IsFunc(findexefunc))
     Try SetACLexe := %findexefunc%(SystemDrive . "\SysUtils\SetACL.exe", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils")
+If (SetACLexe) {
+    RunWait "%SetACLexe%" -on "%ProfilesDest%" -ot file -actn ace -ace "n:%SIDUsers%;s:y;p:read;i:np;m:set" -actn ace -ace "n:%SIDEveryone%;s:y;p:read;i:np;m:set" -actn ace -ace "n:%SIDSYSTEM%;s:y;p:full" -actn ace -ace "n:%SIDAdministrators%;s:y;p:full" -actn setowner -ownr "n:%SIDSYSTEM%;s:y"
 } Else {
-    SetACLexe:=SystemDrive . "\SysUtils\SetACL.exe"
+    RunWait %SystemRoot%\System32\icacls.exe "%ProfilesDest%" /grant:r "*%SIDUsers%:(NP)(RX)" /grant:r "*%SIDEveryone%:(NP)(RX)" /grant:r "*%SIDSYSTEM%:F(OI)(CI)" "%SIDAdministrators%:F(OI)(CI)" /C /L
+    ;RunWait %SystemRoot%\System32\icacls.exe "%ProfilesDest%" /setowner "*%SIDSYSTEM%" /C /L
+        ;>%SystemRoot%\System32\icacls.exe "%ProfilesDest%" /setowner "*%SIDSYSTEM%" /C /L
+        ;test: This security ID may not be assigned as the owner of this object.
+        ;Successfully processed 0 files; Failed processing 1 files
 }
-
-UIDEveryone := "S-1-1-0;s:y"
-UIDAuthenticatedUsers := "S-1-5-11;s:y"
-UIDUsers := "S-1-5-32-545;s:y"
-UIDSYSTEM := "S-1-5-18;s:y"
-UIDCreatorOwner := "S-1-3-0;s:y"
-UIDAdministrators := "S-1-5-32-544;s:y"
-
-Run "%SetACLexe%" -on "%ProfilesDest%" -ot file -actn ace -ace "n:%UIDUsers%;p:read;i:np;m:set" -actn ace -ace "n:%UIDEveryone%;p:read;i:np;m:set" -actn ace -ace "n:%UIDSYSTEM%;p:full" -actn ace -ace "n:%UIDAdministrators%;p:full" -actn setowner -ownr "n:%UIDSYSTEM%"
 
 ExitApp
 
-#Include *i %A_ScriptDir%\..\Lib\findexe.ahk
+#include *i %A_LineFile%\..\..\Lib\findexe.ahk
+#include *i %A_LineFile%\..\..\Lib\InteractiveRunAs.ahk
