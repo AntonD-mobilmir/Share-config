@@ -13,7 +13,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 }
 
 find7zexe(exename:="7z.exe", paths*) {
-    local regPaths, bakRegView, i, regpath, currpath, ProgramFilesx86, SystemDrive, findexefunc, path, fullpath
+    local regPaths, bakRegView, i, regpath, currpath, ProgramFilesx86, SystemDrive, path, fullpath
     ;key, value, flag "this is path to exe (only use directory)"
     regPaths := [["HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command",,1]
 		,["HKEY_CURRENT_USER\Software\7-Zip", "Path"]
@@ -33,19 +33,18 @@ find7zexe(exename:="7z.exe", paths*) {
 	Try return Check7zDir(exename, Trim(currpath,""""))
     }
     
-    findexefunc=findexe
-    If(IsFunc(findexefunc)) {
+    If(IsFunc(("findexe"))) {
 	EnvGet ProgramFilesx86,ProgramFiles(x86)
 	EnvGet SystemDrive,SystemDrive
-	Try return %findexefunc%(exename, ProgramFiles . "\7-Zip", ProgramFilesx86 . "\7-Zip", SystemDrive . "\Program Files\7-Zip", SystemDrive . "\Arc\7-Zip")
-	Try return %findexefunc%("7za.exe", SystemDrive . "\Arc\7-Zip")
+	Try return Func("findexe").Call(exename, ProgramFiles . "\7-Zip", ProgramFilesx86 . "\7-Zip", SystemDrive . "\Program Files\7-Zip", SystemDrive . "\Arc\7-Zip")
+	Try return Func("findexe").Call("7za.exe", SystemDrive . "\Arc\7-Zip")
     }
     
     For i,path in paths {
 	Loop Files, %path%, D
 	{
 	    fullpath=%A_LoopFileLongPath%\%exename%
-	    IfExist %fullpath%
+	    If (FileExist(fullpath))
 		return fullpath
 	}
     }

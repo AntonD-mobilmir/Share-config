@@ -75,7 +75,7 @@ EXIT /B
 :CheckForInstallerScript
 (
     FOR /D %%A IN ("%distDir:~0,-1%" "%distDir%..") DO (
-        FOR %%B IN (update autoupdate) DO ( & REM install_silently update reinstall install
+        FOR %%B IN (update autoupdate) DO (
             FOR %%C IN ("%%~A\%%~B.ahk" "%%~A\%%~B.cmd") DO IF EXIST "%%~C" (
                 SET "installerPath=%%~C"
                 SET "installertype=%%~xC"

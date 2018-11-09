@@ -6,7 +6,7 @@ InteractiveRunAs(runCmdLine := "") {
     If (RunInteractiveInstalls!="0") {
         If (runCmdLine == "")
             runCmdLine := DllCall( "GetCommandLine", "Str" )
-        Run "*RunAs " runCmdLine
+        Run *RunAs %runCmdLine%
     } Else
         Throw Exception("Need to RunAs, but RunInteractiveInstalls=0",-1,A_ThisFunc)
 }

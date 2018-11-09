@@ -47,8 +47,9 @@ SETLOCAL ENABLEEXTENSIONS
 
     REM Uninstall quickstart
     FOR /D %%I IN ("%ProgramFilesx86%\Java\jre*") DO "%%~I\bin\jqs.exe" -unregister
-
     CALL "%~dp0HideStartMenuIcons.cmd"
+
+    CALL :Compact "%ProgramData%\Oracle\Java"
     rem EXIT /B %InstallError% -- SET is in same subsection
 EXIT /B %ERRORLEVEL%
 )
@@ -72,3 +73,9 @@ EXIT /B
 	SET "LatestDate=%CurrentDate%"
     )
 EXIT /B
+
+:Compact
+(
+    FOR %%O IN ("/EXE:LZX" "") DO ECHO %SystemRoot%\System32\COMPACT.exe /C %%~O /S:"%ProgramData%\Oracle\Java" && EXIT /B
+EXIT /B
+)
