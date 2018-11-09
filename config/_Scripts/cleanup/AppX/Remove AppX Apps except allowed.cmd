@@ -103,6 +103,7 @@ Microsoft.ECApp_*
 Microsoft.GetHelp_*
 Microsoft.Getstarted_*
 Microsoft.HEIFImageExtension_*
+Microsoft.Language*
 Microsoft.LockApp_*
 Microsoft.Messaging_*
 Microsoft.Microsoft3DViewer_*
@@ -139,3 +140,9 @@ Microsoft.ZuneMusic_*
 Microsoft.ZuneVideo_*
 windows.*
 Windows.*
+Microsoft.HEVCVideoExtension_*
+Microsoft.MPEG2VideoExtension_*
+E046963F.LenovoCompanion_*
+E046963F.LenovoUtility_*
+CyberLinkCorp.th.Power2GoforLenovo_*
+CyberLinkCorp.th.PowerDVDforLenovo_*

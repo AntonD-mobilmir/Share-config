@@ -95,3 +95,5 @@ Microsoft.ZuneVideo_*
 Windows.CBSPreview_*
 windows.immersivecontrolpanel_*
 Windows.PrintDialog_*
+
+Microsoft.LanguageExperiencePackru-ru_*

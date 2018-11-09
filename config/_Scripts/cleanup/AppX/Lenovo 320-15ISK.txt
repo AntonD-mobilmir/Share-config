@@ -1,0 +1,6 @@
+Microsoft.HEVCVideoExtension_*
+Microsoft.MPEG2VideoExtension_*
+E046963F.LenovoCompanion_*
+E046963F.LenovoUtility_*
+CyberLinkCorp.th.Power2GoforLenovo_*
+CyberLinkCorp.th.PowerDVDforLenovo_*
