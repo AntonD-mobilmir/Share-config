@@ -25,11 +25,15 @@ uninstCount := uninstList.Length()
 fhLog := FileOpen(A_Desktop "\" A_ScriptName "." A_Now ".txt", "a")
 Progress A M R0-%uninstCount%, `n`n`n, Uninstalling…
 For i, uninstStrArr in uninstList {
+    If (!uninstStrArr[3])
+        continue
+    
     keyFound := 0
     For i, rv in regViews {
         Loop Reg, % uninstStrArr[3]
             keyFound := 1, break
     } Until keyFound
+    
     If (!keyFound)
         continue
     uninstName := uninstStrArr[4]
