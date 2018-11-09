@@ -82,10 +82,10 @@ IF DEFINED desthost CALL :SetDesthostVars || EXIT /B 1
 (
     ECHO Архив с дистрибутивами: %DistributivesArchive%
     ECHO MSI для установки: %InstallMSI%
+    ECHO Скрипт настроек: %SettingsScript%
     IF DEFINED RemoveMSI ECHO MSI для удаления: %RemoveMSI%
     %exe7z% e -y -aoa -- "%DistributivesArchive%" "%InstallMSI%" %quotedRemoveMSI%||%ErrorCmd%
     COPY /B /Y "%srcpath%PostFormData.ahk"
-    ECHO Скрипт настроек: %SettingsScript%
     COPY /B /Y "%srcpath%%SettingsScript%"
     IF DEFINED RegConfigFullPath (
 	ECHO reg-файл с настройками: %RegConfigFullPath%
@@ -192,17 +192,18 @@ EXIT /B
     DEL "%listtemp%"
     
     SET /P "MSINum=Выбранный вариант:"
-    IF "%MSINum%"=="0" (
-	SET "RemoveMSI=TeamViewer_Host.msi"
-	SET "InstallMSI=TeamViewer.msi"
-	SET "RegConfigName=TeamViewer.reg"
-	EXIT /B
-    )
+    REM MSINum defined above
 )
-(	REM MSINum defined above
-    FOR /F "usebackq delims=" %%I IN (`ECHO %%MSI%MSINum%%%`) DO (
-	SET "InstallMSI=%%I"
-	SET "RegConfigName=%%~nI.reg"
+(
+    IF "%MSINum%"=="0" (
+        SET "RemoveMSI=TeamViewer_Host.msi"
+        SET "InstallMSI=TeamViewer.msi"
+        SET "RegConfigName=TeamViewer.reg"
+    ) ELSE (
+        FOR /F "usebackq delims=" %%I IN (`ECHO %%MSI%MSINum%%%`) DO (
+            SET "InstallMSI=%%I"
+            SET "RegConfigName=%%~nI.reg"
+        )
     )
 EXIT /B
 )
