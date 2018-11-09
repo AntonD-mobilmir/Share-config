@@ -11,7 +11,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     rem 	cscript.exe %windir%\System32\slmgr.vbs /ato &
     rem но это вызывает двойную активацию на Win10
     SET "key=%~1"
-    IF NOT DEFINED key IF NOT "%RunInteractiveInstalls%"=="0" SET /P "=Ключ: "
+    IF NOT DEFINED key IF NOT "%RunInteractiveInstalls%"=="0" SET /P "key=Ключ: "
     IF NOT DEFINED ErrorCmd (
 	IF "%RunInteractiveInstalls%"=="0" (
 	    SET "ErrorCmd=ping -n 30 127.0.0.1 >nul"
