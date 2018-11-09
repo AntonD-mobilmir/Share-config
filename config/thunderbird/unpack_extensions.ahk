@@ -3,6 +3,7 @@
 #NoEnv
 
 EnvGet SystemDrive,SystemDrive
+EnvGet SystemRoot,SystemRoot
 global defaultConfig
 Try retailDept := getDefaultConfigFileName() = "Apps_dept.7z"
 
@@ -20,68 +21,47 @@ If (!destDir) {
     }
 }
 
-If (retailDept) {
-    userOrSID = S-1-5-11;s:y ;Authenticated Users
-} Else {
-    userOrSID = %A_UserName%;s:n
+unpackArchiveSuffixes := ["", (retailDept ? "" : "-not" ) . "-retail"]
+For i, suff in unpackArchiveSuffixes {
+    arcName = %srcDir%\staged%suff%.7z
+    If (FileExist(arcName))
+        Run7z("x -aoa -o""" destDir "\staged"" -- """ arcName """")
 }
 
-profilesSubkey = SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
-Loop Reg, HKEY_LOCAL_MACHINE\%profilesSubkey%, K
-{
-    RegRead profilePath, %A_LoopRegKey%\%profilesSubkey%\%A_LoopRegName%, ProfileImagePath
-    If ( (profilePath . "\") = SubStr(destDir, 1, StrLen(profilePath) + 1) ) {
-	userOrSID := A_LoopRegName . ";s:y"
-	break
-    }
-}
+;If (retailDept) { ;Authenticated Users
+;    userIcacls = *S-1-5-11
+;} Else {
+;    userIcacls = %A_UserName%
+;}
 
-arg7z = x -aoa -o"%destDir%\staged" -- "%srcDir%\staged.7z"
-Run7z(arg7z)
-If (retailDept) {
-    arg7z = x -aoa -o"%destDir%\staged" -- "%srcDir%\staged-retail.7z"
-} Else {
-    arg7z = x -aoa -o"%destDir%\staged" -- "%srcDir%\staged-not-retail.7z"
-}
-Run7z(arg7z)
+;profilesSubkey = SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
+;Loop Reg, HKEY_LOCAL_MACHINE\%profilesSubkey%, K
+;{
+;    RegRead profilePath, %A_LoopRegKey%\%profilesSubkey%\%A_LoopRegName%, ProfileImagePath
+;    If ( (profilePath . "\") = SubStr(destDir, 1, StrLen(profilePath) + 1) ) {
+;	userIcacls := "*" . A_LoopRegName
+;	break
+;    }
+;}
 
-findexefunc:="findexe"
-If(IsFunc(findexefunc)) {
-    Try SetACLexe := %findexefunc%(SystemDrive . "\SysUtils\SetACL.exe", "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils")
-} Else {
-    SetACLexe:=SystemDrive . "\SysUtils\SetACL.exe"
-}
-
-RunWait "%SetACLexe%" -on "%destDir%" -ot file -actn ace -ace "n:%userOrSID%;p:change;i:so`,sc;m:set;w:dacl",, Min UseErrorLevel
-
+; no more binary components
+;RunWait "%SystemRoot%\System32\icacls.exe" "%destDir%" /grant:r "%userIcacls%:(OI)(CI)M",, Min UseErrorLevel
 Exit
 
 Run7z(args) {
     static exe7z
     If (!exe7z) {
-	find7zexefunc:="find7zexe"
-	find7zaexefunc:="find7zaexe"
-	If(IsFunc(find7zexefunc)) {
-	    Try {
-		exe7z := %find7zexefunc%("7zg.exe")
-	    } Catch {
-		Try {
-		    exe7z := %find7zexefunc%()
-		} Catch {
-		    Try exe7z := %find7zaexefunc%()
-		}
-	    }
-	} Else {
-	    Throw "Не найден 7-Zip, архивы дополнений Thunderbird не будут распакованы."
-	}
+        exe7z := find7zGUIorAny()
+        If (!exe7z)
+            Throw Exception("Не найден 7-Zip, архивы дополнений Thunderbird не будут распакованы.")
     }
     
     RunWait "%exe7z%" %args%,, UseErrorlevel
     If (ErrorLevel)
-	MsgBox После выполненя`n"%exe7z%" %args%`nобнаружен код ошибки: %ErrorLevel%
+	Throw Exception(exe7z " " args " завершился с ошибкой " ErrorLevel)
 }
 
-#Include %A_ScriptDir%\..\_Scripts\Lib\getDefaultConfig.ahk
-#Include *i %A_ScriptDir%\..\_Scripts\Lib\find7zexe.ahk
+#include %A_ScriptDir%\..\_Scripts\Lib\getDefaultConfig.ahk
+#include *i %A_ScriptDir%\..\_Scripts\Lib\find7zexe.ahk
 
-#Include %A_ScriptDir%\FindThunderbirdProfile.ahk
+#include %A_ScriptDir%\FindThunderbirdProfile.ahk
