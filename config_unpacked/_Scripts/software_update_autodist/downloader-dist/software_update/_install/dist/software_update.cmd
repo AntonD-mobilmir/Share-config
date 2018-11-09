@@ -34,7 +34,7 @@ IF NOT DEFINED DefaultsSource EXIT /B 32010
 IF NOT EXIST "%SUScripts%" (
     %SystemRoot%\System32\net.exe use \\%SUSHost% /Delete
     %SystemRoot%\System32\net.exe use "%SUScripts%" /Delete
-    ECHO.|%SystemRoot%\System32\net.exe use "%SUScripts%" /USER:nobody-%COMPUTERNAME% /PERSISTENT:NO
+    ECHO.|%SystemRoot%\System32\net.exe use "%SUScripts%" /USER:"nobody-%COMPUTERNAME%" /PERSISTENT:NO
 )
 IF NOT EXIST "%SUScripts%" EXIT /B 32003
 IF NOT EXIST "%SUScriptsStatus%" MKDIR "%SUScriptsStatus%" & IF NOT EXIST "%SUScriptsStatus%" EXIT /B 32767
@@ -42,42 +42,49 @@ IF NOT EXIST "%SUScriptsOldLogs%" MKDIR "%SUScriptsOldLogs%" & IF NOT EXIST "%SU
 
 CALL :GetDir configDir "%DefaultsSource%"
 )
-CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
-:NextArg
-(
-IF "%~1"=="" GOTO :NoMoreArgs
-ECHO Unknown argument: %~1. Aborting >&2
-EXIT /B 32100
-SHIFT
-GOTO :NextArg
-)
-:NoMoreArgs
-(
-REM selfupdate
-rem SUScripts=\\%SUSHost%\%SUSPath%\scripts
-"%SystemRoot%\system32\fc.exe" /B "%0" "%SUScripts%\..\_install\dist\software_update.cmd" >NUL 2>&1
-REM One of compared files not exist or somethin more serious
-IF ERRORLEVEL 2 EXIT /B 32200
-REM compared files differ
-IF ERRORLEVEL 1 COPY /B /Y "%SUScripts%\..\_install\dist\software_update.cmd" "%0" & EXIT /B
+IF "%~1"=="" (
+    REM selfupdate
+    rem SUScripts=\\%SUSHost%\%SUSPath%\scripts
+    "%SystemRoot%\system32\fc.exe" /B "%0" "%SUScripts%\..\_install\dist\software_update.cmd" >NUL 2>&1
+    REM One of compared files not exist or somethin more serious
+    IF ERRORLEVEL 2 EXIT /B 32200
+    REM compared files differ
+    IF ERRORLEVEL 1 COPY /B /Y "%SUScripts%\..\_install\dist\software_update.cmd" "%0" & EXIT /B
 
-REM cleanup
-FOR %%I IN ("%SUScriptsStatus%\*.*") DO IF NOT EXIST "%SUScripts%\%%~nI" ECHO Y|MOVE /Y "%%~I" "%SUScriptsOldLogs%"
-%AutohotkeyExe% /ErrorStdOut "%SUScripts%\..\_install\dist\remove old logs.ahk" 1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%" 2>&1
-REM scripts running once if no error
-FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" SET "ScriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
-REM scripts running each time
-FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\!*.*"`) DO SET "ScriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I"
+    
+    REM cleanup
+    FOR %%I IN ("%SUScriptsStatus%\*.*") DO IF NOT EXIST "%SUScripts%\%%~nI" ECHO Y|MOVE /Y "%%~I" "%SUScriptsOldLogs%"
+    
+    REM scripts running once if no error
+    FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
+    REM scripts running each time are postponed
+    FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\!*.*"`) DO SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I"
+    
+    REM %AutohotkeyExe% may still be undefined
+    IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
+    GOTO :removeoldlogs
+) ELSE (
+    ECHO Unknown argument: %~1. Aborting >&2
+    EXIT /B 32100
+)
+:removeoldlogs
+(
+    %AutohotkeyExe% /ErrorStdOut "%SUScripts%\..\_install\dist\remove old logs.ahk" 1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%" 2>&1
 EXIT /B
 )
-:RunUpdate <script-name> <exclusion-suffix-char>
+:RunUpdate <script-name> <exclusion-prefix-char>
 (
-    IF "%ScriptName:~0,1%"=="%~2" EXIT /B
+    IF "%scriptName:~0,1%"=="%~2" EXIT /B
     
     SET "logmsi=%SUScriptsStatus%\%~nx1-msiexec.log"
     SET "log=%SUScriptsStatus%\%~nx1%logsuffix%"
 
-    IF "%~x1"==".cmd" (
+    IF "%~x1"==".reg" (
+        REM IF "%scriptName:~-6%"=="32-bit"
+        REM ELSE IF "%scriptName:~-6%"=="64-bit"
+	ECHO %DATE% %TIME% Importing regfile "%~1"1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%"
+        REG IMPORT "%~1"
+    ) ELSE IF "%~x1"==".cmd" (
 	ECHO %DATE% %TIME% Starting %comspec% /C "%~1"1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%"
 	%comspec% /C %1 1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%" 2>&1
     ) ELSE IF "%~x1"==".ahk" (
