@@ -261,8 +261,7 @@ RemovePercent1(str) {
 
 ClipHook(cliptype) {
     global perfResultsObj, ResultsURL
-    static requiredURLprefix := "http://www.userbenchmark.com/UserRun/"
-	 , WrongContentsErrText := "Ожидается либо URL с префиксом " requiredURLprefix ", либо текст результатов."
+    static requiredURLprefix := "^https?:\/\/www\.userbenchmark\.com\/UserRun\/"
     
     If (cliptype == 1) {
 	Try {
@@ -272,7 +271,7 @@ ClipHook(cliptype) {
 	    return
 	}
     
-    	If ( SubStr(clipContents,1,StrLen(requiredURLprefix)) == requiredURLprefix ) {
+    	If ( clipContents ~= requiredURLprefix ) {
 	    TrayTip Найден URL, %ResultsURL%
 	    ResultsURL := clipContents
 	} Else If ( IsObject(perfResultsObjNew := ParsePerfResults(clipContents)) ) {
@@ -281,11 +280,11 @@ ClipHook(cliptype) {
 	    TrayTip Найден текст с результатами теста, % perfResultsObj.ResultsText
 	    ;MsgBox % perfResultsObj.Desktop . "`n" . 	    perfResultsObj.CPU . "`n" . 	    perfResultsObj.CPUModel . "`n" . 	    perfResultsObj.HDD . "`n" . 	    perfResultsObj.HDDModel . "`n" . 	    perfResultsObj.SSD . "`n" . 	    perfResultsObj.SSDModel
 	} Else {
-	    TrayTip Скопированный текст не подходит, Текст не похож ни на URL`, ни на результаты:`n%WrongContentsErrText%
+	    TrayTip Скопированный текст не подходит, Текст не похож ни на URL`, ни на результаты.`nОжидается либо URL подходящий к маске %requiredURLprefix%`, либо текст результатов.
 	    return
 	}
     } Else {
-	TrayTip Скопирован не текст, %WrongContentsErrText%
+	TrayTip Скопирован не текст, Ожидается либо текст результатов`, либо ссылка на них
 	return
     }
 }
