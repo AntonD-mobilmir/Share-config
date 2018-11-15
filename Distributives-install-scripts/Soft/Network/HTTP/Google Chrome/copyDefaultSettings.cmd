@@ -35,7 +35,7 @@ IF NOT DEFINED configDir CALL :findconfigDir
         SET %1=%2
         EXIT /B
     )
-    IF "%~3"="" EXIT /B 1
+    IF "%~3"=="" EXIT /B 1
     SHIFT /2
     GOTO :SetFirstExistingExe
 )

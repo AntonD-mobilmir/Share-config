@@ -3,6 +3,7 @@
 
 global ScriptTitle := "LibreOffice uninstall and cleanup"
      , silent
+     , remainingFolders := {}
 
 Menu Tray, Tip, %ScriptTitle%
 
@@ -28,9 +29,15 @@ regViews := [32], baseDirs := {(A_ProgramFiles): ""}
 If (A_Is64bitOS) {
     regViews.Push(64)
     For i, envVar in ["ProgramFiles", "ProgramFiles(x86)", "ProgramW6432"] {
-        EnvGet evValue, envVar
-        baseDirs[evValue] := ""
+        EnvGet evValue, %envVar%
+        If (evValue)
+	    baseDirs[evValue] := ""
     }
+}
+
+For baseDir in baseDirs {
+    For j, leafDirName in ["", " 4", " 5"]
+    remainingFolders[baseDir "\LibreOffice" leafDirName] := 0
 }
 
 If (silent)
@@ -48,13 +55,13 @@ For i, regView in regViews {
 	If (SubStr(DisplayName, 1, 12)!="LibreOffice ")
 	    Continue
 	RegRead URLInfoAbout, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLInfoAbout
-	If (!(URLInfoAbout == "https://www.libreoffice.org/" || URLInfoAbout == "http://www.documentfoundation.org" || URLInfoAbout == "https://www.documentfoundation.org"))
+	If (!(URLInfoAbout ~= "https?:\/\/www\.documentfoundation\.org|https.:\/\/www\.libreoffice\.org/"))
 	    Continue
         
 	RegRead InstallLocation, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, InstallLocation
 	baseDirFound := 0
 	For baseDir in baseDirs
-            If (StartsWith(InstallLocation, baseDir)) {
+            If (StartsWith(InstallLocation, baseDir "\Libre")) {
                 baseDirFound := 1
                 break
             }
@@ -75,15 +82,19 @@ For i, regView in regViews {
                     Exit %ErrorLevel%
                 }
             } Else {
-                TrayTip %ScriptTitle%, Удаление папки %InstallLocation%,,16
-                FileRemoveDir %InstallLocation%, 1
+                remainingFolders[InstallLocation]++
                 uninstCount++
             }
             break
         }
     }
 }
-If (!uninstCount) {
+If (uninstCount) {
+    For InstallLocation in remainingFolders {
+        TrayTip %ScriptTitle%, Удаление папки %InstallLocation%,,16
+        FileRemoveDir %InstallLocation%, 1
+    }
+} Else {
     If (!silent)
 	MsgBox 0x30, %ScriptTitle%, LibreOffice не найден в списке установки и удаления программ., 120
     ExitApp 1
