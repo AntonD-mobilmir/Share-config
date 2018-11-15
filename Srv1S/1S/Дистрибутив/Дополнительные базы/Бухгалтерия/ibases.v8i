@@ -8,7 +8,7 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.10.2753
+Version=8.3.12.1714
 [Бухгалтерия 2.0 ООО]
 Connect=Srvr="Srv1S-R.office0.mobilmir:1541";Ref="Accounting2Opt";
 ID=bafb9740-8e07-4b13-99f7-1b7da0826841
@@ -19,4 +19,4 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.10.2753
+Version=8.3.12.1714

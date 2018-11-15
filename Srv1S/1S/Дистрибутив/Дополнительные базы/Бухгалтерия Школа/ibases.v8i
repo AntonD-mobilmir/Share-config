@@ -1,5 +1,5 @@
 ﻿[Бухгалтерия 3.0 Школа]
-Connect=Srvr="Srv1S-b.office0.mobilmir:1541";Ref="AccountingSchool";
+Connect=Srvr="Srv1S-R.office0.mobilmir:1541";Ref="Accounting3School";
 ID=f96e96a4-1a32-4452-bc18-161ebcbc05c6
 OrderInList=33088
 Folder=/
@@ -8,4 +8,4 @@ External=0
 ClientConnectionSpeed=Normal
 App=Auto
 WA=1
-Version=8.3.10.2753
+Version=8.3.12.1714
