@@ -4,43 +4,45 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 ECHO OFF
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    
+    REM IF NOT DEFINED configDir CALL :findconfigDir
+    SET "configDir=\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\"
+    IF NOT DEFINED exe7z CALL :RunFromConfig "_Scripts\find7zexe.cmd" || CALL :SetFirstExistingExe exe7z "%~dp0..\..\PreInstalled\utils\7za.exe" || EXIT /B
+    CALL :SetFirstExistingExe gpgexe "%LocalAppData%\Programs\SysUtils\gnupg\gpg.exe" || IF NOT DEFINED gpgexe CALL :RunFromConfig "_Scripts\findgpgexe.cmd" || EXIT /B
 
-SET exe7z="c:\Program Files\7-Zip\7z.exe"
-SET gpgexe="D:\Users\LogicDaemon\AppData\Local\Programs\SysUtils\gnupg\gpg.exe"
-
-RD /S /Q "%TEMP%\%~n0.tmp"
-MKDIR "%TEMP%\%~n0.tmp"
+    RD /S /Q "%TEMP%\%~n0.tmp"
+    MKDIR "%TEMP%\%~n0.tmp"
 )
 PUSHD "%TEMP%\%~n0.tmp" && (
-    rem MKDIR "Distributives\config\_Scripts"
-    rem XCOPY "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\scriptUpdater.ahk" "Distributives\config\_Scripts\" /I
-    %exe7z% x "\\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\D.7z" "Local_Scripts\*"
+    %exe7z% x "%configDir%Users\depts\D.7z" "Local_Scripts\*"
     
     %exe7z% a SharedLocal.7z
     
-    COPY \\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\dist.7z MailLoader-dist.7z
+    COPY /B "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\MailLoader\dist.7z" MailLoader-dist.7z
     
-    COPY \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\ScriptUpdater_dist\ScriptUpdater.7z
-    COPY \\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\Shortcuts.7z
-    COPY \\Srv0.office0.mobilmir\profiles$\Share\config\Users\depts\Shortcuts_64bit.7z
+    COPY /B "%configDir%_Scripts\ScriptUpdater_dist\ScriptUpdater.7z"
+    COPY /B "%configDir%Users\depts\Shortcuts.7z"
+    COPY /B "%configDir%Users\depts\Shortcuts_64bit.7z"
+    
+    COPY /B "%configDir%_Scripts\software_update_autodist\downloader-dist.7z" "software_update_autodist downloader-dist.7z"
+    COPY /B "%configDir%_Scripts\software_update_autodist\software_update.7z" "software_update_autodist software_update.7z"
     
     FOR %%A IN (*.*) DO (
-	%gpgexe% -o "%%~A.curr" -d "%~dp0%%~nxA.gpg"
-	ECHO Comparing "%%~A" and "%~dp0%%~nxA.gpg"
-	C:\SysUtils\UnxUtils\cmp.exe -s "%%~A" "%%~A.curr" || CALL :Compare "%%~A" "%%~A.curr" || (
-	    SET "a="
-	    SET /P "a=Verify changes. Any text to sign, Enter to cancel >"
-	    IF DEFINED a (
-		%gpgexe% --sign "%%~A"
-		MOVE /Y "%%~A.gpg" "%~dp0"
-	    )
-	)
-	rem DEL "%%~A" "%%~A.curr"
+        %gpgexe% -o "%%~A.curr" -d "%~dp0%%~nxA.gpg"
+        ECHO Comparing "%%~A" and "%~dp0%%~nxA.gpg"
+        C:\SysUtils\UnxUtils\cmp.exe -s "%%~A" "%%~A.curr" || CALL :Compare "%%~A" "%%~A.curr" || (
+            SET "a="
+            SET /P "a=Verify changes. Non-empty string to sign, Enter to cancel >"
+            IF DEFINED a (
+                %gpgexe% --sign "%%~A"
+                MOVE /Y "%%~A.gpg" "%~dp0"
+            )
+        )
+        rem DEL "%%~A" "%%~A.curr"
     )
+    POPD
+    EXIT /B
 )
-EXIT /B
 :Compare
 (
     IF "%~x1"==".7z" GOTO :CompareArcs
@@ -70,4 +72,34 @@ EXIT /B
     rem -s  --report-identical-files  Report when two files are the same.
     C:\SysUtils\UnxUtils\diff.exe -bqdNTr "%~1.new" "%~1.old" || START "" /B "C:\Program Files (x86)\KDiff3\kdiff3.exe" "%~1.new" "%~1.old"
     EXIT /B
+)
+
+:RunFromConfig
+IF NOT DEFINED configDir CALL :findconfigDir
+(
+    IF "%~x1"==".cmd" (
+        CALL "%configDir%"%*
+    ) ELSE "%configDir%"%*
+    EXIT /B
+)
+:SetFirstExistingExe <varname> <path1> <path2> <...>
+(
+    IF EXIST %2 (
+        SET %1=%2
+        EXIT /B
+    )
+    IF "%~3"=="" EXIT /B 1
+    SHIFT /2
+    GOTO :SetFirstExistingExe
+)
+:findconfigDir
+IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
+(
+    CALL :GetDir configDir "%DefaultsSource%"
+EXIT /B
+)
+:GetDir
+(
+    SET "%~1=%~dp2"
+EXIT /B
 )
