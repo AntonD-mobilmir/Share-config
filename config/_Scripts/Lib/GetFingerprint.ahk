@@ -119,6 +119,8 @@ GetFingerprint_GetForgedValues() {
 			 , "SerNum3": ""
 			 , "Default string": ""
 			 , "N/A": ""
+			 , "Unknow": ""
+			 , "Unknow Unknow Unknow": "" ; https://trello.com/c/uTCFOTJW/77
 			 , "None": "" }
     return SkipValues
 }
