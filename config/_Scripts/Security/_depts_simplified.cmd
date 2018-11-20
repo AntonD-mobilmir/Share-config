@@ -46,11 +46,16 @@ rem FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SE
     CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
     ECHO Настройка доступа к стандартным общим папкам
     CALL "%srcpath%FSACL_PublicDirsRoot.cmd" "%ProfilesDirectory%\Public" "%ProfilesDirectory%\All Users" "%ProfilesDirectory%\Default User"
-    ECHO Настройка доступа к d:\dealer.beeline.ru и d:\Mail\Thunderbird\profile
-    CALL :ResetACL d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
-    CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\dealer.beeline.ru d:\Mail\Thunderbird\profile 
-    ECHO Разрешение записи и выполнения в d:\Mail\Thunderbird\profile\extensions, "d:\Program Files", "D:\dealer.beeline.ru\bin"
-    CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files" "D:\dealer.beeline.ru\bin"
+    REM d:\dealer.beeline.ru и 
+    ECHO Настройка доступа к d:\Mail\Thunderbird\profile
+    REM d:\dealer.beeline.ru
+    CALL :ResetACL d:\Mail\Thunderbird\profile 
+    REM d:\dealer.beeline.ru
+    CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile 
+    REM , "D:\dealer.beeline.ru\bin"
+    ECHO Разрешение записи и выполнения в d:\Mail\Thunderbird\profile\extensions, "d:\Program Files"
+    REM "D:\dealer.beeline.ru\bin"
+    CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files"
     ECHO Настройка доступа к папке истории файлов
     CALL "%srcpath%FSACL_FileHistory.cmd"
 EXIT /B
