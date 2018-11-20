@@ -38,7 +38,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
 )
 (
-    %AutohotkeyExe% "%ScriptUpdaterDir%\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts.7z" https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1
+    %AutohotkeyExe% /ErrorStdOut "%ScriptUpdaterDir%\scriptUpdater.ahk" "%configDir%Users\depts\Shortcuts.7z" "https://www.dropbox.com/s/hc73p6v080ffajy/Shortcuts.7z.gpg?dl=1"
     FOR %%A IN ("%configDir%Users\depts\Shortcuts.7z") DO IF NOT "%lastShortcutsTime%"=="%%~tA" SET "ShortcutsTime=%%~tA"
     IF DEFINED OS64bit (
 	%AutohotkeyExe% "%ScriptUpdaterDir%\scriptUpdater.ahk" /ErrorStdOut "%configDir%Users\depts\Shortcuts_64bit.7z" https://www.dropbox.com/s/0hhm20a0oemp1m9/Shortcuts_64bit.7z.gpg?dl=1
@@ -77,8 +77,8 @@ EXIT /B
 )
 (
     (
-    ECHO %ShortcutsTime%
-    ECHO %Shortcuts_64bitTime%
+        ECHO %ShortcutsTime%
+        ECHO %Shortcuts_64bitTime%
     )>"%scriptConfDir%\lastUnpacked.txt"
     START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeNftB3Rwx9ztsZn6FD3mHbAOR87-nxPMaeSle80obZAIR3TQ/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%" "entry.1400183939=%USERNAME%"
 EXIT /B
