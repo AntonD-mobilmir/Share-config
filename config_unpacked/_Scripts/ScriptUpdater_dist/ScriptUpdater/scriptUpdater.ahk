@@ -58,7 +58,8 @@ If (StartsWith(clURL, "http")) {
     }
     ExitApp UpdateScript(destPath, checkPeriod, clURL, gpgFName)
 } Else {
-    SharedLocalScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" . (SharedLocalGPGFName := "SharedLocal.7z.gpg") . "?dl=1"
+    SharedLocalGPGFName := "SharedLocal.7z.gpg"
+    SharedLocalScriptsURL := "https://www.dropbox.com/s/jec74kwu40wjqgm/" SharedLocalGPGFName "?dl=1"
     checkPeriod=
     Loop %0%
     {

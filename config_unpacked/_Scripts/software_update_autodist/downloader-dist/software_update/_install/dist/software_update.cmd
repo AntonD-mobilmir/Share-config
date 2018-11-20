@@ -50,18 +50,17 @@ IF "%~1"=="" (
     IF ERRORLEVEL 2 EXIT /B 32200
     REM compared files differ
     IF ERRORLEVEL 1 COPY /B /Y "%SUScripts%\..\_install\dist\software_update.cmd" "%0" & EXIT /B
-
     
     REM cleanup
     FOR %%I IN ("%SUScriptsStatus%\*.*") DO IF NOT EXIST "%SUScripts%\%%~nI" ECHO Y|MOVE /Y "%%~I" "%SUScriptsOldLogs%"
     
+    REM %AutohotkeyExe% may still be undefined
+    IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
     REM scripts running once if no error
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
     REM scripts running each time are postponed
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\!*.*"`) DO SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I"
     
-    REM %AutohotkeyExe% may still be undefined
-    IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
     GOTO :removeoldlogs
 ) ELSE (
     ECHO Unknown argument: %~1. Aborting >&2
@@ -69,7 +68,7 @@ IF "%~1"=="" (
 )
 :removeoldlogs
 (
-    %AutohotkeyExe% /ErrorStdOut "%SUScripts%\..\_install\dist\remove old logs.ahk" 1>>"%SUScriptsStatus%\%~nx1%logrunningsuffix%" 2>&1
+    START "" /LOW %AutohotkeyExe% /ErrorStdOut "%SUScripts%\..\_install\dist\remove old logs.ahk"
 EXIT /B
 )
 :RunUpdate <script-name> <exclusion-prefix-char>
