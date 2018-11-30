@@ -194,7 +194,7 @@ Defrag(ByRef path) {
 UninstallMSI(path) {
     Loop
     {
-        RunWait "%A_WinDir%\System32\MsiExec.exe" /X"%A_LoopRegName%" %argsmsiexec% /norestart,,UseErrorLevel
+        RunWait "%A_WinDir%\System32\MsiExec.exe" /X"%path%" /qn /norestart,,UseErrorLevel
         If (ErrorLevel) {
             If (ErrorLevel==1618) { ; Another install is currently in progress
                 FileAppend %A_Now% Error %ErrorLevel% uninstalling %path%: another install currently in progress`, waiting 30 s [try %A_Index%]`n, *, CP1
