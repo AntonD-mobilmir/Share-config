@@ -117,7 +117,7 @@ user_pref("extensions.addressbookssync.synctype", "local");
 user_pref("extensions.addressbookssync.timeddownload", false);
 user_pref("extensions.addressbookssync.timedupload", false);
 user_pref("extensions.awsome_auto_archive.alert_show_time", 0);
-user_pref("extensions.awsome_auto_archive.messages_size_limit", 500);
+user_pref("extensions.awsome_auto_archive.messages_size_limit", 50);
 //user_pref("extensions.awsome_auto_archive.rules", "[{\"enable\":true,\"action\":\"archive\",\"src\":\"imap://{$MailUserId$}%40{$MailDomain$}@imap.googlemail.com/INBOX\",\"sub\":0,\"age\":180}]");
 user_pref("extensions.awsome_auto_archive.rules", "[{\"enable\":true,\"action\":\"archive\",\"src\":\"imap://{$MailUserId$}%40{$MailDomain$}@imap.googlemail.com/INBOX\",\"sub\":0,\"age\":180},{\"enable\":true,\"action\":\"archive\",\"src\":\"imap://{$MailUserId$}%40{$MailDomain$}@imap.googlemail.com/[Gmail]/&BB4EQgQ,BEAEMAQyBDsENQQ9BD0ESwQ1-\",\"sub\":0,\"age\":180}]");
 user_pref("extensions.awsome_auto_archive.show_folder_as", 1);
