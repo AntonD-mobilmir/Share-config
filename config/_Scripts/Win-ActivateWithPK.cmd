@@ -7,9 +7,6 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
-    rem после cls было:
-    rem 	cscript.exe %windir%\System32\slmgr.vbs /ato &
-    rem но это вызывает двойную активацию на Win10
     SET "key=%~1"
     IF NOT DEFINED key IF NOT "%RunInteractiveInstalls%"=="0" SET /P "key=Ключ: "
     IF NOT DEFINED ErrorCmd (
@@ -20,6 +17,12 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 )
 (
 %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /ipk "%key%" || %ErrorCmd%
-IF NOT ERRORLEVEL 1 CLS & %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /cpky || %ErrorCmd%
+IF NOT ERRORLEVEL 1 CLS
+rem 	cscript.exe %windir%\System32\slmgr.vbs /ato &
+rem вызывает двойную активацию на Win10 до 1809Oct. 1809Oct без этого ключа не активируется ;-(
+SET "Activate=1"
+CALL "%~dp0CheckWinVer.cmd" 10.0 && CALL "%~dp0CheckWinVer.cmd" 10.0.17763.134 || SET "Activate="
+IF DEFINED Activate %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /ato || %ErrorCmd%
+%SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /cpky || %ErrorCmd%
 EXIT /B
 )
