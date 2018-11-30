@@ -57,23 +57,23 @@ SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
     CALL :backupACLFlagSubdir "%tgt%\AppData\Roaming\Microsoft\Windows\CloudStore" "AppDataRoamingMicrosoftWindowsCloudStore" || EXIT /B
     
     REM take ownership just in case; will be handled back after permissions setup
-    ECHO %DATE% %TIME% Сброс владельца для "%tgt%"
+    CALL :LogWithDate Сброс владельца для "%tgt%"
     CALL "%~dp0TAKEOWN_SKIPSL.cmd" /F "%tgt%" /A >NUL
     rem CALL "%~dp0..\CheckWinVer.cmd" 6.2 && %SystemRoot%\System32\TAKEOWN.exe /F "%tgt%" /A /R /D Y /SKIPSL >NUL
     rem IF ERRORLEVEL 1 %SystemRoot%\System32\TAKEOWN.exe /F "%tgt%" /A /R /D Y >NUL
     REM -rec cont_obj -actn setowner -ownr "n:%saUIDAdministrators%"
-    ECHO %DATE% %TIME% Сброс ACL для "%tgt%"
+    CALL :LogWithDate Сброс ACL для "%tgt%"
     %SetACLexe% -on "%tgt%" -ot file -rec cont_obj -actn rstchldrn -rst dacl -ignoreerr -silent
     REM Allow users modify, do not allow execute
-    ECHO %DATE% %TIME% Разрешение пользователю менять "%tgt%", запретить запускать программы
+    CALL :LogWithDate Разрешение пользователю менять "%tgt%", запретить запускать программы
     %SetACLexe% -on "%tgt%" -ot file -actn setprot -op "dacl:p_nc;sacl:np" -actn clear -clr dacl -actn ace -ace "n:%saUIDAdministrators%;p:full;i:sc,so" -actn ace -ace "n:%saUIDSYSTEM%;p:full;i:sc,so" -actn ace -ace "n:%saUIDProfileOwner%;p:change,FILE_DELETE_CHILD;i:sc" -actn ace -ace "n:%saUIDProfileOwner%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so" -ignoreerr -silent
-    ECHO %DATE% %TIME% Смена владельца "%tgt%" на %saUIDProfileOwner%
+    CALL :LogWithDate Смена владельца "%tgt%" на %saUIDProfileOwner%
     %SetACLexe% -on "%tgt%" -ot file -rec cont_obj -actn setowner -ownr "n:%saUIDProfileOwner%" -ignoreerr -silent
     rem %SetACLexe% -on "%tgt%\AppData\Local\Temp" -ot file -actn clear -clr dacl -actn rstchldrn -rst dacl -actn ace -ace "n:%saUIDAdministrators%;p:full;i:sc,so" -actn ace -ace "n:%saUIDSYSTEM%;p:full;i:sc,so" -actn ace -ace "n:%saUIDProfileOwner%;p:change,FILE_DELETE_CHILD;i:sc" -actn ace -ace "n:%saUIDProfileOwner%;p:write,read,FILE_DELETE_CHILD,DELETE;i:io,so"
     
     rem defaults: %user%	1	DACL(protected):СИСТЕМА,full,allow,container_inherit+object_inherit:Администраторы,full,allow,container_inherit+object_inherit:%user%,full,allow,container_inherit+object_inherit;Owner:СИСТЕМА;Group:СИСТЕМА
     
-    ECHO %DATE% %TIME% Установка владельца и специальных ACL для некоторых папок, как в профиле по умолчанию
+    CALL :LogWithDate Установка владельца и специальных ACL для некоторых папок, как в профиле по умолчанию
     CALL :SetSystemOwnerAndGroup "%tgt%" "%tgt%\AppData\Local\Microsoft\Windows\UPPS\UPPS.bin" "%tgt%\AppData\Local\TileDataLayer\Database\EDBtmp.log" "%tgt%\Application Data" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History"
      
     
@@ -84,7 +84,7 @@ SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
     
     CALL :SetSystemOwnerAndGroupForFiles "%tgt%\AppData\Local\Microsoft\Windows\UsrClass.dat*" "%tgt%\ntuser.dat*" "%tgt%\ntuser.ini" "%tgt%\AppData\Local\Microsoft\Windows\UPPS\UPPS.bin" "%tgt%\AppData\Local\TileDataLayer\Database\EDBtmp.log"
     CALL "%~dp0..\CheckWinVer.cmd" 6 && (
-        ECHO %DATE% %TIME% Запрет просмотра списка файлов для некоторых папок
+        CALL :LogWithDate Запрет просмотра списка файлов для некоторых папок
         REM DACL(not_protected+auto_inherited):Все,FILE_LIST_DIRECTORY,deny,no_inheritance;Owner:СИСТЕМА;Group:СИСТЕМА
         CALL :DenyListDirectory "%saUIDEveryone%" "%tgt%\AppData\Local\Application Data" "%tgt%\AppData\Local\History" "%tgt%\AppData\Local\Microsoft\Windows\INetCache\Content.IE5" "%tgt%\AppData\Local\Microsoft\Windows\Temporary Internet Files" "%tgt%\AppData\Local\Temporary Internet Files" "%tgt%\AppData\Roaming\Microsoft\Windows\Start Menu\Программы" "%tgt%\Application Data" "%tgt%\Cookies" "%tgt%\Documents\Мои видеозаписи" "%tgt%\Documents\мои рисунки" "%tgt%\Documents\Моя музыка" "%tgt%\Local Settings" "%tgt%\NetHood" "%tgt%\PrintHood" "%tgt%\Recent" "%tgt%\SendTo" "%tgt%\главное меню" "%tgt%\Мои документы" "%tgt%\Шаблоны"
     )
@@ -96,9 +96,9 @@ SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
     rem AppData\Local\Microsoft\Windows\INetCache\counters.dat	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read_execute,allow,no_inheritance;
     rem AppData\Local\Microsoft\Windows\INetCache\counters2.dat	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету, включая входящие подключения из Интернета,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Домашние или рабочие сети,read_execute,allow,no_inheritance
 
-    ECHO %DATE% %TIME% Разрешение изменения и выполнения файлов из некоторых папок
+    CALL :LogWithDate Разрешение изменения и выполнения файлов из некоторых папок
     CALL "%srcpath%FSACL_Change.cmd" "%saUIDProfileOwner%" "%tgt%\Mail\Thunderbird\profile\extensions" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs"
-    REM исправление последствий опечатки --- \ в конце предыдущей строки
+    CALL :LogWithDate Исправление последствий опечатки --- \ в конце предыдущей команды
     %SetACLexe% -on \ -ot file -actn ace -ace "n:%saUIDProfileOwner%;p:change;i:so,sc;m:revoke;w:dacl" -ignoreerr -silent
     
     CALL :restoreACLUnflagSubdir "%tgt%\AppData\Local\Packages" "AppDataLocalPackages"
@@ -110,6 +110,11 @@ SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
     rem without FULL access to TEMP, HP MF driver hangs when printing non-PDFs :(
     FOR /F "usebackq delims=" %%Z IN ("%~dp0Allow TEMP full access.txt") DO IF /I "%COMPUTERNAME%"=="%%Z" %SetACLexe% -on "%tgt%\AppData\Local\Temp" -ot file -rec cont_obj -actn setowner -ownr "n:%saUIDProfileOwner%" -actn rstchldrn -rst dacl -actn ace -ace "n:%saUIDProfileOwner%;p:full" -ignoreerr -silent
     POPD
+EXIT /B
+)
+:LogWithDate
+(
+    ECHO %DATE% %TIME% %*
 EXIT /B
 )
 :SetSystemOwnerAndGroup
@@ -141,9 +146,9 @@ GOTO :CheckArgShift
 (
     IF NOT EXIST %1 EXIT /B 0
     IF EXIST "%~2.flag" CALL :AskRestoreACL %* || EXIT /B
-    (ECHO %DATE% %TIME% Запущено создание резервной копии от имени %USERNAME%)>>"%ACLBackupDir%\%~2.flag"
+    (CALL :LogWithDate Запущено создание резервной копии от имени %USERNAME%)>>"%ACLBackupDir%\%~2.flag"
     CALL :backupACL %1 %2
-    (ECHO %DATE% %TIME% Резервная копия сохранена, не восстановлена)>>"%ACLBackupDir%\%~2.flag"
+    (CALL :LogWithDate Резервная копия сохранена, не восстановлена)>>"%ACLBackupDir%\%~2.flag"
 EXIT /B
 )
 :backupACL <path> <backup-name>
@@ -188,9 +193,11 @@ EXIT /B
     FOR %%A IN ("%restoreMask%") DO CALL :RememberIfLatest restoreFile "%%A"
     IF NOT DEFINED restoreFile EXIT /B 1
 )
+(
     ECHO %DATE% %TIME% Восстановление сохранённых ACL для %1
     %SetACLexe% -on %1 -ot file -actn restore -bckp "%restoreFile%" -ignoreerr -silent && DEL "%ACLBackupDir%\%~2.flag"
     EXIT /B
+)
 :restoreACLUnflagSubdir <path> <backup-name>
 (
     ECHO %DATE% %TIME% Восстановление сохранённых ACL для %1
