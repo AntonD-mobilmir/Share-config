@@ -28,7 +28,7 @@ If (MailUserId) {
     If (!destPath)
 	destPath = %UserProfile%\Mail\Thunderbird\profile
     
-    Try fullName := Func("WMIGetUserFullname").Call(3)
+    Try fullName := Func("WMIGetUserFullname").Call(2)
     If (!fullName)
 	fullName = (не удалось разобрать: %userFIO%)
 }

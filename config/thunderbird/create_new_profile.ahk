@@ -106,7 +106,7 @@ If (!skipCreatingProfile) {
 	    }
 	}
     } Else {
-	mailFullName := Func("WMIGetUserFullname").Call(3)
+	mailFullName := Func("WMIGetUserFullname").Call(2)
     }
     
     ;prefsjs := RegExReplace(prefsjs, "\{\$\w+\$\}", )
