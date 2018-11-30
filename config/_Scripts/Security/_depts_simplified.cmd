@@ -46,16 +46,11 @@ rem FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SE
     CALL "%srcpath%FSACL_ReadExecute.cmd" "%UIDEveryone%" d:\Mail\Thunderbird\AddressBook D:\Distributives "%USERPROFILE%\BTSync\Distributives"
     ECHO Настройка доступа к стандартным общим папкам
     CALL "%srcpath%FSACL_PublicDirsRoot.cmd" "%ProfilesDirectory%\Public" "%ProfilesDirectory%\All Users" "%ProfilesDirectory%\Default User"
-    REM d:\dealer.beeline.ru и 
     ECHO Настройка доступа к d:\Mail\Thunderbird\profile
-    REM d:\dealer.beeline.ru
     CALL :ResetACL d:\Mail\Thunderbird\profile 
-    REM d:\dealer.beeline.ru
     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile 
-    REM , "D:\dealer.beeline.ru\bin"
-    ECHO Разрешение записи и выполнения в d:\Mail\Thunderbird\profile\extensions, "d:\Program Files"
-    REM "D:\dealer.beeline.ru\bin"
-    CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" d:\Mail\Thunderbird\profile\extensions "d:\Program Files"
+    REM ECHO Разрешение записи и выполнения в "d:\Program Files"
+    REM CALL "%srcpath%FSACL_Change.cmd" "%UIDAuthenticatedUsers%" "d:\Program Files"
     ECHO Настройка доступа к папке истории файлов
     CALL "%srcpath%FSACL_FileHistory.cmd"
 EXIT /B
@@ -63,7 +58,7 @@ EXIT /B
 
 :MakeDirsReadOnlyForUsers
 (
-    CALL "%srcpath%FSACL_ReadExecute.cmd" %1 C:\ D:\ R:\ "%ALLUSERSPROFILE%\Documents" "%ALLUSERSPROFILE%\DRM" "%ALLUSERSPROFILE%\Application Data"
+    CALL "%srcpath%FSACL_ReadExecute.cmd" %1 C:\ D:\ R:\ "%SystemRoot%\Temp" "%ALLUSERSPROFILE%\Documents" "%ALLUSERSPROFILE%\DRM" "%ALLUSERSPROFILE%\Application Data"
     IF "%~2"=="" EXIT /B
     SHIFT
 GOTO :MakeDirsReadOnlyForUsers
