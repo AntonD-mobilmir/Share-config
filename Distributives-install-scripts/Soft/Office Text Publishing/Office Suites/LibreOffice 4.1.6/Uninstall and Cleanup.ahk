@@ -67,10 +67,14 @@ For i, regView in regViews {
             }
         If (!baseDirFound)
             continue
+        If (!MsiExecExe) {
+            EnvGet SystemRoot, SystemRoot
+            MsiExecExe := (SystemRoot ? SystemRoot "\System32\" : "") . "MsiExec.exe"
+        }
         Loop
         {
             TrayTip %ScriptTitle%, Найден %DisplayName% (GUID %A_LoopRegName%)`, удаление,,16
-            RunWait "%A_WinDir%\System32\MsiExec.exe" /X"%A_LoopRegName%" %argsmsiexec% /norestart,,UseErrorLevel
+            RunWait "%MsiExecExe%" /X"%A_LoopRegName%" %argsmsiexec% /norestart,,UseErrorLevel
             If (ErrorLevel) {
                 If (ErrorLevel==1618) { ; Another install is currently in progress
                     TrayTip %A_ScriptName%, Ошибка %ErrorLevel%: В данный момент выполняется другая установка`, ожидание 30 с перед повтором.`n`n[попытка %A_Index%]
