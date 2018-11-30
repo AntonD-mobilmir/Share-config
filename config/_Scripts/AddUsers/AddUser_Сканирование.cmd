@@ -5,5 +5,7 @@ SETLOCAL ENABLEEXTENSIONS
 
     %SystemRoot%\System32\net.exe USER "Сканирование" /Add /FULLNAME:"Сканирование (без пароля)" /USERCOMMENT:"Вход без пароля для доступа к сканеру" /passwordchg:no /passwordreq:no || EXIT /B
     %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Сканирование' set PasswordExpires=false
+
+    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
 EXIT /B
 )

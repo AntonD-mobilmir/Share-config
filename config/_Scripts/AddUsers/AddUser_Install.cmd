@@ -49,6 +49,8 @@ rem :CreateNewUser
     "%SystemRoot%\System32\NET.exe" LOCALGROUP Administrators %InstallUsername% /Add
     "%SystemRoot%\System32\NET.exe" LOCALGROUP Администраторы %InstallUsername% /Add
 
+    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+
 GOTO :ShowFileAndPostPassword
 )
 :ErrorCreatingUser

@@ -14,7 +14,7 @@ SETLOCAL ENABLEEXTENSIONS
     %SystemRoot%\System32\net.exe USER "%newUserName%" * /Add /FULLNAME:"%FullName%" /USERCOMMENT:"%Note%" /passwordchg:no /passwordreq:no || EXIT /B
     %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='%newUserName%' set PasswordExpires=false
     
-    CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
 EXIT /B
 )
 

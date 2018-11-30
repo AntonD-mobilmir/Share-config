@@ -94,6 +94,8 @@ EXIT /B
 	NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:NO /FULLNAME:"%FullName%" || CALL :SetUserAddError
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
     
+    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+    
     IF DEFINED gpgexe (
 	DEL %gpgencOut% 2>NUL
 	%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%"
