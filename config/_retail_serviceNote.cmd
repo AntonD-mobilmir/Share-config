@@ -14,7 +14,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
     CALL "%~dp0_Scripts\AddUsers\AddUser_Install.cmd"
     START "Inventory\collector-script\SaveArchiveReport.cmd" /B %comspec% /C "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Inventory\collector-script\SaveArchiveReport.cmd"
-    FOR %%A IN ("%~dp0..\Programs\collectProductKeys.exe" "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs\collectProductKeys.exe") DO IF NOT DEFINED collectProductKeysStarted IF EXIST "%%~A" SET "collectProductKeysStarted=1" & START "Programs\collectProductKeys.exe" /B "%%~A"
+    START "run_collectProductKeys" /MIN %comspec% /C "%~dp0_Scripts\run_collectProductKeys.cmd"
 
     IF EXIST "%SystemDrive%\Windows\SwapSpace" CALL :TestDestMovePagefile
 )

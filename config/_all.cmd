@@ -9,7 +9,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     rem Disable 8.3 filenames in NTFS filesystem (it's only useful for DOS software)
     "%SystemRoot%\System32\fsutil.exe" behavior set disable8dot3 1
 
-    FOR %%A IN ("%~dp0..\Programs\collectProductKeys.exe" "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs\collectProductKeys.exe") DO IF NOT DEFINED collectProductKeysStarted IF EXIST "%%~A" SET "collectProductKeysStarted=1" & START "Programs\collectProductKeys.exe" /B "%%~A"
+    START "run_collectProductKeys" /MIN %comspec% /C "%~dp0_Scripts\run_collectProductKeys.cmd"
 
     CALL "%~dp0_Scripts\_software_install.cmd" %*
 )
