@@ -33,16 +33,16 @@ IF DEFINED deptSector (
     rem     However, when hashes are sent, Google is unable to ensure password length and strength so it's possible to set passwords that do not conform to Google's length requirement this way. The optional parameter nohash disables GAM's automatic hashing of the password (password is still sent over encrypted HTTPS) so that Google can evaluate the length and strength of the password.
     rem     Optional parameter org moves the user into the desired Organizational Unit.
     ECHO Создание пользователя %deptLogin%
-    CALL gam create user "%deptLogin%" firstname "%deptName%" lastname "%deptLastName%" org "%org%" || PAUSE
+    CALL gam.cmd create user "%deptLogin%" firstname "%deptName%" lastname "%deptLastName%" org "%org%" || PAUSE
     ECHO Добавление в %sectGroup%
-    CALL gam update group "%sectGroup%" add member user "%deptLogin%" ||PAUSE
+    CALL gam.cmd update group "%sectGroup%" add member user "%deptLogin%" ||PAUSE
     
     ECHO Смена домена на status.%pd%
     CALL switchdomain.cmd status.%pd% >NUL
     rem gam create group <group email> [name <Group Name>] [description <Group Description>]
     rem https://github.com/jay0lee/GAM/wiki/GAM3GroupSettings
     ECHO Создание группы depts-co-%deptLogin%
-    CALL gam create group "depts-co-%deptLogin%" name "Контроль розничных отделов: %deptName%" ||PAUSE
+    CALL gam.cmd create group "depts-co-%deptLogin%" name "Контроль розничных отделов: %deptName%" ||PAUSE
     REM who_can_post_message anyone_can_post send_message_deny_notification true allow_google_communication false is_archived false max_message_bytes 25M spam_moderation_level allow who_can_view_group all_in_domain_can_view
     REM при попытках изменения большей части свойств появляется:
     rem ERROR: 401: Domain cannot use Api, Groups service is not installed. - authError
@@ -50,15 +50,15 @@ IF DEFINED deptSector (
     
     rem gam update group <group email> add owner|member|manager [notsuspended] {user <email address> | group <group address> | ou|ou_and_children <org name> | file <file name> | all users} 
     ECHO Добавление dept-forwarding-setup в depts-co-%deptLogin%
-    CALL gam update group "depts-co-%deptLogin%" add member user dept-forwarding-setup ||PAUSE
+    CALL gam.cmd update group "depts-co-%deptLogin%" add member user dept-forwarding-setup ||PAUSE
     ECHO.
     ECHO Настройте пересылку из ящика отдела на адрес depts-co-%deptLogin%@status.%pd%
     ECHO ^(см. https://trello.com/c/T65sBlNF/7-e-mail^)
     PAUSE
     ECHO Удаление dept-forwarding-setup из depts-co-%deptLogin%
-    CALL gam update group "depts-co-%deptLogin%" remove user dept-forwarding-setup ||PAUSE
+    CALL gam.cmd update group "depts-co-%deptLogin%" remove user dept-forwarding-setup ||PAUSE
     ECHO Добавление %monAddr%
-    CALL gam update group "depts-co-%deptLogin%" add member user "%monAddr%" ||PAUSE
+    CALL gam.cmd update group "depts-co-%deptLogin%" add member user "%monAddr%" ||PAUSE
     IF NOT ERRORLEVEL 1 (
 	ECHO Всё готово!
 	PAUSE
