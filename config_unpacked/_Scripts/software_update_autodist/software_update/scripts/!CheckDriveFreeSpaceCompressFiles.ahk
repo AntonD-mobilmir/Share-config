@@ -15,10 +15,22 @@ CBSlogMaxSizeMB := 512
 ;1. regex replace "^([^\.]+)$" → ""
 ;2. regex replace ".+\.([^\.]+)$" → "\1"
 
-
 For i, System32 in [ SystemRoot "\SysNative", SystemRoot "\System32" ]
     If (InStr(FileExist(System32), "D"))
 	break
+
+; Отметить текущий запуск, чтобы скрипт не перезапускался при каждой загрузке, если место освободить не удаётся
+flagFName := A_AppDataCommon "\mobilmir.ru\" A_ScriptName ".flag"
+Loop Files, %flagFName%
+{
+    age := ""
+    age -= A_LoopFileTimeModified, Days
+    If (age < 3) {
+        FileAppend %A_Now% Previous run only %age% days ago`, terminating.`n, *, CP1
+        ExitApp
+    }
+}
+FileOpen(flagFName, 2).Close()
 
 If (GetAndLogFreeSpace(SystemRoot) < FreeSpaceLowMarginMB) {
     ; not in win below 7   RunWait dism /online /cleanup-image /spsuperseded
@@ -48,9 +60,25 @@ If (GetAndLogFreeSpace(SystemRoot) < FreeSpaceLowMarginMB) {
     }
 }
 
+If (GetAndLogFreeSpace(A_AppDataCommon) < FreeSpaceLowMarginMB) {
+    Loop Files, %A_AppDataCommon%\Adobe\ARM\*.msi
+        If (UninstallMSI(A_LoopFileFullPath))
+            FileDelete %A_LoopFileFullPath%
+    GetAndLogFreeSpace(A_AppDataCommon, "after """ A_AppDataCommon "\Adobe\ARM\*.msi"" uninstalling")
+    FileRemoveDir %A_AppDataCommon%\Adobe\ARM, 1
+    GetAndLogFreeSpace(A_AppDataCommon, "after """ A_AppDataCommon "\Adobe\ARM"" removal")
+    
+    For i, subDir in [ "Microsoft\Windows\Power Efficiency Diagnostics"
+                     , "Package Cache" ] {
+        CallCompact(A_AppDataCommon "\" subDir)
+        GetAndLogFreeSpace(A_AppDataCommon, "after """ A_AppDataCommon . subDir """ compacting")
+    }
+    
+}
+
 If (GetAndLogFreeSpace(SystemDrive) < FreeSpaceLowMarginMB && InStr(FileExist(SystemDrive . "\RecoveryImage\Drivers"), "D") ) {
     CallCompact(SystemDrive . "\RecoveryImage\Drivers")
-    GetAndLogFreeSpace(A_ProgramFiles, "after " SystemDrive "\RecoveryImage\Drivers compression")
+    GetAndLogFreeSpace(SystemDrive, "after """ SystemDrive "\RecoveryImage\Drivers"" compression")
 }
 
 If (GetAndLogFreeSpace(A_ProgramFiles) < FreeSpaceLowMarginMB) {
@@ -104,10 +132,6 @@ If (GetAndLogFreeSpace(SystemRoot) < FreeSpaceLowMarginMB) {
     GetAndLogFreeSpace(SystemRoot,"after cleanup scripts")
     Defrag(SystemRoot)
     GetAndLogFreeSpace(SystemRoot,"after defrag")
-    
-    ; Отметить текущий запуск, чтобы скрипт не перезапускался при каждой загрузке, если место освободить не удаётся
-    For i, dir in [ A_ProgramData "\mobilmir.ru", A_Temp ]
-	FileOpen(dir "\" A_ScriptName ".flag", 2).Close()
 }
 
 Exit
@@ -164,5 +188,23 @@ Defrag(ByRef path) {
 	    RunWait "%System32%\defrag.exe" %defragDrive%,,UseErrorLevel
 	Else ; Win8 or higher
 	    RunWait "%System32%\defrag.exe" %defragDrive% /O,,UseErrorLevel
+    }
+}
+
+UninstallMSI(path) {
+    Loop
+    {
+        RunWait "%A_WinDir%\System32\MsiExec.exe" /X"%A_LoopRegName%" %argsmsiexec% /norestart,,UseErrorLevel
+        If (ErrorLevel) {
+            If (ErrorLevel==1618) { ; Another install is currently in progress
+                FileAppend %A_Now% Error %ErrorLevel% uninstalling %path%: another install currently in progress`, waiting 30 s [try %A_Index%]`n, *, CP1
+                Sleep 30000
+                continue
+            } Else If (ErrorLevel!=3010) { ;3010: restart required
+                FileAppend %A_Now% Error %ErrorLevel% uninstalling %path%
+                return 0
+            }
+        }
+        return %A_Index%
     }
 }
