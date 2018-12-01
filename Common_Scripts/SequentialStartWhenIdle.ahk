@@ -2,9 +2,11 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
+scriptName=Отложенный автозапуск
+
 If %0%
 {
-    TrayTip Автозагрузка, Ожидание простоя процессора`, после чего будут запущены оставшиеся программы.
+    TrayTip %scriptName%, Ожидание простоя процессора`, после чего будут запущены программы.
     WaitCPUIdle()
     TrayTip
     
@@ -33,12 +35,12 @@ RunAndWaitWindow(pathRunProgram, param="", nameRunProgram="") {
     If (nameRunProgram=="") {
 	nameRunProgram=%OutNameNoExt%
     }
-    TrayTip Автозагрузка, Запуск %nameRunProgram%…
+    TrayTip %scriptName%, Запуск %nameRunProgram%…
     Run "%pathRunProgram%" %param%,%OutDir%,UseErrorLevel,aPID
     If (ErrorLevel=="ERROR")
     {
 	TrayTip
-	TrayTip Автозагрузка – ошибка запуска %A_LoopFileName%, %A_LoopFileFullPath% не может быть запущен`, исправьте ярлык в автогразуке или обратитесь к технической поддержке.
+	TrayTip %scriptName% – ошибка запуска %A_LoopFileName%, %A_LoopFileFullPath% не может быть запущен`, исправьте ярлык в автогразуке или обратитесь к технической поддержке.
 	Sleep 3000
     } Else {
 	SetTimer ShowWaitingMsg, -3000
@@ -84,5 +86,5 @@ GetIdleTime()    ;idle time fraction
 }
 
 ShowWaitingMsg:
-    TrayTip Автозагрузка, Ожидание появления окна запущенной программы…
+    TrayTip %scriptName%, Ожидание появления окна запущенной программы…
 return

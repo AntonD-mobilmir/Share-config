@@ -57,8 +57,8 @@ While (MaxBackupSize*2) > SpaceFree
     FileAppend `tRemoving "%BackupSetName%" (BackupSetSize=%BackupSetSize%)`, new SpaceFree=%SpaceFree%`n, *
     FileRemoveDir %BackupSetName%, 1
 }
-DriveSpaceFree CurrentSpaceFree, .
-FileAppend `tDone. Current free space %SpaceFree%`, expected (calculated): %SpaceFree%`n, *
+DriveSpaceFree SpaceFreeAfter, .
+FileAppend `tDone. Current free space %SpaceFreeAfter%`, expected (calculated): %SpaceFree%`n, *
 
 Exit
 
