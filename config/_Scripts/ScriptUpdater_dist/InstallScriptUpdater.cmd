@@ -88,14 +88,17 @@ EXIT /B
 	DEL "%pubkeysDest%\%fnameTest%"
 	GOTO :GenKeyring
     )
-    IF DEFINED LastTry EXIT /B 1
     ECHO Папка "%pubkeysDest%" недоступна для записи.
+    IF DEFINED LastTry EXIT /B 1
+    SET "srvPubkeysDest=%pubkeysDest%"
     SET "pubkeysDest=%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater-PubKeys"
 )
 (
     MKDIR "%pubkeysDest%"
     IF EXIST "%pubkeysDest%" (
-        ECHO Открытые ключи будут сохранены в "%pubkeysDest%", чтобы адресная книга обновлялась - скопируйте их на сервер.
+        ECHO Открытые ключи будут сохранены в "%pubkeysDest%", чтобы адресная книга обновлялась - скопируйте их в "%srvPubkeysDest%"
+        IF NOT "%RunInteractiveInstalls%"=="0" %SystemRoot%\explorer.exe /explore,"%srvPubkeysDest%"
+        
         SET "LastTry=1"
         GOTO :CheckGenKeyring
     ) ELSE (

@@ -23,6 +23,11 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 	SET "abDir=%LOCALAPPDATA%\mobilmir.ru\AddressBook"
 	IF NOT DEFINED ScriptUpdaterDir (
 	    CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd" "%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater" || PAUSE
+	    IF EXIST "%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater-PubKeys" (
+                %SystemRoot%\explorer.exe /explore,"%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater-PubKeys"
+                ECHO Скопируйте ключ из "%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater-PubKeys" в папку на сервере!
+                PAUSE
+	    )
 	    SET "ScriptUpdaterDir=%LOCALAPPDATA%\mobilmir.ru\ScriptUpdater"
 	    SET "rcScriptUpdaterDir=%%LOCALAPPDATA%%\mobilmir.ru\ScriptUpdater"
 	)
