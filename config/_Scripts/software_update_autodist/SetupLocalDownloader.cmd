@@ -82,8 +82,10 @@ IF NOT DEFINED configDir CALL :getconfigDir
     %SystemRoot%\System32\takeown.exe /F "d:\Distributives" /A /R /D Y
     %SetACLexe% -on "d:\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
     %SetACLexe% -on "%USERPROFILE%\BTSync\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
-
-    %sedexe% -i "s/"{$SUSHost$}/"%SUSHost%/g" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd" || %ErrorCmd%
+    
+    COPY /B /Y "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.template" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.tmp"
+    %sedexe% -i "s/"{$SUSHost$}/"%SUSHost%/g" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.tmp" || %ErrorCmd%
+    MOVE /Y "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.tmp" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd"
 
     START "install_software_update_scripts.cmd" /MIN %comspec% /C "%InstDest%\software_update\_install\install_software_update_scripts.cmd"
 
