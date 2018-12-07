@@ -303,6 +303,8 @@ For i,regview in regViews {
 
 If (A_OSVersion == "WIN_7") {
     SetRegView 64
+    RegDelete HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\Setup\11.0, DoNotAllowIE11
+    
     ;[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsBackup\ScheduleParams\Rules\2]
     ;"Root"="D:\\Users\\Продавец\\Mail\\Thunderbird\\profile\\Mail\\Local Folders\\"
     ;"UniqueId"=""
