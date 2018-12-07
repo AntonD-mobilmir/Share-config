@@ -116,7 +116,7 @@ rem PAUSE
 :skipMTMail
 (
 REM Install 1S
-IF NOT DEFINED Inst1S CALL :AskAbout1S
+rem IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF NOT "%Inst1S%"=="1" GOTO :Skip1SAndRelated
 )
 :r1SAndRelated
@@ -146,7 +146,7 @@ ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUS
 	    EXIT /B
 	)
     )
-    SET /P "Inst1S=Устанавливать 1С-Рарус? [1=да]"
+    SET /P "Inst1S=Этот компьютер - касса? [1,y,д=да]"
     IF /I "%Inst1S:~0,1%"=="y" SET "Inst1S=1"
     IF /I "%Inst1S:~0,1%"=="д" SET "Inst1S=1"
 EXIT /B
