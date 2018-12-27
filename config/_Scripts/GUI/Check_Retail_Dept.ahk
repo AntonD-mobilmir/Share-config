@@ -291,6 +291,8 @@ If (ReRunAsAdmin) {
     ExitApp
 }
 
+RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir.ru\backup_1S_base" /F,, Min UseErrorLevel
+
 For i,regview in regViews {
     SetRegView %regview%
     RegRead unCR, HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\{7C05EEDD-E565-4E2B-ADE4-0C784C17311C}, UninstallString
