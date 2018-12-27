@@ -55,7 +55,7 @@ For i, regView in regViews {
 	If (SubStr(DisplayName, 1, 12)!="LibreOffice ")
 	    Continue
 	RegRead URLInfoAbout, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, URLInfoAbout
-	If (!(URLInfoAbout ~= "https?:\/\/www\.documentfoundation\.org|https.:\/\/www\.libreoffice\.org/"))
+	If (!(URLInfoAbout ~= "https?:\/\/www\.documentfoundation\.org|https?:\/\/www\.libreoffice\.org/"))
 	    Continue
         
 	RegRead InstallLocation, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, InstallLocation
