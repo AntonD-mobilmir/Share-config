@@ -49,11 +49,11 @@ If (AppXSupported)
 
 Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%
 
-If (FileExist("D:\")) {
-    MsgBox 0x24, Система на SSD?, Перенести индекс поиска Windows на D: ?
-    IfMsgBox Yes
-        Run "%A_AhkPath%" "%A_ScriptDir%\Move Windows Search Index to D.ahk"
-}
+;If (FileExist("D:\")) {
+;    MsgBox 0x24, Система на SSD?, Перенести индекс поиска Windows на D: ?
+;    IfMsgBox Yes
+;        Run "%A_AhkPath%" "%A_ScriptDir%\Move Windows Search Index to D.ahk"
+;}
 
 ExitApp
 

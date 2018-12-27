@@ -20,6 +20,7 @@ If (curSearchRoot != newSearchRoot) {
         xccurSearchRoot := RTrim(curSearchRoot, "\"), xcnewSearchRoot := RTrim(newSearchRoot, "\")
         Loop
         {
+            RegRead startbak, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WSearch, Start
             RunWait %SystemRoot%\System32\sc.exe config wsearch start= disabled,,Min
             RunWait %SystemRoot%\System32\net.exe stop WSearch,,Min
             FileCreateDir %newSearchRoot%
@@ -63,9 +64,11 @@ If (curSearchRoot != newSearchRoot) {
         ;ControlClick Button2
         ;WinWait Advanced Options ahk_pid %rundllPID%
         ;ControlClick Button7
-        backupName := A_AppDataCommon "\mobilmir.ru\Windows Search bak " A_Now ".reg"
+        backupBaseDir := A_AppDataCommon "\mobilmir.ru\reg-backup"
+        backupName := backupBaseDir "\Windows Search bak " A_Now ".reg"
+        FileCreateDir %backupBaseDir%
         RunWait %SystemRoot%\System32\reg.exe export "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Search" "%backupName%",,Min
-        Run %SystemRoot%\System32\compact.exe /C /EXE:LZX "%backupName%"
+        Run %SystemRoot%\System32\compact.exe /C /EXE:LZX "%backupName%",,Min
         
         RegWrite REG_SZ, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Search, DataDirectory, %newSearchRoot%
         RegWrite REG_SZ, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Search\Gather\Windows\SystemIndex, LogDirectory, %newSearchRoot%\Applications\Windows\Projects\SystemIndex
@@ -77,8 +80,8 @@ If (curSearchRoot != newSearchRoot) {
         
         RegWrite REG_SZ, HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Search\Gathering Manager\Applications\Windows\Projects\SystemIndex, WorkingDirectory, %newSearchRoot%\Applications\Windows\Projects\SystemIndex
         
-        RegWrite REG_DWORD, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WSearch, Start, %startbak%
         RunWait %SystemRoot%\System32\sc.exe config wsearch start= delayed-auto,,Min
+        RegWrite REG_DWORD, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WSearch, Start, %startbak%
         RunWait %SystemRoot%\System32\net.exe start WSearch,,Min
         
         If (curSearchRoot) {
