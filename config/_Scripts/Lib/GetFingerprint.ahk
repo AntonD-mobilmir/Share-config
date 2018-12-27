@@ -130,7 +130,8 @@ GetFingerprint_CheckVirtualNIC(fieldName, v) {
 			       , "WAN Miniport (IP)": ""
 			       , "WAN Miniport (IPv6)": ""
 			       , "WAN Miniport (Network Monitor)": ""
-			       , "Минипорт WAN (PPTP)": "" }
+			       , "Минипорт WAN (PPTP)": ""
+			       , "Microsoft Wi-Fi Direct Virtual Adapter": "" }
 	 , SkipMACs := { "20:41:53:59:4E:FF": "" ; Виртуальный NIC VPN с одним и тем же MAC на разных системах
 		       , "50:50:54:50:30:30": "" ; Минипорт WAN (PPTP)
 		       , "33:50:6F:45:30:30": ""} ; https://www.lansweeper.com/forum/yaf_postst6456_Report-Duplicate-MAC-Addresses-lists-same-computer-multiple-times.aspx
