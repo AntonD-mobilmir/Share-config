@@ -87,19 +87,27 @@ SET "srcpath="
 )
 :PrepareProfiles
 (
-TITLE PrepareProfiles
-CALL "%~dp0_Scripts\HideShortcutsInAllUsersStartMenu.cmd"
-CALL "%~dp0_Scripts\copyDefaultUserProfile.cmd"
-REM Unpacking Desktop Shortcuts / Распаковка ярлыков на рабочий стол 
-CALL "%~dp0_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"
-rem Изменение пути профилей
-MKDIR d:\Users
-IF EXIST d:\Users %AutohotkeyExe% "%~dp0_Scripts\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+    TITLE PrepareProfiles
+    CALL "%~dp0_Scripts\HideShortcutsInAllUsersStartMenu.cmd"
+    CALL "%~dp0_Scripts\copyDefaultUserProfile.cmd"
+    REM Unpacking Desktop Shortcuts / Распаковка ярлыков на рабочий стол 
+    CALL "%~dp0_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd"
+    rem Изменение пути профилей
+    MKDIR d:\Users
+    IF EXIST d:\Users %AutohotkeyExe% "%~dp0_Scripts\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
 
-rem TODO: не работает, если запускать "!run without installing soft.cmd"
-REM Копирование дистрибутивов, поскольку новые отделы не подключены к офисной сети
-IF /I "%COMPUTERNAME:~-2%"=="-K" START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
-rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g\Projects\depts-commands\execscripts\install.cmd"
+    rem TODO: не работает, если запускать "!run without installing soft.cmd"
+    REM Копирование дистрибутивов, поскольку новые отделы не подключены к офисной сети
+    IF /I "%COMPUTERNAME:~-2%"=="-K" (
+        START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
+        rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g\Projects\depts-commands\execscripts\install.cmd"
+        
+        ECHO Выключение спящего и ждущего режимов
+        %SystemRoot%\System32\powercfg.exe -X -standby-timeout-ac 0
+        %SystemRoot%\System32\powercfg.exe -X -standby-timeout-dc 0
+        %SystemRoot%\System32\powercfg.exe -X -hibernate-timeout-ac 0
+        %SystemRoot%\System32\powercfg.exe -X -hibernate-timeout-dc 0
+    )
 )
 :MTMail
 (
