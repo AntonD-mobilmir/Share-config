@@ -4,19 +4,24 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
-regPassKey = "SecurityPasswordAES"=hex:
-
-ListPassHashes := {	 "e5cea553a702dfea4d0df508c7fa32bf":""	; действующие\TeamViewer_host.defaults.reg
-			,"dcc3c599c017e66ef26af2ad41ad851f":""	; действующие\Apps_dept\TeamViewer*.reg
-			,"3ba9fd9337e1b3cc3e426d55a85c6b5c":""	; действующие\Apps_office\TeamViewer.reg, TeamViewer_Host.reg
-			,"75a1ae487a131ac684441f0a4490e930":""	; действующие\Apps_roaming\TeamViewer.reg, TeamViewer_Host.reg
-			,"f479d774e8bc76723cdfd322754e77cc":""	; действующие\TeamViewer5HostUnattended_egs\TeamViewer_host.reg
+ListPassHashes := {	 "ab12997087fb03c88c379439f16002ed":""	; №407 действующие\Apps_dept.7z\TeamViewer\TeamViewer*.reg
+			,"0004323f7a1a9343a925c294419756bf":""	; №408 действующие\Apps_office.7z\TeamViewer\TeamViewer*.reg
+			,"db431dbadbedbfc5fe6403977015f3b1":""	; №409 действующие\Apps_roaming.7z\TeamViewer\TeamViewer*.reg
+			,"556d71c5d7afbe99a5f4aca58cc8620c":"!"	; №410 действующие\Distributives\...\TeamViewer 5\TeamViewer_host.defaults.reg
+			,"74abdbc5bbd8b5a8943d854e4e723c1e":"!"	; №411 действующие\TeamViewer5HostUnattended_egs.exe
+			,"5ab9133bafa3afc243c2c2d40e0741ec":"TeamViewer_ServiceNote"	; №412 действующие\Apps_roaming.7z\TeamViewer\TeamViewer_ServiceNote.reg
+			
+			,"e5cea553a702dfea4d0df508c7fa32bf":"!"	; до 2018-12-18\TeamViewer_host.defaults.reg
+			,"dcc3c599c017e66ef26af2ad41ad851f":"."	; до 2018-12-18\Apps_dept\TeamViewer*.reg
+			,"3ba9fd9337e1b3cc3e426d55a85c6b5c":"."	; до 2018-12-18\Apps_office\TeamViewer.reg, TeamViewer_Host.reg
+			,"75a1ae487a131ac684441f0a4490e930":"."	; до 2018-12-18\Apps_roaming\TeamViewer.reg, TeamViewer_Host.reg
+			,"f479d774e8bc76723cdfd322754e77cc":"!"	; до 2018-12-18\TeamViewer5HostUnattended_egs\TeamViewer_host.reg
 
                         ,"a7d5df881f9720f3dfe2470b6985506a":"."	; до 2018-10-08\Apps_dept\TeamViewer.reg (DT-2)
 			,"e7c4c0134748b894aa5bcfc65ef7d4e0":"."	; до 2018-10-08\Apps_dept\TeamViewer.reg, TeamViewer_host.reg
 			,"742c2b5812955928e50b0053aaa645b4":"!"	; до 2016-08-18\TeamViewer_host.defaults.reg
 			,"308f8e5264396fa07e9530a92d65afbd":"."	; до 2016-08-18\Apps_dept\TeamViewer.reg, Apps_office\TeamViewer.reg, Apps_roaming\TeamViewer.reg
-			,"3e84f2424c8ae3f52af890ab9eb066b9":"Apps_dept.7z"	; до 2016-08-18\Apps_dept\TeamViewer_host.reg
+			,"3e84f2424c8ae3f52af890ab9eb066b9":"Apps_dept"	; до 2016-08-18\Apps_dept\TeamViewer_host.reg
 			,"e2499266c256861e2ff57a8e3d3a472c":"."	; до 2016-08-18\Apps_office\TeamViewer_Host.reg, Apps_roaming\TeamViewer_Host.reg
 			,"26d5b24f2bdd004ef942684f2b3d1ddc":"!"	} ; до 2016-08-18\TeamViewer5HostUnattended_egs\TeamViewer_host.reg 
 SetRegView 32
@@ -44,19 +49,19 @@ If (ListPassHashes.HasKey(md5ofpwd)) {
 
 ExitApp
 
-WriteRegSettings(defaultsPath := "") {
-    If (!defaultsPath) {
+WriteRegSettings(confName := "") {
+    If (!confName) {
 	defaultsPath := getDefaultConfig()
-    }
+        ;SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+        SplitPath defaultsPath,            ,       ,             , confName
+    }    
     
-    ;SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-    SplitPath defaultsPath,            ,       ,             , defArcName
+    ListNewPasswds := { "Apps_dept":    "381BBF396E764A594B929129B4E88133D1CE56E07804EA441F2A580B1A200586B5BEA82B647FBB6496630F8C7F3F889C"
+                      , "Apps_office":  "3D27D8C509759CE1D3FD308F4F39777AE3A842D808E3177FCCA65C6674AC86B1462FFD58BC7221F95A0ECB897C01FBAB"
+                      , "Apps_roaming": "833DB799624A8F334C4F083B20A0B81690EBFB0BA12F874A07110061F4B964A802F53DE90F56E3AA67A83594B5678A7B"
+                      , "TeamViewer_ServiceNote": "013DEE97E649C3BB63AFE125D1BDF2D7B6201D661ED305CEC6664E30BA0C347D78116F2D230CC1B58260F94A07BDDD99" }
     
-    ListNewPasswds := {	 "Apps_dept":	"B6A0BA5F7280B090C170550CE7F554F3AE79B80B2BF25BC426A53BD99A4CF7F82D0216227D045C557E243FEC53FC2B66"
-			,"Apps_office":	"F2AD0177D24744298C530F4F05EE62B2D3AD5A77FD9DF84C535ACD8ECF54ACD3201D31B03EADCFF4B0E37A8E7C7795D0"
-			,"Apps_roaming":	"4012F58BE8D40F6C2295C3B108EC3AEE1C428441D85540FB940A5DE55277416A94E0E6CEE9AFAAAAA0033361C3D91D71"}
-    
-    If (ListNewPasswds.HasKey(defArcName)) {
+    If (ListNewPasswds.HasKey(confName)) {
 	If (!A_IsAdmin) {
 	    EnvGet RunInteractiveInstalls,RunInteractiveInstalls
 	    If (RunInteractiveInstalls!="0") {
@@ -68,14 +73,14 @@ WriteRegSettings(defaultsPath := "") {
 	    }
 	}
 
-	RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, % ListNewPasswds[defArcName]
+	RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, % ListNewPasswds[confName]
 	If (ErrorLevel) {
 	    ShowMsg("Ошибка записи нового пароля.", 0x10)
 	} Else {
-	    ShowMsg("Пароль заменён на пароль из конфигурации " . defArcName)
+	    ShowMsg("Пароль заменён на пароль из конфигурации " . defaultsPath)
 	}
     } Else {
-	ShowMsg("Не найден пароль для конфигурации " . defaultsPath, 0x10)
+	ShowMsg("В скрипте нет пароля для конфигурации " . defaultsPath, 0x10)
     }
 }
 

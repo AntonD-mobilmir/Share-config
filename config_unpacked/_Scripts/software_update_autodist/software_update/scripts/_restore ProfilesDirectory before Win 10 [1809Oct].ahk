@@ -4,8 +4,19 @@
 
 ver := RtlGetVersion()
 
-If (ver[2] < 8 || VersionAtLeast(ver, [1,10,0,17763.134]))
-    return
+If (ver[2] < 8 || VersionAtLeast(ver, [1,1,10,0,17763,134])) {
+    If (InStr(FileExist("D:\Users"), "D")) {
+        FileAppend Windows version is outside range`, setting up correct ProfilesDirectory path, *
+        EnvGet configDir, configDir
+        RunWait %A_AhkPath% /ErrorStdOut "%configDir%\_Scripts\MoveUserProfile\SetProfilesDirectory_D_Users.ahk",, UseErrorLevel
+    } Else {
+        FileAppend Windows version is outside range`, but D:\Users does not exist. Doing nothing., *
+    }
+    
+    ExitApp %ErrorLevel%
+}
+
+FileAppend Windows version is in range`, restoring ProfilesDirectory from backup., *
 
 EnvGet SystemDrive, SystemDrive
 
