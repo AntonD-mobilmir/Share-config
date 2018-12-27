@@ -4,4 +4,4 @@ BBLIHCDBLMR2WWQA5QKHMVBY2EJD364WF	d:\Users\Anton.Derbenev\BTSync\software_update
 B4FCX443GDOTCDOUNHT7L27EDD3XFVADS	d:\Users\LogicDaemon\BTSync\Distributives
 BBLIHCDBLMR2WWQA5QKHMVBY2EJD364WF	d:\Users\LogicDaemon\BTSync\software_update
 
-office0.mobilmir.ru	15443
+office-btsync.mobilmir.ru	15443
