@@ -94,6 +94,8 @@ If (A_IsAdmin) {
     SetLastRowStatus("Добавление в автозагрузку", 0)
     FileCreateShortcut D:\Local_Scripts\RetailHelper.ahk, %shortcutPath%
     SetLastRowStatus(ErrorLevel, !ErrorLevel)
+
+    DeleteWithLog(A_Startup "\1С - Рарус - Продавец.lnk")
 }
 
 chkDefConfigDir := CheckPath(getDefaultConfigDir())
@@ -245,7 +247,7 @@ If (AppXSupported && (A_UserName="Продавец" || A_UserName="Пользо�
 
 ;"C:\Program Files\KKMSuite\KKMWatcher.exe"
 ;"C:\Program Files (x86)\KKMSuite\KKMWatcher.exe"
-FileDelete %A_Startup%\KKMGMSuite.exe window not on top.lnk
+DeleteWithLog(A_Startup "\KKMGMSuite.exe window not on top.lnk")
 
 regViews := [32]
 If (A_Is64bitOS)
@@ -1091,6 +1093,14 @@ Expand(string) {
     output .= SubStr(string,PrevPctChr+1)
     
     return % output
+}
+
+DeleteWithLog(ByRef path) {
+    If (FileExist(path)) {
+        AddLog("Удаление """ path """")
+        FileDelete %path%
+        SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    }
 }
 
 #include %A_LineFile%\..\..\..\_Scripts\Lib\RtlGetVersion.ahk
