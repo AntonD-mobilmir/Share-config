@@ -95,14 +95,21 @@ ShowMsg(text, type:=0) {
     If (RunInteractiveInstalls!="0") {
 	MsgBox % type, %A_ScriptName%, %text%, 60
     }
+    
+    configDir := getDefaultConfigDir()
+    text := StrReplace(text, """", "'")
+    Run "%A_AhkPath%" /ErrorStdOut "%configDir%\_Scripts\Lib\RetailStatusReport.ahk" "%A_ScriptName%" "%type%" "%text%",,UseErrorLevel
 }
 
 ; \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
 getDefaultConfig() {
+    static defaultConfig
     EnvGet SystemDrive, SystemDrive
-    defaultConfig := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd", "DefaultsSource")
-    If (!defaultConfig)
-	defaultConfig := ReadSetVarFromBatchFile(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd", "DefaultsSource")
+    If (!defaultConfig) {
+        defaultConfig := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd", "DefaultsSource")
+        If (!defaultConfig)
+            defaultConfig := ReadSetVarFromBatchFile(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd", "DefaultsSource")
+    }
     return defaultConfig
 }
 
