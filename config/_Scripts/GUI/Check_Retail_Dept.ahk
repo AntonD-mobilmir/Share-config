@@ -525,11 +525,7 @@ If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdSc
     RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
 ;-- должен устранавливаться скриптом unpack_retail_files_and_desktop_shortcuts.cmd -- RunFromConfigDir("_Scripts\ScriptUpdater_dist\InstallScriptUpdater.cmd", "ScriptUpdater") 
-If (FileExist(SystemRoot "\System32\Tasks\mobilmir\AddressBook"))
-AddLog("Удаление задачи планировщика mobilmir\AddressBook…")
-RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir\AddressBook_download" /F,, Min UseErrorLevel
-SetLastRowStatus(ErrorLevel,!ErrorLevel)
-
+CheckRemoveSchedulerTask("mobilmir\AddressBook")
 RunFromConfigDir("_Scripts\Tasks\All XML.cmd", "Обновление задач планировщика")
 RunFromConfigDir("_Scripts\Tasks\AddressBook_download.cmd")
 RunWait %SystemRoot%\System32\NET.exe SHARE AddressBook$ /DELETE,,Min UseErrorLevel
@@ -652,6 +648,14 @@ ButtonCancel:
 	    return
     }
     ExitApp
+
+CheckRemoveSchedulerTask(taskname) {
+    If (FileExist(SystemRoot "\System32\Tasks\" taskname)) {
+        AddLog("Удаление задачи планировщика " taskname "…")
+        RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "%taskname%" /F,, Min UseErrorLevel
+        SetLastRowStatus(ErrorLevel,!ErrorLevel)
+    }
+}
 
 RunRsyncAutohotkey(wait := 1) {
     global subdirDistAutoHotkey, lDistributives, officeDistSrvPath

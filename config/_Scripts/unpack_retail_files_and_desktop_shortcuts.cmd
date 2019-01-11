@@ -31,6 +31,10 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
     IF DEFINED CommonDesktop (
 	ECHO.|DEL /F "%CommonDesktop%\Exchange.lnk"
 	ECHO.|DEL /F "%CommonDesktop%\Ценники из выгрузок Рарус.lnk"
+	ECHO.|DEL /F "%CommonDesktop%\1С*.lnk"
+        rem ECHO.|DEL /F "%CommonDesktop%\1С 8 Розница Продавец.lnk"
+        rem ECHO.|DEL /F "%CommonDesktop%\1С.lnk"
+        rem ECHO.|DEL /F "%CommonDesktop%\1С - Рарус - Продавец.lnk"
 	RD /S /Q "%CommonDesktop%\Дополнительные ярлыки"
 	RD /S /Q "%CommonDesktop%\Сервисы сторонних компаний"
 
