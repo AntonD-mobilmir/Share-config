@@ -19,8 +19,10 @@ UninstallAllForCurrentRegView() {
 	DashPos:=InStr(UninstallString, "-")
 	If DashPos
 	    UninstallString:=SubStr(UninstallString, 1, DashPos-1)
-	    
+        
 	RunWait "%UninstallString%" --uninstall --multi-install --chrome --system-level --force-uninstall
+	If (ErrorLevel)
+            Throw Exception(ErrorLevel, UninstallString, A_LastError)
 	ChromeProgramFiles:=A_ProgramFiles
 	If A_Is64bitOS
 	    EnvGet ChromeProgramFiles, ProgramFiles(x86)
