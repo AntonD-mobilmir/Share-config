@@ -13,14 +13,22 @@ queryPrefix := A_Args[1]
 If (!queryPrefix)
     queryPrefix := "/boards/GNhOgPCn"
 
-actionsToLog := { "updateCard": "parse_updateCard"
-                , "commentCard": "parse_commentCard"
+actionsToLog := { "updateCard": Func("parse_updateCard")
+                , "commentCard": {"Добавлен комментарий": "data.text"}
                 , "createCard": "Карточка создана"
-                , "updateCheckItemStateOnCard": ""
-                , "addMemberToCard": "На карточку добавлен участник"
-                , "addChecklistToCard": "Добавлен чек-лист"
-                , "copyCard": "Карточка скопирована"
-                , "updateCheckItemStateOnCard": "В чек-листе отмечен пункт" }
+                , "convertToCardFromCheckItem": "Пункт чек-листа преобразован в карточку"
+                , "updateCheckItemStateOnCard": {"Изменена отметка пункта": "data.checkItem.state data.checkItem.name data.checkItem.textData"}
+                , "addMemberToCard": {"На карточку добавлен участник": "data.member.name"}
+                , "removeMemberFromCard": {"С карточки удален участник": "data.member.name"}
+                , "addChecklistToCard": {"Добавлен чек-лист": "data.checklist.name"}
+                , "removeChecklistFromCard": {"Удален чек-лист": "data.checklist.name"}
+                , "updateChecklist": "Измненен чек-лист"
+                , "addAttachmentToCard": "Прикреплено вложение"
+                , "deleteAttachmentFromCard": "Удалено вложение"
+                , "moveCardFromBoard": "Карточка перемещена с доски"
+                , "moveCardToBoard": "Карточка перемещена на эту доску"
+                , "deleteCard": "Карточка удалена"
+                , "copyCard": "Карточка скопирована" }
 
 actions_since := SubStr(A_Now, 1, 6) "01" ; YYYYMM01 – первое число текущего месяца
 actions_since += -1, Days ; последнее число предыдущего
@@ -37,12 +45,7 @@ Loop
     For i, actn in actionsPage {
 	If (i > maxIndex)
 	    maxIndex := i, lastID := actn.id
-        If (actionsToLog.HasKey(actn.type))
-            actions.Push(actn)
-        Else {
-            actn[""] := "Неизвестное действие: " actn.type
-            actions.Push(actn)
-        }
+        actions.Push(actn)
         cardMembers := BatchQueryCardMembers(actn.data.card.id, cardMembers)
     }
 } Until !maxIndex
@@ -51,24 +54,58 @@ flog.Close()
 
 FileAppend % ObjectToText(cardMembers), %A_Temp%\%A_ScriptName%.debug.txt
 
-out := """Дата"",""Карточка"",""Заголовок карточки"",""Кому назначена"",""Доска"",""Список"",""Пользователь, выполнивший действие"",""Действие с карточкой""`n"
+out =
+    (Join, LTrim
+    "Дата"
+    "Карточка"
+    "Заголовок карточки"
+    "Кому назначена"
+    "Доска"
+    "Список"
+    "Пользователь, выполнивший действие"
+    "Действие с карточкой"
+    "Подробности"
+    "JSON"
+    `n
+    )
 For i, actn in actions {
-    If (IsFunc(fnName := actionsToLog[actn.type]))
-        curLn := Func(fnName).Call(actn.data)
-    Else
-        curLn := fnName ": " JSON.Dump(actn)
-    If (!curLn)
-        continue
-    ; при изменении списка, в data.list.name пусто
-    out .= actn.date 
-         . ",""https://trello.com/c/" actn.data.card.shortLink
-         . """,""" StrReplace(actn.data.card.name, """", """""")
-         . """,""" StrReplace(cardMembers[actn.data.card.id], """", """""")
-         . """,""" StrReplace(actn.data.board.name, """", """""")
-         . """,""" StrReplace(((listName := actn.data.list.name) = "" ? actn.data.listAfter.name : listName), """", """""")
-         . """,""" StrReplace(actn.memberCreator.fullName "(@" actn.memberCreator.username ")" , """", """""")
-         . """,""" StrReplace(curLn , """", """""")
-         . """`n"
+    If (actionsToLog.HasKey(actn.type)) {
+        logActnData := actionsToLog[actn.type]
+        If (IsFunc(logActnData))
+            logActnData := logActnData.Call(actn.data)
+        Else If (IsObject(logActnData)) {
+            logActnDetails := {}
+            For logActnDataName, logActnDataQuery in logActnData {
+                logDetailText := "", lpos := 1
+                Loop Parse, logActnDataQuery, %A_Space%`,
+                {
+                    logActnDataObj := actn
+                    Loop Parse, A_LoopField,.
+                        logActnDataObj := logActnDataObj[A_LoopField]
+                    logDetailText .= logActnDataObj . SubStr(logActnDataQuery, lpos += StrLen(A_LoopField), 1)
+                }
+                logActnDetails[logActnDataName] := logDetailText
+            }
+            logActnData := logActnDetails
+        } Else
+            logActnData := {(logActnData): ""}
+    } Else {
+        logActnData := {"Неизвестное действие": ""}
+    }
+    
+    For updType, detail in logActnData { ; при изменении списка, в data.list.name пусто
+        out .= actn.date 
+             . ",""https://trello.com/c/" actn.data.card.shortLink
+             . """,""" StrReplace(actn.data.card.name, """", """""")
+             . """,""" StrReplace(cardMembers[actn.data.card.id], """", """""")
+             . """,""" StrReplace(actn.data.board.name, """", """""")
+             . """,""" StrReplace(((listName := actn.data.list.name) = "" ? actn.data.listAfter.name : listName), """", """""")
+             . """,""" StrReplace(actn.memberCreator.fullName " (@" actn.memberCreator.username ")" , """", """""")
+             . """,""" StrReplace(updType, """", """""")
+             . """,""" StrReplace(detail, """", """""")
+             . """,""" StrReplace(JSON.Dump(actn) , """", """""")
+             . """`n"
+    }
 }
 
 reportName = %A_TEMP%\%A_ScriptName%-%A_Now%.csv
@@ -102,28 +139,25 @@ BatchQueryCardMembers(idCard, cardMembers) {
 
 parse_updateCard(data) {
     global cardMembers
-    changeList := "", listName := data.list.name
-    For field, value in data.old
+    changeList := {}
+    
+    For field, value in data.old {
 	If field in desc,due,pos,name,idLabels,idAttachmentCover,idMembers
 	    continue
 	Else If (field == "dueComplete")
-            changeList .= (value ? "☐" : "☑") . " в поле ""срок"", " ; value – это старое значение, а не новое
+            changeList[(value ? "☐" : "☑") . " в поле ""срок"""] := "было: " value ; value – это старое значение, а не новое
         Else If (field == "closed")
-            changeList .= (value ? "раз" : "за") "архивирована, "
+            changeList[(value ? "раз" : "за") "архивирована"] := "было: " value
 	Else If (field == "idList") {
             newListName := data.listAfter.name
-            If newListName in Готово,Выполнено,Завершено
-		changeList .= "перемещена в список " data.listAfter.name ", "
-            If (!listName) ; при изменении списка, в data.list.name пусто
-                listName := data.listAfter.name
-	} Else
-	    return "Изменено поле """ field """, обработка для него не прописана. Всё действие: " JSON.Dump(data)
-    If (changeList)
-        return SubStr(changeList, 1, -2)
-}
-
-parse_commentCard(data) {
-    return "Добавлен комментарий: " data.text
+            changeList["Перемещена в список"] := newListName
+            ;If newListName in Готово,Выполнено,Завершено
+	} Else {
+	    changeList["Поле " field " изменено со значения "] := value
+        }
+    }
+    If (changeList.Length())
+        return changeList
 }
 
 #include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\TrelloAPI1.ahk
