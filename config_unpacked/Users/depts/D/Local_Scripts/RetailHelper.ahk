@@ -15,17 +15,13 @@ rebootOfferDelay := 60 * 60 * 1000 ; 1h in ms
 maxIdleForMsgbox := timerPeriod := 3000 ; ms
 startDay := A_DD
 wintitle1s=ahk_exe 1cv7s.exe
+
+EnvGet SystemRoot,SystemRoot
+EnvGet LocalAppData,LOCALAPPDATA
 EnvGet lProgramFiles, ProgramFiles(x86)
-If (!lProgramFiles)
-    lProgramFiles := A_ProgramFiles
+lProgramFiles := lProgramFiles ? lProgramFiles : A_ProgramFiles
 If (FileExist(lProgramFiles "\Canon\MF Scan Utility\MFSCANUTILITY.exe"))
     checkCanonMFScan := -1 ; PID скрипта исправления ACL. Скрипт будет запущен при обнаружении MFSCANUTILITY.exe, если процесса с таким PID нет.
-
-timeTillEndOfDay := A_YYYY . A_MM . A_DD
-timeTillEndOfDay += 1, Days
-timeTillEndOfDay -= A_Now, Seconds
-
-nextRebootOffer := A_TickCount + TimeTillEndOfDay * 1000 ; ms
 
 ;ahk_class HwndWrapper[KKMGMSuite.exe;;ec6679dd-7266-4fe0-8880-fd566da471b0]
 ;ahk_exe KKMGMSuite.exe
@@ -35,57 +31,10 @@ GroupAdd KKMGMSuite, ahk_exe KKMGMSuite.exe
 SetTimer Periodic, %timerPeriod%
 
 ; Разрешение запуска PepperFlash из папки настроек Chrome пользователя
-EnvGet LocalAppData,LOCALAPPDATA
-RunWait %A_WinDir%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C, %A_Temp%, Min UseErrorLevel
+RunWait %SystemRoot%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data\PepperFlash" /grant "%A_UserName%:(OI)(CI)M" /T /C, %A_Temp%, Min UseErrorLevel
 
 ; Удаление дистрибутивов OneDrive – иначе со временем их скачивается много версий и они занимают гигабайты
 FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
-
-; Проверка флагов ошибок при отправке выгрузок
-foundErrFlags=
-Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\DispatchFiles.ahk.log*.errflag
-{
-    age=
-    age -= A_LoopFileTimeCreated, Days
-    If (age > minAgeForSendLogs) {
-	FileReadLine errLine, %A_LoopFileFullPath%, 1
-	foundErrFlags .= A_LoopFileName ": " errLine ", "
-    }
-}
-If (foundErrFlags)
-    foundErrFlags := "Флаги ошибок: " SubStr(foundErrFlags, 1, -2) "."
-unsentCounts:={}
-For mask, name in {"OutgoingText\*.txt": "уведомления", "OutgoingFiles\*.7z": "выгрузки"}
-    Loop Files, d:\1S\Rarus\ShopBTS\ExtForms\post\%mask%
-    {
-	age=
-	age -= A_LoopFileTimeModified, Days
-	If (age > minAgeForSendLogs) {
-	    If (!unsentCounts.HasKey(name))
-		unsentCounts[name] := {}
-	    If (!unsentCounts[name].HasKey(age))
-		unsentCounts[name][age] := 1
-	    Else
-		unsentCounts[name][age]++
-	}
-    }
-unsentCountsText=
-For name, counts in unsentCounts {
-    unsentCountsLine=
-    For age, c in counts
-	If (c)
-	    unsentCountsLine .= " (" c ") в течение " age " дн.,"
-    If (unsentCountsLine)
-	unsentCountsText .= name . unsentCountsLine
-}
-If (unsentCountsText)
-    foundErrFlags := "Есть не отправленные " SubStr(unsentCountsText, 1, -1) ". " foundErrFlags
-If (foundErrFlags) {
-    ;\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\RetailStatusReport.ahk  <Module> <Status> <Extended info …>
-    Try Run % """" A_AhkPath """ """ getDefaultConfigDir() "\_Scripts\Lib\RetailStatusReport.ahk"" """ A_ScriptName """ ""Rarus email system malfunction"" """ StrReplace(StrReplace(foundErrFlags, """", "'"), "`n", "; ") """"
-    MsgBox 0x30, Ошибки при отправке выгрузок или уведомлений из 1С-Рарус, При отправке выгрузок или увеодмлений из 1С-Рарус возникли ошибки`, и отправка частично либо полностью не работает.`n`nПри закрытии этого окна`, откроется шаблон письма для регистрации заявки. Проверьте его`, добавьте известную Вам информацию и отправляйте. Если письмо не отправится – звоните.
-    Run % "mailto:it-task@status.mobilmir.ru?subject=Ошибки%20отправки%20выгрузок%20или%20уведомлений%20из%201С-Рарус%20&body=Обнаружены%20сигнальные%20файлы%20ошибок%20при%20отправке%20выгрузок%20или%20уведомлений%20из%201С-Рарус%3A%0A%0A" UriEncode(foundErrFlags)
-}
 
 If (A_IsAdmin)
     ExitApp
@@ -102,19 +51,6 @@ Periodic:
 	RasDisconnected:=1
     } Else {
 	RasDisconnected=
-	If (rarusPID && A_TickCount >= nextRebootOffer && A_TimeIdlePhysical > maxIdleForMsgbox) {
-	    MsgBox 0x34, Компьютер не перезагружался, Компьютер включен со вчерашнего дня.`nДля создания резервной копии 1С-Рарус требуется перезагрузка. Перезагрузить сейчас?`n`n(если ответите нет – перезагрузите сами при первой возможности), 60
-	    IfMsgBox No
-	    {
-		nextRebootOffer := A_TickCount + rebootOfferDelay ; ms
-	    } Else {
-		WinClose %wintitle1s%
-		WinWaitClose,,, 30 ; seconds to wait for close
-		Shutdown 2
-	    }
-	} Else {
-	    rarusPID := getFirstPid("1cv7s.exe", "1cv7.exe")
-	}
 	
 	If (checkCanonMFScan) {
 	    Process Exist, MFSCANUTILITY.exe
@@ -138,38 +74,6 @@ Periodic:
 	    transp:=255
 	    WinSet Transparent, Off
 	}
-    }
-;Рарус
-    If (idle > idletimeRarusCheckAutoLoad && A_TickCount > rarusLoadNextCheck && WinExist(wintitle1s)) {
-	rarusMinMax := 2
-	ControlGetText txtBtn, Button20
-	If (ErrorLevel || txtBtn != "ОБМЕН УТ") {
-	    WinGet rarusMinMax, MinMax
-	    If (rarusMinMax == -1)
-		WinRestore
-	    ControlSend ahk_parent, {F12}
-	    ;Progress,, Фронт кассира развернут
-	    Sleep 2000
-	    ControlGetText txtBtn, Button20
-	    If (ErrorLevel || txtBtn != "ОБМЕН УТ") ; че-то не сработало
-		Exit
-	}
-	ControlGetText txtStatic, Static2
-	If (ErrorLevel || txtStatic != "ОБМЕН УТ")
-	    Exit
-	; кроме Static2, можно проверять видимость Button21, но Button21 -- без текста
-	ControlGet s2vis, Visible,, Static2
-	If (!ErrorLevel && s2vis) { ; кнопка – красная
-	    If (rarusMinMax == 2) {
-		WinGet rarusMinMax, MinMax
-		If (rarusMinMax == -1)
-		    WinRestore
-	    }
-	    ControlClick Button20 ; ОБМЕН УТ
-	    rarusLoadNextCheck := A_TickCount + doublepressRarusTimeout
-	}
-	If (rarusMinMax = -1)
-	    WinMinimize
     }
 return
 
