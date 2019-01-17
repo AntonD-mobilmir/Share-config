@@ -67,15 +67,18 @@ Periodic:
     }
     
 ;Гифтоман
-    If (WinExist("ahk_group KKMGMSuite")) {
-	If (WinActive()) {
-	    transp:=255
-	    WinSet Transparent, Off
-	} Else If (idle > idletimeGiftomanNonOnTop) {
-            transp -= transp > 50 ? 10 : 0
-	    WinSet Transparent, %transp%
-	    WinSet AlwaysOnTop, Off
-	}
+    If (giftomanWinExist || idle > idletimeGiftomanNonOnTop) {
+        giftomanWinExist := WinExist("ahk_group KKMGMSuite")
+        If (giftomanWinExist) {
+            If (transp < 255 && WinActive()) {
+                WinSet Transparent, Off
+                transp := 255
+            } Else {
+                WinSet AlwaysOnTop, Off
+                If (transp > 50)
+                    WinSet Transparent, % transp >>= 1
+            }
+        }
     }
 return
 
