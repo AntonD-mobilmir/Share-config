@@ -23,6 +23,9 @@ lProgramFiles := lProgramFiles ? lProgramFiles : A_ProgramFiles
 If (FileExist(lProgramFiles "\Canon\MF Scan Utility\MFSCANUTILITY.exe"))
     checkCanonMFScan := -1 ; PID скрипта исправления ACL. Скрипт будет запущен при обнаружении MFSCANUTILITY.exe, если процесса с таким PID нет.
 
+If (A_IsAdmin)
+    Menu Tray, Icon
+
 ;ahk_class HwndWrapper[KKMGMSuite.exe;;ec6679dd-7266-4fe0-8880-fd566da471b0]
 ;ahk_exe KKMGMSuite.exe
 GroupAdd KKMGMSuite, ahk_exe KKMGMSuite.exe
@@ -36,8 +39,9 @@ RunWait %SystemRoot%\System32\icacls.exe "%LocalAppData%\Google\Chrome\User Data
 ; Удаление дистрибутивов OneDrive – иначе со временем их скачивается много версий и они занимают гигабайты
 FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
 
-If (A_IsAdmin)
-    ExitApp
+;save a bit on memory if Windows 5 or newer - MilesAhead
+DllCall("psapi.dll\EmptyWorkingSet", "Int", -1, "Int")
+
 Exit
 
 Periodic:
@@ -63,16 +67,14 @@ Periodic:
     }
     
 ;Гифтоман
-    If (idle > idletimeGiftomanNonOnTop && WinExist("ahk_group KKMGMSuite")) {
-	If (transp > 50)
-	    transp-=10
-	IfWinActive
-	{
-	    WinSet Transparent, %transp%
-	    WinSet AlwaysOnTop, Off
-	} Else {
+    If (WinExist("ahk_group KKMGMSuite")) {
+	If (WinActive()) {
 	    transp:=255
 	    WinSet Transparent, Off
+	} Else If (idle > idletimeGiftomanNonOnTop) {
+            transp -= transp > 50 ? 10 : 0
+	    WinSet Transparent, %transp%
+	    WinSet AlwaysOnTop, Off
 	}
     }
 return
