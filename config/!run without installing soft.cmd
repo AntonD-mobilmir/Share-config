@@ -13,9 +13,12 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
     SET /A "n=1"
     FOR %%I IN ("%~dp0_*.cmd") DO (
-	ECHO !n!: %%~nxI
-	SET "script!n!=%%~fI"
-	SET /A n+=1
+        SET "scriptName=%%~nI"
+	IF "!scriptName:~0,1!"=="_" (
+            SET "script!n!=%%~fI"
+            ECHO !n!: %%~nxI
+            SET /A "n+=1"
+        )
     )
     
     ECHO Какой скрипт запустить? ^(номер или полный путь^)
