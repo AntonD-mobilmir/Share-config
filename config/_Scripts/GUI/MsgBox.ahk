@@ -15,6 +15,14 @@ If (A_Args.Length() < 2) {
     ;Makes the 2nd button the default 256 0x100 
     ;Makes the 3rd button the default 512 0x200 
 
+    ;Icon Hand (stop/error) 16 0x10 
+    ;Icon Question 32 0x20 
+    ;Icon Exclamation 48 0x30 
+    ;Icon Asterisk (info) 64 0x40 
+
+    ;Makes the 2nd button the default 256 0x100 
+    ;Makes the 3rd button the default 512 0x200 
+
     MsgBox % A_Args[1], %2%, %3%, %4%
     IfMsgBox OK
         Exit 100

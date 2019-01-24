@@ -20,9 +20,10 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 IF NOT ERRORLEVEL 1 CLS
 rem 	cscript.exe %windir%\System32\slmgr.vbs /ato &
 rem вызывает двойную активацию на Win10 до 1809Oct. 1809Oct без этого ключа не активируется ;-(
-SET "Activate=1"
-CALL "%~dp0CheckWinVer.cmd" 10.0 && CALL "%~dp0CheckWinVer.cmd" 10.0.17763.134 || SET "Activate="
-IF DEFINED Activate %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /ato || %ErrorCmd%
+rem up 2019-01-24: похоже, кроме 1809Oct с последними обновлениями :-/ Ибо с ними --- снова двойная активация.
+rem up 2019-01-24: SET "Activate=1"
+rem up 2019-01-24: CALL "%~dp0CheckWinVer.cmd" 10.0 && CALL "%~dp0CheckWinVer.cmd" 10.0.17763.134 || SET "Activate="
+rem up 2019-01-24: IF DEFINED Activate %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /ato || %ErrorCmd%
 %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /cpky || %ErrorCmd%
 EXIT /B
 )
