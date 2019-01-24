@@ -6,17 +6,10 @@ FileEncoding UTF-8
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 
-If (!A_IsAdmin) {
-    RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
-    ExitApp
-}
+IniWrite https://trello.com/b/9SqV3GUA, %A_Desktop%\¡Шаблон_ подготовка компьютера (Trello).url, InternetShortcut, URL
 
 If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
     sysNative := SystemRoot "\System32"
-
-Run %sysNative%\bcdedit.exe /set nx optout, %A_Temp%, Min
-Run %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%, Min
-Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%, Min
 
 defaultConfigDir = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config
 configScriptsDir = %A_ScriptDir%\..
@@ -25,13 +18,24 @@ If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
     configDir = %configScriptsDir%\..
 }
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
-IniWrite https://trello.com/b/9SqV3GUA, %A_Desktop%\¡Шаблон_ подготовка компьютера (Trello).url, InternetShortcut, URL
+FileCopy %configScriptsDir%\lnk\Win-ActivateWithPK.lnk, %A_Desktop%\*.*
+FileCopy %configScriptsDir%\lnk\SwapSpace_FORMAT_MOUNT.lnk, %A_Desktop%\*.*
+FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot.lnk, %A_Desktop%\*.*
+
+If (!A_IsAdmin) {
+    RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
+    ExitApp
+}
+
+Run %sysNative%\bcdedit.exe /set nx optout, %A_Temp%, Min
+Run %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%, Min
+Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%, Min
 
 OSVersionObj := RtlGetVersion()
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
 
 If (AppXSupported)
-    Run %comspec% /C "%configScriptsDir%\Windows 10 right after OOBE.cmd", %A_Temp%
+    Run %comspec% /C "%configScriptsDir%\Win10 right after OOBE.cmd", %A_Temp%, Min
 
 Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%, Min
 
@@ -46,7 +50,7 @@ If (StartsWith(Hostname, "DESKTOP-") || StartsWith(Hostname, "LAPTOP-")) {
 }
 
 ;EnvSet Write-trello-id.ahk-params, /nag
-Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%, Min
+RunWait %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%, Min
 ;If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
 ;}
 
@@ -55,6 +59,9 @@ Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cm
 ;    IfMsgBox Yes
 ;        Run "%A_AhkPath%" "%A_ScriptDir%\Move Windows Search Index to D.ahk"
 ;}
+
+If (A_OSVersion == "WIN_7")
+    RunWait %comspec% /C ""\\Srv0.office0.mobilmir\Distributives\Updates\Windows\7 From Scratch\install.cmd" /noreboot"
 
 ExitApp
 
