@@ -33,6 +33,6 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     ENDLOCAL
     %comspec% /C "%runscript%"
     ECHO Скрипт "%runscript%" завершился.
-    PING 127.0.0.1 -n 10 >NUL
+    PING 127.0.0.1 -n 3 >NUL
     EXIT /B
 )

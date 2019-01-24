@@ -32,18 +32,18 @@ SETLOCAL ENABLEEXTENSIONS
     %exe7z% x -aoa -y -o"d:\Scripts" -- "%scriptConfDir%\software_update_autodist downloader-dist.7z" || CALL :RecordError "downloader-dist.7z"
     %exe7z% x -aoa -y -o"d:\Scripts\software_update" -- "%scriptConfDir%\software_update_autodist software_update.7z" || CALL :RecordError "software_update.7z"
     
-    (
-        ECHO %dldisttm%
-        ECHO %softuptm%
-    ) >>"%scriptConfDir%\last_dates.txt"
-    
     IF NOT DEFINED recErr (
-        START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\RetailStatusReport.ahk" "%~n0" "OK" "downloader-dist.7z: %dldisttm%, software_update.7z: %softuptm%"
+        (
+            ECHO %dldisttm%
+            ECHO %softuptm%
+        ) >>"%scriptConfDir%\last_dates.txt"
+        
+        START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\RetailStatusReport.ahk" "%~n0" "OK" "downloader-dist.7z: %dldisttm% (prev: %prevdldisttm%), software_update.7z: %softuptm% (prev: %prevsoftuptm%)"
         EXIT /B
     )
 )
 (
-    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\RetailStatusReport.ahk" "%~n0" "%recErr:~2%" "downloader-dist.7z: %dldisttm%, software_update.7z: %softuptm%"
+    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\RetailStatusReport.ahk" "%~f0" "%recErr:~2%" "downloader-dist.7z: %dldisttm% (prev: %prevdldisttm%), software_update.7z: %softuptm% (prev: %prevsoftuptm%)"
     EXIT /B
 )
 :RecordError

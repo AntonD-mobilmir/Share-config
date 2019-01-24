@@ -14,9 +14,9 @@ If (!A_IsAdmin) {
 If (!FileExist((sysNative := SystemRoot "\SysNative") "\cmd.exe"))
     sysNative := SystemRoot "\System32"
 
-Run %sysNative%\bcdedit.exe /set nx optout, %A_Temp%
-Run %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%
-Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%
+Run %sysNative%\bcdedit.exe /set nx optout, %A_Temp%, Min
+Run %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%, Min
+Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%, Min
 
 defaultConfigDir = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config
 configScriptsDir = %A_ScriptDir%\..
@@ -25,7 +25,7 @@ If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
     configDir = %configScriptsDir%\..
 }
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
-IniWrite https://trello.com/b/9SqV3GUA, %A_Desktop%\¡Шаблон_ подготовка компьютера (Trello).lnk, InternetShortcut, URL
+IniWrite https://trello.com/b/9SqV3GUA, %A_Desktop%\¡Шаблон_ подготовка компьютера (Trello).url, InternetShortcut, URL
 
 OSVersionObj := RtlGetVersion()
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
@@ -33,7 +33,7 @@ AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] 
 If (AppXSupported)
     Run %comspec% /C "%configScriptsDir%\Windows 10 right after OOBE.cmd", %A_Temp%
 
-Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%
+Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%, Min
 
 RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 ; стандартный hostname в Win10: DESKTOP-*
@@ -46,7 +46,7 @@ If (StartsWith(Hostname, "DESKTOP-") || StartsWith(Hostname, "LAPTOP-")) {
 }
 
 ;EnvSet Write-trello-id.ahk-params, /nag
-Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%
+Run %comspec% /C "%configDir%\..\Inventory\collector-script\SaveArchiveReport.cmd", %A_Temp%, Min
 ;If (!FileExist(A_AppDataCommon "\mobilmir.ru\trello-id.txt")) {
 ;}
 
