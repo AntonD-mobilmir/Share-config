@@ -96,14 +96,16 @@ EXIT /B
 (
     MKDIR "%pubkeysDest%"
     IF EXIST "%pubkeysDest%" (
-        ECHO Открытые ключи будут сохранены в "%pubkeysDest%", чтобы адресная книга обновлялась - скопируйте их в "%srvPubkeysDest%"
-        IF NOT "%RunInteractiveInstalls%"=="0" %SystemRoot%\explorer.exe /explore,"%srvPubkeysDest%"
+        ECHO Открытые ключи будут сохранены в "%pubkeysDest%", чтобы адресная книга обновлялась - поместите их в "%srvPubkeysDest%"
+        ECHO "%srvPubkeysDest%">"%pubkeysDest%\_srvPubkeysDest.txt"
+        SET "CannotSaveToServer=1"
         
         SET "LastTry=1"
         GOTO :CheckGenKeyring
     ) ELSE (
         ECHO Не удалось создать папку "%pubkeysDest%"
         ECHO Открытые ключи не сохранятся, выход.
+        IF NOT "%RunInteractiveInstalls%"=="0" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\GUI\MsgBox.ahk" 16 "%~nx0" "Не удалось создать папку %pubkeysDest%."
         PING -n 15 >NUL
         EXIT /B 1
     )
@@ -111,5 +113,9 @@ EXIT /B
 :GenKeyring
 (
     CALL "%~dp0..\genGpgKeyring.cmd" "%pubkeysDest%" "%UserIDPrefix%%Hostname%@ScriptUpdater.mobilmir" "ScriptUpdater"
+    IF DEFINED CannotSaveToServer IF NOT "%RunInteractiveInstalls%"=="0" (
+        %SystemRoot%\explorer.exe /explore,"%pubkeysDest%"
+        CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\GUI\MsgBox.ahk" 48 "%~nx0" "Открытые ключи сохранены в %pubkeysDest%, чтобы адресная книга обновлялась - поместите их в %srvPubkeysDest%"
+    )
 EXIT /B
 )
