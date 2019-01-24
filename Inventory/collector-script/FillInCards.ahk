@@ -46,6 +46,7 @@ ProcessDir(ByRef srcDirs*) {
     hostNames := {}
     For i, nameRegex in [ "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2}\s{1,2}\d+(\.\d+)?)(?P<Suffix>.*)"
                         , "S)^(?P<Hostname>[^ .]+)(?P<Suffix>.*)" ] {
+        mHostname := mDateTime := ""
         For i, srcDir in srcDirs
             Loop Files, %srcDir%\*.json
                 If (RegexMatch(A_LoopFileName, nameRegex, m))
@@ -56,6 +57,7 @@ ProcessDir(ByRef srcDirs*) {
     For Hostname, mDateTime in hostNames {
         query := {Hostname: Hostname}, options := {log: srcDirs[1] "\" Hostname ".log"}
         commonsuffix := "\" Hostname . (mDateTime ? " " mDateTime : "")
+        ;MsgBox commonsuffix: %commonsuffix%`nHostname: %Hostname%`nmDateTime: %mDateTime%
         For i, srcDir in srcDirs {
             For fnamesuffix, qParam in SuffixesToQueries {
                 Loop Files, %srcDir%%commonsuffix%%fnamesuffix%
@@ -124,13 +126,16 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
             cardDesc := card.desc
             lfo.WriteLine("Найдена карточка " card.name " <" card.shortUrl "> #" cardID "`n" cardDesc)
             textfp=
-            If (pathtextfp := options.txt)
+            If (pathtextfp := options.txt) {
                 FileRead textfp, %pathtextfp%
+                lfo.WriteLine("`nИз файла """ options.txt """ прочитан текст:`n" textfp)
+            }
             If (!textfp) { ; txt option is not specified, or file is empty or can't be read
-                If (IsObject(fp))
+                If (IsObject(fp)) {
                     textfp := GetFingerprint_Object_To_Text(fp)
-                Else
-                    Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText(lastMatch))
+                    lfo.WriteLine("`nИз отпечатка получен текст:`n" textfp)
+                } Else
+                    Throw Exception("Текст отпечатка для " card.name " <" card.shortUrl "> не определен, нечего добавлять в карточку.",,ObjectToText({lastMatch: lastMatch, options: options, fp: fp}))
             }
             
             lfo.WriteLine("Текст отпечатка: " textfp)
