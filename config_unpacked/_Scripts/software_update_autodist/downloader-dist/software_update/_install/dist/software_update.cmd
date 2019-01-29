@@ -57,9 +57,11 @@ IF "%~1"=="" (
     REM %AutohotkeyExe% may still be undefined
     IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
     REM scripts running once if no error
-    FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
+    FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logrunningsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
     REM scripts running each time are postponed
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\!*.*"`) DO SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I"
+    REM scripts errored once are postponed
+    FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%SUScripts%\*.*"`) DO IF NOT EXIST "%SUScriptsStatus%\%%~nxI%logsuffix%" IF EXIST "%SUScriptsStatus%\%%~nxI%logrunningsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%SUScripts%\%%~I" !
     
     GOTO :removeoldlogs
 ) ELSE (
