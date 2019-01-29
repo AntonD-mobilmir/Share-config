@@ -38,8 +38,8 @@ Loop Read, %passFileName%
 }
 
 If (backupHostname != m.Hostname) {
-    Hostname := m.Hostname . " (" . backupHostname . ")"
-    backupName .= " @ " . backupDir
+    Hostname := backupHostname " (" m.Hostname ")"
+    backupName .= " @ " backupDir
 } Else {
     Hostname := m.Hostname
 }

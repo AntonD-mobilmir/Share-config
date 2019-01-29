@@ -53,13 +53,15 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
     
     CALL :unpack7zs "%~dp0Shortcuts.new"
+    REM Удаление файлов, которых нет в новом архиве
     FOR /F "usebackq delims=" %%A IN (`DIR /B /A-D "%~dp0Shortcuts\*.*"`) DO IF NOT EXIST "%~dp0Shortcuts.new\%%~A" ECHO.|DEL /F "%~dp0Shortcuts\%%~A"
     REM Файлов в подпапках может не быть новых архивах, проверить в пакетном файле это будет сложно
     FOR /F "usebackq delims=" %%A IN (`DIR /B /AD "%~dp0Shortcuts\*.*"`) DO RD /S /Q "%~dp0Shortcuts\%%~A"
+    REM проще и быстрее распаковать заново, чем переместить
     RD /S /Q "%~dp0Shortcuts.new"
     CALL :unpack7zs "%~dp0Shortcuts"
     
-    CALL :RecordNewTimes
+    CALL :UpdatelastUnpackedtxt
     
     %AutohotkeyExe% "%ScriptUpdaterDir%\scriptUpdater.ahk" /ErrorStdOut "%~f0"
     EXIT /B
@@ -70,17 +72,18 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     IF DEFINED Shortcuts_64bitTime %exe7z% x -aoa -o%1 -- "%configDir%Users\depts\Shortcuts_64bit.7z" >"%scriptConfDir%\unpack-Shortcuts_64bit.7z.log" 2>&1 || CALL :SaveErrorLevel unpacking Shortcuts_64bit.7z
 EXIT /B
 )
-:RecordNewTimes
+:UpdatelastUnpackedtxt
 (
+    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeRCnfwwNbKEruCW0ALmzsXvF9oRhm9MHe95qOleKzqrbpp7A/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%" "entry.1400183939=%USERNAME% (up from %lastShortcutsTime%/%lastShortcuts_64bitTime%)"
+
     IF NOT DEFINED ShortcutsTime SET "ShortcutsTime=%lastShortcutsTime%"
     IF NOT DEFINED Shortcuts_64bitTime SET "Shortcuts_64bitTime=%lastShortcuts_64bitTime%"
 )
-(
+@(
     (
         ECHO %ShortcutsTime%
         ECHO %Shortcuts_64bitTime%
     )>"%scriptConfDir%\lastUnpacked.txt"
-    START "" %AutohotkeyExe% "%configDir%_Scripts\Lib\PostGoogleForm.ahk" "https://docs.google.com/forms/d/e/1FAIpQLSeNftB3Rwx9ztsZn6FD3mHbAOR87-nxPMaeSle80obZAIR3TQ/formResponse" "entry.48561467=%MailUserId%" "entry.1166115539=%Hostname%" "entry.2076050092=%ShortcutsTime%" "entry.1752683108=%Shortcuts_64bitTime%" "entry.1722862426=%savedErrors%" "entry.1400183939=%USERNAME%"
 EXIT /B
 )
 :GetDir

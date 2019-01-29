@@ -12,7 +12,7 @@
     SETLOCAL ENABLEEXTENSIONS
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-
+    
     FOR /f "usebackq tokens=3*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED PassFilePath (
 	IF EXIST "C:\Users\Install\Install-pwd.txt" (
@@ -21,7 +21,7 @@
 	    SET "PassFilePath=%USERPROFILE%\Install-pwd.txt"
 	)
     )
-
+    
     IF NOT DEFINED includes SET "includes=-allCritical"
     SET "DstBaseDir=%~1"
     REM Windows 8+ cannot restore from compressed images
@@ -36,7 +36,7 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
 	ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
 	SET "CopyToR=0"
     ) ELSE IF EXIST R:\ SET /P "CopyToR=Сделать копию образа на R: ? [1=да] "
-
+    
     IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
 )
 (
@@ -51,15 +51,15 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     
     ECHO Запись контрольных сумм
     rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла
-
+    
     IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%DstDirWIB%\%Hostname%-7zchecksums.txt" "%DstDirWIB%\%Hostname%\7zchecksums.txt""
-
+    
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
 	CALL :CompressAndDefrag R:
     )
     CALL :CompressAndDefrag "%DstBaseDir%"
-
+    
     EXIT /B
 )
 :CopyEchoPassFilePath
@@ -98,7 +98,7 @@ EXIT /B
 	ECHO Папка "%~1\WindowsImageBackup\%Hostname%" уже существует. Она будет переименована.
 	MOVE /Y "%~1\WindowsImageBackup\%Hostname%" "%~1\WindowsImageBackup\%Hostname%.%RANDOM%"
     )
-
+    
     ECHO Копирование образа в "%~1\WindowsImageBackup\%Hostname%"
     MKDIR "%~1\WindowsImageBackup\%Hostname%" 2>NUL
     XCOPY "%DstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
@@ -117,7 +117,7 @@ EXIT /B
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /grant "*S-1-5-32-544:(OI)(CI)F" /grant "*S-1-5-18:(OI)(CI)F" /grant "*S-1-5-32-551:(OI)(CI)F" /grant "*S-1-3-0:(OI)(CI)F" /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /inheritance:r /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
-
+    
     ECHO Ожидание окончания записи контрольных сумм
 )
 (
