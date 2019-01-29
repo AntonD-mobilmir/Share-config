@@ -1,5 +1,6 @@
 #http://www.74k.org/java-uninstall-remove-guids-strings
-#first line is last version
+#first line is latest version
+26A24AE4-039D-4CA4-87B4-2F64180201F0	8u201 64-bit
 26A24AE4-039D-4CA4-87B4-2F64180192F0	8u192 64-bit
 26A24AE4-039D-4CA4-87B4-2F64180181F0	8u181 64-bit
 26A24AE4-039D-4CA4-87B4-2F64180152F0	8u152 64-bit
