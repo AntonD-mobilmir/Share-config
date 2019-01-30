@@ -109,6 +109,8 @@ GetFingerprint_GetForgedValues() {
 			 , "Manufacturer2": "" ; RAM: Manufacturer2, PartNumber: PartNum2, SerialNumber: SerNum2
 			 , "Manufacturer3": ""
 			 , "Manufacturer00": "" ; RAM: Manufacturer00, PartNumber: HMT125U6TFR8C-H9, SerialNumber: A516521C
+			 , "ModulePartNumber00": "" ; https://trello.com/c/HFcgc6Er/236
+			 , "SerNum00": "" ; https://trello.com/c/HFcgc6Er/236
 			 , "PartNum0": ""
 			 , "PartNum1": ""
 			 , "PartNum2": ""
