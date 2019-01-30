@@ -375,7 +375,7 @@ If (gsussScript) {
     keepOpen := 1
 }
 Distributives := EnvGetAfterScript(gsussScript, "Distributives")
-SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")))
+SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")), InStr(FileExist(Distributives), "D"))
 If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
     AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
     Distributives := officeDistSrvPath
