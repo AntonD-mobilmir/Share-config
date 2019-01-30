@@ -13,7 +13,12 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
     
-    SET "scriptConfDir=%LOCALAPPDATA%\mobilmir.ru\%~n0"
+    SET "scriptConfDir=%ProgramData%\dpn0"
+    IF NOT EXIST "%ProgramData%\dpn0" MKDIR "%ProgramData%\dpn0"
+    IF NOT EXIST "%ProgramData%\dpn0" (
+        SET "scriptConfDir=%LOCALAPPDATA%\mobilmir.ru\%~n0"
+        IF NOT EXIST "%LOCALAPPDATA%\mobilmir.ru\%~n0" MKDIR "%LOCALAPPDATA%\mobilmir.ru\%~n0"
+    )
 
 :GetScriptUpdaterDirAgain
     FOR /F "usebackq delims=" %%A IN ("%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt") DO SET "ScriptUpdaterDir=%%~A"
@@ -26,7 +31,6 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 )
 (
     CALL :GetDir configDir "%DefaultsSource%"
-    IF NOT EXIST "%scriptConfDir%" MKDIR "%scriptConfDir%"
     
     SET "foundShortcuts="
     FOR /D %%A IN ("%~dp0Shortcuts\*.*") DO IF EXIST "%%~A\*.lnk" SET "foundShortcuts=1"
