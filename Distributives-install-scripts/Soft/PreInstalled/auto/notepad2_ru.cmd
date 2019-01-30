@@ -28,10 +28,10 @@ IF DEFINED ProgramFiles^(x86^) (
 ASSOC .txt=notepad2-txtfile
 FTYPE notepad2-txtfile=^"%%%RunPathVar%%%\Notepad2\Notepad2.exe^" %%1
 
-REG ADD "HKEY_CLASSES_ROOT\notepad2-txtfile\DefaultIcon" /ve /t REG_EXPAND_SZ /d "%SystemRoot%\system32\imageres.dll,-102"
-REG ADD "HKEY_CLASSES_ROOT\*\OpenWithList\Notepad2.exe" /f
+ECHO N|REG ADD "HKEY_CLASSES_ROOT\.txt\ShellNew" /v "NullFile" /d ""
+ECHO N|REG ADD "HKEY_CLASSES_ROOT\notepad2-txtfile\DefaultIcon" /ve /t REG_EXPAND_SZ /d "%SystemRoot%\system32\imageres.dll,-102"
 REG ADD "HKEY_CLASSES_ROOT\Applications\notepad2.exe\shell\open\command" /ve /d """"%%%RunPathVar%%%\Notepad2\notepad2.exe""" """%%1"""" /f
 REG ADD "HKEY_CLASSES_ROOT\Applications\notepad2.exe\shell\edit\command" /ve /d """"%%%RunPathVar%%%\Notepad2\notepad2.exe""" """%%1"""" /f
-ECHO N|REG ADD "HKEY_CLASSES_ROOT\.txt\ShellNew" /v "NullFile" /d ""
+REG ADD "HKEY_CLASSES_ROOT\*\OpenWithList\Notepad2.exe" /f
 )
 EXIT /B %ErrorPresence%
