@@ -2,8 +2,12 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
+If (!A_IsAdmin) {
+    Run % "*RunAs " . DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
+    ExitApp
+}
+
 EnvGet LocalAppData, LOCALAPPDATA
-SplitPath A_ScriptName, 
 SplitPath A_ScriptName, , , , ScriptName
 configDir = %A_AppDataCommon%\mobilmir.ru\%ScriptName%
 logsDir = %A_Temp%
