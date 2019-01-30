@@ -80,38 +80,41 @@ If (FileExist(mailProfileDir . "\prefs.js")) {
 
 If (!skipCreatingProfile) {
     FileCreateDir %mailProfileDir%
-    FileCopyDir %A_ScriptDir%\default_profile_template, %mailProfileDir%, 1
-    If (!FileExist(mailProfileDir . "\*.*")) {
-	MsgBox Не удалось создать "%mailProfileDir%"!
-	Exit
-    }
+    If (!InStr(FileExist(mailProfileDir), "D"))
+	Throw Exception(A_LastError,, "Не удалось создать """ mailProfileDir """!")
+    Try
+        FileCopyDir %A_ScriptDir%\default_profile_template, %mailProfileDir%, 1
+    Catch e
+        Throw Exception(e,, "Ошибка при копировании """ A_ScriptDir "\default_profile_template"" в """ mailProfileDir """")
+    If ( !(prefsjs := fRead(mailProfileDir "\prefs.js")) )
+	Throw Exception(A_LastError,, "Не удалось прочитать файл """ mailProfileDir " \prefs.js"".")
 
     Run %SystemRoot%\System32\compact.exe /C /S:"%mailProfileDir%\Mail" /I, %mailProfileDir%, Min UseErrorLevel
     Run %SystemRoot%\System32\compact.exe /C /S:"%mailProfileDir%\ImapMail" /I, %mailProfileDir%, Min UseErrorLevel
 
-    If ( IsObject(prefsJsHndl := FileOpen(mailProfileDir "\prefs.js", "r-wd", "UTF-8")) ) {
-	prefsjs := prefsJsHndl.Read(), prefsJsHndl.Close()
-    } Else {
-	MsgBox Не удалось открыть файл prefs.js. A_LastError=%A_LastError%
-	Exit
-    }
-
     If (retailDept) {
-	If ( IsObject(appendPrefsJsHndl := FileOpen(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_retail.js", "r-wd", "UTF-8")) ) {
-	    appendprefsjs := appendPrefsJsHndl.Read(), appendPrefsJsHndl.Close()
+        If (InStr(FileExist("d:\Mail\Thunderbird\AddressBook"), "D")
+            && appendprefsjs := fRead(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_retail.js")) {
+            If (RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) ; this only replaces hostname in comments, which is borderline superflous
+                appendprefsjs := StrReplace(appendprefsjs, "{$HostNameDeptPrefix$}", HostnameMatch1)
+            ; otherwise appendprefsjs may stay as is
+	} Else If (InStr(FileExist("\\localhost\AddressBook$"), "D")
+                   && appendprefsjs := fRead(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_anypath.js")) {
+            appendprefsjs := StrReplace(appendprefsjs, "{$path$}", "\\\\localhost\\AddressBook$")
+        }
 
-	    If (RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) {
-		StringReplace appendprefsjs, appendprefsjs, {$HostNameDeptPrefix$}, %HostnameMatch1%, 1
-		prefsjs .= "`n" . appendprefsjs
-	    }
-	}
+        If (appendprefsjs)
+            prefsjs .= (   SubStr(appendprefsjs, 1, 1) == "`n"
+                           || SubStr(prefsjs, 0, 1) == "`n"
+                         ? ""
+                         : "`n" )
+                       . appendprefsjs
     } Else {
 	mailFullName := Func("WMIGetUserFullname").Call(2)
     }
     
     ;prefsjs := RegExReplace(prefsjs, "\{\$\w+\$\}", )
-    StringReplace prefsjs, prefsjs, {$MailUserId$}, %MailUserId%, 1
-    StringReplace prefsjs, prefsjs, {$MailDomain$}, %MailDomain%, 1
+    prefsjs := StrReplace( StrReplace(prefsjs, "{$MailUserId$}", MailUserId), "{$MailDomain$}", MailDomain )
     If (mailFullName) {
 	searchStr := "//user_pref(""mail.identity.id1.fullName"", ""{$MailFullName$}"");"
 	newStr := "user_pref(""mail.identity.id1.fullName"", """ mailFullName """);"
@@ -143,6 +146,11 @@ ExitApp
 
 StartsWith(longstr, shortstr) {
     return shortstr == SubStr(longstr,1,StrLen(shortstr))
+}
+
+fRead(ByRef path, encoding := "UTF-8", mode := "r-wd") {
+    If ( IsObject(fo := FileOpen(path, mode, encoding)) )
+        return fo.Read(), fo.Close()
 }
 
 #Include *i %A_LineFile%\..\..\_Scripts\Lib\getDefaultConfig.ahk
