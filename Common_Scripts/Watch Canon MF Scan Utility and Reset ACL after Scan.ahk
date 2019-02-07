@@ -9,7 +9,7 @@ FileEncoding UTF-8
 global ScriptName:="Наблюдение за Canon MF Scan Utility и сброс настроек доступа к отсканированным файлам"
     , ErrMsgs := {scanDirNotFound: "Не найдена папка сканированных документов. Выход."}
 
-ResetMinPeriod := 30000 ; ms
+ResetMinPeriod := 15000 ; ms
 
 If (!(tgtBase := FindScanDest())) {
     TrayTip(ErrMsgs[scanDirNotFound])
@@ -29,20 +29,24 @@ GroupAdd mfprogress, ScanGear ahk_exe %mfscanexe%
 
 Loop
 {
+    reset := 0
     WinWait ahk_exe %mfscanexe%
     While WinExist("ahk_exe " mfscanexe) {
-	WinWait ahk_group mfprogress,,3
-	If (!ErrorLevel) {
-	    TrayTip("Обнаружено начало сканирования, ожидание завершения")
-	    WinWaitClose
-	    ResetACL()
-	    reset := 1
-	}
-	TrayTip("Обнаружено окно MF Scan Utility, ожидание начала сканирования")
+        Loop
+        {
+            TrayTip("Обнаружено окно MF Scan Utility, ожидание начала сканирования")
+            WinWait ahk_group mfprogress,, 15
+            If (!ErrorLevel) {
+                TrayTip("Обнаружено начало сканирования, ожидание завершения")
+                WinWaitClose
+                ResetACL()
+                reset := 1
+            }
+        } Until ErrorLevel
     }
-    If (!reset)
-	ResetACL()
     TrayTipAndHide("Окно MF Scan Utility закрылось")
+    If (reset)
+        ResetACL()
 }
 ExitApp
 
