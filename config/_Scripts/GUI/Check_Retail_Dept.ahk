@@ -73,11 +73,7 @@ If (A_IsAdmin) {
 
     If (runAhkUpdate)
 	RunRsyncAutohotkey(0)
-    If (FileExist(SystemDrive "\Sun")) {
-	AddLog("Удаление " SystemDrive "\Sun")
-	FileRemoveDir %SystemDrive%\Sun, 1
-	SetLastRowStatus(ErrorLevel, !ErrorLevel)
-    }
+    RemoveDirsWithLog(SystemDrive "\Sun")
     
     Loop Files, %A_AhkPath%
         AhkDir := A_LoopFileDir
@@ -210,7 +206,7 @@ RegRead OneDriveSetup, HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
 If (!ErrorLevel) {
     AddLog("OneDriveSetup в автозагрузке", "Удаление")
     RegDelete HKEY_CURRENT_USER\%RunKey%, OneDriveSetup
-    FileRemoveDir %LocalAppData%\Microsoft\OneDrive, 1
+    keepOpen += !!RemoveDirsWithLog(LocalAppData "\Microsoft\OneDrive")
     keepOpen += !!ErrorLevel
     SetLastRowStatus(ErrorLevel)
 }
@@ -294,6 +290,8 @@ If (ReRunAsAdmin) {
     Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
     ExitApp
 }
+
+RemoveDirsWithLog(A_AppDataCommon "\dpn0")
 
 RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir.ru\backup_1S_base" /F,, Min UseErrorLevel
 
@@ -447,14 +445,7 @@ If (FileExist("c:\squid")) {
 	SetLastRowStatus("Ошибка " ErrorLevel " при удалении службы", 0)
     Else {
 	SetLastRowStatus("Служба удалена")
-	FileRemoveDir c:\squid, 1
-	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
-	FileRemoveDir d:\squid, 1
-	squidFolderRmvErr := ErrorLevel || squidFolderRmvErr
-	If (squidFolderRmvErr)
-	    SetLastRowStatus("Папка осталась")
-	Else
-	    SetLastRowStatus("Папка удалена")
+	RemoveDirsWithLog("c:\squid", "d:\squid")
     }
 } Else {
     RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "squid_logrorate" /F,, Min UseErrorLevel
@@ -1102,12 +1093,26 @@ Expand(string) {
 }
 
 DeleteWithLog(ByRef paths*) {
+    errors := 0
     For i, path in paths
         If (FileExist(path)) {
             AddLog("Удаление """ path """")
             FileDelete %path%
-            SetLastRowStatus(ErrorLevel,!ErrorLevel)
+            errors := ErrorLevel || errors
+            SetLastRowStatus(errors += ErrorLevel,!ErrorLevel)
         }
+    return !errors
+}
+
+RemoveDirsWithLog(ByRef paths*) {
+    For i, path in paths
+        If (FileExist(path)) {
+            AddLog("Удаление " path)
+            FileRemoveDir %path%, 1
+            errors := ErrorLevel || errors
+            SetLastRowStatus(ErrorLevel, !ErrorLevel)
+        }
+    return !errors
 }
 
 #include %A_LineFile%\..\..\..\_Scripts\Lib\RtlGetVersion.ahk

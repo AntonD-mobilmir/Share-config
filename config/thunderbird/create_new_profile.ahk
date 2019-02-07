@@ -62,7 +62,7 @@ If (!mailProfileDir)
 ;MsgBox,,%A_ScriptName% Debug, MailUserId = "%MailUserId%"`nMailDomain = "%MailDomain%"`nmailFullName = "%mailFullName%"`nmailProfileDir = "%mailProfileDir%"
 
 If (FileExist(mailProfileDir . "\prefs.js")) {
-    MsgBox 35,, "%mailProfileDir%" уже существует.`nВсё равно копировать шаблон и генерировать ключ?`n(если нет`, просто будет записан путь к профилю в [Profile0] в profiles.ini)
+    MsgBox 35,, "%mailProfileDir%" уже существует.`nВсё равно создать новый профиль?`n(если нет`, просто будет записан путь к профилю в [Profile0] в profiles.ini)
 
     IfMsgBox Cancel
 	Exit

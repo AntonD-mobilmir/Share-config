@@ -111,3 +111,5 @@ Microsoft.HEVCVideoExtension_*
 Microsoft.MPEG2VideoExtension_*
 E046963F.LenovoCompanion_*
 E046963F.LenovoUtility_*
+E0469640.LenovoUtility_*
+*.LenovoUtility_*
