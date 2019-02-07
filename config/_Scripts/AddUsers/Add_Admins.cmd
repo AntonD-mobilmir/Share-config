@@ -28,17 +28,17 @@ EXIT /B
 (
     SETLOCAL ENABLEEXTENSIONS
     FOR /F "delims=/ tokens=1*" %%A IN ("%~1") DO (
-	SET "NewUsername=%%~A"
+	SET "newUsername=%%~A"
 	SET "flags=%%~B"
     )
-    SET "FullName=%~2"
+    SET "fullName=%~2"
     SET "gpgUserID=%~3"
-    SET "SaveDir=%~4"
+    SET "saveDir=%~4"
 )
 @(
     rem Check user existence
-    NET USER "%NewUsername%" >NUL 2>&1 && EXIT /B
-    IF DEFINED %NewUsername%_flags CALL :GetValue flags "%NewUsername%_flags"
+    NET USER "%newUsername%" >NUL 2>&1 && EXIT /B
+    IF DEFINED %newUsername%_flags CALL :GetValue flags "%newUsername%_flags"
     IF DEFINED flags CALL :ParseFlags
     IF DEFINED flag_n EXIT /B
     IF DEFINED flag_r (
@@ -49,12 +49,12 @@ EXIT /B
     IF NOT DEFINED flag_f IF "%RunInteractiveInstalls%"=="0" EXIT /B
     IF NOT DEFINED flag_f CALL :AskCreateUser || EXIT /B
     IF DEFINED flag_p (
-	%SystemRoot%\System32\net.exe USER "%NewUsername%" /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /USERCOMMENT:"Пользователь создан %DATE% в %TIME% скриптом %~f0" /FULLNAME:"%FullName%"
-	%SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='%NewUsername%' set PasswordExpires=false
+	%SystemRoot%\System32\net.exe USER "%newUsername%" /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /USERCOMMENT:"Пользователь создан %DATE% в %TIME% скриптом %~f0" /fullName:"%fullName%"
+	%SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='%newUsername%' set PasswordExpires=false
 	GOTO :setupgroups
     )
     
-    IF DEFINED SaveDir IF EXIST "%SaveDir%" SET "dirPlainOut=%SaveDir%\%Hostname%"
+    IF DEFINED saveDir IF EXIST "%saveDir%" SET "dirPlainOut=%saveDir%\%Hostname%"
     IF NOT DEFINED dirPlainOut SET "dirPlainOut=%TEMP%\%~n0.e"
 
     IF DEFINED gpgUserID (
@@ -82,7 +82,7 @@ EXIT /B
     IF DEFINED gpgUserID (
 	MKDIR "%dirGPGout%"
 	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
-	SET gpgServerCopy="\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\%NewUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
+	SET gpgServerCopy="\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\%newUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
     )
 )
 @(
@@ -90,8 +90,8 @@ EXIT /B
     rem Create new user
     (
 	rem Write password to file
-	ECHO %Hostname%\%NewUsername%	%pwd%
-	NET USER "%NewUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:NO /FULLNAME:"%FullName%" || CALL :SetUserAddError
+	ECHO %Hostname%\%newUsername%	%pwd%
+	NET USER "%newUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:NO /fullName:"%fullName%" || CALL :SetUserAddError
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
     
     IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
@@ -101,7 +101,7 @@ EXIT /B
 	%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%"
 	START "Copying gpg-encrypted password to Srv1S-B" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
 	IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
-	START "" %AutoHotkeyExe% "%~dp0Add_Admins_PostPasswordToForm.ahk" "%NewUsername%" %gpgencOut%
+	START "" %AutoHotkeyExe% "%~dp0submitEncryptedPassword.ahk" "%newUsername%" %gpgencOut%
     )
 )
 :setupgroups
@@ -109,10 +109,10 @@ EXIT /B
 REM END IF [DEFINED flag_p]
     rem Add to admin group. Its name differs depending on Windows language.
     (
-	NET LOCALGROUP Administrators "%NewUsername%" /Add
-	NET LOCALGROUP Администраторы "%NewUsername%" /Add
-	NET LOCALGROUP Users "%NewUsername%" /Delete
-	NET LOCALGROUP Пользователи "%NewUsername%" /Delete
+	NET LOCALGROUP Administrators "%newUsername%" /Add
+	NET LOCALGROUP Администраторы "%newUsername%" /Add
+	NET LOCALGROUP Users "%newUsername%" /Delete
+	NET LOCALGROUP Пользователи "%newUsername%" /Delete
     ) >NUL 2>&1
     ENDLOCAL
     IF NOT [%AutoHotkeyExe%]==[] SET AutoHotkeyExe=%AutoHotkeyExe%
@@ -147,7 +147,7 @@ EXIT /B
     GOTO :ParseNextFlag
 )
 :AskCreateUser
-    SET /P "doit=Создать пользователя %NewUsername% (%FullName%)? [0=N=нет, остальное = да]"
+    SET /P "doit=Создать пользователя %newUsername% (%fullName%)? [0=N=нет, остальное = да]"
 (
     IF "%doit%"=="0" EXIT /B 1
     IF /I "%doit:~0,1%" EQU "n" EXIT /B 1

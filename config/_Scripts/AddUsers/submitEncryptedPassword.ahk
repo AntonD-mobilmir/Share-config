@@ -13,7 +13,7 @@ RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Par
 RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
 If (!Domain)
     RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, DhcpDomain
-If (Domain != "office0.mobilmir" && Domain != "officeVPN.mobilmir")
+If (Domain != "office0.mobilmir")
     Hostname .= "." . Domain
 
 POSTDATA := { "entry.1247228425" : Hostname

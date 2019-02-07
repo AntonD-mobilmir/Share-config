@@ -1,0 +1,10 @@
+.sync
+Auto Create New Accounts/*.log
+Auto Create New Accounts/create_scripts_for_new_users.ahk.groups_url.txt
+Auto Create New Accounts/depts-to-groups.tsv
+Auto Create New Accounts/processed/*
+Auto Create New Accounts/pwd.*
+Auto Create New Accounts/req/*
+ExecQueue.done/*
+ExecQueue.error/*
+ExecQueue/*
