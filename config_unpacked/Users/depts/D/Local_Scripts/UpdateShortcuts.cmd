@@ -3,8 +3,6 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
     
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
     IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
@@ -13,28 +11,36 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
     FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED MailUserId CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"
     
-    SET "scriptConfDir=%ProgramData%\dpn0"
-    IF NOT EXIST "%ProgramData%\dpn0" MKDIR "%ProgramData%\dpn0"
-    IF NOT EXIST "%ProgramData%\dpn0" (
-        SET "scriptConfDir=%LOCALAPPDATA%\mobilmir.ru\%~n0"
-        IF NOT EXIST "%LOCALAPPDATA%\mobilmir.ru\%~n0" MKDIR "%LOCALAPPDATA%\mobilmir.ru\%~n0"
+    FOR %%A IN ("%ProgramData%" "%LOCALAPPDATA%") DO (
+        SET "scriptConfDir=%%~A\mobilmir.ru\%~n0"
+        DEL /F "%%~A\mobilmir.ru\%~n0\test.tmp"
+        IF NOT EXIST "%%~A\mobilmir.ru\%~n0\test.tmp" (
+            IF NOT EXIST "%%~A\mobilmir.ru\%~n0" MKDIR "%%~A\mobilmir.ru\%~n0"
+            ECHO.>"%%~A\mobilmir.ru\%~n0\test.tmp"
+            IF EXIST "%%~A\mobilmir.ru\%~n0\test.tmp" (
+                DEL /F "%%~A\mobilmir.ru\%~n0\test.tmp"
+                GOTO :FindScriptUpdaterDir
+            )
+        )
     )
-
-:GetScriptUpdaterDirAgain
+    ECHO Не удалось найти папку для записи состояния скрипта.
+    EXIT /B 1
+)
+:FindScriptUpdaterDir
+(
     FOR /F "usebackq delims=" %%A IN ("%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt") DO SET "ScriptUpdaterDir=%%~A"
     IF NOT DEFINED ScriptUpdaterDir (
+        ECHO "%ProgramData%\mobilmir.ru\ScriptUpdaterDir.txt" не существует, либо нет доступа для чтения.
 	rem %SystemRoot%\System32\fltmc.exe >nul 2>&1 || (ECHO Чтобы установить ScriptUpdater, нужны права администратора & EXIT /B)
 	rem CALL "%~dp0..\ScriptUpdater_dist\InstallScriptUpdater.cmd"
-	rem GOTO :GetScriptUpdaterDirAgain
+	rem GOTO :FindScriptUpdaterDir
 	EXIT /B 1
     )
-)
-(
+    
     CALL :GetDir configDir "%DefaultsSource%"
     
     SET "foundShortcuts="
     FOR /D %%A IN ("%~dp0Shortcuts\*.*") DO IF EXIST "%%~A\*.lnk" SET "foundShortcuts=1"
-    
     IF DEFINED foundShortcuts FOR /F "usebackq delims=" %%A IN ("%scriptConfDir%\lastUnpacked.txt") DO IF DEFINED lastShortcutsTime (SET "lastShortcuts_64bitTime=%%~A") ELSE SET "lastShortcutsTime=%%~A"
 )
 (
