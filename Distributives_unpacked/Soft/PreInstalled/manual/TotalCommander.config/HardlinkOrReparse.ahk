@@ -21,7 +21,10 @@ IfNotExist %1%
 	If (!SrcName) {
 	    SplitPath SrcDir, SrcName
 	    LinkType = Junction
-	    RunWait "%A_ScriptDir%\xln.exe" -n "%SrcDir%" "%2%%SrcName%",,Hide UseErrorLevel
+	    If (A_IsAdmin)
+                RunWait "%comspec%" /D "%2%%SrcName%" "%SrcDir%",,Hide UseErrorLevel
+	    Else
+                RunWait "%A_ScriptDir%\xln.exe" -n "%SrcDir%" "%2%%SrcName%",,Hide UseErrorLevel
 	} Else {
 	    LinkType = Hardlink
 	    RunWait "%A_ScriptDir%\xln.exe" "%A_LoopReadLine%" "%2%%SrcName%",,Hide UseErrorLevel

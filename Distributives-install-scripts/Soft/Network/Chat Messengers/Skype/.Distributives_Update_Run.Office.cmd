@@ -21,6 +21,7 @@ rem     IF NOT DEFINED curlexe IF EXIST "%SystemDrive%\SysUtils\curl.exe" SET cu
     IF NOT DEFINED wgetexe IF EXIST "%SystemDrive%\SysUtils\wget.exe" SET wgetexe="%SystemDrive%\SysUtils\wget.exe"
 )
 (
+    MKDIR "%workdir%" 2>NUL
     REM go.skype.com doesn't support HEAD request ;-(
     REM CURL, on the other hand, saves to file named "windows.desktop.download"
     REM seemingly because it uses name from URL in command line instead of redirected one. -J as you see does not help
@@ -45,6 +46,7 @@ rem     FOR %%A IN ("%workdir%%distMask%") DO ECHO.|DEL "%%~A"||MOVE /Y "%%~A" "
 rem     %curlexe% -vLR -o "%workdir%%newDst%" https://go.skype.com/windows.desktop.download >"%logsDir%\curl.log" 2>&1
     REM -L - follow redirects, -R - remote time
     %xlnexe% "%workdir%%newDst%" "%srcpath%%newDst%" || COPY /B /Y "%workdir%%newDst%" "%srcpath%%newDst%"
+    FOR %%A IN ("%srcpath%%distMask%") DO IF /I "%%~nxA" NEQ "%newDst%" ECHO N|DEL "%%~A"
     
     rem SET "cleanup_action=DEL "
     CALL "%baseScripts%\DistCleanup.cmd" "%srcpath%%distMask%" "%srcpath%%newDst%"
