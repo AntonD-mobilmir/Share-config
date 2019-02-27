@@ -10,15 +10,31 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
     CALL :SetOrAsk newUserName "Имя пользователя (логин)" "%~1"
     CALL :SetOrAsk FullName "Полное имя (ФИО по-русски)" "%~2"
-    CALL :SetOrAsk Note "Описание (см. trello.com/c/uJ4B9C7w)" "%~3"
+    SET "Note=%~3"
+    REM CALL :SetOrAsk Note "Описание (см. trello.com/c/uJ4B9C7w)" "%~3"
+    
+    SET "ErrAcc="
+    SET "useradderr="
 )
 (
-    %SystemRoot%\System32\net.exe USER "%newUserName%" * /Add /FULLNAME:"%FullName%" /USERCOMMENT:"%Note%" || EXIT /B
-    %SystemRoot%\System32\net.exe USER "%newUserName%" /LOGONPASSWORDCHG:NO
-    %SystemRoot%\System32\net.exe LOCALGROUP "Пользователи удаленного рабочего стола" "%newUserName%" /Add
-    %SystemRoot%\System32\net.exe LOCALGROUP "Remote Desktop Users" "%newUserName%" /Add
+    %SystemRoot%\System32\net.exe USER "%newUserName%" * /Add /FULLNAME:"%FullName%" /USERCOMMENT:"%Note%" || CALL :AccumulateError "net user /Add" erruseradd
+    %SystemRoot%\System32\net.exe USER "%newUserName%" /LOGONPASSWORDCHG:NO || CALL :AccumulateError "/LOGONPASSWORDCHG:NO"
+    %SystemRoot%\System32\net.exe LOCALGROUP "Пользователи удаленного рабочего стола" "%newUserName%" /Add || CALL :AccumulateError "LOCALGROUP Пользователи удаленного рабочего стола"
+    %SystemRoot%\System32\net.exe LOCALGROUP "Remote Desktop Users" "%newUserName%" /Add || CALL :AccumulateError "LOCALGROUP Remote Desktop Users"
     
     IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+    IF NOT DEFINED useradderr EXIT /B
+)
+(
+    ECHO %ErrAcc%
+EXIT /B %erruseradd%
+)
+
+:AccumulateError <textname> [<varname>]
+(
+    SET "ErrAcc=%ErrAcc% %~1: err %ERRORLEVEL%"
+    IF "%~2"=="" EXIT /B
+    SET "%2=%ERRORLEVEL%"
 EXIT /B
 )
 
