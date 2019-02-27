@@ -9,13 +9,13 @@ REM http://creativecommons.org/licenses/by/3.0/
 SETLOCAL ENABLEEXTENSIONS
 IF "%1"=="/?" GOTO help
 SET "count=%~2"
-IF NOT DEFINED count SET /A "count=15"
+IF NOT DEFINED count SET /A "count=900"
 SET "host=%~1"
 IF NOT DEFINED host FOR /F "usebackq tokens=3 delims= " %%I IN (`route print 0.0.0.0 ^| find "0.0.0.0"`) DO SET "host=%%~I"
 )
 :retry
 (
-IF %count% LEQ 1 (
+IF %count% EQU 1 (
     ping -n 1 %host%
     EXIT /B
 )
