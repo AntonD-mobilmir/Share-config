@@ -1,4 +1,5 @@
-@REM coding:OEM
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-SET AddtoSUScripts=1
-CALL "%~dp0download.cmd" %*
+@(REM coding:CP866
+    SETLOCAL ENABLEEXTENSIONS
+    SET "AddtoS_UScripts=1"
+    CALL "%~dp0download.cmd" %*
+)

@@ -1,9 +1,9 @@
 @(REM coding:CP866
-REM by LogicDaemon <www.logicdaemon.ru>
-REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-SETLOCAL ENABLEEXTENSIONS
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
-SET "distcleanup=1"
+    SETLOCAL ENABLEEXTENSIONS
+    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    IF NOT DEFINED baseScripts SET "baseScripts=\Local_Scripts\software_update\Downloader"
+    SET "distcleanup=1"
 )
-CALL "%baseScripts%\_DistDownload" https://rufus.akeo.ie/ *.exe -ml1 -A.exe
+(
+    CALL "%baseScripts%\_DistDownload.cmd" https://rufus.akeo.ie/ *.exe -ml1 -A.exe
+)

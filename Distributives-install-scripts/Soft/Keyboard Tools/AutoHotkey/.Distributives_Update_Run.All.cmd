@@ -7,5 +7,5 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
 CALL "%~dp0download.cmd" %*
-IF DEFINED SUScripts FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%~dp0AutoHotkey*.exe"`) DO CALL "%SUScripts%\..\templates\_add_withVer.cmd" "%%~I" & EXIT /B
+IF DEFINED s_uscripts FOR /F "usebackq delims=" %%I IN (`DIR /B /O-D "%~dp0AutoHotkey*.exe"`) DO CALL "%s_uscripts%\..\templates\_add_withVer.cmd" "%%~I" & EXIT /B
 )

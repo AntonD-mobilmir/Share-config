@@ -1,23 +1,7 @@
 @(REM coding:CP866
-REM by LogicDaemon <www.logicdaemon.ru>
-REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
     SETLOCAL ENABLEEXTENSIONS
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-
-    rem SET "distcleanup=1"
-    rem with -N, it says
-	rem --2017-02-10 09:43:07--  https://download-chromium.appspot.com/dl/Win?type=snapshots
-	rem Connecting to 192.168.127.1:3128... connected.
-	rem Proxy request sent, awaiting response... 405 Method Not Allowed
-	rem 2017-02-10 09:43:09 ERROR 405: Method Not Allowed.
-
-    rem SET wgetConf=-d -H -e "robots=off" --user-agent="Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US)" --no-timestamping
-    REM --no-timestamping
-    REM --no-if-modified-since
-
-    IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
+    IF NOT DEFINED baseScripts SET "baseScripts=\Local_Scripts\software_update\Downloader"
 )
 (
     CALL "%baseScripts%\_GetWorkPaths.cmd"
@@ -37,3 +21,16 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF EXIST "%workdir%chrome-win.zip" %SystemDrive%\SysUtils\xln.exe "%workdir%chrome-win.zip" "%srcpath%\chrome-win.zip" >>"%logsDir%snapshots-dl.log" 2>&1
 EXIT /B
 )
+
+
+    rem SET "distcleanup=1"
+    rem with -N, it says
+	rem --2017-02-10 09:43:07--  https://download-chromium.appspot.com/dl/Win?type=snapshots
+	rem Connecting to 192.168.127.1:3128... connected.
+	rem Proxy request sent, awaiting response... 405 Method Not Allowed
+	rem 2017-02-10 09:43:09 ERROR 405: Method Not Allowed.
+
+    rem SET wgetConf=-d -H -e "robots=off" --user-agent="Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US)" --no-timestamping
+    REM --no-timestamping
+    REM --no-if-modified-since
+

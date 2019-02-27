@@ -1,25 +1,20 @@
 @(REM coding:CP866
-REM by LogicDaemon <www.logicdaemon.ru>
-REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-SETLOCAL ENABLEEXTENSIONS
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    SETLOCAL ENABLEEXTENSIONS
+    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    IF NOT DEFINED baseScripts SET "baseScripts=\Local_Scripts\software_update\Downloader"
 
-SET "url=https://autohotkey.com/download/ahk-install.exe"
-SET "urlfname=ahk-install.exe"
-SET "distfmask=AutoHotkey_*_setup.exe"
-IF NOT DEFINED baseScripts SET "baseScripts=\Scripts"
-
+    SET "url=https://autohotkey.com/download/ahk-install.exe"
+    SET "urlfname=ahk-install.exe"
+    SET "distfmask=AutoHotkey_*_setup.exe"
 )
-(
-    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
-	SET "curDistPath=%srcpath%%%~A"
-	SET "curDistName=%%~nxA"
-	SET timeCond=-z "%srcpath%%%~A"
-	GOTO :ExitcurDistPathFor
-    )
+FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
+    SET "curDistPath=%srcpath%%%~A"
+    SET "curDistName=%%~nxA"
+    SET timeCond=-z "%srcpath%%%~A"
+    GOTO :ExitcurDistPathFor
+)
 :ExitcurDistPathFor
+(
     CALL "%baseScripts%\_GetWorkPaths.cmd"
     rem srcpath with baseDistUpdateScripts replaced to baseDistributives
     rem relpath is srcpath relatively to baseDistributives (no trailing backslash)
