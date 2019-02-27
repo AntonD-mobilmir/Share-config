@@ -275,6 +275,8 @@ For i,regview in regViews {
 }
 SetRegView Default
 
+RemoveDirsWithLog(A_AppData "\SibIT")
+
 If (ReRunAsAdmin) {
     ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
     If (removeAppXPID)

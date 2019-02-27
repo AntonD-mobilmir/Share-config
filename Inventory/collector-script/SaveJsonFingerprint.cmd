@@ -22,7 +22,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED copyDir SET "copyDir=%~dp0Fingerprints"
     IF EXIST "%~dp0GetFingerprint.ahk" (
 	SET GetFingerprintahk="%~dp0GetFingerprint.ahk"
-    ) ELSE SET GetFingerprintahk="%~dp0..\..\config\_Scripts\Lib\GetFingerprint.ahk"
+    ) ELSE SET GetFingerprintahk="%~dp0..\..\config\_Scripts\GetFingerprint.ahk"
 )
 SET "destFName=%Hostname% %cDate% %cTime:,=.%"
 (

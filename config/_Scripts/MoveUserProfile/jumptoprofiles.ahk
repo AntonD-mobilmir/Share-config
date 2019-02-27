@@ -7,5 +7,5 @@ RegRead CurrentLastRegeditKey, HKEY_CURRENT_USER, Software\Microsoft\Windows\Cur
 ThisPCPrefix := SubStr(CurrentLastRegeditKey, 1, InStr(CurrentLastRegeditKey, "\", true)) 
 
 Process Close, regedit.exe
-RegWrite REG_SZ, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Applets\Regedit, LastKey, %ThisPCPrefix%HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
+RegWrite REG_SZ, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit, LastKey, %ThisPCPrefix%HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
 Run regedit.exe
