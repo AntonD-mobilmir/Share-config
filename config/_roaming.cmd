@@ -6,7 +6,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 IF DEFINED PROCESSOR_ARCHITEW6432 "%SystemRoot%\SysNative\cmd.exe" /C "%0 %*" & EXIT /B
 SETLOCAL ENABLEEXTENSIONS
 SET "configDir=%~dp0"
-SET /P runNotebookScript=Ноутбук? [1=да]
+rem -> _notebook_roaming.cmd -- SET /P runNotebookScript=Ноутбук? [1=да]
 CALL "%~dp0_Scripts\Lib\.utils.cmd" CheckSetSystemVars
 CALL "%~dp0_Scripts\FindAutoHotkeyExe.cmd"
 IF NOT DEFINED exe7z CALL "%~dp0_Scripts\find7zexe.cmd" || PAUSE
