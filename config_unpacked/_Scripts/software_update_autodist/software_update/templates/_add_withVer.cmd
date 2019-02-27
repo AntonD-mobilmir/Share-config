@@ -20,7 +20,7 @@ REM or install_silently.*/update.*/reinstall.*/install.* in caller directory
 
     SETLOCAL ENABLEEXTENSIONS
 
-    IF NOT DEFINED SUScripts EXIT /B 1
+    IF NOT DEFINED s_uScripts EXIT /B 1
     IF DEFINED srcpath SET "distDir=%srcpath%"
 
     IF NOT "%~2"=="" (
@@ -36,7 +36,7 @@ REM or install_silently.*/update.*/reinstall.*/install.* in caller directory
 )
 (
     IF NOT DEFINED SU_Aversion (
-	IF EXIST "%~1" ( CALL :GetVersion %1 ) ELSE SET "SU_Aversion=%~n1"
+	IF EXIST "%~1" ( CALL :GetVersion %1 ) ELSE (SET "SU_Aversion=%~n1")
     )
     IF NOT DEFINED distDir (
 	ECHO %0 %DATE% %TIME%: Received following arguments: %*
@@ -50,7 +50,7 @@ REM or install_silently.*/update.*/reinstall.*/install.* in caller directory
     )
     
     IF NOT DEFINED UpdateScriptName CALL :getLastComponentOfPath UpdateScriptName "%distDir:~0,-1%"
-    ECHO %0 %DATE% %TIME%: Silent auto-update script will be written to SUScripts ^(=%SUScripts%^)
+    ECHO %0 %DATE% %TIME%: Silent auto-update script will be written to s_uScripts ^(=%s_uScripts%^)
 )
 rem removing denied characters
 SET "SU_Aversion=%SU_Aversion:\=_%"
@@ -59,16 +59,16 @@ SET "SU_Aversion=%SU_Aversion::=_%"
 (
 ECHO cleaned up SU_Aversion: %SU_Aversion%
 
-SET SU_AScript="%SUScripts%\%UpdateScriptName% %SU_Aversion%.cmd"
+SET SU_AScript="%s_uScripts%\%UpdateScriptName% %SU_Aversion%.cmd"
 IF DEFINED SilentUpdater GOTO :ScriptCallingSilentUpdater
 
 REM Check if there is a template
 IF EXIST "%~dp0%UpdateScriptName%.*" GOTO :UpdaterFromTemplate
 REM Or there is already installer for older version
-IF EXIST "%SUScripts%\%UpdateScriptName%*.*" GOTO :AtLeastThereIsPrevCaller
+IF EXIST "%s_uScripts%\%UpdateScriptName%*.*" GOTO :AtLeastThereIsPrevCaller
 
 rem If any of previous would worked, script won't go till here. This is fallback variant.
-CALL :CheckForInstallerScript || ECHO %0 %DATE% %TIME%: No Auto-update method found, nothing added to SUScripts!
+CALL :CheckForInstallerScript || ECHO %0 %DATE% %TIME%: No Auto-update method found, nothing added to s_uScripts!
 EXIT /B
 )
 
@@ -97,7 +97,7 @@ GOTO :ScriptCallingSilentUpdater
 )
 :ScriptCallingSilentUpdater
 (
-    rem -cannot be here, checked before calling- MOVE /Y "%SUScripts%\%UpdateScriptName%*.*" "%SUScripts%\..\old\"
+    rem -cannot be here, checked before calling- MOVE /Y "%s_uScripts%\%UpdateScriptName%*.*" "%s_uScripts%\..\old\"
     (ECHO @^(REM coding:OEM
     ECHO REM Automatically written with "%~f0" on %DATE% %TIME% as fallback
     IF /I "%installertype%"==".ahk" (
@@ -110,12 +110,12 @@ GOTO :ScriptCallingSilentUpdater
 EXIT /B 0
 )
 :UpdaterFromTemplate
-    MOVE "%SUScripts%\%UpdateScriptName%*.*" "%SUScripts%\..\old\"
+    MOVE "%s_uScripts%\%UpdateScriptName%*.*" "%s_uScripts%\..\old\"
     FOR %%I IN ("%~dp0%UpdateScriptName%.*") DO %xlnexe% "%%~I" %SU_AScript%||COPY /B /Y "%%~I" %SU_AScript%
 EXIT /B
 
 :AtLeastThereIsPrevCaller
-    REN "%SUScripts%\%UpdateScriptName%*.*" "%UpdateScriptName% %SU_Aversion%.*"
+    REN "%s_uScripts%\%UpdateScriptName%*.*" "%UpdateScriptName% %SU_Aversion%.*"
 EXIT /B
 
 :getLastComponentOfPath

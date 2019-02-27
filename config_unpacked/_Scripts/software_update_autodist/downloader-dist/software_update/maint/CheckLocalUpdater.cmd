@@ -8,9 +8,9 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 )
 CALL "%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd"
 (
-    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%SUScriptsStatus%\*.*"`) DO (
-	SET "lastLog=%SUScriptsStatus%\%%~A"
-	SET "lastLogTime=%SUScriptsStatus%\%%~tA"
+    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%s_uscriptsStatus%\*.*"`) DO (
+	SET "lastLog=%s_uscriptsStatus%\%%~A"
+	SET "lastLogTime=%s_uscriptsStatus%\%%~tA"
 	GOTO :FoundLatest
     )
     IF ERRORLEVEL 1 EXIT /B

@@ -22,8 +22,8 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     @REM 		mandatory, it's destination for distributive file
     ECHO 	distcleanup="%distcleanup%"
     @REM 		if set to 1, distcleanup procedures are executed
-    ECHO 	AddtoSUScripts="%AddtoSUScripts%", SUScripts="%SUScripts%", UseTimeAsVersion="%UseTimeAsVersion%"
-    @REM 		use 0 to disable calling "%%SUScripts%%\..\templates\_add_withVer.cmd". SUScripts must also be defined. If UseTimeAsVersion=1, _add_withVer will not try reading version of setup to determine version if installed software, and will use filename datetime instead.
+    ECHO 	addToS_UScripts="%addToS_UScripts%", s_uscripts="%s_uscripts%", UseTimeAsVersion="%UseTimeAsVersion%"
+    @REM 		use 0 to disable calling "%%s_uscripts%%\..\templates\_add_withVer.cmd". s_uscripts must also be defined. If UseTimeAsVersion=1, _add_withVer will not try reading version of setup to determine version if installed software, and will use filename datetime instead.
     ECHO 	findpath="%findpath%"
     @REM 		relative path for unix find, which performed when seeking %distfmask% for files to link
     ECHO 	findargs="%findargs%"
@@ -96,7 +96,7 @@ IF NOT "%~2"=="" (
     CALL :GetWgetArgsSkippingFirst %*
 )
 (
-IF NOT DEFINED wgetparm SET "wgetparm=-m -l 1 -nd -e robots=off --no-check-certificate"
+IF NOT DEFINED wgetparm SET "wgetparm=-m -l 1 -nd -e robots=off --no-check-certificate --unlink"
 IF NOT DEFINED logfname GOTO :setDefaultLogFName
 @REM Check if log filename contains unwanted characters
 SET "checklogfname=%logfname:&=%"
@@ -128,7 +128,7 @@ IF DEFINED findexe FOR /F "usebackq delims=" %%I IN (`%findexe% "%workdir%%findp
 )
 (
 IF DEFINED dstfname CALL :linkdst "%dstfname%"
-IF DEFINED SUScripts IF NOT "%AddtoSUScripts%"=="0" CALL "%SUScripts%\..\templates\_add_withVer.cmd" "%dstfname%"
+IF DEFINED s_uscripts IF NOT "%addToS_UScripts%"=="0" CALL "%s_uscripts%\..\templates\_add_withVer.cmd" "%dstfname%"
 
 EXIT /B %wgeterrorlevel%
 )

@@ -1,0 +1,3 @@
+﻿
+_DistDownload.cmd (REM coding:CP866\nSET "srcpath=%~dp0"\nIF NOT DEFINED baseScripts SET "baseScripts=\\Local_Scripts\\software_update\\Downloader"\n)\nCALL "%baseScripts%\\_DistDownload.cmd" url "file name or mask" [wget arguments]\nÂ
+Distributives_Update_Run.cmd x:\Distributives_Download\Distributives_Update_Run.log
