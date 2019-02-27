@@ -12,13 +12,13 @@
     IF NOT DEFINED ErrorCmd SET "ErrorCmd=@(ECHO  & (PING 127.0.0.1 -n 30 >NUL) & EXIT /B 32767)"
     
     REM following path is hardcoded inside Update_Distributives.job and in a lot of cmd scripts.
-    SET "InstDest=d:\Scripts"
+    SET "instDest=D:\Local_Scripts"
+    SET "oldinstDest=d:\Scripts"
     REM Distributives are hardcoded in Distributives_Update_Run.cmd as "%~d0\Distributives"
     SET "DistDst=d:\Distributives"
-    SET "UIDEveryone=S-1-1-0;s:y"
-    SET "UIDAuthenticatedUsers=S-1-5-11;s:y"
-    SET "UIDUsers=S-1-5-32-545;s:y"
-    SET "UIDSYSTEM=S-1-5-18"
+    SET "SIDEveryone=S-1-1-0"
+    SET "SIDAuthenticatedUsers=S-1-5-11"
+    SET "SIDCreatorOwner=S-1-3-0"
     
     FOR /F "usebackq tokens=2*" %%I IN (`REG QUERY "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "SUSHost=%%J"
     
@@ -26,35 +26,37 @@
     CALL :ensureRsyncReady
     IF NOT DEFINED SetACLexe CALL "%~dp0..\find_exe.cmd" SetACLexe "%SystemDrive%\SysUtils\SetACL.exe" || GOTO :SysutilsFail
 
-    rem без следующей строки на чистых Windows появляется:
-    rem # sed.exe - Системная ошибка
-    rem Запуск программы невозможен, так как на компьютере отсутствует libintl3.dll. Попробуйте переустановить программу. 
-    SET "PATH=%PATH%;%SystemDrive%\SysUtils\libs"
-    
-    IF NOT DEFINED sedexe CALL "%~dp0..\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\UnxUtils\sed.exe" || GOTO :SysutilsFail
     IF NOT DEFINED AutohotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+    
 )
 (
-    IF NOT EXIST "%InstDest%" MKDIR "%InstDest%" || (
-	ECHO Не удалось создать папку %InstDest%. Продолжение установки невозможно.
+    "%SystemRoot%\System32\schtasks.exe" /End /TN "mobilmir.ru\Update_Distributives" /F
+    IF NOT EXIST "%instDest%" MKDIR "%instDest%"
+    IF NOT EXIST "%instDest%" (
+	ECHO Не удалось создать папку %instDest%. Продолжение установки невозможно.
 	%ErrorCmd%
 	EXIT /B
     )
-    "%SystemRoot%\System32\schtasks.exe" /End /TN "mobilmir\Update_Distributives" /F
-    "%SystemRoot%\System32\schtasks.exe" /End /TN "mobilmir.ru\Update_Distributives" /F
-    DEL /S /Q "%InstDest%\software_update\scripts\!*.*"
-    DEL /S /Q "%InstDest%\software_update\scripts\_*.*"
-
-    %exe7z% x -aoa -o"%InstDest%" -- "%~dp0downloader-dist.7z" || %ErrorCmd%
-    %exe7z% x -aoa -o"%InstDest%\software_update" -- "%~dp0software_update.7z" || %ErrorCmd%
-    IF EXIST "%InstDest%\logs.bak" RD /S /Q "%InstDest%\logs.bak"
-    IF EXIST "%InstDest%\logs" MOVE "%InstDest%\logs" "%InstDest%\logs.bak"
-    MKDIR "%InstDest%\logs" || %ErrorCmd%
-    CALL :CheckCreateDir "%InstDest%\software_update\status" || %ErrorCmd%
-    %SetACLexe% -on "%InstDest%\software_update\status" -ot file -actn ace -ace "n:%UIDEveryone%;p:change"
-    CALL :CheckCreateDir "%InstDest%\software_update\old\status" || %ErrorCmd%
-    %SetACLexe% -on "%InstDest%\software_update\old\status" -ot file -actn ace -ace "n:%UIDEveryone%;p:change"
-
+    
+    IF EXIST "%oldinstDest%\software_update" MOVE /Y "%oldinstDest%\*.*" "%instDest%\*.*"
+    DEL /S /Q "%instDest%\software_update\client_exec\!*.*"
+    DEL /S /Q "%instDest%\software_update\client_exec\_*.*"
+    
+    %exe7z% x -aoa -o"%instDest%" -- "%~dp0downloader-dist.7z" || %ErrorCmd%
+    %exe7z% x -aoa -o"%instDest%\software_update" -- "%~dp0software_update.7z" || %ErrorCmd%
+    
+    IF EXIST "%instDest%\logs.bak" RD /S /Q "%instDest%\logs.bak"
+    IF EXIST "%instDest%\logs" MOVE /Y "%instDest%\logs" "%instDest%\logs.bak"
+    MKDIR "%instDest%\logs" || %ErrorCmd%
+    
+    CALL :CheckCreateDir "%instDest%\software_update\status" || %ErrorCmd%
+    CALL :CheckCreateDir "%instDest%\software_update\reports"
+    
+    rem %SetACLexe% -on "%instDest%\software_update\status" -ot file -actn ace -ace "n:%SIDEveryone%;s:y;p:change"
+    %SystemRoot%\System32\icacls.exe "%instDest%\software_update\status" /Reset /T /C /Q
+    %SystemRoot%\System32\icacls.exe "%instDest%\software_update\status" /Grant "*%SIDAuthenticatedUsers%:(NP)(GR,AD)"
+    %SystemRoot%\System32\icacls.exe "%instDest%\software_update\reports" /Grant "*%SIDEveryone%:(NP)(AD,WD)" /Grant "*%SIDCreatorOwner%:(OI)(CI)(IO)(DE,GR,GW,WA)"
+    
     IF NOT DEFINED schedUserName CALL "%~dp0..\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
     IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
 )
@@ -78,32 +80,31 @@ IF NOT DEFINED configDir CALL :getconfigDir
 (
     IF "%retaskq%"=="1" GOTO :addTask
     IF /I "%retaskq:~0,1%"=="y" GOTO :addTask
-    %SetACLexe% -on "%InstDest%" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
+    %SetACLexe% -on "%instDest%" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
     %SystemRoot%\System32\takeown.exe /F "d:\Distributives" /A /R /D Y
     %SetACLexe% -on "d:\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
     %SetACLexe% -on "%USERPROFILE%\BTSync\Distributives" -ot file -actn ace -ace "n:%schedUserName%;s:n;p:change"
     
-    COPY /B /Y "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.template" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.tmp"
-    %sedexe% -i "s/"{$SUSHost$}/"%SUSHost%/g" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.tmp" || %ErrorCmd%
-    MOVE /Y "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd.tmp" "%InstDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd"
+    COPY /B /Y "%instDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd" "%instDest%\software_update\_install\dist\_get_SoftUpdateScripts_source.cmd"
 
-    START "install_software_update_scripts.cmd" /MIN %comspec% /C "%InstDest%\software_update\_install\install_software_update_scripts.cmd"
+    START "install_software_update_scripts.cmd" /MIN %comspec% /C "%instDest%\software_update\_install\install_software_update_scripts.cmd"
 
     ECHO N|%SystemRoot%\System32\net.exe SHARE "Distributives" /DELETE
     %SystemRoot%\System32\net.exe SHARE "Distributives=d:\Distributives"
     ECHO Y|%SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$" /DELETE
-    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Everyone,CHANGE
-    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update" /GRANT:Все,CHANGE
-    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%InstDest%\software_update"
-
-    CALL :updateSysUtils
+    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%instDest%\software_update" /GRANT:Everyone,CHANGE
+    %SystemRoot%\System32\net.exe SHARE "SoftUpdateScripts$=%instDest%\software_update" /GRANT:Все,CHANGE
 
     CALL :checkProxy
     START "Copying download-scripts" /MIN %comspec% /C "%~dp0..\CopyDistributives_Downloaders.cmd"
 
-    IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z") DO (
-	(ECHO %%~tI)>"%InstDest%\ver.flag"
-	SET "instVersion=%%~tI"
+    IF NOT ERRORLEVEL 1 FOR %%I IN ("%~dp0downloader-dist.7z" "%~dp0software_update.7z") DO (
+	(ECHO %%~tI)>"%instDest%\software_update_scripts.ver"
+	IF NOT DEFINED instVersion1 (
+            SET "instVersion1=%%~nxtI"
+	) ELSE (
+            SET "instVersion2=%%~nxtI"
+	)
     )
 
     ECHO Готово.
@@ -114,7 +115,7 @@ IF NOT DEFINED configDir CALL :getconfigDir
     IF NOT DEFINED MailUserId SET "MailUserId=%COMPUTERNAME%"
 )
 FOR /F "usebackq delims=" %%A IN ("%~dp0..\pseudo-secrets\%~nx0.txt") DO (
-    START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion%"
+    START "" %AutohotkeyExe% "%~dp0..\Lib\PostGoogleFormWithPostID.ahk" "%%~A" "entry.435608024=" "entry.1052111258=%MailUserId%" "entry.1449295455=%instVersion1%, %instVersion2%"
     EXIT /B
 )
 (
