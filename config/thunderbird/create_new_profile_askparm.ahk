@@ -20,18 +20,41 @@ If (!MailUserId) {
 	MailUserId := Format("{:Ls}", m1)
 }
 
-If (MailUserId) {
-    If (!destPath)
-	destPath = D:\Mail\Thunderbird\profile
+If (MailUserId) { ; Компьютер в рознице либо другой общий с общим профилем почты
+    If (!destPath) {
+        destPath = D:\Mail\Thunderbird\profile
+        FileCreateDir %destPath%
+        FileDelete %destPath%\test.tmp
+        FileAppend,,%destPath%\test.tmp
+        If (!FileExist(destPath "\test.tmp"))
+            destPath := ""
+        FileDelete %destPath%\test.tmp
+    }
+    
+    If (!fullName) {
+        Try {
+            senderNameCommentSuffix := A_ComputerName ~= "-K$" ? ", касса" : ""
+            deptsList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vS1VdSPrtzh81PwFn--mytpZqsgjmTZBtAEzhEINXBnOt-b8gSuD3s5xqyj5-bC1uLw1RhZgwPxFzyV/pub?gid=0&single=true&output=tsv")
+            Loop Parse, deptsList, `n, `r
+            {
+                If (RegexMatch(A_LoopField, "A)(?P<Name>.+) (?P<ID>[^ ]+)@", dept)) {
+                    If (deptID=MailUserId) {
+                        fullName = %deptName% (отдел%senderNameCommentSuffix%)
+                        break
+                    }
+                }
+            }
+        }
+    }
 } Else {
     MailUserId := A_UserName
-    If (!destPath)
-	destPath = %UserProfile%\Mail\Thunderbird\profile
     
     Try fullName := Func("WMIGetUserFullname").Call(2)
     If (!fullName)
 	fullName = (не удалось разобрать: %userFIO%)
 }
+If (!destPath)
+    destPath = %UserProfile%\Mail\Thunderbird\profile
 
 Gui -Resize -MaximizeBox  
 Gui Add, Text, Section, Полный адрес email: 
@@ -60,3 +83,4 @@ ButtonCancel:
 
 #include *i %A_LineFile%\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
 #include *i %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\XMLHTTP_Request.ahk
