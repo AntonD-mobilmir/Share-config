@@ -49,6 +49,8 @@ findexe(exe, paths*) {
 				 , A_LineFile . "..\..\..\..\..\Distributives\Soft\PreInstalled\utils" ; in retail, for case when config is in some other dir
 				 , "\Distributives\Soft\PreInstalled\utils" ; same
 				 , "\\localhost\Distributives\Soft\PreInstalled\utils" ; sometimes Distributives are somewhere else but available on net
+				 , "\\Srv1S-B.office0.mobilmir\Distributives\Soft\PreInstalled\utils" ; almost last resort, only works in office0
+				 , "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\Programs" ; last resort, only works in office0
 				 , "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils" ; almost last resort, only works in office0
 				 , "\\Srv0.office0.mobilmir\profiles$\Share\Programs" ) ; last resort, only works in office0
 

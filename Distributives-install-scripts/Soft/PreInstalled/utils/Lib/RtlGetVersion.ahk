@@ -22,9 +22,7 @@ RtlGetVersion() {
 }
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
-
     RtlGetVersion := RtlGetVersion()
-    
     
     FileAppend % "RtlGetVersion function`n"
 	   . "RTL_OSVERSIONINFOEXW structure`n`n"
