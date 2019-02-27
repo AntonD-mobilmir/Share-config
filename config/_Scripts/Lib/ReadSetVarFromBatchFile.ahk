@@ -4,7 +4,7 @@
 ReadSetVarFromBatchFile(filename, varname) {
     Loop Read, %filename%
     {
-	If (RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
+	If (RegExMatch(A_LoopReadLine, "ASi)[\s()]*SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
 	    If (Trim(Trim(mName), """") = varname) {
 		return Trim(Trim(mValue), """")
 	    }
