@@ -477,27 +477,32 @@ If (hostSUScripts) {
     }
 }
 
-softUpdScripts := CheckPath("d:\Scripts\_DistDownload.cmd", 1, 0)
-If (IsObject(softUpdScripts)) {
-    If (FileExist("d:\Scripts\ver.flag")) {
-	;15.08.2016 20:09
-	FileRead verFlagSoftUpdScripts, *m16 d:\Scripts\ver.flag
-	SetLastRowStatus(verFlagSoftUpdScripts, 0)
-	
-	runDistributivesCopy := true
-    }
-    
-    distSoftUpdScripts := CheckPath(DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z")
-    If (!IsObject(distSoftUpdScripts))
-	softUpdScripts=
-    FormatTime timeDistSoftUpdScripts, % distSoftUpdScripts.mtime, dd.MM.yyyy HH:mm
-    If (timeDistSoftUpdScripts == verFlagSoftUpdScripts) {
-	SetRowStatus(distSoftUpdScripts.line, timeDistSoftUpdScripts, 1)
-	SetRowStatus(softUpdScripts.line, "Актуальный", 1)
-	softUpdScripts=
-    } Else {
-	SetRowStatus(distSoftUpdScripts.line, timeDistSoftUpdScripts, 0)
-	SetRowStatus(softUpdScripts.line, , 0)
+If (FileExist("D:\Scripts")) {
+    s_uline := AddLog("D:\Scripts существует! Переустановка software_update")
+    softUpdScripts := {}
+} Else {
+    softUpdScripts := CheckPath("D:\Local_Scripts\software_update\Downloader\_DistDownload.cmd", 1, 0)
+    If (IsObject(softUpdScripts)) {
+        If (FileExist("D:\Local_Scripts\software_update\software_update_scripts.ver")) { ; "d:\Scripts\ver.flag"
+            ;15.08.2016 20:09
+            FileRead verFlagSoftUpdScripts, *m16 D:\Local_Scripts\software_update\software_update_scripts.ver
+            SetLastRowStatus(verFlagSoftUpdScripts, 0)
+            
+            runDistributivesCopy := true
+        }
+        
+        distSoftUpdScripts := CheckPath(DefaultConfigDir . "\_Scripts\software_update_autodist\downloader-dist.7z")
+        If (!IsObject(distSoftUpdScripts))
+            softUpdScripts=
+        FormatTime timeDistSoftUpdScripts, % distSoftUpdScripts.mtime, dd.MM.yyyy HH:mm
+        If (timeDistSoftUpdScripts == verFlagSoftUpdScripts) {
+            SetRowStatus(distSoftUpdScripts.line, timeDistSoftUpdScripts, 1)
+            SetRowStatus(softUpdScripts.line, "Актуальный", 1)
+            softUpdScripts=
+        } Else {
+            SetRowStatus(distSoftUpdScripts.line, timeDistSoftUpdScripts, 0)
+            SetRowStatus(softUpdScripts.line, , 0)
+        }
     }
 }
 
@@ -509,8 +514,16 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
 	SetRowStatus(distSoftUpdScripts.line, "Обновляется", 0)
 	RunWait %comspec% /C "%DefaultConfigDir%\_Scripts\software_update_autodist\SetupLocalDownloader.cmd",, Min UseErrorLevel
 	SetRowStatus(distSoftUpdScripts.line, ErrorLevel ? ErrorLevel : timeDistSoftUpdScripts, ErrorLevel=0)
+
+        If (s_uline) {
+            FileMoveDir D:\Scripts, %A_Temp%\Scripts, R
+            SetRowStatus(s_uline,"Перемещено в Temp текущего пользователя",!ErrorLevel)
+        }
     }
 }
+
+If (FileExist("D:\Local_Scripts\software_update"))
+    RunScript("D:\Local_Scripts\software_update\client_exec\PCX-1.13.3310-win32.msi.ahk")
 
 If (IsObject(rsyncPreinstalled)) { ; pidRsyncPreinstalled
     AddLog("Ожидание завершения rsync PreInstalled")

@@ -4,7 +4,8 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 
-XCOPY "%SUScripts%\..\_install\dist\*.cmd" "%ProgramData%\mobilmir.ru" /K /I /H /F /Y || EXIT /B
+rem XCOPY "%s_uscripts%\..\_install\dist\*.cmd" "%ProgramData%\mobilmir.ru" /K /I /H /F /Y || EXIT /B
+CALL "%s_uscripts%\..\_install\install_software_update_scripts.cmd"
 
 ECHO.>"%log%"
 SCHTASKS /End /TN "mobilmir.ru\SoftwareUpdate"

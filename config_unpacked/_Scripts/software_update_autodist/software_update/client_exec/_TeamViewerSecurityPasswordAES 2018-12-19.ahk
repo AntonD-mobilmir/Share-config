@@ -13,7 +13,8 @@ ListPassHashes := {	 "ab12997087fb03c88c379439f16002ed":""	; №407 действ
 			
 			,"e5cea553a702dfea4d0df508c7fa32bf":"!"	; до 2018-12-18\TeamViewer_host.defaults.reg
 			,"dcc3c599c017e66ef26af2ad41ad851f":"."	; до 2018-12-18\Apps_dept\TeamViewer*.reg
-			,"3ba9fd9337e1b3cc3e426d55a85c6b5c":"."	; до 2018-12-18\Apps_office\TeamViewer.reg, TeamViewer_Host.reg
+			,"abe7ad541f21a0fb6611c6162a1f85eb":"."	; до 2018-12-18\Apps_office\TeamViewer.reg, TeamViewer_Host.reg
+			,"3ba9fd9337e1b3cc3e426d55a85c6b5c":"."	; до ?2018-12-18?\Apps_office\TeamViewer.reg, TeamViewer_Host.reg
 			,"75a1ae487a131ac684441f0a4490e930":"."	; до 2018-12-18\Apps_roaming\TeamViewer.reg, TeamViewer_Host.reg
 			,"f479d774e8bc76723cdfd322754e77cc":"!"	; до 2018-12-18\TeamViewer5HostUnattended_egs\TeamViewer_host.reg
 
@@ -97,44 +98,59 @@ ShowMsg(text, type:=0) {
     }
     
     configDir := getDefaultConfigDir()
-    text := StrReplace(text, """", "'")
-    Run "%A_AhkPath%" /ErrorStdOut "%configDir%\_Scripts\Lib\RetailStatusReport.ahk" "%A_ScriptName%" "%type%" "%text%",,UseErrorLevel
-}
-
-; \\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
-getDefaultConfig() {
-    static defaultConfig
-    EnvGet SystemDrive, SystemDrive
-    If (!defaultConfig) {
-        defaultConfig := ReadSetVarFromBatchFile(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd", "DefaultsSource")
-        If (!defaultConfig)
-            defaultConfig := ReadSetVarFromBatchFile(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd", "DefaultsSource")
+    If (configDir) {
+        text := StrReplace(text, """", "'")
+        Run "%A_AhkPath%" /ErrorStdOut "%configDir%\_Scripts\Lib\RetailStatusReport.ahk" "%A_ScriptName%" "%type%" "%text%",,UseErrorLevel
     }
-    return defaultConfig
+    
+    ExitApp
 }
 
-getDefaultConfigFileName() {
-    defaultConfig := getDefaultConfig()
-    SplitPath defaultConfig, OutFileName
+; \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
+getDefaultConfigFileName(defCfg := -1) {
+    If (defCfg==-1)
+	defCfg := getDefaultConfig()
+    SplitPath defCfg, OutFileName
     return OutFileName
 }
 
-getDefaultConfigDir() {
-    defaultConfig := getDefaultConfig()
-    SplitPath defaultsSource,,OutDir
+getDefaultConfigDir(defCfg := -1) {
+    If (defCfg==-1) {
+        EnvGet configDir, configDir
+	If (configDir)
+	    return RTrim(configDir, "\")
+	defCfg := getDefaultConfig()
+    }
+    SplitPath defCfg,,OutDir
     return OutDir
+}
+
+getDefaultConfig(batchPath := -1) {
+    If (batchPath == -1) {
+	EnvGet DefaultsSource, DefaultsSource
+	If (DefaultsSource)
+	    return DefaultsSource
+	Try {
+	    return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
+	}
+	EnvGet SystemDrive, SystemDrive
+	return getDefaultConfig(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd")
+    } Else {
+	return ReadSetVarFromBatchFile(batchPath, "DefaultsSource")
+    }
 }
 
 ;#Include %A_LineFile%\..\ReadSetVarFromBatchFile.ahk
 ReadSetVarFromBatchFile(filename, varname) {
     Loop Read, %filename%
     {
-	If (mpos := RegExMatch(A_LoopReadLine, "i)SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", match)) {
-	    If (Trim(Trim(matchName), """") = varname) {
-		return Trim(Trim(matchValue), """")
+	If (RegExMatch(A_LoopReadLine, "ASi)[\s()]*SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
+	    If (Trim(Trim(mName), """") = varname) {
+		return Trim(Trim(mValue), """")
 	    }
 	}
     }
+    Throw Exception("Var not found",, varname)
 }
 
 ;src: https://github.com/jNizM/AutoHotkey_Scripts/blob/master/Functions/Checksums/MD5.ahk

@@ -28,7 +28,10 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED s_uScripts EXIT /B 32002
 )
 (
+    IF NOT EXIST "%s_uScriptsStatus%" MKDIR "%s_uScriptsStatus%"
     IF NOT EXIST "%s_uScriptsStatus%" EXIT /B 32767
+    REM used by Check Update Status.ahk to determine if software_update.cmd started since reboot
+    (ECHO %DATE% %TIME%)>"%s_uScriptsStatus%\.running"
     
     CALL :GetDir configDir "%DefaultsSource%"
     
@@ -40,7 +43,11 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT EXIST "%s_uScripts%" EXIT /B 32003
 
 )
-IF "%~1"=="" (
+IF NOT "%~1"=="" (
+    ECHO Unknown argument: %~1. Aborting>&2
+    EXIT /B 32100
+)
+(
     IF EXIST "%s_uScripts%\..\_install\dist\software_update.cmd" (
         REM selfupdate
         "%SystemRoot%\system32\fc.exe" /B "%0" "%s_uScripts%\..\_install\dist\software_update.cmd" >NUL 2>&1
@@ -62,14 +69,10 @@ IF "%~1"=="" (
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%s_uScripts%\!*.*"`) DO SET "scriptName=%%~I" & CALL :RunUpdate "%s_uScripts%\%%~I"
     REM scripts errored once are postponed
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%s_uScripts%\*.*"`) DO IF NOT EXIST "%s_uScriptsStatus%\%%~nxI%logsuffix%" IF EXIST "%s_uScriptsStatus%\%%~nxI%logrunningsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%s_uScripts%\%%~I" !
-    
-    GOTO :removeoldlogs
-) ELSE (
-    ECHO Unknown argument: %~1. Aborting >&2
-    EXIT /B 32100
 )
-:removeoldlogs
 (
+    MOVE /Y "%s_uScriptsStatus%\.running" "%s_uScriptsStatus%\.log"
+    (ECHO Finished %DATE% %TIME%)>>"%s_uScriptsStatus%\.log"
     IF DEFINED s_uScriptsOldLogs (
         IF EXIST "%s_uScriptsOldLogs%" FOR %%I IN ("%s_uScriptsStatus%\*.*") DO IF NOT EXIST "%s_uScripts%\%%~nI" MOVE /Y "%%~I" "%s_uScriptsOldLogs%"
         START "" /LOW %AutohotkeyExe% /ErrorStdOut "%s_uScripts%\..\maint\remove old files.ahk" "%s_uScriptsOldLogs%"
@@ -82,7 +85,7 @@ EXIT /B
     
     SET "logmsi=%s_uScriptsStatus%\%~nx1-msiexec.log"
     SET "log=%s_uScriptsStatus%\%~nx1%logsuffix%"
-
+    
     IF "%~x1"==".reg" (
         REM IF "%scriptName:~-6%"=="32-bit"
         REM ELSE IF "%scriptName:~-6%"=="64-bit"
