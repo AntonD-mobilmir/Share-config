@@ -16,7 +16,7 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 
     CALL :FindCommonDesktopPath
     IF NOT DEFINED DefaultUserProfile CALL "%~dp0copyDefaultUserProfile.cmd"
-    IF EXIST D:\1S\Rarus\ShopBTS SET "Inst1S=1"
+    IF EXIST D:\1S SET "unpackShortcuts1S=1"
 )
 (
     FOR %%I IN ("%~dp0..\Users\depts\?.7z") DO %exe7z% x -aoa -o"%%~nI:\" -- "%%~I"
@@ -42,7 +42,7 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 	%exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts.7z"
 	IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_64bit.7z"
 	
-	IF "%Inst1S%"=="1" (
+	IF "%unpackShortcuts1S%"=="1" (
 	    %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S.7z"
 	    IF "%OS64bit%"=="1" %exe7z% x -aoa -o"%CommonDesktop%" -- "%~dp0..\Users\depts\Desktop_shortcuts_1S_64bit.7z"
 	    %exe7z% x -aoa -o"%ProgramData%\mobilmir.ru" -- "\\Srv0.office0.mobilmir\1S\ShopBTS_InitialBase\Rarus_Scripts.7z"
