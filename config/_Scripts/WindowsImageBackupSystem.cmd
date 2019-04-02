@@ -120,10 +120,11 @@ EXIT /B
     
     ECHO Ожидание окончания записи контрольных сумм
 )
-(
+@(
+    ECHO %DATE% %TIME% Waiting for "%DstDirWIB%\%Hostname%\7zchecksums.txt"
     :waitmore
-    PING 127.0.0.1 -n 2 >NUL
-    IF NOT EXIST "%DstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%DstDirWIB%\%Hostname%-7zchecksums.txt" GOTO :waitmore
+    @PING 127.0.0.1 -n 2 >NUL
+    @IF NOT EXIST "%DstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%DstDirWIB%\%Hostname%-7zchecksums.txt" GOTO :waitmore
     COPY /Y /D /B "%DstDirWIB%\%Hostname%\7zchecksums.txt" "%~1\WindowsImageBackup\%Hostname%\7zchecksums.txt"
 EXIT /B
 )

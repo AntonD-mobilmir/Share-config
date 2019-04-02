@@ -159,3 +159,5 @@ uwe-sieber.de\RescanDevices.txt
 uwe-sieber.de\RestartSrDev.exe
 uwe-sieber.de\USB-WriteCache.exe
 wait.exe
+devcon32.exe
+devcon64.exe

@@ -8,39 +8,57 @@
 
 ;MsgBox % list of objects: %1%`ndestination where they will be linked: %2%
 
-IfNotExist %1%
-{
-    Errors=Listfile %1% not exist!
-    Exit 4
-} Else {
-    Loop Read, %1%
+If (A_Args.Length() && FileExist(A_Args[1])) {
+    Loop Read, % A_Args[1]
     {
-	SplitPath A_LoopReadLine, SrcName, SrcDir
+	SplitPath A_LoopReadLine, SrcName, SrcDir ;,,, SrcDrive
 ;	FileGetAttrib Attributes,A_LoopReadLine
 ;	IfInString Attributes, D
+        SetTimer showcPID, -3000
 	If (!SrcName) {
 	    SplitPath SrcDir, SrcName
-	    LinkType = Junction
-	    If (A_IsAdmin)
-                RunWait "%comspec%" /C "MKLINK /D "%2%%SrcName%" "%SrcDir%"",,Hide UseErrorLevel
-	    Else
-                RunWait "%A_ScriptDir%\xln.exe" -n "%SrcDir%" "%2%%SrcName%",,Hide UseErrorLevel
+            If (A_IsAdmin) {
+                linkType = Directory Symlink
+                RunWait "%comspec%" /C "MKLINK /D "%2%%SrcName%" "%SrcDir%"",,Hide UseErrorLevel, cPID
+            } Else {
+                linkType = Junction
+                RunWait "%A_ScriptDir%\xln.exe" -n "%SrcDir%" "%2%%SrcName%",,Hide UseErrorLevel, cPID
+            }
 	} Else {
-	    LinkType = Hardlink
-	    RunWait "%A_ScriptDir%\xln.exe" "%A_LoopReadLine%" "%2%%SrcName%",,Hide UseErrorLevel
+            ;If (!OutDrive)
+            ;    SplitPath 2,,,,, OutDrive
+            ;If (SrcDrive = SrcDrive)
+            linkType = Hardlink
+            RunWait "%A_ScriptDir%\xln.exe" "%A_LoopReadLine%" "%2%%SrcName%",,Hide UseErrorLevel, cPID
+            
+            If (ErrorLevel) {
+                linkType = Symlink
+                RunWait "%comspec%" /C "MKLINK "%2%%SrcName%" "%A_LoopReadLine%"",,Hide UseErrorLevel, cPID
+            }
 	}
-
+        SetTimer showcPID, Off
+        
 	If (ErrorLevel) {
-	    errorText = Error %ERRORLEVEL% creating %LinkType% for %A_LoopReadLine%`n
+	    errorText = Error %ERRORLEVEL% creating %linkType% for %A_LoopReadLine%`n
 	    Errors = %Errors%%errorText%
 	    FileAppend %errorText%,*
 	} Else {
 	    AtLeastOneSucceeded := 1
 	}
     }
+} Else {
+    Errors=Listfile "%1%" does not exist!
+    exitError := 4
 }
 
-If (Errors) {
-    MsgBox 48, Errors occured while linking, %Errors%
-    Exit AtLeastOneSucceeded ? 2 : 1
+
+If (Errors || exitError) {
+    MsgBox 48, A_ScriptName, Errors occured while linking: %Errors%
+    Exit exitError ? exitError : AtLeastOneSucceeded + 1
+}
+
+showcPID() {
+    global cPID
+    GroupAdd cshow, ahk_pid %cPID%
+    WinShow ahk_group cshow
 }

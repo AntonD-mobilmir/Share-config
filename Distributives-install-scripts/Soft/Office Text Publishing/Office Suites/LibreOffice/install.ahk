@@ -34,7 +34,7 @@ For i, distToTry in distsToTry {
 If (!DistributiveMask)
     Throw Exception("Дистрибутив не найден")
 
-EnvGet LogPath,logmsi
+EnvGet logPath,logmsi
 
 RemoveLangpacks 	:= ReadListFromFile(A_ScriptDir . "\remove_langpacks.txt")
 RemoveDictionaries 	:= ReadListFromFile(A_ScriptDir . "\remove_langpacks.txt")
@@ -96,15 +96,15 @@ RunWait %comspec% /C ""%A_ScriptDir%\CompactLODir.cmd"",,Min
 
 Exit ErrorsOccured
 
-InstallMSI(MSIFileFullPath, params){
-    Global LogPath
+InstallMSI(MSIFileFullPath, params) {
+    Global logPath
     
     SplitPath MSIFileFullPath, MSIFileName
-    If Not LogPath
-	LogPath=%A_TEMP%\%MSIFileName%.log
+    If (!logPath)
+	logPath=%A_TEMP%\%MSIFileName%.log
     Menu Tray, Tip, Installing %MSIFileFullPath%
 TryInstallAgain:
-    RunWait %A_WinDir%\System32\msiexec.exe /i "%MSIFileFullPath%" %params% /norestart /l+* "%LogPath%",, UseErrorLevel
+    RunWait %A_WinDir%\System32\msiexec.exe /i "%MSIFileFullPath%" %params% /norestart /l+* "%logPath%",, UseErrorLevel
 
     If (ErrorLevel==1618) { ; Another install is currently in progress
 	TrayTip %textTrayTip%, Error 1618: Another install currently in progress`, waiting 30 sec to repeat
@@ -120,10 +120,10 @@ TryInstallAgain:
 }
 
 CheckError(ReturnErrValue, Description) {
-    Global RunInteractiveInstalls,LogPath
+    Global RunInteractiveInstalls,logPath
     If (ReturnErrValue) {
-	FileAppend Error %ReturnErrValue% installing %Description%`nLog written to %LogPath%, *
-	If RunInteractiveInstalls!=0
+	FileAppend Error %ReturnErrValue% installing %Description%`nLog written to %logPath%, *
+	If (RunInteractiveInstalls!=0)
 	    MsgBox 48, LibreOffice Installing error, ErrorLevel: %ReturnErrValue%`n%Description%, 30
     } else {
 	FileAppend Finished installing %Description%`n, *

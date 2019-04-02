@@ -24,7 +24,7 @@ IF NOT "%dst:~-1%"=="\" SET "dst=%dst%\" & REM should only happen once
 	MKLINK /D "%dst%%srcnx%" "%src:~0,-1%" || MKLINK /J "%dst%%srcnx%" "%src:~0,-1%" || "%COMMANDER_PATH%\xln.exe" -n "%src:~0,-1%" "%dst%%srcnx%"
     ) ELSE (
 	rem fsutil requires admin rights --
-	MKLINK /H "%dst%%srcnx%" "%src:~0,-1%" || "%COMMANDER_PATH%\xln.exe" "%src:~0,-1%" "%dst%%srcnx%" || fsutil hardlink create "%dst%%~nx1" %1
+	MKLINK /H "%dst%%srcnx%" "%src:~0,-1%" || MKLINK "%dst%%srcnx%" "%src:~0,-1%" || "%COMMANDER_PATH%\xln.exe" "%src:~0,-1%" "%dst%%srcnx%" || fsutil hardlink create "%dst%%~nx1" %1
     )
     IF ERRORLEVEL 1 GOTO :ShowError
 EXIT /B
