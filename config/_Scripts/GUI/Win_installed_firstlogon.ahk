@@ -20,6 +20,7 @@ If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
 FileCopy %configScriptsDir%\lnk\Win-ActivateWithPK.lnk, %A_Desktop%\*.*
 FileCopy %configScriptsDir%\lnk\SwapSpace_FORMAT_MOUNT.lnk, %A_Desktop%\*.*
+FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot - Srv1S-B.lnk, %A_Desktop%\*.*
 FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot.lnk, %A_Desktop%\*.*
 
 If (!A_IsAdmin) {
@@ -31,13 +32,15 @@ Run %sysNative%\bcdedit.exe /set nx optout, %A_Temp%, Min
 Run %sysNative%\wbem\WMIC.exe recoveros set DebugInfoType = 0, %A_Temp%, Min
 Run %comspec% /C "%configScriptsDir%\Windows Components\WindowsComponentsSetup.cmd", %A_Temp%, Min
 
-OSVersionObj := RtlGetVersion()
-AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
+objOSVer := RtlGetVersion()
 
+AppXSupported := objOSVer[2] > 6 || (objOSVer[2] = 6 && objOSVer[3] >= 2) ; 10 or 6.[>2] : 6.0 → Vista, 6.1 → Win7, 6.2 → Win8, 6.3 → 8.1, ≥6.4 → Win10
 If (AppXSupported)
     Run %comspec% /C "%configScriptsDir%\Win10 right after OOBE.cmd", %A_Temp%, Min
 
-Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%, Min
+RecommmendedUpdatesCanBeDisabled := objOSVer[2] < 6 || (objOSVer[2] < 10 && objOSVer[3] < 4)
+If (RecommmendedUpdatesCanBeDisabled)
+    Run %comspec% /C "%configScriptsDir%dontIncludeRecommendedUpdates.cmd", %A_Temp%, Min
 
 RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 ; стандартный hostname в Win10: DESKTOP-*
