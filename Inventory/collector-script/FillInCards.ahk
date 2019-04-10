@@ -44,15 +44,22 @@ ProcessDir(ByRef srcDirs*) {
     static SuffixesToQueries := {".json": "fp", ".txt": "", " TVID.txt": {1: "TVID"}, " trello-id.txt": {1: "URL", 4: "id"}}
     
     hostNames := {}
-    For i, nameRegex in [ "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2}\s{1,2}\d+(\.\d+)?)(?P<Suffix>.*)"
-                        , "S)^(?P<Hostname>[^ .]+)(?P<Suffix>.*)" ] {
-        mHostname := mDateTime := ""
-        For i, srcDir in srcDirs
-            Loop Files, %srcDir%\*.json
-                If (RegexMatch(A_LoopFileName, nameRegex, m))
-                    If (!hostNames.HasKey(mHostname) || hostNames[mHostname] < mDateTime)
+    For i, srcDir in srcDirs
+        Loop Files, %srcDir%\*.json
+            For i, nameRegex in [ "S)^(?P<Hostname>[^ ]+) (?P<DateTime>\d{4}(-\d\d){2}\s{1,2}\d+(\.\d+)?)(?P<Suffix>.*)"
+                                , "S)^(?P<Hostname>[^ ]+) (?P<DateTimeUS>\d{4}(-\d\d){2}\s{1,2}\d+(\.\d+)? (AM|PM))(?P<Suffix>.*)"
+                                , "S)^(?P<Hostname>[^ .]+)(?P<Suffix>.*)" ] {
+                If (RegexMatch(A_LoopFileName, nameRegex, m) && (mSuffix = ".txt" || mSuffix = ".json")) {
+                    If (i==2) { ; convert mDateTimeUS "2017-28-12 0625 PM" to mDateTime "2017-12-28 1825"
+                        ampm = SubStr(mDateTime, -1,2), hh := SubStr(mDateTime, 12, 2), mm := SubStr(mDateTime, 14, 2)
+                        ;            YYYY                      MM                       DD
+                        mDateTime := SubStr(mDateTime, 1, 4) . SubStr(mDateTime, 8,3) . SubStr(mDateTime, 5,3) . A_Space . AMPMto24h(hh,ampm) . mm
+                    }
+                    If (i==3 || !hostNames.HasKey(mHostname) || (hostNames[mHostname] && hostNames[mHostname] < mDateTime)) ; i==3 – regex without date in filename; it's current/preferred one
                         hostNames[mHostname] := mDateTime
-    }
+                    mHostname := mDateTime := mDateTimeUS := ""
+                }
+            }
     
     For Hostname, mDateTime in hostNames {
         query := {Hostname: Hostname}, options := {log: srcDirs[1] "\" Hostname ".log"}
@@ -71,8 +78,8 @@ ProcessDir(ByRef srcDirs*) {
                         options[qParam] := A_LoopFileFullPath
             }
         }
-        ;MsgBox % A_ThisFunc "`noptions: " ObjectToText(options) "`n`nquery: " ObjectToText(query)
         FileAppend %A_Now% Processing %commonsuffix%`n, % options.log
+        ;MsgBox,,%A_ScriptName%, % Hostname "`n" mDateTime "`noptions: " ObjectToText(options) "`n`nquery: " ObjectToText(query), 10
         If (FillInCard(query, options) == 1) {
             For i, srcDir in srcDirs
                 Try {
@@ -187,6 +194,11 @@ FillInCard(ByRef query, ByRef options := "", ByRef fp := "") {
     } Else {
         Throw Exception("Количество подходящих карточек не равно 1",, nMatches ? ObjectToText(lastMatch) : nMatches)
     }
+}
+
+AMPMto24h(hh, ByRef ampm) {
+    ; Converting a 12-hour time to 24-hour time is straight forward, though confusing. From 1:00 PM to 11:59 PM you add 12 hours, and from 12:00 AM (midnight) to 12:59 AM you subtract 12 hours.
+    return hh == 12 ? (ampm = "AM" ? 0 : hh) : (ampm = "PM" && hh > 0 ? hh+12 : hh)
 }
 
 ShowError(ByRef text) {
