@@ -9,6 +9,13 @@ SETLOCAL ENABLEEXTENSIONS
 
     CALL :bg "%~dp0Security\AppLocker - Deny promoted apps Win10.cmd"
     CALL :bg "%~dp0registry\DefaultUserRegistrySettings.cmd"
+    IF /I "%USERNAME%"=="Install" SET "setTheme=1"
+    IF /I "%USERNAME%"=="Anton.Derbenev" SET "setTheme=1"
+    IF DEFINED setTheme (
+        COPY /Y /B "%~dp0..\Users\Default\AppData\Local\mobilmir.ru\plain_grey.deskthemepack" "%TEMP%\plain_grey.deskthemepack"
+        START "" "%TEMP%\plain_grey.deskthemepack"
+    )
+    SET "setTheme=%setTheme%"
 
     CALL :bg "%~dp0FindAutoHotkeyExe.cmd" "%~dp0cleanup\uninstall\050 OneDrive.ahk"
 
