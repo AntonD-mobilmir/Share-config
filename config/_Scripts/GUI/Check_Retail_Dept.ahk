@@ -471,6 +471,7 @@ If (hostSUScripts) {
 	ageLastStatus-=timeLastStatus, Days
 	If (ageLastStatus) {
 	    SetLastRowStatus(hostSUScripts . " [" . ageLastStatus . " дн.]", 0)
+	    RunScript("\\" SubStr(A_ComputerName, 1, -1) . "K\SoftUpdateScripts$\_install\install_software_update_scripts.cmd")
 	} Else {
 	    SetLastRowStatus(fnameLastStatus . " (сегодня)")
 	}
@@ -522,8 +523,8 @@ If (IsObject(softUpdScripts)) { ; если обновлять скрипты sof
     }
 }
 
-If (FileExist("D:\Local_Scripts\software_update"))
-    RunScript("D:\Local_Scripts\software_update\client_exec\PCX-1.13.3310-win32.msi.ahk")
+;If (FileExist("D:\Local_Scripts\software_update"))
+;    RunScript("D:\Local_Scripts\software_update\client_exec\PCX-1.13.3310-win32.msi.ahk")
 
 If (IsObject(rsyncPreinstalled)) { ; pidRsyncPreinstalled
     AddLog("Ожидание завершения rsync PreInstalled")
