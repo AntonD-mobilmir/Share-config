@@ -1,7 +1,4 @@
-﻿SysInternals\autoruns.chm
-SysInternals\autoruns.exe
-SysInternals\procexp.chm
-SysInternals\procexp.exe
+﻿SysInternals\autoruns.cmd
+SysInternals\procexp.cmd
 SysInternals\procexp.reg
-SysInternals\procmon.chm
-SysInternals\Procmon.exe
+SysInternals\procmon.cmd

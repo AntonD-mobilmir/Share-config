@@ -56,6 +56,15 @@ SysInternals\WINOBJ.EXE
 SysInternals\WINOBJ.HLP
 SysInternals\ZoomIt.exe
 SysInternals\regjump.exe
+SysInternals\autoruns.exe
+SysInternals\autoruns64.exe
+SysInternals\autoruns.chm
+SysInternals\procexp.exe
+SysInternals\procexp64.exe
+SysInternals\procexp.chm
+SysInternals\procmon.exe
+SysInternals\procmon64.exe
+SysInternals\procmon.chm
 Terminal.exe
 USBOblivion ReadMe.txt
 USBOblivion32.exe
