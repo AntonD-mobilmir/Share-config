@@ -4,12 +4,19 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 
-ListPassHashes := {	 "ab12997087fb03c88c379439f16002ed":""	; №407 действующие\Apps_dept.7z\TeamViewer\TeamViewer*.reg
-			,"0004323f7a1a9343a925c294419756bf":""	; №408 действующие\Apps_office.7z\TeamViewer\TeamViewer*.reg
-			,"db431dbadbedbfc5fe6403977015f3b1":""	; №409 действующие\Apps_roaming.7z\TeamViewer\TeamViewer*.reg
-			,"556d71c5d7afbe99a5f4aca58cc8620c":"!"	; №410 действующие\Distributives\...\TeamViewer 5\TeamViewer_host.defaults.reg
-			,"74abdbc5bbd8b5a8943d854e4e723c1e":"!"	; №411 действующие\TeamViewer5HostUnattended_egs.exe
-			,"5ab9133bafa3afc243c2c2d40e0741ec":"TeamViewer_ServiceNote"	; №412 действующие\Apps_roaming.7z\TeamViewer\TeamViewer_ServiceNote.reg
+ListPassHashes := {	 "b74015bd90df70c225850ccc047c186d":""  ; №435 действующие\Apps_dept.7z\TeamViewer\TeamViewer*.reg
+                        ,"2bcf87fa612fa62c7bad7415fae969b1":""  ; №436 действующие\Apps_office.7z\TeamViewer\TeamViewer*.reg
+                        ,"91fd065c00031676a85172b5f74c64be":""  ; №437 действующие\Apps_roaming.7z\TeamViewer\TeamViewer*.reg
+                        ,"aa3624245e61f37edce805e8a292706d":"!" ; №438 действующие\Distributives\...\TeamViewer 5\TeamViewer_host.defaults.reg
+                        ,"6b5a621080a656cb2f076101aca2d027":"!" ; №439 действующие\TeamViewer5HostUnattended_egs.exe
+                        ,"7d5f1524425ce399aacac1c42eb395f2":""  ; №440 действующие\Apps_roaming.7z\TeamViewer\TeamViewer_ServiceNote.reg
+
+                        ,"ab12997087fb03c88c379439f16002ed":"."	; №407 до 2019-04-09\Apps_dept.7z\TeamViewer\TeamViewer*.reg
+			,"0004323f7a1a9343a925c294419756bf":"."	; №408 до 2019-04-09\Apps_office.7z\TeamViewer\TeamViewer*.reg
+			,"db431dbadbedbfc5fe6403977015f3b1":"."	; №409 до 2019-04-09\Apps_roaming.7z\TeamViewer\TeamViewer*.reg
+			,"556d71c5d7afbe99a5f4aca58cc8620c":"!"	; №410 до 2019-04-09\Distributives\...\TeamViewer 5\TeamViewer_host.defaults.reg
+			,"74abdbc5bbd8b5a8943d854e4e723c1e":"!"	; №411 до 2019-04-09\TeamViewer5HostUnattended_egs.exe
+			,"5ab9133bafa3afc243c2c2d40e0741ec":"TeamViewer_ServiceNote"	; №412 до 2019-04-09\Apps_roaming.7z\TeamViewer\TeamViewer_ServiceNote.reg
 			
 			,"e5cea553a702dfea4d0df508c7fa32bf":"!"	; до 2018-12-18\TeamViewer_host.defaults.reg
 			,"dcc3c599c017e66ef26af2ad41ad851f":"."	; до 2018-12-18\Apps_dept\TeamViewer*.reg
@@ -57,44 +64,44 @@ WriteRegSettings(confName := "") {
         SplitPath defaultsPath,            ,       ,             , confName
     }    
     
-    ListNewPasswds := { "Apps_dept":    "381BBF396E764A594B929129B4E88133D1CE56E07804EA441F2A580B1A200586B5BEA82B647FBB6496630F8C7F3F889C"
-                      , "Apps_office":  "3D27D8C509759CE1D3FD308F4F39777AE3A842D808E3177FCCA65C6674AC86B1462FFD58BC7221F95A0ECB897C01FBAB"
-                      , "Apps_roaming": "833DB799624A8F334C4F083B20A0B81690EBFB0BA12F874A07110061F4B964A802F53DE90F56E3AA67A83594B5678A7B"
-                      , "TeamViewer_ServiceNote": "013DEE97E649C3BB63AFE125D1BDF2D7B6201D661ED305CEC6664E30BA0C347D78116F2D230CC1B58260F94A07BDDD99" }
+    ListNewPasswds := { "Apps_dept":              "4BD4CA95FCE47DB472108537070DA11520B6C094BBBAF9DDB3DBC620979309F8CD0C7EF843CE38C66C9728BDD0593940"
+                      , "Apps_office":            "BD56AFA1015C5B891A343B22B465A59D48EF717F40EC10C58CFAA0FF0D5B531E797E34C098D43E3574A110D7CC3FECAD"
+                      , "Apps_roaming":           "0B287DA11E760C42403D765EE1369896E4787066BFBA3D5B3A04A0D0AD0AD550C7F0A0FB5E39438DC1D2915E8D5EBDF7"
+                      , "TeamViewer_ServiceNote": "2FDE2359DE84EF4C3E8FE3E604FEB5C2DD7CC3325371B0417B3AD801BD116F6B13F67300A9C1A4CA858661F12F3BD6C2" }
     
     If (ListNewPasswds.HasKey(confName)) {
 	If (!A_IsAdmin) {
-	    EnvGet RunInteractiveInstalls,RunInteractiveInstalls
-	    If (RunInteractiveInstalls!="0") {
-		ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-		Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
-		ExitApp
-	    } Else {
-		ShowMsg("Скрипт запущен без прав администратора в не-интерактивном режиме. ")
-	    }
-	}
+            EnvGet RunInteractiveInstalls,RunInteractiveInstalls
+            If (RunInteractiveInstalls!="0") {
+                ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+                Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
+                ExitApp
+            } Else {
+                ShowMsg("Скрипт запущен без прав администратора в не-интерактивном режиме. ")
+            }
+        }
 
-	RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, % ListNewPasswds[confName]
-	If (ErrorLevel) {
-	    ShowMsg("Ошибка записи нового пароля.", 0x10)
-	} Else {
-	    ShowMsg("Пароль заменён на пароль из конфигурации " . defaultsPath)
-	}
+        RegWrite REG_BINARY, HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1, SecurityPasswordAES, % ListNewPasswds[confName]
+        If (ErrorLevel) {
+            ShowMsg("Ошибка записи нового пароля.", 0x10)
+        } Else {
+            ShowMsg("Пароль заменён на пароль из конфигурации " . defaultsPath)
+        }
     } Else {
-	ShowMsg("В скрипте нет пароля для конфигурации " . defaultsPath, 0x10)
+        ShowMsg("В скрипте нет пароля для конфигурации " . defaultsPath, 0x10)
     }
 }
 
 ShowMsg(text, type:=0) {
     static envGot
     If (!envGot) {
-	EnvGet RunInteractiveInstalls,RunInteractiveInstalls
-	envGot:=1
+        EnvGet RunInteractiveInstalls,RunInteractiveInstalls
+        envGot:=1
     }
     
     FileAppend %text%`n,*,cp1
     If (RunInteractiveInstalls!="0") {
-	MsgBox % type, %A_ScriptName%, %text%, 60
+        MsgBox % type, %A_ScriptName%, %text%, 60
     }
     
     configDir := getDefaultConfigDir()
@@ -109,7 +116,7 @@ ShowMsg(text, type:=0) {
 ; \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\getDefaultConfig.ahk
 getDefaultConfigFileName(defCfg := -1) {
     If (defCfg==-1)
-	defCfg := getDefaultConfig()
+        defCfg := getDefaultConfig()
     SplitPath defCfg, OutFileName
     return OutFileName
 }
@@ -117,9 +124,9 @@ getDefaultConfigFileName(defCfg := -1) {
 getDefaultConfigDir(defCfg := -1) {
     If (defCfg==-1) {
         EnvGet configDir, configDir
-	If (configDir)
-	    return RTrim(configDir, "\")
-	defCfg := getDefaultConfig()
+        If (configDir)
+            return RTrim(configDir, "\")
+        defCfg := getDefaultConfig()
     }
     SplitPath defCfg,,OutDir
     return OutDir
@@ -127,16 +134,16 @@ getDefaultConfigDir(defCfg := -1) {
 
 getDefaultConfig(batchPath := -1) {
     If (batchPath == -1) {
-	EnvGet DefaultsSource, DefaultsSource
-	If (DefaultsSource)
-	    return DefaultsSource
-	Try {
-	    return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
-	}
-	EnvGet SystemDrive, SystemDrive
-	return getDefaultConfig(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd")
+        EnvGet DefaultsSource, DefaultsSource
+        If (DefaultsSource)
+            return DefaultsSource
+        Try {
+            return getDefaultConfig(A_AppDataCommon . "\mobilmir.ru\_get_defaultconfig_source.cmd")
+        }
+        EnvGet SystemDrive, SystemDrive
+        return getDefaultConfig(SystemDrive . "\Local_Scripts\_get_defaultconfig_source.cmd")
     } Else {
-	return ReadSetVarFromBatchFile(batchPath, "DefaultsSource")
+        return ReadSetVarFromBatchFile(batchPath, "DefaultsSource")
     }
 }
 
@@ -144,11 +151,11 @@ getDefaultConfig(batchPath := -1) {
 ReadSetVarFromBatchFile(filename, varname) {
     Loop Read, %filename%
     {
-	If (RegExMatch(A_LoopReadLine, "ASi)[\s()]*SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
-	    If (Trim(Trim(mName), """") = varname) {
-		return Trim(Trim(mValue), """")
-	    }
-	}
+        If (RegExMatch(A_LoopReadLine, "ASi)[\s()]*SET\s+(?P<Name>.+)\s*=(?P<Value>.+)", m)) {
+            If (Trim(Trim(mName), """") = varname) {
+                return Trim(Trim(mValue), """")
+            }
+        }
     }
     Throw Exception("Var not found",, varname)
 }
