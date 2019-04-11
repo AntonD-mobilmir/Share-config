@@ -424,7 +424,7 @@ If (FileExist("D:\Credit")) {
     SetLastRowStatus(ErrorLevel,!ErrorLevel)
 }
 
-Loop Files, %A_ScriptDir%\..\..\..\software_update\scripts\_TeamViewerSecurityPasswordAES *.ahk
+Loop Files, \\Srv0.office0.mobilmir\profiles$\Share\software_update\client_exec\_TeamViewerSecurityPasswordAES *.ahk
 {
     tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
     tvPassChangeErr := RunScript(A_LoopFileFullPath, "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)

@@ -85,7 +85,7 @@ WriteRegSettings(confName := "") {
         If (ErrorLevel) {
             ShowMsg("Ошибка записи нового пароля.", 0x10)
         } Else {
-            ShowMsg("Пароль заменён на пароль из конфигурации " . defaultsPath)
+            ShowMsg("Пароль TeamViewer обновлен из конфигурации " . defaultsPath)
         }
     } Else {
         ShowMsg("В скрипте нет пароля для конфигурации " . defaultsPath, 0x10)
