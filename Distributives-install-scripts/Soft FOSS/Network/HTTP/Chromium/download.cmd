@@ -13,12 +13,21 @@
 )
 (
     IF NOT DEFINED logsDir SET "logsDir=%workdir%"
-    IF EXIST "%workdir%chrome-win.zip" MOVE /Y "%workdir%chrome-win.zip" "%workdir%chrome-win.zip.bak"
-    IF EXIST "%workdir%chrome-win.zip.bak" SET timeCond=-z "%workdir%chrome-win.zip.bak"
+    IF NOT EXIST "%workdir%" MKDIR "%workdir%"
+    
+    CALL :download "chrome-win.zip" "https://download-chromium.appspot.com/dl/Win?type=snapshots"
+    CALL :download "chrome-win64.zip" "https://download-chromium.appspot.com/dl/Win_x64?type=snapshots"
+EXIT /B
 )
+:download
 (
-    CALL %SystemDrive%\SysUtils\curl.exe -LpR %timeCond% -o "%workdir%chrome-win.zip" "https://download-chromium.appspot.com/dl/Win?type=snapshots" %wgetConf% >"%logsDir%snapshots-dl.log" 2>&1
-    IF EXIST "%workdir%chrome-win.zip" %SystemDrive%\SysUtils\xln.exe "%workdir%chrome-win.zip" "%srcpath%\chrome-win.zip" >>"%logsDir%snapshots-dl.log" 2>&1
+    IF EXIST "%workdir%%~nx1" MOVE /Y "%workdir%%~nx1" "%workdir%%~nx1.bak"
+    IF EXIST "%workdir%%~nx1.bak" SET timeCond=-z "%workdir%%~nx1.bak"
+    CALL %SystemDrive%\SysUtils\curl.exe -LpR %timeCond% -o "%workdir%%~nx1.tmp" %2 %wgetConf% >"%logsDir%%~nx1.log" 2>&1
+    IF EXIST "%workdir%%~nx1.tmp" (
+        MOVE /Y "%workdir%%~nx1.tmp" "%workdir%%~nx1"
+        %SystemDrive%\SysUtils\xln.exe "%workdir%%~nx1" "%srcpath%%~nx1" >>"%logsDir%%~nx1.log" 2>&1
+    )
 EXIT /B
 )
 
