@@ -54,7 +54,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	rem Security included to full WinAudit report
 	rem     secedit.exe /export /CFG "SecurityPolicy-%Hostname%.inf"
 	rem     secedit.exe /export /mergedpolicy /CFG "SecurityPolicy-ADMerged-%Hostname%.inf"
-	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=goPNtzabMpi /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
+	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=goPNtzabMpmid /f="%TEMP%\%~n0\Short WinAudit %Hostname% macaddress.csv" /l="short-%Hostname%-log"
 	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.html" /l="full-html-%Hostname%-log"
 	CALL :RunInBackground "%WinAuditDir%WinAudit.exe" /r=gsoPxuTUeERNtnzDaIbMpmidcSArHG /f="%TEMP%\%~n0\Full WinAudit %Hostname% macaddress.csv" /l="full-csv-%Hostname%-log"
 	
