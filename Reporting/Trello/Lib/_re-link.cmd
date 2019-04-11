@@ -5,8 +5,11 @@ SETLOCAL ENABLEEXTENSIONS
 
     PUSHD "%~dp0" || EXIT /B
     FOR %%A IN (*.ahk) DO IF EXIST "%~dp0..\..\..\..\Backups\profiles$\Share\config\_Scripts\Lib\%%~nxA" (
-        DEL "%%~A"
-        MKLINK "%%~A" "%~dp0..\..\..\..\Backups\profiles$\Share\config\_Scripts\Lib\%%~nxA"
+        MOVE /Y "%%~A" "%%~A.bak" && (
+            MKLINK "%%~A" "%~dp0..\..\..\..\Backups\profiles$\Share\config\_Scripts\Lib\%%~nxA"
+            IF EXIST "%%~A" ( DEL "%%~A.bak" ) ELSE MOVE "%%~A.bak" "%%~A"
+        )
+        
     )
     POPD
 )
