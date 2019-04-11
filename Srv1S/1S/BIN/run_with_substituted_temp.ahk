@@ -1,16 +1,16 @@
 ﻿;by LogicDaemon (www.logicdaemon.ru). CC BY 4.0+ http://creativecommons.org/licenses/by/4.0/
 #NoEnv
 #SingleInstance force
+FileEncoding UTF-8
 
-platf_8_3_4	:=	"8.3.4.408"
-platf_8_3_10	:=	"8.3.10.2753"
-platf_8_3_12	:=	"8.3.12.1714"
-
-ServerPlaforms := { "Srv1S" : [platf_8_3_10, "1cv8.exe"]
-		  , "Srv1S-B" : [platf_8_3_10, "1cv8s.exe"]
-		  , "Srv1S-R" : [platf_8_3_12, "1cv8s.exe"] }
-PlatformNames := { (platf_8_3_10) : "Управление торговлей 2015, Операторы 2015 (УТ для SIM-карт) и Клиентская техника"
-		 , (platf_8_3_12) : "ЗУП, Бухгалтерия, Фитнес-клуб (Инсигма)" }
+;platf_8_3_10	:=	"8.3.10.2753"
+;platf_8_3_12	:=	"8.3.12.1714"
+;serverPlaforms := { "Srv1S" : [platf_8_3_10, "1cv8.exe"]
+;		  , "Srv1S-B" : [platf_8_3_10, "1cv8s.exe"]
+;		  , "Srv1S-R" : [platf_8_3_12, "1cv8s.exe"]
+;		  , "Srv1S-R:2541" : [platf_8_3_10, "1cv8s.exe"] }
+;PlatformNames := { (platf_8_3_10) : "Управление торговлей 2015, Операторы 2015 (УТ для SIM-карт) и Клиентская техника"
+;		 , (platf_8_3_12) : "ЗУП, Бухгалтерия, Фитнес-клуб (Инсигма)" }
 
 global WinVer := GetWinVer()
      , LocalAppData := FindLocalAppData()
@@ -18,36 +18,52 @@ global WinVer := GetWinVer()
      , SystemRoot
 EnvGet SystemRoot, SystemRoot
 
-menuCreated := 0
+menuCreated := 0, platfCount := 0, localPlatformCache := LocalAppData "\Programs\1C\PlatformCache"
 
-localPlatformCache := LocalAppData "\Programs\1C\PlatformCache"
+serverPlaforms := {}
+Loop Read, %A_ScriptDir%\какая платформа на каком сервере.txt
+{
+    If (!(A_LoopReadLine ~= "^\s*[;#]") ; skip line if it starts with ; or #
+      && RegexMatch(A_LoopReadLine, "^(?P<serverName>[^\s]+)\s+(?P<platfDirName>\S+)\s+(?P<exeName>\S+)\s*(?P<desc>.*)?", m)) {
+        serverPlaforms[mserverName] := [mplatfDirName, mexeName, mdesc]
+        platfCount++
+    }
+}
+
 If (FileExist(LocalAppData "\1C\PlatformCache"))
     FileMoveDir %LocalAppData%\1C\PlatformCache, %localPlatformCache%
 
 For i, argv in A_Args {
-    For serverName, platfData in ServerPlaforms
+    For serverName, platfData in serverPlaforms
     {
-        If (argv ~= "i)\/S" serverName "(?:\.office0\.mobilmir)?(?::\d+)?\\") {
-	    PlatformVersionName := platfData[1]
+        If (colon := InStr(serverName, ":")) {
+            serverName := SubStr(serverName, 1, colon-1)
+            port := SubStr(serverName, colon+1)
+        } Else {
+            port := ""
+        }
+        If (argv ~= "i)\/S" serverName "(?:\.office0\.mobilmir)?" . (port ? ":" port : "(?::1541)?") . "\\") { ; (?::\d+)?
+	    platfDirName := platfData[1]
             PlatformExecutiveRelativePath := "bin\" platfData[2]
-            ;MsgBox PlatformVersionName: %PlatformVersionName%`nPlatformExecutiveRelativePath: %PlatformExecutiveRelativePath%
+            ;MsgBox platfDirName: %platfDirName%`nPlatformExecutiveRelativePath: %PlatformExecutiveRelativePath%
 	    break
 	}
     }
 }
 
-If (PlatformVersionName)
+If (platfDirName)
     GoTo SelectedPlatform
 
 PlatformExecutiveRelativePath := "bin\1cv8s.exe"
 
 Gui Add, Text, w500, У нас используются разные версии платформы для разных конфигураций 1С. Если попытаться запустить конфигурацию`, не соответствующую платформе`, 1С покажет ошибку и не запустится. Причем окно списка конфигураций показывает платформа`, так что выбрать`, какую запускать платформу`, надо до выбора конфигурации.
-Gui Add, ListView, -Multi LV-E0x200 r3 w500 AltSubmit gSelectPlatform, Платформа|Примечание
+Gui Add, ListView, -Multi LV-E0x200 r%platfCount% w640 AltSubmit gSelectPlatform, Сервер[:порт]|Платформа и описание
 Gui Add, Button, Default vbtnOK Section, OK
 Gui Add, Button, ys gShowMenu vbtnMenu, ...
 
-For platfVer, platfName in PlatformNames
-    LV_Add("", platfVer, platfName)
+;For platfVer, platfName in PlatformNames
+For serverName, platfData in serverPlaforms
+    LV_Add("", serverName, platfData[1] ": " platfData[3])
 GuiShowAgain:
     Gui Show,, Выбор платформы 1С
     ;GuiControl Choose, ControlID, 1
@@ -65,12 +81,13 @@ ButtonOK:
     If (!selRow)
 	return
     Gui Submit
-    LV_GetText(PlatformVersionName, selRow)
+    LV_GetText(serverName, selRow)
+    platfDirName := serverPlaforms[serverName][1]
 
 SelectedPlatform:
     params := SubStr(CommandLine, InStr(CommandLine := DllCall( "GetCommandLine", "Str" ),A_ScriptName,1)+StrLen(A_ScriptName)+2)
-    PlatformSource=%A_ScriptDir%\%PlatformVersionName%
-    PlatformSourceArc=%A_ScriptDir%\%PlatformVersionName%.7z
+    PlatformSource=%A_ScriptDir%\%platfDirName%
+    PlatformSourceArc=%A_ScriptDir%\%platfDirName%.7z
 
     ProcIDStorage=%origTemp%\1sprocesses.ini
 
@@ -78,7 +95,7 @@ SelectedPlatform:
     Menu Tray, Tip, Запуск 1С
 
     If (!GetKeyState("Shift", "P")) {
-	IniRead PID1S, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
+	IniRead PID1S, %ProcIDStorage%, %platfDirName%, % L128Hash(params)
 	GroupAdd 1s, ahk_pid %PID1S% ahk_exe 1cv8.exe
 	GroupAdd 1s, ahk_pid %PID1S% ahk_exe 1cv8s.exe
 	GroupAdd 1s, ahk_pid %PID1S% ahk_exe 1cv8l.exe
@@ -104,7 +121,7 @@ SelectedPlatform:
     TrayTip
 
     TrayTip Запуск 1С, Проверка локального кэша платформы...
-    PlatformRunPath := CachePlatformLocally(PlatformVersionName) "\" PlatformExecutiveRelativePath
+    PlatformRunPath := CachePlatformLocally(platfDirName) "\" PlatformExecutiveRelativePath
     TrayTip
 
     TrayTip Запуск 1С, Запуск нового процесса 1С
@@ -135,7 +152,7 @@ tryRunAgain:
 	MsgBox 16, Не удалось запустить 1С., Код системной ошибки: %A_LastError%. Обратитесь в службу ИТ.
 	ExitApp %A_LastError%
     } Else {
-	IniWrite %PID1S%, %ProcIDStorage%, %PlatformVersionName%, % L128Hash(params)
+	IniWrite %PID1S%, %ProcIDStorage%, %platfDirName%, % L128Hash(params)
     }
 
     ToolTip
@@ -181,7 +198,7 @@ removelocalplatform:
     FileRemoveDir %localPlatformCache%, 1
     return
 
-CachePlatformLocally(PlatformVersionName) {
+CachePlatformLocally(platfDirName) {
     global localPlatformCache, PlatformSource, PlatformSourceArc
     global BackupWorkingDir := A_WorkingDir
 
@@ -194,13 +211,8 @@ CachePlatformLocally(PlatformVersionName) {
 	return PlatformSource
     
     ; ToDo: Clean unused platform versions
-    ;Loop %localPlatformCache%\*, 2
-    ;    If (A_LoopFileName != PlatformVersionName && A_LoopFileName != platf_8_3_10 && A_LoopFileName != platf_8_3_4)
-    ;	FileRemoveDir %A_LoopFileFullPath%, 1
     
     unarchive:=PlatformSourceArc && (!InStr(FileExist(PlatformSourceArc),"D")) ; if true, use 7-Zip instead of copying files
-;    If (A_ComputerName=="ACERASPIRE7720G")
-;	MsgBox %unarchive%
     ;Check local directory existence and set up permissons, if it's not
     If (!FileExist(localPlatformCache)) {
 	Try {
@@ -213,8 +225,8 @@ CachePlatformLocally(PlatformVersionName) {
 	    return ShowErrorLocalCaching("ошибка " e.Message " " e.Extra)
 	}
     }
-    ;localPlatformCache is appended with \%PlatformVersionName% after setting up permissions.
-    localPlatformCache=%localPlatformCache%\%PlatformVersionName%
+    ;localPlatformCache is appended with \%platfDirName% after setting up permissions.
+    localPlatformCache=%localPlatformCache%\%platfDirName%
     If (!FileExist(localPlatformCache))
 	FileCreateDir %localPlatformCache%
     SetWorkingDir %PlatformSource%
@@ -283,7 +295,7 @@ CachePlatformLocally(PlatformVersionName) {
 		    Else
 			SizeUnit := SubStr(MultiplicatorLetters, A_Index, 1) "Б"
 		}
-		Progress A M R0-%TotalCopySize%, Копируемый объём: %HumanReadableSize% %SizeUnit%, Кэширование платформы 1С.`n(версия %PlatformVersionName%)`n`nЭто делается 1 раз для версии`, следующий запуск будет намного быстрее., Скрипт запуска 1С
+		Progress A M R0-%TotalCopySize%, Копируемый объём: %HumanReadableSize% %SizeUnit%, Кэширование платформы 1С.`n(версия %platfDirName%)`n`nЭто делается 1 раз для версии`, следующий запуск будет намного быстрее., Скрипт запуска 1С
 		Sleep 0
 		
 		Loop *, 2, 1 ; Only directories, recursively
