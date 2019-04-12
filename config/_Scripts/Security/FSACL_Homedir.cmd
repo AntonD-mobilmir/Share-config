@@ -97,7 +97,8 @@ SET "ACLBackupDir=%tgt%\AppData\Local\ACL-backup"
     rem AppData\Local\Microsoft\Windows\INetCache\counters2.dat	1	DACL(not_protected):ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\ВСЕ ПАКЕТЫ ПРИЛОЖЕНИЙ,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Подключение к Интернету, включая входящие подключения из Интернета,read_execute,allow,no_inheritance:ЦЕНТР ПАКЕТОВ ПРИЛОЖЕНИЙ\Домашние или рабочие сети,read_execute,allow,no_inheritance
 
     CALL :LogWithDate Разрешение изменения и выполнения файлов из некоторых папок
-    CALL "%srcpath%FSACL_Change.cmd" "%saUIDProfileOwner%" "%tgt%\Mail\Thunderbird\profile\extensions" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs"
+    CALL "%srcpath%FSACL_Change.cmd" "%saUIDProfileOwner%" "%tgt%\AppData\Local\Google\Chrome\User Data\PepperFlash" "%tgt%\AppData\Local\Google\Chrome\User Data\WidevineCDM" "%tgt%\AppData\Local\Google\Chrome\User Data\SwiftShader" "%tgt%\AppData\Local\Programs" "%tgt%\AppData\Local\SkbKontur"
+    REM "%tgt%\Mail\Thunderbird\profile\extensions"
     CALL :LogWithDate Исправление последствий опечатки --- \ в конце предыдущей команды
     %SetACLexe% -on \ -ot file -actn ace -ace "n:%saUIDProfileOwner%;p:change;i:so,sc;m:revoke;w:dacl" -ignoreerr -silent
     
