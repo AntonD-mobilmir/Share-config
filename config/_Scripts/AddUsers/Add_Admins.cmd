@@ -82,7 +82,8 @@ EXIT /B
     IF DEFINED gpgUserID (
 	MKDIR "%dirGPGout%"
 	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
-	SET gpgServerCopy="\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\%newUsername%@%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
+	MKDIR "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\%newUsername%"
+	SET gpgServerCopy="\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\%newUsername%\%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
     )
 )
 @(
