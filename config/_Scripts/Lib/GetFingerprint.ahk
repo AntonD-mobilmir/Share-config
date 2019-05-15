@@ -68,8 +68,17 @@ GetFingerprint_GetForgedValues() {
 			 , "Manufacturer2": "" ; RAM: Manufacturer2, PartNumber: PartNum2, SerialNumber: SerNum2
 			 , "Manufacturer3": ""
 			 , "Manufacturer00": "" ; RAM: Manufacturer00, PartNumber: HMT125U6TFR8C-H9, SerialNumber: A516521C
+			 , "Manufacturer01": "" ; RAM: Manufacturer01, PartNumber: ModulePartNumber01, SerialNumber: SerNum01 https://trello.com/c/8wHwo4SQ/67
+			 , "Manufacturer02": ""
+			 , "Manufacturer03": ""
 			 , "ModulePartNumber00": "" ; https://trello.com/c/HFcgc6Er/236
+			 , "ModulePartNumber01": "" ; RAM: Manufacturer01, PartNumber: ModulePartNumber01, SerialNumber: SerNum01 https://trello.com/c/8wHwo4SQ/67
+			 , "ModulePartNumber02": ""
+			 , "ModulePartNumber03": ""
 			 , "SerNum00": "" ; https://trello.com/c/HFcgc6Er/236
+			 , "SerNum01": "" ; RAM: Manufacturer01, PartNumber: ModulePartNumber01, SerialNumber: SerNum01 https://trello.com/c/8wHwo4SQ/67
+			 , "SerNum02": ""
+			 , "SerNum03": ""
 			 , "PartNum0": ""
 			 , "PartNum1": ""
 			 , "PartNum2": ""
