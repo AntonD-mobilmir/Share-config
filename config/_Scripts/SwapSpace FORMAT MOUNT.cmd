@@ -46,7 +46,11 @@ SETLOCAL ENABLEEXTENSIONS
 
     REM                     A B C D E F
     FOR /F "usebackq tokens=2,3,4,5,6,7,8 delims= " %%A IN ("%t%\vol.txt") DO (
-        IF "%%~B"=="NTFS" ( REM без метки, без буквы
+        IF "%%~B"=="Раздел" ( REM без метки, без буквы и без ФС
+            IF "%%~C"=="2048" CALL :IfInList "%%~D" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
+        ) ELSE IF "%%~B"=="RAW" ( REM без метки, без буквы
+            IF "%%~D"=="2048" CALL :IfInList "%%~E" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
+        ) ELSE IF "%%~B"=="NTFS" ( REM без метки, без буквы
             IF "%%~D"=="2048" CALL :IfInList "%%~E" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
         ) ELSE (
             IF "%%~B"=="SwapSpace" SET "volnum=%%~A" & GOTO :foundvol
