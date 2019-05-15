@@ -7,7 +7,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 
     FOR /F "usebackq delims=" %%A IN ("%~dp0SoftUpdateScripts_source.txt") DO (
         IF NOT DEFINED dfnd_s_usHost (
-            SET "s_usHost=%%A"
+            SET "dfnd_s_usHost=1" & SET "s_usHost=%%A"
         ) ELSE SET "s_usPath=%%A"
     )
     

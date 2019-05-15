@@ -50,12 +50,12 @@ IF NOT "%~1"=="" (
 (
     IF EXIST "%s_uScripts%\..\_install\dist\software_update.cmd" (
         REM selfupdate
-        "%SystemRoot%\system32\fc.exe" /B "%0" "%s_uScripts%\..\_install\dist\software_update.cmd" >NUL 2>&1
+        "%SystemRoot%\system32\fc.exe" /B "%~0" "%s_uScripts%\..\_install\dist\software_update.cmd" >NUL 2>&1
         REM One of compared files not exist or somethin more serious
         IF ERRORLEVEL 2 EXIT /B 32200
         REM compared files differ
         IF ERRORLEVEL 1 (
-            COPY /B /Y "%s_uScripts%\..\_install\dist\software_update.cmd" "%0"
+            COPY /B /Y "%s_uScripts%\..\_install\dist\software_update.cmd" "%~0"
             CALL %*
             EXIT /B
         )
