@@ -64,7 +64,19 @@ RunWait %A_AhkPath% /ErrorStdOut "%A_ScriptDir%\Check and close running soffice.
 TrayTip
 
 TrayTip %textTrayTip%, Main MSI (Distributive)
+
+If (A_OSVersion=="WIN_7") { ; LO 6.2.3 fails to install on Win7 due to error. To fix that, has to stop Windows Update service prior to installing.
+    SplitPath Distributive, MSIFileName
+    ;If (StartsWith(MSIFileName, "LibreOffice_6.2.3_Win_")) {
+    EnvGet SystemRoot, SystemRoot
+    RunWait %SystemRoot%\System32\net.exe stop wuauserv
+    restartWuauserv:=1
+    ;}
+}
 ErrorsOccured := ErrorsOccured || InstallMSI(Distributive, QuietInstall . " COMPANYNAME=""группа компаний Цифроград"" ISCHECKFORPRODUCTUPDATE=0 REGISTER_ALL_MSO_TYPES=1 ADDLOCAL=ALL REMOVE=" . Remove . " AgreeToLicense=Yes")
+If (restartWuauserv)
+    Run %SystemRoot%\System32\net.exe start wuauserv
+    
 FileSetAttrib +H, %A_DesktopCommon%\LibreOffice *
 
 If (!ErrorsOccured) {
@@ -146,4 +158,8 @@ FirstExisting(paths*) {
 	    return path
     
     return
+}
+
+StartsWith(ByRef long, ByRef short) {
+    return short = SubStr(long, 1, StrLen(short))
 }
