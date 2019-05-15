@@ -22,6 +22,9 @@ SET "csvName=sector-changes-%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%%suffix%.csv"
     CALL "%~dp0sector-changes.cmd" "%~dp0%csvName%"
     IF ERRORLEVEL 1 CALL :EchoError
     START "" "%editURL%"
+    ECHO.
+    ECHO Готово.
+    ECHO.
     ECHO Скопируйте A:B в F:G ^(только значения^)
     PAUSE
     )

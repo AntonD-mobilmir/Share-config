@@ -36,7 +36,7 @@ IF /I "%argflag%"==":" (
 
 TITLE Initial config
 %AutoHotkeyExe% /ErrorStdOut "%~dp0_Scripts\GUI\AcquireAndRecordMailUserId.ahk"
-IF NOT DEFINED instSoftUpdScripts CALL :AskAboutBTSync
+IF NOT DEFINED instSoftUpdScripts CALL :Ask_SetupLocalDownloader
 IF NOT DEFINED Inst1S CALL :AskAbout1S
 IF "%Inst1S%"=="1" (
     %SystemRoot%\System32\NET.exe USER Продавец /ADD /passwordchg:no /passwordreq:no
@@ -99,14 +99,19 @@ SET "srcpath="
     rem TODO: не работает, если запускать "!run without installing soft.cmd"
     REM Копирование дистрибутивов, поскольку новые отделы не подключены к офисной сети
     IF /I "%COMPUTERNAME:~-2%"=="-K" (
-        START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
-        rem START "Установка depts-commands\execscripts" %comspec% /C "\\AcerAspire7720g\Projects\depts-commands\execscripts\install.cmd"
-        
         ECHO Выключение спящего и ждущего режимов
         %SystemRoot%\System32\powercfg.exe -X -standby-timeout-ac 0
         %SystemRoot%\System32\powercfg.exe -X -standby-timeout-dc 0
         %SystemRoot%\System32\powercfg.exe -X -hibernate-timeout-ac 0
         %SystemRoot%\System32\powercfg.exe -X -hibernate-timeout-dc 0
+        
+        IF NOT DEFINED instSoftUpdScripts SET "instSoftUpdScripts=1"
+    )
+
+    IF NOT DEFINED instSoftUpdScripts CALL :Ask_SetupLocalDownloader
+    IF /I "%instSoftUpdScripts%"=="1" (
+        START "Установка скрипта авто-обновления ПО" %comspec% /C "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
+        START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
     )
 )
 :MTMail
@@ -138,9 +143,6 @@ rem     START "Installing Rarus" /I /WAIT %comspec% /C "%RarusInstallScript%"
 rem )
 :Skip1SAndRelated
 (
-IF NOT DEFINED instSoftUpdScripts CALL :AskAboutBTSync
-IF /I "%instSoftUpdScripts%"=="1" START "Установка скрипта авто-обновления ПО" %comspec% /C "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
-
 ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUSE & EXIT /B
 )
 :AskAbout1S
@@ -159,7 +161,7 @@ ECHO Скрипт завершил работу. Окно остаётся открыто для просмотра журнала. & PAUS
     IF /I "%Inst1S:~0,1%"=="д" SET "Inst1S=1"
 EXIT /B
 )
-:AskAboutBTSync
+:Ask_SetupLocalDownloader
 (
     ECHO /P "instSoftUpdScripts=Запустить установку скриптов автообновления ПО? [1=да]"
 EXIT /B
