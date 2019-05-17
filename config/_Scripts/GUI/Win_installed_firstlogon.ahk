@@ -18,10 +18,30 @@ If (!InStr(FileExist(configDir := defaultConfigDir), "D")) {
     configDir = %configScriptsDir%\..
 }
 FileCreateShortcut %SystemRoot%\explorer.exe, %A_Desktop%\config.lnk,, /open`,"%configDir%"
-FileCopy %configScriptsDir%\lnk\Win-ActivateWithPK.lnk, %A_Desktop%\*.*
-FileCopy %configScriptsDir%\lnk\SwapSpace_FORMAT_MOUNT.lnk, %A_Desktop%\*.*
-FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot - Srv1S-B.lnk, %A_Desktop%\*.*
-FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot.lnk, %A_Desktop%\*.*
+shortcutsDest = %A_Desktop%\скрипты настройки
+FileCreateDir %shortcutsDest%
+;FileCopy %configScriptsDir%\MoveUserProfile\Move Public Folders to D_Users_Public.lnk, %shortcutsDest%\*.*
+For i,name in [ "SwapSpace_FORMAT_MOUNT.lnk"
+              , "srchadmin.dll.lnk"
+              , "MovePublicFolderstoD_Users_Public.lnk"
+              , "_office0.lnk"
+              , "_retail.lnk"
+              , "_retail_serviceNote.lnk"
+              , "_roaming.lnk"
+              , "_roaming_notebook.lnk"
+              , "Win-ActivateWithPK.lnk"
+              , "cleanup_1_before_reboot.lnk"
+              , "cleanup_2_before_backup.lnk"
+              , "Write-trello-id.lnk"
+              , "_run_without_installing_soft.lnk"
+              , "SetupLocalDownloader.lnk"
+              , "CreateLocalUser.lnk"
+              , "CreateSharedAccount.lnk" ] {
+    FileCopy %configScriptsDir%\lnk\%name%, %shortcutsDest%\%i% %name%
+}
+
+FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot*.lnk, %shortcutsDest%\*.*
+;FileCopy \\Srv1S-B.office0.mobilmir\Distributives\Updates\Windows\wsusoffline\Initial Update Unattended +Autoreboot - Srv1S-B.lnk, %shortcutsDest%\*.*
 
 If (!A_IsAdmin) {
     RunWait % "*RunAs " DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+

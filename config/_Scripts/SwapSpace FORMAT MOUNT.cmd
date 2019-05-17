@@ -48,15 +48,18 @@ SETLOCAL ENABLEEXTENSIONS
     FOR /F "usebackq tokens=2,3,4,5,6,7,8 delims= " %%A IN ("%t%\vol.txt") DO (
         IF "%%~B"=="Раздел" ( REM без метки, без буквы и без ФС
             IF "%%~C"=="2048" CALL :IfInList "%%~D" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
-        ) ELSE IF "%%~B"=="RAW" ( REM без метки, без буквы
+        ) ELSE IF "%%~B"=="RAW" ( REM без метки, без буквы и без ФС, вариант Win10
             IF "%%~D"=="2048" CALL :IfInList "%%~E" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
         ) ELSE IF "%%~B"=="NTFS" ( REM без метки, без буквы
             IF "%%~D"=="2048" CALL :IfInList "%%~E" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
-        ) ELSE (
+        ) ELSE ( REM с меткой или буквой
             IF "%%~B"=="SwapSpace" SET "volnum=%%~A" & GOTO :foundvol
             IF "%%~C"=="SwapSpace" SET "volnum=%%~A" & GOTO :foundvol
             
             IF "%%~С"=="NTFS" IF "%%~E"=="2048" CALL :IfInList "%%~F" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
+            IF "%%~С"=="RAW" IF "%%~E"=="2048" CALL :IfInList "%%~F" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
+            
+            REM с меткой и буквой, без ФС быть не может ибо откуда иначе метка
             IF "%%~D"=="NTFS" IF "%%~F"=="2048" CALL :IfInList "%%~G" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
         )
     )

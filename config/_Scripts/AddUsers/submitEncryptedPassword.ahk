@@ -6,8 +6,11 @@
 UserName=%1%
 FilePath=%2%
 EnvGet Status, UserAddError
+Menu Tray, Tip, UserName: %UserName%`nStatus: %Status%`nFile: %FilePath%
 
 FileRead data, %FilePath%
+If (!data)
+    Throw Exception("В файле нет данных для отправки",, FilePath)
 
 RegRead Hostname, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Hostname
 RegRead Domain, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters, Domain
@@ -25,4 +28,4 @@ POSTDATA := { "entry.1247228425" : Hostname
 FileReadLine URL, %A_LineFile%\..\..\pseudo-secrets\%A_ScriptName%.txt, 1
 ExitApp !PostGoogleFormWithPostID(URL, POSTDATA)
 
-#Include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk
+#include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk

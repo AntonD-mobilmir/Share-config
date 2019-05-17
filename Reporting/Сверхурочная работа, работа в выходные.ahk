@@ -21,8 +21,7 @@ While (A_Index<3) {
 
 ;InputBox comment
 ;comment := UriEncodeR(comment)
-
-Run https://docs.google.com/forms/d/e/1FAIpQLSdEN3LM_hZaMfL0JsAr2288ElZdTxomwqFlzqbk_Pu76-QVlQ/viewform?usp=pp_url&entry.1383268982=%dateISO%&entry.448792864=%hours%&entry.1981205041=%comment%
+Run https://docs.google.com/forms/d/e/1FAIpQLSdEN3LM_hZaMfL0JsAr2288ElZdTxomwqFlzqbk_Pu76-QVlQ/viewform?usp=pp_url&entry.1383268982=%dateISO%&entry.448792864=%extTimeHours%&entry.1981205041=%comment%
 
 
 ; wrapped to leave Russian letters intact

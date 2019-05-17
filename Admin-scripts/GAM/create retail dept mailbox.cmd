@@ -15,12 +15,15 @@ CALL :SetOrAsk deptSector "Номер сектора (если неизвестен, оставьте пустым)" %3
 SET "deptLastName=(розничный отдел)"
 SET "org=/Розничные отделы"
 )
-IF DEFINED deptSector (
-    SET "sectGroup=depts%deptSector%@%pd%"
-    SET "monAddr=depts%deptSector%-co@status.%pd%"
-) ELSE (
-    SET "sectGroup=retail-depts@%pd%"
-    SET "monAddr=depts-co@%pd%"
+(
+    IF "%deptSector%"=="0" SET "deptSector="
+    IF DEFINED deptSector (
+        SET "sectGroup=depts%deptSector%@%pd%"
+        SET "monAddr=depts%deptSector%-co@status.%pd%"
+    ) ELSE (
+        SET "sectGroup=retail-depts@%pd%"
+        SET "monAddr=depts-co@%pd%"
+    )
 )
 (
     CALL switchdomain.cmd %pd%
