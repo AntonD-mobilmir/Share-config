@@ -4,10 +4,10 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-IF NOT DEFINED utilsdir SET "utilsdir=%~dp0..\utils\"
-IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
+    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    IF NOT DEFINED utilsdir SET "utilsdir=%~dp0..\utils\"
+    IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
 
     SET "srcBasePath=%~dpn0"
     SET "UIDCreatorOwner=S-1-3-0;s:y"
@@ -16,6 +16,12 @@ IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
     SET "OS64Bit="
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
     IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
+    IF NOT DEFINED exename7za IF DEFINED OS64Bit ( SET "exename7za=7za64.exe" ) ELSE ( SET "exename7za=7za.exe" )
+    IF NOT DEFINED exenameAutohotkey IF DEFINED OS64Bit ( SET "exenameAutohotkey=AutoHotkeyU64.exe" ) ELSE ( SET "exenameAutohotkey=AutoHotkey.exe" )
+)
+(
+    IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exename7za%"
+    rem IF NOT DEFINED AutohotkeyExe SET "AutohotkeyExe=%utilsdir%%exenameAutohotkey%"
     IF NOT DEFINED AutohotkeyExe CALL :FindAutoHotkeyExe || (CALL "%~dp0..\..\Keyboard Tools\AutoHotkey\install.cmd" & CALL :FindAutoHotkeyExe)
 
     SET "distNotepad2Mask=Notepad2-mod.*"
@@ -53,7 +59,6 @@ IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
     )
     
     IF NOT DEFINED TCDir SET "TCDir=%LOCALAPPDATA%\Programs\Total Commander"
-    IF NOT DEFINED exe7z SET exe7z="%utilsdir%7za.exe"
     REM exe7z will be redefined in next CALL
     FOR /F "usebackq delims=" %%N IN (`DIR /S /B /A-D "%dist7zDir%\7z*.exe"`) DO CALL :Unpack7ZipDist "%%~N"
 )
@@ -138,7 +143,7 @@ IF "%dist7zNameNoExt:~-4%"=="-x64" (
 :UnpackNotepad2Mod
 (
     FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%distNotepad2Dir%\%distNotepad2Mask%%Notepad2DistSuffix%"`) DO (
-	%utilsdir%7za.exe x -aoa -y -o"%TCDir%\notepad2" -- "%distNotepad2Dir%\%%~A"
+	"%utilsdir%%exename7za%" x -aoa -y -o"%TCDir%\notepad2" -- "%distNotepad2Dir%\%%~A"
 	FOR %%B IN ("%TCDir%\notepad2\notepad2*.*") DO MOVE "%%~B" "%TCDir%\"
 	FOR %%B IN ("%TCDir%\notepad2\*.*") DO MOVE "%%~B" "%TCDir%\notepad2-%%~nxB"
 	RD /S /Q "%TCDir%\notepad2"
@@ -160,7 +165,7 @@ EXIT /B
 (
     FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :CheckAutohotkeyExe %%I
     rem continuing if AutoHotkeyScript type isn't defined or specified path points to incorect location
-    IF NOT DEFINED AutohotkeyExe CALL :CheckAutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" || CALL :CheckAutohotkeyExe "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe" || SET AutohotkeyExe="%~dp0..\utils\AutoHotkey.exe"
+    IF NOT DEFINED AutohotkeyExe CALL :CheckAutohotkeyExe "%ProgramFiles%\AutoHotkey\AutoHotkey.exe" || CALL :CheckAutohotkeyExe "%ProgramFiles(x86)%\AutoHotkey\AutoHotkey.exe" || CALL :CheckAutohotkeyExe "%utilsdir%%exenameAutohotkey%"
     EXIT /B
 )
 :CheckAutohotkeyExe <exepath>

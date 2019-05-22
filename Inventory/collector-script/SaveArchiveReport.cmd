@@ -7,16 +7,19 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 
     SET "fnametime=%TIME::=%"
-    IF EXIST "%~dp07za.exe" ( SET exe7z="%~dp07za.exe" ) ELSE ( CALL :find7zexe || CALL :no7zip )
+    
+    SET "OS64Bit="
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
+    IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
+    
+    IF DEFINED OS64Bit ( SET "smartctlexe=smartctl-64.exe" ) ELSE ( SET "smartctlexe=smartctl-32.exe" )
+    IF NOT DEFINED exe7z IF DEFINED OS64Bit IF EXIST "%~dp07za64.exe" SET exe7z="%~dp07za64.exe"
+    IF NOT DEFINED exe7z IF EXIST "%~dp07za.exe" ( SET exe7z="%~dp07za.exe" ) ELSE ( CALL :find7zexe || CALL :no7zip )
     
     FOR /F "usebackq tokens=1 delims=[]" %%A IN (`%SystemRoot%\System32\find.exe /n "-!!! list of WMI paths to request" "%~0"`) DO SET "WMIListSkipLines=skip=%%A"
     FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID" /reg:32`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
     rem /reg:32 won't work on Vista and XP, so fall back
     IF ERRORLEVEL 1 FOR /F "usebackq tokens=1,2*" %%A IN (`reg.exe query HKEY_LOCAL_MACHINE\SOFTWARE\TeamViewer\Version5.1 /v "ClientID"`) DO IF "%%A"=="ClientID" SET /A "tvID=%%~C"
-
-    SET "smartctlexe=smartctl-32.exe"
-    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "smartctlexe=smartctl-64.exe"
-    IF /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" SET "smartctlexe=smartctl-64.exe"
 )
 (
     ECHO Y|DEL /F /Q "%TEMP%\%~n0\TempWmicBatchFile.bat"
@@ -129,20 +132,31 @@ EXIT /B %ERRORLEVEL%
 	CALL "%~dp0..\..\config\_Scripts\find7zexe.cmd"
 	EXIT /B
     )
-    FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command" /ve /reg:64`) DO CALL :checkDirFrom1stArg %%B && EXIT /B
-    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_CURRENT_USER\Software\7-Zip" /v "Path" /reg:64`) DO CALL :Check7zDir "%%~B" && EXIT /B
+    FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\7-Zip.7z\shell\open\command" /ve`) DO CALL :checkDirFrom1stArg %%B && EXIT /B
+    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_CURRENT_USER\Software\7-Zip" /v "Path"`) DO CALL :Check7zDir "%%~B" && EXIT /B
+    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\Software\7-Zip" /v "Path"`) DO CALL :Check7zDir "%%~B" && EXIT /B
     IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\Software\7-Zip" /v "Path" /reg:64`) DO CALL :Check7zDir "%%~B" && EXIT /B
+    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe" /v "Path"`) DO CALL :Check7zDir "%%~B" && EXIT /B
     IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe" /v "Path" /reg:64`) DO CALL :Check7zDir "%%~B" && EXIT /B
+    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe" /ve`) DO CALL :Check7zDir "%%~dpB" && EXIT /B
     IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\7zFM.exe" /ve /reg:64`) DO CALL :Check7zDir "%%~dpB" && EXIT /B
+    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip" /v "InstallLocation"`) DO CALL :Check7zDir "%%~B" && EXIT /B
     IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip" /v "InstallLocation" /reg:64`) DO CALL :Check7zDir "%%~B" && EXIT /B
+    IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip" /v "UninstallString"`) DO CALL :Check7zDir "%%~dpB" && EXIT /B
     IF NOT DEFINED exe7z FOR /F "usebackq tokens=2*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip" /v "UninstallString" /reg:64`) DO CALL :Check7zDir "%%~dpB" && EXIT /B
+
+    SET "OS64Bit="
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
+    IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
 
     IF EXIST "%~dp0..\..\config\_Scripts\find_exe.cmd" (
 	SET find_execmd="%~dp0..\..\config\_Scripts\find_exe.cmd"
     ) ELSE SET "find_execmd=:findexesimple"
 )
 (
-    CALL %find_execmd% exe7z 7z.exe "%ProgramFiles%\7-Zip\7z.exe" "%ProgramFiles(x86)%\7-Zip\7z.exe" "%SystemDrive%\Program Files\7-Zip\7z.exe" "%SystemDrive%\Arc\7-Zip\7z.exe" || CALL %find_execmd% exe7z 7za.exe "%SystemDrive%\Arc\7-Zip\7za.exe" || (ECHO  & EXIT /B 9009)
+    CALL %find_execmd% exe7z 7z.exe "%ProgramFiles%\7-Zip\7z.exe" "%ProgramFiles(x86)%\7-Zip\7z.exe" "%SystemDrive%\Program Files\7-Zip\7z.exe" "%SystemDrive%\Arc\7-Zip\7z.exe"
+    IF ERRORLEVEL 1 IF DEFINED OS64Bit CALL %find_execmd% exe7z 7za64.exe
+    IF ERRORLEVEL 1 CALL %find_execmd% exe7z 7za.exe || (ECHO  & EXIT /B 9009)
 EXIT /B
 )
 :checkDirFrom1stArg <arg1> <anything else>
@@ -155,7 +169,7 @@ EXIT /B
     IF "%dir7z:~-1%"=="\" SET "dir7z=%dir7z:~0,-1%"
 (
     IF NOT EXIST "%dir7z%\7z.exe" EXIT /B 9009
-    "%dir7z%\7z.exe" >NUL 2>&1 <NUL || IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
+    "%dir7z%\7z.exe" <NUL >NUL 2>&1 || IF ERRORLEVEL 9009 IF NOT ERRORLEVEL 9010 EXIT /B
     SET exe7z="%dir7z%\7z.exe"
 EXIT /B
 )

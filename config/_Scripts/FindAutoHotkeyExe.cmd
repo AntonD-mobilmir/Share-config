@@ -22,9 +22,17 @@ EXIT /B
     EXIT /B
 )
 :tryutilsdir
-    IF NOT DEFINED utilsdir CALL "%~dp0FindSoftwareSource.cmd" || EXIT /B 1
 (
-    CALL :CheckAutohotkeyExe "%utilsdir%AutoHotkey.exe"
+    IF NOT DEFINED utilsdir CALL "%~dp0FindSoftwareSource.cmd" || EXIT /B 1
+
+    SET "OS64Bit="
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"
+    IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64Bit=1"
+    
+    IF NOT DEFINED exenameAutohotkey IF DEFINED OS64Bit ( SET "exenameAutohotkey=AutoHotkeyU64.exe" ) ELSE ( SET "exenameAutohotkey=AutoHotkey.exe" )
+)
+(
+    CALL :CheckAutohotkeyExe "%utilsdir%%exenameAutohotkey%"
 EXIT /B
 )
 :CheckAutohotkeyExe <path>
