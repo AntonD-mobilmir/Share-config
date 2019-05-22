@@ -46,7 +46,7 @@ Loop Files, %A_ScriptDir%\req\*.txt
             pathpwd = %A_ScriptDir%\pwd.efs\%vusername%.pwd
             pathScript = %A_ScriptDir%\..\ExecQueue\create user %vusername%.cmd
             TransactWrite(pathpwd, GenPassword())
-            Run %comspec% /C ""%A_ScriptDir%\encrypt_new_user_password.cmd" "%vusername%" "%pathpwd%" >"d:\var\log\Auto Create New Accounts\encrypt_new_user_password.log" 2>&1"
+            Run %comspec% /C ""%A_ScriptDir%\encrypt_new_user_password.cmd" "%vusername%" "%pathpwd%" >>"d:\var\log\Auto Create New Accounts\encrypt_new_user_password.log" 2>&1"
             
             FileDelete %pathScript%
             FileAppend,
