@@ -29,37 +29,43 @@ REM or install_silently.*/update.*/reinstall.*/install.* in caller directory
 	    SET "distDir=%~dp2"
 	) ELSE (
 	    SET "distDir=%~dp1"
-	    SET "SU_Aversion=%~2"
+	    SET "s_u_Aversion=%~2"
 	)
 	SHIFT
     )
 )
 (
-    IF NOT DEFINED SU_Aversion (
-	IF EXIST "%~1" ( CALL :GetVersion %1 ) ELSE (SET "SU_Aversion=%~n1")
+    IF NOT DEFINED s_u_Aversion (
+	IF EXIST "%~1" ( CALL :GetVersion %1 ) ELSE SET "s_u_Aversion=%~n1"
     )
     IF NOT DEFINED distDir (
 	ECHO %0 %DATE% %TIME%: Received following arguments: %*
 	ECHO %0 %DATE% %TIME%: distDir - Update Caller directory cannot be determined!
 	EXIT /B 2
     )
-    IF NOT DEFINED SU_Aversion (
+    IF NOT DEFINED s_u_Aversion (
 	ECHO %0 %DATE% %TIME%: Received following arguments: %*
-	ECHO %0 %DATE% %TIME%: SU_Aversion - Update Version cannot be determined!
+	ECHO %0 %DATE% %TIME%: s_u_Aversion - Update Version cannot be determined!
 	EXIT /B 2
     )
     
-    IF NOT DEFINED UpdateScriptName CALL :getLastComponentOfPath UpdateScriptName "%distDir:~0,-1%"
+    IF NOT DEFINED UpdateScriptName (
+        IF "%distDir:~-1%"=="\" (
+            CALL :getLastComponentOfPath UpdateScriptName "%distDir:~0,-1%"
+        ) ELSE (
+            CALL :getLastComponentOfPath UpdateScriptName "%distDir%"
+        )
+    )
     ECHO %0 %DATE% %TIME%: Silent auto-update script will be written to s_uScripts ^(=%s_uScripts%^)
 )
 rem removing denied characters
-SET "SU_Aversion=%SU_Aversion:\=_%"
-SET "SU_Aversion=%SU_Aversion:/=_%"
-SET "SU_Aversion=%SU_Aversion::=_%"
+SET "s_u_Aversion=%s_u_Aversion:\=_%"
+SET "s_u_Aversion=%s_u_Aversion:/=_%"
+SET "s_u_Aversion=%s_u_Aversion::=_%"
 (
-ECHO cleaned up SU_Aversion: %SU_Aversion%
+ECHO cleaned up s_u_Aversion: %s_u_Aversion%
 
-SET SU_AScript="%s_uScripts%\%UpdateScriptName% %SU_Aversion%.cmd"
+SET SU_AScript="%s_uScripts%\%UpdateScriptName% %s_u_Aversion%.cmd"
 IF DEFINED SilentUpdater GOTO :ScriptCallingSilentUpdater
 
 REM Check if there is a template
@@ -115,7 +121,7 @@ EXIT /B 0
 EXIT /B
 
 :AtLeastThereIsPrevCaller
-    REN "%s_uScripts%\%UpdateScriptName%*.*" "%UpdateScriptName% %SU_Aversion%.*"
+    REN "%s_uScripts%\%UpdateScriptName%*.*" "%UpdateScriptName% %s_u_Aversion%.*"
 EXIT /B
 
 :getLastComponentOfPath
@@ -124,23 +130,23 @@ EXIT /B
 
 :GetVersion
     SETLOCAL
-    REM semi-universal procedure to get version no. (%SU_Aversion%) from file (%1)
+    REM semi-universal procedure to get version no. (%s_u_Aversion%) from file (%1)
     IF "%UseTimeAsVersion%"=="1" (
 	CALL :prepTimeSuffix %1
 	GOTO :GetVersionFromFileName
     )
-    FOR /F "usebackq tokens=1" %%V IN (`%SystemDrive%\SysUtils\lbrisar\getver.exe "%~1"`) DO SET "SU_Aversion=%%~V"
+    FOR /F "usebackq tokens=1" %%V IN (`%SystemDrive%\SysUtils\lbrisar\getver.exe "%~1"`) DO SET "s_u_Aversion=%%~V"
 (
-    IF "%SU_Aversion%"=="?" GOTO :GetVersionFromFileName
-    IF "%SU_Aversion%"=="" GOTO :GetVersionFromFileName
+    IF "%s_u_Aversion%"=="?" GOTO :GetVersionFromFileName
+    IF "%s_u_Aversion%"=="" GOTO :GetVersionFromFileName
     ENDLOCAL
-    SET "SU_Aversion=%SU_Aversion%"
+    SET "s_u_Aversion=%s_u_Aversion%"
     EXIT /B
 )
 :GetVersionFromFileName
 (
     REM ignore extension
-    SET "SU_Aversion=%~n1"
+    SET "s_u_Aversion=%~n1"
     REM split filename by "-_ " and use last part as version
     SET "VerSplitter=-_ "
     SET /A RunCount=0
@@ -149,26 +155,26 @@ EXIT /B
 (
     REM %%U - filename
     REM %%V - version
-    IF NOT DEFINED SU_Aversion EXIT /B 1
+    IF NOT DEFINED s_u_Aversion EXIT /B 1
     IF %RunCount% GTR 100 EXIT /B 1
     SET /A RunCount+=1
-    FOR /F "tokens=1* delims=%VerSplitter%" %%U IN ("%SU_Aversion%") DO (
+    FOR /F "tokens=1* delims=%VerSplitter%" %%U IN ("%s_u_Aversion%") DO (
 	IF "%%~V"=="" (
-	    IF NOT DEFINED CurSU_Aversion IF NOT "%VerSplitter%"=="." (
+	    IF NOT DEFINED Curs_u_Aversion IF NOT "%VerSplitter%"=="." (
 		REM there were no "-_ " in string, use "."
 		SET "VerSplitter=."
 		GOTO :GetVFFNAgain
 	    )
 	    ENDLOCAL
-	    SET "SU_Aversion=%SU_Aversion% %verSuffix%"
+	    SET "s_u_Aversion=%s_u_Aversion% %verSuffix%"
 	    EXIT /B
 	) ELSE (
-	    SET "CurSU_Aversion=%%~V"
+	    SET "Curs_u_Aversion=%%~V"
 	)
     )
 )
 (
-    SET "SU_Aversion=%CurSU_Aversion%"
+    SET "s_u_Aversion=%Curs_u_Aversion%"
     GOTO :GetVFFNAgain
 )
 :prepTimeSuffix
