@@ -8,33 +8,28 @@
 
 ;MsgBox % list of objects: %1%`ndestination where they will be linked: %2%
 
+If (!A_IsAdmin) {
+    ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+    RunWait *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
+    if (ErrorLevel = "ERROR")
+	MsgBox Без прав администратора ничего не выйдет.
+    ExitApp
+}
+
 If (A_Args.Length() && FileExist(A_Args[1])) {
     Loop Read, % A_Args[1]
     {
 	SplitPath A_LoopReadLine, SrcName, SrcDir ;,,, SrcDrive
-;	FileGetAttrib Attributes,A_LoopReadLine
-;	IfInString Attributes, D
         SetTimer showcPID, -3000
 	If (!SrcName) {
 	    SplitPath SrcDir, SrcName
             If (A_IsAdmin) {
                 linkType = Directory Symlink
                 RunWait "%comspec%" /C "MKLINK /D "%2%%SrcName%" "%SrcDir%"",,Hide UseErrorLevel, cPID
-            } Else {
-                linkType = Junction
-                RunWait "%A_ScriptDir%\xln.exe" -n "%SrcDir%" "%2%%SrcName%",,Hide UseErrorLevel, cPID
             }
 	} Else {
-            ;If (!OutDrive)
-            ;    SplitPath 2,,,,, OutDrive
-            ;If (SrcDrive = SrcDrive)
-            linkType = Hardlink
-            RunWait "%A_ScriptDir%\xln.exe" "%A_LoopReadLine%" "%2%%SrcName%",,Hide UseErrorLevel, cPID
-            
-            If (ErrorLevel) {
-                linkType = Symlink
-                RunWait "%comspec%" /C "MKLINK "%2%%SrcName%" "%A_LoopReadLine%"",,Hide UseErrorLevel, cPID
-            }
+            linkType = Symlink
+            RunWait "%comspec%" /C "MKLINK "%2%%SrcName%" "%A_LoopReadLine%"",,Hide UseErrorLevel, cPID
 	}
         SetTimer showcPID, Off
         
@@ -50,7 +45,6 @@ If (A_Args.Length() && FileExist(A_Args[1])) {
     Errors=Listfile "%1%" does not exist!
     exitError := 4
 }
-
 
 If (Errors || exitError) {
     MsgBox 48, A_ScriptName, Errors occured while linking: %Errors%`nExitError: %exitError%

@@ -8,15 +8,18 @@
 	<compression save="1" sfx="7z.sfx" updateSfx="0" askByContent="0" askByContentTimeout="1" alwaysWait7zip="0" extractToTempCount="20" deleteToRecycleBin="1" keySimpleMode="-1">
 		<settings_7zip Level="0" Archiver="7z" ShowPassword="0" EncryptHeaders="0">
 			<Options>
-				<formatOptions FormatID="7z" Level="9" Dictionary="67108864" Order="64" BlockSize="32" NumThreads="2" Method="LZMA" Options="" EncryptionMethod="" />
+				<formatOptions FormatID="7z" Level="9" Dictionary="67108864" Order="273" BlockSize="32" NumThreads="4" Method="LZMA2" Options="" EncryptionMethod="" />
 			</Options>
 		</settings_7zip>
 	</compression>
 	<passwords save="0" />
 	<formats save="1">
 		<format description="zip" guid="{23170F69-40C1-278A-1000-000110010000}">
+			<ext val="apk" />
+			<ext val="appx" />
 			<ext val="docx" />
 			<ext val="epub" />
+			<ext val="ipa" />
 			<ext val="jar" />
 			<ext val="ods" />
 			<ext val="odt" />
@@ -81,6 +84,9 @@
 		<format description="Ppmd" guid="{23170F69-40C1-278A-1000-0001100D0000}">
 			<ext val="pmd" />
 			<ext val="ppmd" />
+		</format>
+		<format description="COFF" guid="{23170F69-40C1-278A-1000-000110C60000}">
+			<ext val="obj" />
 		</format>
 		<format description="Ext" guid="{23170F69-40C1-278A-1000-000110C70000}">
 			<ext val="ext" />
@@ -161,6 +167,7 @@
 			<ext val="fat" />
 			<ext val="img" />
 			<ext val="imgptn" />
+			<ext val="imgptn23" />
 		</format>
 		<format description="MBR" guid="{23170F69-40C1-278A-1000-000110DB0000}">
 			<ext val="mbr" />
@@ -187,6 +194,7 @@
 			<ext val="macho" />
 		</format>
 		<format description="Udf" guid="{23170F69-40C1-278A-1000-000110E00000}">
+			<ext val="!qb" />
 			<ext val="img" />
 			<ext val="iso" />
 			<ext val="udf" />
@@ -219,6 +227,7 @@
 		</format>
 		<format description="wim" guid="{23170F69-40C1-278A-1000-000110E60000}">
 			<ext val="esd" />
+			<ext val="ppkg" />
 			<ext val="swm" />
 			<ext val="wim" />
 		</format>
@@ -260,6 +269,7 @@
 			<ext val="tar" />
 		</format>
 		<format description="gzip" guid="{23170F69-40C1-278A-1000-000110EF0000}">
+			<ext val="apk" />
 			<ext val="gz" />
 			<ext val="gzip" />
 			<ext val="tgz" />
