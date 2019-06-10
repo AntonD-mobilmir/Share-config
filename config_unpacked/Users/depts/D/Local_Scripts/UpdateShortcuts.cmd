@@ -91,8 +91,8 @@ EXIT /B
 )
 @(
     (
-        ECHO %ShortcutsTime%
-        ECHO %Shortcuts_64bitTime%
+        IF DEFINED ShortcutsTime (ECHO %ShortcutsTime%) ELSE ECHO.
+        IF DEFINED Shortcuts_64bitTime (ECHO %Shortcuts_64bitTime%) ELSE ECHO.
     )>"%scriptConfDir%\lastUnpacked.txt"
 EXIT /B
 )
