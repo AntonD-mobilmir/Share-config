@@ -33,19 +33,34 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED logsDir SET "logsDir=%workdir%"
     
     PING -n 5 127.0.0.1 >NUL
-    DEL "%workdir%%urlfname%" <NUL >NUL 2>&1
+    rem DEL "%workdir%%urlfname%" <NUL >NUL 2>&1
+
     rem CURL still ignores server filename. Have no idea what to do with it.
-    START "" /B /WAIT /D "%workdir%" curl -x socks://127.0.0.1:9150 %timeCond% -o "%workdir%%urlfname%" -ORL %url% || (CALL :ExitWithError running CURL & EXIT /B)
-    
+    rem START "" /B /WAIT /D "%workdir%" curl -x socks://127.0.0.1:9150 %timeCond% -o "%workdir%%urlfname%" -ORL %url% || (CALL :ExitWithError running CURL & EXIT /B)
+    IF EXIST "%workdir%new.tmp" RD /S /Q "%workdir%new.tmp"
+    MD "%workdir%new.tmp"
+    START "" /B /WAIT /D "%workdir%new.tmp" curl "%url%" -x socks://127.0.0.1:9150 %timeCond% -H "authority: autohotkey.com" -H "upgrade-insecure-requests: 1" -H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36" -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" -H "accept-encoding: gzip, deflate, br" -H "accept-language: ru,en-GB;q=0.9,en;q=0.8,en-US;q=0.7" -OJR || (CALL :ExitWithError running CURL & EXIT /B)
+    rem -o "%workdir%new.tmp\%urlfname%"
+    FOR %%A IN ("%workdir%new.tmp\*.exe") DO (
+        SET "urlfname=%%~nxA"
+        ECHO Y|MOVE /Y "%%~A" "%workdir%%%~nxA"
+        RD /S /Q "%workdir%new.tmp"
+        GOTO :foundurlfname
+    )
+    (CALL :ExitWithError finding downloaded file & EXIT /B)
+)
+:foundurlfname
+(
+    IF /I "%urlfname:~0,11%"=="AutoHotkey_" IF /I "%urlfname:~-10%"=="_setup.exe" SET "dstfname=%urlfname%"
     IF EXIST "%workdir%%urlfname%" FOR %%A IN ("%workdir%%urlfname%") DO (	
 	SET "dlfname=%%~nxA"
 	FOR /F "usebackq tokens=1*" %%B IN (`c:\SysUtils\lbrisar\getver.exe "%%~A"`) DO (
 	    SET "ver=%%~B"
 	    
-	    IF "%%~nxA"=="%urlfname%" (
+	    IF /I "%%~nxA"=="%urlfname%" (
 		IF NOT DEFINED ver (
 		    ECHO Could not determine version of the executable, and it's used to define filename
-		) ELSE SET "dstfname=AutoHotkey_%%~B_setup.exe"
+		) ELSE IF NOT DEFINED dstfname SET "dstfname=AutoHotkey_%%~B_setup.exe"
 	    )
 	    IF NOT DEFINED dstfname SET "dstfname=%%~nxA"
 	)
@@ -57,8 +72,9 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 )
 :ExitGetVerLoop
 (
+
     IF NOT "%ver:~0,2%"=="1." (
-	( CALL :ExitWithError Version %ver% downloaded from %url% ^(must be version 1.*^)!
+	( CALL :ExitWithError "Version %ver% downloaded from %url% ^(must be version 1.*^)!"
 	EXIT /B 1
 	) > "%srcpath%warning.txt"
     )

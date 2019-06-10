@@ -27,7 +27,8 @@ FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
     IF EXIST "%workdir%new.tmp" RD /S /Q "%workdir%new.tmp"
     MKDIR "%workdir%new.tmp"
     xln.exe "%curDistPath%" "%workdir%new.tmp\%curDistName%"
-    START "" /B /WAIT /D "%workdir%new.tmp" wget.exe -N %url%
+    rem START "" /B /WAIT /D "%workdir%new.tmp" wget.exe -N %url%
+    START "" /B /WAIT /D "%workdir%new.tmp" curl "%url%" %timeCond% -OJR -H "authority: autohotkey.com" -H "upgrade-insecure-requests: 1" -H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36" -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" -H "accept-encoding: gzip, deflate, br" -H "accept-language: ru,en-GB;q=0.9,en;q=0.8,en-US;q=0.7" || CALL :ExitWithError running CURL & EXIT /B
     
     IF NOT EXIST "%workdir%new.tmp\*.*" (
 	rem CURL still ignores server filename. Have no idea what to do with it. So it'll be only used as backup.
@@ -42,7 +43,7 @@ FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
 	rem -R, --remote-time   Set the remote file's time on the local output
 	rem -z, --time-cond TIME   Transfer based on a time condition
 
-	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe -LpR --remote-name-all %timeCond% %url% || CALL :ExitWithError running CURL & EXIT /B
+	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe "%url%" -LpR --remote-name-all %timeCond% || CALL :ExitWithError running CURL & EXIT /B
     )
     rem without -o for CURL and -O for wget, filename is unknown
     FOR %%A IN ("%workdir%new.tmp\*.exe") DO (	
