@@ -13,7 +13,7 @@ SETLOCAL ENABLEEXTENSIONS
 ) >managers-mobilmir.ru-list.csv
 (
     PAUSE
-    rem allmail|nomail|daily|digest
-    CALL gam update group managers-mobilmir sync member nomail csv "managers-mobilmir.ru-list.csv:email"
+    CALL gam create group managers-mobilmir
+    CALL gam csv managers-mobilmir.ru-list.csv gam update group managers-mobilmir add member ~email
     rem -- ERROR: 401: Domain cannot use Api, Groups service is not installed. - authError -- CALL gam update group managers-mobilmir description "Пользователи из managers@mobilmir.ru с почтой в @mobilmir.ru, обновлена %DATE% %TIME%"
 )
