@@ -17,7 +17,11 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 )
 (
 %SystemRoot%\System32\cscript.exe %windir%\System32\slmgr.vbs /ipk "%key%" || %ErrorCmd%
-IF NOT ERRORLEVEL 1 CLS
+IF NOT ERRORLEVEL 1 (
+    CLS
+    ECHO Ключ установлен в реестр. Проверьте активацию, а если невыполнена - запустите устранение неполадок.
+    PAUSE
+)
 rem 	cscript.exe %windir%\System32\slmgr.vbs /ato &
 rem вызывает двойную активацию на Win10 до 1809Oct. 1809Oct без этого ключа не активируется ;-(
 rem up 2019-01-24: похоже, кроме 1809Oct с последними обновлениями :-/ Ибо с ними --- снова двойная активация.
