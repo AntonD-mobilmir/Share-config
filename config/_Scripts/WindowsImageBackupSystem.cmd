@@ -43,6 +43,8 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     MKDIR "%DstDirWIB%" 2>NUL
     %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
     COPY /B /Y "%ProgramData%\mobilmir.ru\trello-id.txt" "%DstDirWIB%\%Hostname%\"
+    MKDIR "%DstDirWIB%\%Hostname%\WindowsBackup-Logs"
+    COPY /B /Y "%SystemRoot%\Logs\WindowsBackup\*.*" "%DstDirWIB%\%Hostname%\WindowsBackup-Logs\"
     
     IF DEFINED PassFilePath CALL :CopyEchoPassFilePath
     rem previous thing inine instead of CALL causes this:
