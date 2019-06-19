@@ -111,8 +111,10 @@ IF DEFINED desthost CALL :SetDesthostVars || EXIT /B 1
 )
 :retryMsiExecUninstall
 (
-    %PreExeCcmd% msiexec.exe /x "{118F5245-1999-4227-A12D-A0BB69A5E80B}" /qn REBOOT=ReallySuppress /log+ "%MSILog%" || %PreExeCcmd% msiexec.exe /x %RemoveMSI% /qn REBOOT=ReallySuppress /log+ "%MSILog%"
-    IF ERRORLEVEL 1618 IF NOT ERRORLEVEL 1619 ( %SystemRoot%\System32\ping.exe 127.0.0.1 -n 30 >NUL & GOTO :retryMsiExecUninstall ) & rem another install in progress, wait and retry
+    FOR %%A IN ("{118F5245-1999-4227-A12D-A0BB69A5E80B}" "{464CA7EE-BD7E-496F-9054-7E4E87AF12E3}" %RemoveMSI%) DO (
+        %PreExeCcmd% msiexec.exe /x "%%~A" /qn REBOOT=ReallySuppress /log+ "%MSILog%"
+        IF ERRORLEVEL 1618 IF NOT ERRORLEVEL 1619 ( %SystemRoot%\System32\ping.exe 127.0.0.1 -n 30 >NUL & GOTO :retryMsiExecUninstall ) & rem another install in progress, wait and retry
+    )
     IF ERRORLEVEL 1 SET "showlog=1"
     %PreExeCcmd% "C:\Program Files\Teamviewer\Version5\uninstall.exe" -silent
     %PreExeCcmd% "C:\Program Files (x86)\Teamviewer\Version5\uninstall.exe" -silent
@@ -121,9 +123,7 @@ IF DEFINED desthost CALL :SetDesthostVars || EXIT /B 1
 )
 :skipRemoveMSI
 (
-    %SystemRoot%\System32\taskkill.exe %taskkillRmt% /F /IM TeamViewer_Service.exe
-    %SystemRoot%\System32\taskkill.exe %taskkillRmt% /F /IM TeamViewer.exe
-    
+    FOR %%A IN (TeamViewer_Service.exe TeamViewer.exe) DO %SystemRoot%\System32\taskkill.exe %taskkillRmt% /F /IM %%A
     %PreExeCcmd% cmd.exe /C ""%SettingsScript%" "%RegConfigName%""
 )
 :retryMsiExecFixAll
