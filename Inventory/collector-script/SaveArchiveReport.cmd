@@ -26,6 +26,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     RD "%TEMP%\%~n0" 2>NUL
     IF EXIST "%TEMP%\%~n0" (
 	IF "%RunInteractiveInstalls%"=="0" EXIT /B 127
+	DIR "%TEMP%\%~n0"
 	ECHO Папка "%TEMP%\%~n0" существует. Возможно, в данный момент выполняется другой процесс аудита.
 	ECHO Нажмите любую клавишу для попытки полного удаления этой папки.
 	PAUSE
