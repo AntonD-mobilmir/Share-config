@@ -88,6 +88,7 @@ Microsoft.Office.OneNote_*
 Microsoft.PPIProjection_*
 Microsoft.Reader_*
 Microsoft.ScreenSketch_*
+Microsoft.UI.Xaml.*
 Microsoft.VCLibs.*
 Microsoft.VP9VideoExtensions_*
 Microsoft.Wallet_*

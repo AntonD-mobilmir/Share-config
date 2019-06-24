@@ -78,6 +78,14 @@ REM Get-Appxpackage -Allusers
 REM Add-AppxPackage -register "C:\Program Files\WindowsApps\******\AppxManifest.xml" -DisableDevelopmentMode
 REM ex: Add-AppxPackage -register "C:\Program Files\WindowsApps\Microsoft.WindowsStore_8wekyb3d8bbwe\AppxManifest.xml" -DisableDevelopmentMode
 
+REM https://github.com/Disassembler0/Win10-Initial-Setup-Script/issues/169
+REM 1527c705-839a-4832-9118-54d4Bd6a0c89	Microsoft.Windows.FilePicker
+REM c5e2524a-ea46-4f67-841f-6a9465d9d515	Microsoft.Windows.FileExplorer
+REM E2A4F912-2574-4A75-9BB0-0D023378592B	Microsoft.Windows.AppResolverUX
+REM F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE	Microsoft.Windows.AppSuggestedFoldersToLibraryDialog
+
+REM also https://docs.microsoft.com/en-us/windows/configuration/mobile-devices/product-ids-in-windows-10-mobile
+
 REM -!!! exceptions list: -
 1527c705-839a-4832-9118-54d4Bd6a0c89_*
 c5e2524a-ea46-4f67-841f-6a9465d9d515_*
@@ -126,6 +134,7 @@ Microsoft.ScreenSketch_*
 Microsoft.Services.Store.Engagement_*
 Microsoft.SkypeApp_*
 Microsoft.StorePurchaseApp_*
+Microsoft.UI.Xaml.*
 Microsoft.VCLibs.*
 Microsoft.VP9VideoExtensions_*
 Microsoft.Wallet_*
