@@ -41,7 +41,6 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
         ECHO.|%SystemRoot%\System32\net.exe use "%s_uScripts%" /USER:"nobody-%COMPUTERNAME%" /PERSISTENT:NO
     )
     IF NOT EXIST "%s_uScripts%" EXIT /B 32003
-
 )
 IF NOT "%~1"=="" (
     ECHO Unknown argument: %~1. Aborting>&2
@@ -60,8 +59,8 @@ IF NOT "%~1"=="" (
             EXIT /B
         )
     )
-    
     REM %AutohotkeyExe% may still be undefined
+    IF NOT EXIST "%configDir%" IF "%configDir:~0,2%"=="\\" CALL :ConnectNetDir "%configDir%"
     IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd" || EXIT /B 32020
     REM scripts running once if no error
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON /A-D "%s_uScripts%\*.*"`) DO IF NOT EXIST "%s_uScriptsStatus%\%%~nxI%logsuffix%" IF NOT EXIST "%s_uScriptsStatus%\%%~nxI%logrunningsuffix%" SET "scriptName=%%~I" & CALL :RunUpdate "%s_uScripts%\%%~I" !
@@ -116,3 +115,10 @@ EXIT /B
     SET "%~1=%~dp2"
 EXIT /B
 )
+:ConnectNetDir <path>
+FOR /F "delims=\ tokens=1,2" %%A IN ("%~1") DO (
+    NET USE "\\%%~A" /DELETE
+    NET USE "\\%%~A\%%~B" /DELETE
+    NET USE "\\%%~A\%%~B" /USER:"nobody-%COMPUTERNAME%" /PERSISTENT:NO
+)
+EXIT /B
