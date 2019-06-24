@@ -16,8 +16,7 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
 (
     CALL :GetDir configDir "%DefaultsSource%"
     REM use user named admin-task-scheduler with random password, write password to an encrypted local file, use this password for tasks creation
-    IF EXIST "%srcpath%dist\SoftUpdateScripts_source.txt" IF NOT DEFINED schedUserName CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
-    IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
+    IF NOT DEFINED schedUserName CALL :Getadmin-task-scheduler-data
 )
 :SchtasksRepeat
 (
@@ -29,7 +28,6 @@ CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemD
     )
 )
 (
-    rem schedUserName	schedUserPwd
     SET "swSchtasksPass="
     SET "STARTMode="
     IF DEFINED schedUserPwd (
@@ -64,7 +62,6 @@ IF /I "%schtasksRepeat:~0,1%"=="1" GOTO :SchtasksRepeat
 IF /I "%schtasksRepeat:~0,1%"=="Y" GOTO :SchtasksRepeat
 IF /I "%schtasksRepeat:~0,1%"=="¤" GOTO :SchtasksRepeat
 )
-
 :AfterSchtasks
 (
     IF NOT "%desthost%"=="" "%SystemRoot%\System32\schtasks.exe" %schTasksRemote% /Run /TN "mobilmir.ru\SoftwareUpdate"
@@ -120,6 +117,12 @@ EXIT /B
 :GetDir <var> <path>
 (
     SET "%~1=%~dp2"
+EXIT /B
+)
+:Getadmin-task-scheduler-data
+(
+    IF EXIST "%srcpath%dist\SoftUpdateScripts_source.txt" CALL "%configDir%_Scripts\AddUsers\AddUser_admin-task-scheduler.cmd" /LeaveExistingPwd
+    IF NOT DEFINED schedUserName CALL :GetCurrentUserName schedUserName
 EXIT /B
 )
 :GetCurrentUserName <varname>
