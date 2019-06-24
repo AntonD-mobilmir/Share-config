@@ -1,6 +1,7 @@
 @(REM coding:CP866
     REM by LogicDaemon <www.logicdaemon.ru>
     REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
+    ECHO OFF
     
     %SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
     
@@ -8,7 +9,6 @@
 	"%SystemRoot%\SysNative\cmd.exe" /C %0 %*
 	EXIT /B
     )
-    rem ECHO OFF
     SETLOCAL ENABLEEXTENSIONS
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
@@ -23,15 +23,18 @@
     )
     
     IF NOT DEFINED includes SET "includes=-allCritical"
-    SET "DstBaseDir=%~1"
+    SET "dstBaseDir=%~1"
     REM Windows 8+ cannot restore from compressed images
     CALL "%~dp0CheckWinVer.cmd" 6.2 && SET "DontCompressLocal=1"
-    IF NOT DEFINED DstBaseDir SET /P "DstBaseDir=Буква тома или сетевая папка для резервной копии (без кавычек): "
+    IF NOT DEFINED dstBaseDir (
+        CALL :AcquireDstBaseDir
+    ) ELSE (
+        CALL :SetAndCheckDstDirWIB || EXIT /B
+        SET "wbAdminQuiet=-quiet"
+    )
 )
-IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
-(
-    SET "DstDirWIB=%DstBaseDir%\WindowsImageBackup"
-    IF /I "%DstBaseDir%"=="R:" SET "CopyToR=0"
+@(
+    IF /I "%dstBaseDir%"=="R:" SET "CopyToR=0"
     IF NOT DEFINED CopyToR IF EXIST "R:\WindowsImageBackup\%Hostname%\*" (
 	ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
 	SET "CopyToR=0"
@@ -39,12 +42,13 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     
     IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
 )
-(
-    MKDIR "%DstDirWIB%" 2>NUL
-    %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%DstBaseDir%" %includes% -quiet
-    COPY /B /Y "%ProgramData%\mobilmir.ru\trello-id.txt" "%DstDirWIB%\%Hostname%\"
-    MKDIR "%DstDirWIB%\%Hostname%\WindowsBackup-Logs"
-    COPY /B /Y "%SystemRoot%\Logs\WindowsBackup\*.*" "%DstDirWIB%\%Hostname%\WindowsBackup-Logs\"
+@(
+    MKDIR "%dstDirWIB%" 2>NUL
+    %SystemRoot%\System32\wbadmin.exe START BACKUP -backupTarget:"%dstBaseDir%" %includes% %wbAdminQuiet%
+    IF ERRORLEVEL 1 CALL :wbAdminError || EXIT /B
+    COPY /B /Y "%ProgramData%\mobilmir.ru\trello-id.txt" "%dstDirWIB%\%Hostname%\"
+    MKDIR "%dstDirWIB%\%Hostname%\Logs"
+    COPY /B /Y "%SystemRoot%\Logs\WindowsBackup\*.*" "%dstDirWIB%\%Hostname%\Logs\"
     
     IF DEFINED PassFilePath CALL :CopyEchoPassFilePath
     rem previous thing inine instead of CALL causes this:
@@ -54,22 +58,22 @@ IF "%DstBaseDir:~-1%"=="\" SET "DstBaseDir=%DstBaseDir:~0,-1%"
     ECHO Запись контрольных сумм
     rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла
     
-    IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%DstDirWIB%\%Hostname%\*" >"%DstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%DstDirWIB%\%Hostname%-7zchecksums.txt" "%DstDirWIB%\%Hostname%\7zchecksums.txt""
+    IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%dstDirWIB%\%Hostname%\*" >"%dstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%dstDirWIB%\%Hostname%-7zchecksums.txt" "%dstDirWIB%\%Hostname%\7zchecksums.txt""
     
     IF "%CopyToR%"=="1" (
 	CALL :CopyImageTo R:
 	CALL :CompressAndDefrag R:
     )
-    CALL :CompressAndDefrag "%DstBaseDir%"
+    CALL :CompressAndDefrag "%dstBaseDir%"
     
     EXIT /B
 )
 :CopyEchoPassFilePath
 IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 (
-    COPY /B /Y "%PassFilePath%" "%DstDirWIB%\%Hostname%\password.txt"
-    IF DEFINED AutohotkeyExe START "" %AutohotkeyExe% "%~dp0AddUsers\ReadPwd_PostToFormWithBackupName.ahk" "%PassFilePath%" "%DstDirWIB%\%Hostname%"
-    CALL :DirToPassFile "%DstDirWIB%\%Hostname%\Backup*"
+    COPY /B /Y "%PassFilePath%" "%dstDirWIB%\%Hostname%\password.txt"
+    IF DEFINED AutohotkeyExe START "" %AutohotkeyExe% "%~dp0AddUsers\ReadPwd_PostToFormWithBackupName.ahk" "%PassFilePath%" "%dstDirWIB%\%Hostname%"
+    CALL :DirToPassFile "%dstDirWIB%\%Hostname%\Backup*"
 EXIT /B
 )
 
@@ -103,7 +107,7 @@ EXIT /B
     
     ECHO Копирование образа в "%~1\WindowsImageBackup\%Hostname%"
     MKDIR "%~1\WindowsImageBackup\%Hostname%" 2>NUL
-    XCOPY "%DstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
+    XCOPY "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
     IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
     
     rem when making local backup, WindowsImageBackup gets inherited permissions from root, and subfolder with actual backup: http://imgur.com/a/ttyqJ
@@ -123,11 +127,11 @@ EXIT /B
     ECHO Ожидание окончания записи контрольных сумм
 )
 @(
-    ECHO %DATE% %TIME% Waiting for "%DstDirWIB%\%Hostname%\7zchecksums.txt"
+    ECHO %DATE% %TIME% Waiting for "%dstDirWIB%\%Hostname%\7zchecksums.txt"
     :waitmore
     @PING 127.0.0.1 -n 2 >NUL
-    @IF NOT EXIST "%DstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%DstDirWIB%\%Hostname%-7zchecksums.txt" GOTO :waitmore
-    COPY /Y /D /B "%DstDirWIB%\%Hostname%\7zchecksums.txt" "%~1\WindowsImageBackup\%Hostname%\7zchecksums.txt"
+    @IF NOT EXIST "%dstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%dstDirWIB%\%Hostname%-7zchecksums.txt" GOTO :waitmore
+    COPY /Y /D /B "%dstDirWIB%\%Hostname%\7zchecksums.txt" "%~1\WindowsImageBackup\%Hostname%\7zchecksums.txt"
 EXIT /B
 )
 :DirToPassFile <path>
@@ -135,6 +139,72 @@ EXIT /B
     DIR /AD /B /O-D "%~1" >>"%PassFilePath%" 2>&1
 EXIT /B
 )
+:AcquireDstBaseDir
+@(
+    SET /P "dstBaseDir=Место назначения для резервной копии (здесь указывать без кавычек, см. -backupTarget в справке wbAdmin): "
+    IF NOT DEFINED dstBaseDir EXIT /B 1
+    CALL :SetAndCheckDstDirWIB && EXIT /B
+    ECHO Попробуйте ещё раз, либо введите пустую строку для отмены создания образа.
+    GOTO :AcquireDstBaseDir
+)
+:SetAndCheckDstDirWIB
+@IF "%dstBaseDir:~-1%"=="\" SET "dstBaseDir=%dstBaseDir:~0,-1%"
+@(
+    @IF "%dstBaseDir:~0,2%"=="\\" (
+        CALL :SplitNetPath netHost netShare "%dstBaseDir%" || EXIT /B
+    ) ELSE IF NOT "%dstBaseDir:~1,2%"==":" EXIT /B 1
+    SET "dstDirWIB=%dstBaseDir%\WindowsImageBackup"
+)
+:CheckdstDirWIB
+@SET "netShareRemounted="
+:CheckdstDirWIBRetry
+@(
+    SET "ErrorCheckdstDirWIB="
+    MKDIR "%dstDirWIB%\checkdir.tmp" 2>NUL || CALL :SetErrorCheckdstDirWIB "create dir"
+    ECHO.>"%dstDirWIB%\checkdir.tmp\checkflag.tmp" || CALL :SetErrorCheckdstDirWIB "create file"
+    IF NOT EXIST "%dstDirWIB%\checkdir.tmp\checkflag.tmp" (
+        IF DEFINED netHost IF DEFINED netShare IF NOT DEFINED netShareRemounted (
+            SET "netShareRemounted=1"
+            NET USE "\\%netHost%" /DELETE
+            NET USE "\\%netHost%\%destShare%" /DELETE
+            NET USE "\\%netHost%\%destShare%" /PERSISTENT:NO && GOTO :CheckdstDirWIBRetry
+        )
+        ECHO Невозможно создать "%dstDirWIB%\checkdir.tmp\checkflag.tmp", поэтому указанный путь "%dstDirWIB%" нельзя использовать для сохранения образа.
+        RD "%dstDirWIB%\checkdir.tmp"
+        EXIT /B 1
+    )
+    DEL "%dstDirWIB%\checkdir.tmp\checkflag.tmp"
+    RD "%dstDirWIB%\checkdir.tmp"
+EXIT /B 0
+)
+:SetErrorCheckdstDirWIB
+@(
+    SET "ErrorCheckdstDirWIB=, %~1 Error: %ERRORLEVEL%"
+EXIT /B
+)
+:SplitNetPath <hostVar> <shareVar> <path>
+@(
+    FOR /F "delims=\ tokens=1,2" %%A IN ("%~3") DO (
+        IF "%%~A"=="" EXIT /B 1
+        IF "%%~B"=="" EXIT /B 2
+        SET "%~1=%%~A"
+        SET "%~2=%%~B"
+        EXIT /B
+    )
+EXIT /B 3
+)
+:wbAdminError
+@(
+    rem @SET "wbAdminError=%ErrorLevel%"
+    FOR /R /D %%A IN ("%dstDirWIB%\%Hostname%\*.*") DO RD "%%~A" >NUL <NUL
+    RD "%dstDirWIB%\%Hostname%" >NUL <NUL
+    IF NOT EXIST "%dstDirWIB%\%Hostname%" RD "%dstDirWIB%" >NUL <NUL
+    ECHO Ошибка wbAdmin: %ErrorLevel%
+    ECHO Скрипт был запущен со следующими параметрами: %*
+    IF NOT DEFINED wbAdminQuiet PAUSE
+    EXIT /B %ErrorLevel%
+)
+
 rem Синтаксис: WBADMIN START BACKUP
 rem     [-backupTarget:{<целевой_том_архивации> | <целевая_сетевая_папка>}]
 rem     [-include:<включаемые_тома>]
