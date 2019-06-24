@@ -37,8 +37,6 @@ IF DEFINED configDir (
     ECHO Папка настроек: %configDir%
     IF NOT EXIST "%ProgramData%\mobilmir.ru" MKDIR "%ProgramData%\mobilmir.ru"
     ECHO SET "DefaultsSource=%DefaultsSource%">"%DefaultsSourceScript%"
-
-    IF NOT EXIST "%ProgramData%\mobilmir.ru" CALL "%~dp0move Local_Scripts to ProgramData_mobilmir.cmd"
     EXIT /B
 )
 :UsePrefefinedDefaultsSource

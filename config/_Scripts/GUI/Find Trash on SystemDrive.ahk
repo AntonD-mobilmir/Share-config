@@ -13,16 +13,13 @@ GoodDirs =
 (LTrim
 $Recycle.Bin
 BOOT
-Common_Scripts
 Documents and Settings
 Intel
-Local_Scripts
 PerfLogs
 Program Files
 Program Files (x86)
 ProgramData
 Recovery
-squid
 System Volume Information
 SysUtils
 Users

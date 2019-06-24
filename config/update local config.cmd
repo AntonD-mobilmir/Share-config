@@ -3,9 +3,6 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 SETLOCAL ENABLEEXTENSIONS
     SET "srcpath=%~dp0"
-
-    rem IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-    rem CALL "%~dp0_Scripts\move Local_Scripts to ProgramData_mobilmir.cmd"
     CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
 
     IF NOT "%~1"=="" SET "configDir=%~1"

@@ -12,5 +12,5 @@ IF NOT DEFINED ProgramData SET "ProgramData=%ALLUSERSPROFILE%\Application Data"
 	RD "%SystemDrive%\Local_Scripts"
 	MOVE /Y "%SystemDrive%\Local_Scripts" "%ProgramData%\Local_Scripts_old"
     )
-    "%SystemDrive%\SysUtils\xln.exe" -n "%ProgramData%\mobilmir.ru" "%SystemDrive%\Local_Scripts"
+    REM "%SystemDrive%\SysUtils\xln.exe" -n "%ProgramData%\mobilmir.ru" "%SystemDrive%\Local_Scripts"
 )

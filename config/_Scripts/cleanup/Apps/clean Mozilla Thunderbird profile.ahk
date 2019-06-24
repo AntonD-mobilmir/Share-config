@@ -76,6 +76,8 @@ CleanupMTProfile(Dir) {
 	FileDelete *.sqlite-shm
 	FileDelete *.sqlite-wal
 	FileDelete *.tmp
+	FileDelete .startup-incomplete
+	FileDelete addonStartup.json.lz4
 	
 	;FileDelete session-*.json
 	FileDelete addons.json
@@ -139,6 +141,7 @@ CleanupMTProfile(Dir) {
 	Loop Files, Cache.Trash*, D
 	    FileRemoveDir %A_LoopFileFullPath%, 1
 	
+	FileRemoveDir blocklists, 1
 	FileRemoveDir gmp, 1
 	FileRemoveDir Cache, 1
 	FileRemoveDir ABphotos, 1
@@ -187,6 +190,8 @@ CleanupMTProfile(Dir) {
 	    }
 	
 	If (cleanMore) {
+	    FileDelete virtualFolders.dat
+            FileDelete virtualFolders-1.dat
 	    FileRemoveDir ImapMail, 1
 	    Loop Mail\*.msf, 0, 1
 		FileDelete %A_LoopFileFullPath%
@@ -194,7 +199,6 @@ CleanupMTProfile(Dir) {
 		If (A_LoopFileSize=27)
 		    FileDelete %A_LoopFileFullPath%
 		    
-	    FileDelete virtualFolders.dat
 	} Else {
 	    Loop ImapMail\*.mozmsgs, 2, 1 ; Removing Windows Search index-helpers
 	    {
