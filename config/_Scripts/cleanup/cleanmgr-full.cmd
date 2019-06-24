@@ -25,5 +25,8 @@ EXIT /B
 
 :RunCleanup <settings-file>
 REG IMPORT "%~1"
+
+START "mousemove while cleanmgr.exe running.ahk" /LOW /MIN %comspec% /C ""%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\GUI\mousemove while cleanmgr.exe running.ahk""
+
 cleanmgr.exe /sagerun:65535
 EXIT /B
