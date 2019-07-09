@@ -14,7 +14,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 	) ELSE MKDIR "%ProgramData%\mobilmir.ru\Common_Scripts"
     )
 
-    IF "%utilsdir%"=="" SET "utilsdir=%~dp0..\..\utils\"
+    SET "utilsdir=%~dp0..\utils\"
     
     SET "OS64Bit="
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"

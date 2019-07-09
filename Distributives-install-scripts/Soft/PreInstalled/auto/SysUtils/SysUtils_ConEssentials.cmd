@@ -1,5 +1,6 @@
 @(REM coding:CP866
     IF NOT DEFINED SysUtilsDir CALL "%~dp0_init.cmd"
+    IF NOT DEFINED exe7z CALL "%~dp0_init.cmd"
     IF NOT DEFINED pathString SET "pathString=%SysUtilsDir%;%SysUtilsDir%\UnxUtils;%SysUtilsDir%\UnxUtils\Uri;%SysUtilsDir%\kliu;%SysUtilsDir%\libs"
 )
 (

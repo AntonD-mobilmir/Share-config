@@ -8,7 +8,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
         SET "ErrorPresence="
     )
 
-    IF "%utilsdir%"=="" SET "utilsdir=%~dp0..\utils\"
+    SET "utilsdir=%~dp0..\utils\"
     IF NOT DEFINED exename7za (
         SET "exename7za=7za.exe"
         IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "exename7za=7za64.exe"

@@ -4,9 +4,8 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
 IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-    IF NOT DEFINED utilsdir SET "utilsdir=%~dp0..\utils\"
+    SET "utilsdir=%~dp0..\utils\"
     IF NOT DEFINED LOCALAPPDATA CALL :DefineLocalAppData
 
     SET "srcBasePath=%~dpn0"
@@ -84,13 +83,15 @@ IF NOT DEFINED exe7zlocal (
 	@ECHO Error copying AutoHotkey to TC dir "%TCDir%"
 	PING 127.0.0.1 -n 3 >NUL
     )
+    CALL :GetFileNameExt AutohotkeyExeName "%AutohotkeyExe%"
 )
 (
+    "%TCDir%\xln.exe" "%TCDir%\%AutohotkeyExeName%" "%TCDir%\Autohotkey.exe" || COPY /B /Y "%TCDir%\%AutohotkeyExeName%" "%TCDir%\Autohotkey.exe"
     CALL :UnpackNotepad2Mod
     REM unpacking config after notepad2.zip to overwrite notepad2.ini
     %exe7z% x -aoa -y -o"%TCDir%" -- "%srcBasePath%.config.7z"
     REM Autohotkey.exe копируется в %TCDir% выше
-    IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" "%TCDir%\Autohotkey.exe" "%TCDir%\_copy_config.ahk"
+    IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" "%TCDir%\%AutohotkeyExeName%" "%TCDir%\Autohotkey.exe" "%TCDir%\_copy_config.ahk"
     
     FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%distzpaqDir%\zpaq*.zip"`) DO CALL :Unpackzpaq "%distzpaqDir%\%%~N" && EXIT /B
     @ECHO zpaq not unpacked!
@@ -173,4 +174,9 @@ EXIT /B
     IF NOT EXIST %1 EXIT /B 1
     SET AutohotkeyExe=%1
 EXIT /B 0
+)
+:GetFileNameExt <var> <path>
+(
+    SET "%~1=%~nx2"
+EXIT /B
 )

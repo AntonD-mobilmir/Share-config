@@ -8,7 +8,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
         SET "ErrorPresence="
     )
     SET "SysUtilsDir=%SystemDrive%\SysUtils"
-    IF "%utilsdir%"=="" SET "utilsdir=%~dp0..\..\utils\"
+    SET "utilsdir=%~dp0..\..\utils\"
     
     SET "OS64Bit="
     IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64Bit=1"

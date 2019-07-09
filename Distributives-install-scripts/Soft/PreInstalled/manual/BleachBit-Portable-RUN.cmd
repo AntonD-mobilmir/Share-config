@@ -1,6 +1,6 @@
 @(REM coding:CP866
 SETLOCAL ENABLEEXTENSIONS
-IF NOT DEFINED utilsdir SET "utilsdir=%~dp0..\utils\"
+SET "utilsdir=%~dp0..\utils\"
 IF NOT DEFINED LOCALAPPDATA (
     IF EXIST "%USERPROFILE%\AppData\Local\*" ( SET "LOCALAPPDATA=%USERPROFILE%\AppData\Local" ) ELSE SET "LOCALAPPDATA=%USERPROFILE%\Local Settings\Application Data"
 )

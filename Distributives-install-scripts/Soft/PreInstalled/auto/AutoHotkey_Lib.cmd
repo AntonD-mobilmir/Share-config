@@ -13,7 +13,7 @@ REM                                                        logicdaemon.ru
 	SET "ErrorCmd=SET ErrorPresence=1"
 	SET "ErrorPresence="
     )
-    IF "%utilsdir%"=="" SET "utilsdir=%~dp0..\utils\"
+    SET "utilsdir=%~dp0..\utils\"
     IF NOT DEFINED exename7za (
         SET "exename7za=7za.exe"
         IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "exename7za=7za64.exe"
@@ -24,7 +24,6 @@ REM                                                        logicdaemon.ru
     IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exe7za%"
 
     IF %AutoHotkey_Lib_reentrance% LSS 0 SET /A "AutoHotkey_Lib_reentrance=0"
-    IF "%utilsdir%"=="" SET utilsdir=%srcpath%..\utils\
     IF EXIST "%ProgramFiles%\AutoHotkey" (
 	SET "PrimaryDestination=%ProgramFiles%\AutoHotkey\Lib"
     ) ELSE (
