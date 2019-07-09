@@ -11,11 +11,12 @@ SendMode Input
 Process Wait, cleanmgr.exe
 Loop
 {
-    Sleep 3000
+    While (A_TimeIdle < 3000)
+        Sleep 3000
     Process Exist, cleanmgr.exe
     If (!ErrorLevel)
         ExitApp
-    MouseMove 0, 0, 0, R
-    ;MouseMove 1, 0, 0, R
-    ;MouseMove -1, 0, 0, R
+    WinActivateBottom ahk_exe cleanmgr.exe
+    MouseMove 1, 0, 0, R
+    MouseMove -1, 0, 0, R
 }
