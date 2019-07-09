@@ -5,10 +5,11 @@ SETLOCAL ENABLEEXTENSIONS
 
 IF NOT DEFINED exe7z IF EXIST "%~dp0..\..\..\wcx\Total7zip\7z.exe" (SET exe7z="%~dp0..\..\..\wcx\Total7zip\7z.exe") ELSE SET exe7z="%~dp0..\..\..\wcx\Total7zip\7zg.exe"
 
-MKDIR "%TEMP%\%~nx0.tmp"
+MKDIR "%TEMP%\%~nx0.tmp" 2>NUL
 PUSHD "%TEMP%\%~nx0.tmp" && (
-    wget -N http://goo.gl/aJVb http://goo.gl/Bnw1
-    CALL :UpdateFile trid_w32.zip *
+    curl -LR -o trid_w32.zip http://goo.gl/aJVb
+    curl -LR -o triddefs.zip http://goo.gl/Bnw1
+    CALL :UpdateFile trid_w32.zip
     CALL :UpdateFile triddefs.zip triddefs.trd
     POPD
 )
@@ -17,7 +18,7 @@ EXIT /B
 )
 :UpdateFile <arcPath> <mask>
 (
-"%~dp0..\..\..\wcx\Total7zip\7zg.exe" x -aoa -o"%TEMP%\%~nx0.tmp\%~nx1.tmp" -- %*
+%exe7z% x -aoa -o"%TEMP%\%~nx0.tmp\%~nx1.tmp" -- %*
 PUSHD "%TEMP%\%~nx0.tmp\%~nx1.tmp" && (
     FOR %%A IN (%2) DO (
 	FC /B /LB1 /A "%%~A" "%~dp0%%~A" >NUL
