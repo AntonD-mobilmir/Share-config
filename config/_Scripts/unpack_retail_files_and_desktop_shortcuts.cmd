@@ -6,12 +6,6 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 IF DEFINED PROCESSOR_ARCHITEW6432 SET "OS64bit=1"
 IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 
-    rem XP workaround
-    IF NOT DEFINED ProgramData (
-	REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "ProgramData" /t REG_EXPAND_SZ /d "%%ALLUSERSPROFILE%%\Application Data" /f
-	SET "ProgramData=%ALLUSERSPROFILE%\Application Data"
-    )
-    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
     IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd" || EXIT /B
 
     CALL :FindCommonDesktopPath

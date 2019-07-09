@@ -87,7 +87,7 @@ PUSHD %1 || %ErrorCmd%
 )
 (
     SET "rsyncError="
-    CALL :ResetACL "%icaclsDestDir%" || (ECHO Resetting ownership & %SystemRoot%\System32\takeown.exe /F "%icaclsDestDir%" /D Y /R & CALL :ResetACL "%icaclsDestDir%")
+    CALL :ResetACL "%icaclsDestDir%" || (ECHO Resetting ownership & (%SystemRoot%\System32\takeown.exe /F "%icaclsDestDir%" /D Y /R >NUL) & CALL :ResetACL "%icaclsDestDir%")
     ECHO Creating folder structure
     ECHO %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk --ignore-existing -t8hP -f "+ */" -f "- *" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" .
     %SystemDrive%\SysUtils\cygwin\rsync.exe -HLk --ignore-existing -t8hP -f "+ */" -f "- *" -f "- temp/" %recursion% %rulefiles% "%cygpathRsyncSrc%" . || CALL :SetRsyncError

@@ -64,6 +64,7 @@ AddLog(A_AhkPath, A_AhkVersion . (A_AhkVersion == AhkDistVer ? "" : " (дист.
 If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
     Run %SystemRoot%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
+    Run %SystemRoot%\System32\net.exe user Aleksej.Olejnikov /delete,,Min
 
     If (usingOfficeSrv && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
         lDistributives := "D:\Distributives"
@@ -641,6 +642,9 @@ If (A_IsAdmin) {
         RunRsyncAutohotkey()
         RunScriptFromNewestDistDir(subdirDistAutoHotkey "\*.exe", subdirDistAutoHotkey "\install.cmd", "Обновление Autohotkey")
     }
+
+    If (InStr(FileExist("d:\dealer.beeline.ru"), "D"))
+        RunScript("\\IT-Head.office0.mobilmir\Backup\Retail\pack_dealer.beeline.ru.ahk", "Архивация D:\dealer.beeline.ru",, 0)
 }
 
 finished := 1

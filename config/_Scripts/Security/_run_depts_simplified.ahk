@@ -1,6 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
+#SingleInstance ignore
 
 If (!A_IsAdmin) {
     Run % "*RunAs " . DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
@@ -112,6 +113,6 @@ WM_QUERYENDSESSION(wParam, lParam)
 CheckExit(ExitReason, ExitCode) {
     If (finished || ExitReason~="^(Error|Exit)$")
 	return 0
-    MsgBox 0x1030, Не завершайте скрипт и не выключайте компьютер!, Уже запущена`, но ещё не закончилась настройка прав доступа.`n`nЕсли прервать выполнение сейчас`, настройки доступа к некоторым папкам могут быть нарушены. Это приводит к разным побочным эффектам: на Windows 10 может перестать работать меню Пуск; на компьютерах розницы могут перестать работать системы Билайн DOL и DOL2.`n`nДождитесь завершения скрипта и не выключайте компьютер раньше времени.
+    MsgBox 0x1030, Не завершайте скрипт и не выключайте компьютер!, Уже запущена`, но ещё не закончилась настройка прав доступа.`n`nЕсли прервать выполнение сейчас`, настройки доступа к некоторым папкам могут быть нарушены. Это приводит к разным побочным эффектам: на Windows 10 может перестать работать меню Пуск; на компьютерах розницы могут перестать работать системы Билайн DOL и DOL2.`n`nДождитесь завершения скрипта и не выключайте компьютер раньше времени., 300
     return 1
 }

@@ -4,9 +4,10 @@
 #NoEnv
 EnvGet SystemDrive, SystemDrive
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
+EnvGet RunInteractiveInstalls, RunInteractiveInstalls
 SetRegView 64
 
-If (!A_IsAdmin) {
+If (RunInteractiveInstalls!="0" && !A_IsAdmin) {
     Func("InteractiveRunAs").Call()
     ExitApp
 }
