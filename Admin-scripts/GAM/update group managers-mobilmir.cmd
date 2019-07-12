@@ -3,8 +3,8 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>.
 SETLOCAL ENABLEEXTENSIONS
     rem gam create group <group email> [name <Group Name>] [description <Group Description>]
-    CALL switchdomain mobilmir.ru
-    CALL gam print group-members group managers>managers-list.csv
+    CALL "%~dp0switchdomain.cmd" mobilmir.ru
+    CALL "%~dp0gam.cmd" print group-members group managers>managers-list.csv
 )
 @(
     head -n 1 managers-list.csv
