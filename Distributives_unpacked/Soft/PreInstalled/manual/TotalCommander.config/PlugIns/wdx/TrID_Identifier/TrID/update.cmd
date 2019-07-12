@@ -23,7 +23,7 @@ PUSHD "%TEMP%\%~nx0.tmp\%~nx1.tmp" && (
     FOR %%A IN (%2) DO (
 	FC /B /LB1 /A "%%~A" "%~dp0%%~A" >NUL
 	IF ERRORLEVEL 2 PAUSE
-	IF ERRORLEVEL 1 MOVE /Y "%%~A" "%~dp0%%~A"
+	IF ERRORLEVEL 1 MOVE /Y "%%~A" "%~dp0"
     )
     POPD
 )

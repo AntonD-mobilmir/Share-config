@@ -83,7 +83,7 @@ IF NOT DEFINED exe7zlocal (
 	@ECHO Error copying AutoHotkey to TC dir "%TCDir%"
 	PING 127.0.0.1 -n 3 >NUL
     )
-    CALL :GetFileNameExt AutohotkeyExeName "%AutohotkeyExe%"
+    CALL :GetFileNameExt AutohotkeyExeName %AutohotkeyExe%
 )
 (
     "%TCDir%\xln.exe" "%TCDir%\%AutohotkeyExeName%" "%TCDir%\Autohotkey.exe" || COPY /B /Y "%TCDir%\%AutohotkeyExeName%" "%TCDir%\Autohotkey.exe"
@@ -91,7 +91,7 @@ IF NOT DEFINED exe7zlocal (
     REM unpacking config after notepad2.zip to overwrite notepad2.ini
     %exe7z% x -aoa -y -o"%TCDir%" -- "%srcBasePath%.config.7z"
     REM Autohotkey.exe копируется в %TCDir% выше
-    IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" "%TCDir%\%AutohotkeyExeName%" "%TCDir%\Autohotkey.exe" "%TCDir%\_copy_config.ahk"
+    IF NOT EXIST "%APPDATA%\GHISLER\wincmd.ini" START "" /D"%TCDir%" "%TCDir%\%AutohotkeyExeName%" "%TCDir%\_copy_config.ahk"
     
     FOR /F "usebackq delims=" %%N IN (`DIR /B /A-D "%distzpaqDir%\zpaq*.zip"`) DO CALL :Unpackzpaq "%distzpaqDir%\%%~N" && EXIT /B
     @ECHO zpaq not unpacked!

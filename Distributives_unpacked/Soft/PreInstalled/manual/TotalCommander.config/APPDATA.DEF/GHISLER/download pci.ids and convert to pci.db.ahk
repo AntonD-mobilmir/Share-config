@@ -2,12 +2,40 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 FileEncoding CP0
+EnvGet SystemDrive, SystemDrive
+EnvGet SystemRoot, SystemRoot
+EnvGet LocalAppData, LocalAppData
+curlexe := SystemRoot "\System32\curl.exe"
+wgetexe := SystemDrive "\SysUtils\wget.exe"
+If (IsFunc("FindExe"))
+    For i,varname in ["curlexe", "wgetexe"]
+        %varname% := Func("FindExe").Call(%varname%)
 
+exe7zgInTCdir := LocalAppData "\Programs\Total Commander\PlugIns\wcx\Total7zip"
+exe7zgDirs := [A_ProgramFiles "\7-Zip", exe7zgInTCdir]
+If (A_Is64bitOS)
+    exe7zgDirs.Pushd(exe7zgInTCBasedir "\64")
+
+If (IsFunc("find7zGUIorAny"))
+    exe7z := Func("find7zGUIorAny").Call()
+If (!exe7z) {
+    exe7zgPaths := []
+    For i, dir in exe7zgDirs
+        exe7zgPaths[i] := dir "\7zG.exe"
+    exe7z := FirstExisting(exe7zgPaths*)
+}
 ;debug := 1
 
-;RunWait C:\SysUtils\wget.exe -N https://pci-ids.ucw.cz/v2.2/pci.ids.bz2,,Min
-RunWait curl -z pci.ids.bz2 -OR https://pci-ids.ucw.cz/v2.2/pci.ids.bz2,,Min
-RunWait "%A_ProgramFiles%\7-Zip\7zG.exe" e pci.ids.bz2 pci.ids
+If (wgetexe && FileExist(wgetexe))
+    RunWait "%wgetexe%" -N https://pci-ids.ucw.cz/v2.2/pci.ids.bz2,,Min
+If (curlexe && !FileExist("pci.ids.bz2") && FileExist(curlexe))
+    RunWait "%curlexe%" -z pci.ids.bz2 -OR https://pci-ids.ucw.cz/v2.2/pci.ids.bz2,,Min
+If (!FileExist("pci.ids.bz2"))
+    UrlDownloadToFile https://pci-ids.ucw.cz/v2.2/pci.ids.bz2, pci.ids.bz2
+If (!FileExist("pci.ids.bz2"))
+    ExitApp 1
+
+RunWait "%exe7z%" e -aoa -y pci.ids.bz2 pci.ids
 ;RunWait C:\SysUtils\wget.exe -N https://github.com/pciutils/pciids/archive/master.zip,,Min
 ;RunWait "%A_ProgramFiles%\7-Zip\7zG.exe" e master.zip pci.ids
 
@@ -48,8 +76,9 @@ lvlNames	:= dfltLvlNames.Clone()
 
 prLvl := 0
 
-FileMove pci.db, pci.db.bak
-Loop Read, pci.ids, pci.db
+FileCopy pci.db, pci.db.bak
+fout := FileOpen("pci.db", "w")
+Loop Read, pci.ids
 {
     unpad := LTrim(A_LoopReadLine)
     If (!StrLen(unpad) || SubStr(unpad, 1, 1) == "#")
@@ -87,10 +116,27 @@ Loop Read, pci.ids, pci.db
     }
     
     Loop % maxLvl + 1
-	FileAppend % lvlIDs[A_Index-1] "|"
+	fout.Write(lvlIDs[A_Index-1] "|")
     Loop % maxLvl
-	FileAppend % lvlNames[A_Index-1] "|"
-    FileAppend % lvlNames[maxLvl] "`n"
+	fout.Write(lvlNames[A_Index-1] "|")
+    fout.WriteLine(lvlNames[maxLvl])
     
     prLvl := level
 }
+fout.Close()
+
+FileDelete pci.ids
+FileDelete pci.ids.bz2
+FileDelete pci.db.bak
+ExitApp
+
+FirstExisting(paths*) {
+    for index,path in paths
+	If (FileExist(path))
+	    return path
+    
+    return
+}
+
+#include *i <find7zexe>
+#include *i <findexe>
