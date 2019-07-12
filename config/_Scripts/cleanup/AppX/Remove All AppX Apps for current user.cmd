@@ -114,3 +114,4 @@ E046963F.LenovoCompanion_*
 E046963F.LenovoUtility_*
 E0469640.LenovoUtility_*
 *.LenovoUtility_*
+AppUp.IntelGraphicsControlPanel_*

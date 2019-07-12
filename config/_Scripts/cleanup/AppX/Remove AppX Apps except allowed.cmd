@@ -157,3 +157,4 @@ E0469640.LenovoUtility_*
 *.LenovoUtility_*
 CyberLinkCorp.th.Power2GoforLenovo_*
 CyberLinkCorp.th.PowerDVDforLenovo_*
+AppUp.IntelGraphicsControlPanel_*
