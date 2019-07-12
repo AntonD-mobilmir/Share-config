@@ -83,6 +83,9 @@ If (A_IsAdmin) {
 	FileDelete %AhkDir%\*.bak, 1
 	SetLastRowStatus(ErrorLevel, !ErrorLevel)
     }
+
+    If (InStr(FileExist("d:\dealer.beeline.ru"), "D"))
+        RunScript("\\IT-Head.office0.mobilmir\Backup\Retail\pack_dealer.beeline.ru.ahk", "Архивация D:\dealer.beeline.ru",, 0)
 } Else {
     AddLog("Скрипт запущен **без** прав администратора",A_UserName,1)
     
@@ -531,6 +534,13 @@ If (IsObject(rsyncPreinstalled)) { ; pidRsyncPreinstalled
     AddLog("Ожидание завершения rsync PreInstalled")
     RunRSyncWithAddLog(rsyncPreinstalled)
 }
+
+If (FileExist("D:\1S\Утилиты Вики-Принт\Fito 2.2.26")) {
+    AddLog("Fito 2.2.26", "уже установлен", 1)
+} Else If (FileExist("D:\Local_Scripts\software_update\client_exec\_Fito 2.2.26.ahk")) {
+        RunScript("D:\Local_Scripts\software_update\client_exec\_Fito 2.2.26.ahk", "Установка Fito 2.2.26")
+}
+
 If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) ; Если IsObject(softUpdScripts), SysUtils уже были обновлены выше
     RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")
 RunFromConfigDir("_Scripts\unpack_retail_files_and_desktop_shortcuts.cmd", "Замена ярлыков и распаковка стандартных скриптов")
@@ -642,9 +652,6 @@ If (A_IsAdmin) {
         RunRsyncAutohotkey()
         RunScriptFromNewestDistDir(subdirDistAutoHotkey "\*.exe", subdirDistAutoHotkey "\install.cmd", "Обновление Autohotkey")
     }
-
-    If (InStr(FileExist("d:\dealer.beeline.ru"), "D"))
-        RunScript("\\IT-Head.office0.mobilmir\Backup\Retail\pack_dealer.beeline.ru.ahk", "Архивация D:\dealer.beeline.ru",, 0)
 }
 
 finished := 1
@@ -728,17 +735,16 @@ RunRSyncWithAddLog(dir, wait := 1) {
 
 RunRSync(dir, wait := 1) {
     global DefaultConfigDir
-    static    runningRsyncs := {}
-	    , rsyncScript := ""
-	    , maxLineLength := 100
+    static runningRsyncs := {}
+	 , rsyncScript := ""
+	 , maxLineLength := 100
     
     If (IsObject(dir)) {
 	runningRsync := dir
 	dir := runningRsync.dir
     } Else {
 	If (!rsyncScript)
-	    If (!FileExist(rsyncScript := "D:\Distributives\rSync_DistributivesFromSrv0.cmd"))
-		rsyncScript := DefaultConfigDir "\_Scripts\rSync_DistributivesFromSrv0.cmd"
+	    rsyncScript := DefaultConfigDir "\_Scripts\rSync_DistributivesFromSrv0.cmd"
 	If (SubStr(dir, 1, 2) == "\\")
 	    Throw Exception("rsync работает только с локальными папками",, dir)
 	
@@ -750,9 +756,9 @@ RunRSync(dir, wait := 1) {
 	    For i, fname in [ ".sync.excludes", ".sync.includes", ".sync" ]
 		Try FileDelete %dir%\%fname%
 	    If (wait)
-		RunWait %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel
+		RunWait %comspec% /C "TITLE "%rsyncScript%" & "%rsyncScript%" "%dir%" || ECHO ! >"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel
 	    Else
-		Run %comspec% /C "("%rsyncScript%" "%dir%" || ECHO !)>"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel
+		Run %comspec% /C "TITLE "%rsyncScript%" & "%rsyncScript%" "%dir%" || ECHO ! >"%A_Temp%\%A_ScriptName%.%rndid%.rsync.log" 2>&1", %dir%, Min UseErrorLevel
 	    
 	    runningRsync := {rndid: rndid, dir: dir}
 	}
@@ -960,12 +966,27 @@ EnvGetAfterScript(batch, varName) {
     return Trim(out, "`r`n`t ")
 }
 
-StartsWith(longstr, shortstr) {
-    return SubStr(longstr, 1, StrLen(shortstr)) = shortstr
+DeleteWithLog(ByRef paths*) {
+    errors := 0
+    For i, path in paths
+        If (FileExist(path)) {
+            AddLog("Удаление """ path """")
+            FileDelete %path%
+            errors := ErrorLevel || errors
+            SetLastRowStatus(errors += ErrorLevel,!ErrorLevel)
+        }
+    return !errors
 }
 
-EndsWith(longstr, shortstr) {
-    return SubStr(longstr, 1-StrLen(shortstr)) = shortstr
+RemoveDirsWithLog(ByRef paths*) {
+    For i, path in paths
+        If (FileExist(path)) {
+            AddLog("Удаление " path)
+            FileRemoveDir %path%, 1
+            errors := ErrorLevel || errors
+            SetLastRowStatus(ErrorLevel, !ErrorLevel)
+        }
+    return !errors
 }
 
 CheckPath(path, logTime:=1, checkboxIfExist:=1) {
@@ -1112,27 +1133,12 @@ Expand(string) {
     return % output
 }
 
-DeleteWithLog(ByRef paths*) {
-    errors := 0
-    For i, path in paths
-        If (FileExist(path)) {
-            AddLog("Удаление """ path """")
-            FileDelete %path%
-            errors := ErrorLevel || errors
-            SetLastRowStatus(errors += ErrorLevel,!ErrorLevel)
-        }
-    return !errors
+StartsWith(longstr, shortstr) {
+    return SubStr(longstr, 1, StrLen(shortstr)) = shortstr
 }
 
-RemoveDirsWithLog(ByRef paths*) {
-    For i, path in paths
-        If (FileExist(path)) {
-            AddLog("Удаление " path)
-            FileRemoveDir %path%, 1
-            errors := ErrorLevel || errors
-            SetLastRowStatus(ErrorLevel, !ErrorLevel)
-        }
-    return !errors
+EndsWith(longstr, shortstr) {
+    return SubStr(longstr, 1-StrLen(shortstr)) = shortstr
 }
 
 #include %A_LineFile%\..\..\..\_Scripts\Lib\RtlGetVersion.ahk
