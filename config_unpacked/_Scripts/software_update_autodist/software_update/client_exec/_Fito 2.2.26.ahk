@@ -20,8 +20,9 @@ If (RunInteractiveInstalls) {
 } Else If (!InStr(FileExist("d:\1S\Утилиты Вики-Принт"), "D"))
     ExitApp 0
 
+FileCopy \\IT-Head.office0.mobilmir\Users\Public\Dropbox\it.mobilmir.ru Team Folder\Distributives\1С8_Розница\Утилиты.7z, %A_Temp%\*.*
 Unpack(A_Temp "\Утилиты.7z"
-      , "https://p-ams1.pcloud.com/cBZJXwMA8ZceNhuQZZZetdNA7Z2ZZfb5ZkZ2bKQZKVZR7ZhJZnXZ1JZoZUJZtXZ1kZ65ZYZ15ZRXZC7ZfiO37ZaVGEYGxzaOXDqhdjUuy7RjzngOU7/%D0%A3%D1%82%D0%B8%D0%BB%D0%B8%D1%82%D1%8B.7z"
+      , "https://www.dropbox.com/s/xlfn1cgi9g5ntgt/%D0%A3%D1%82%D0%B8%D0%BB%D0%B8%D1%82%D1%8B.7z?dl=1"
       , "d:\1S\Утилиты Вики-Принт")
     RunWait %SystemRoot%\System32\icacls.exe "d:\1S\Утилиты Вики-Принт\*.ini" /T /C /Grant *S-1-5-11:M, d:\1S\Утилиты Вики-Принт, Min
     StatusUpdate((ErrorLevel ? "[!] Error " ErrorLevel : "[OK]") " icacls.exe")
