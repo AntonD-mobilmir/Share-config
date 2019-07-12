@@ -25,7 +25,18 @@ Gui Add, ListView, Checked Count100 -Hdr -E0x200 -Multi NoSortHdr NoSort R35 w60
 Gui Show
 
 OSVersionObj := RtlGetVersion()
-AddLog("Запуск на Win" . OSVersionObj[2] . "." . OSVersionObj[3] . "." . OSVersionObj[4], A_Now, 1)
+WinBuildToName := {"10.0": { 10586: "1511"
+                           , 14393: "1607"
+                           , 15063: "1703"
+                           , 17134: "1709"
+                           , 17763: "1809" } }
+OSVersionMinor := OSVersionObj[2] "." OSVersionObj[3]
+If (WinBuildToName.HasKey(OSVersionMinor)) {
+        OSVersionNameForLog := " " WinBuildToName[OSVersionMinor][OSVersionObj[4]]
+} Else {
+    OSVersionNameForLog := ""
+}
+AddLog("Запуск на Win" OSVersionMinor . OSVersionNameForLog . " (" OSVersionObj[2] "." OSVersionObj[3] "." OSVersionObj[4] ")", A_Now, 1)
 AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] >= 2) ; 10 or 6.[>2] : 6.0 = Vista, 6.1 = Win7, 6.2 = Win8
 
 ReRunAsAdmin := !(A_IsAdmin || A_Args[1] = "/NoAdminRun")

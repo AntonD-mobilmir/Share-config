@@ -5,7 +5,7 @@ ReadTSV(ByRef tsvpath, ByRef reqHeaders := "") {
     return ReadCSV(tsvpath, reqHeaders, A_Tab)
 }
 
-ReadCSV(ByRef tsvpath, ByRef reqHeaders := "", separator:="CSV") {
+ReadCSV(ByRef csvpath, ByRef reqHeaders := "", separator:="CSV") {
     ;modes for reqHeaders:
     ; "" – output is array containing objects, each object is a row with corresponding titles from tsv as key names
     ; 		[{title_of_some_col: value, title_of_other_col: value, …}, {title_of_some_col: value_from_row2, title_of_other_col: value_from_row_2, …}, …]
@@ -25,7 +25,7 @@ ReadCSV(ByRef tsvpath, ByRef reqHeaders := "", separator:="CSV") {
     ;		, …]
     objTSV := []
     singleColumn := ""
-    Loop Read, %tsvpath%
+    Loop Read, %csvpath%
     {
 	If (A_Index == 1) { ; column titles
 	    tsvHdrs := []
@@ -57,7 +57,7 @@ ReadCSV(ByRef tsvpath, ByRef reqHeaders := "", separator:="CSV") {
 			break
 		    }
 		If (singleColumn == "")
-		    Throw Exception("Запрошенный столбец не найден в файле",, "Столбец """ reqHeaders """, файл """ tsvpath """")
+		    Throw Exception("Запрошенный столбец не найден в файле",, "Столбец """ reqHeaders """, файл """ csvpath """")
 	    }
 	} Else {
 	    If (singleColumn) {
