@@ -129,9 +129,9 @@ EXIT /B
 IF NOT DEFINED whoamiexe CALL "%configDir%_Scripts\find_exe.cmd" whoamiexe "%SystemDrive%\SysUtils\UnxUtils\whoami.exe"
 (
     IF DEFINED whoamiexe (
-        FOR /F "usebackq delims=\ tokens=2" %%I IN (`%whoamiexe%`) DO SET "%~1=%%~I"
-    ) ELSE (
-        IF NOT DEFINED %~1 SET "%~1=%USERNAME%"
+	FOR /F "usebackq delims=\ tokens=2" %%I IN (`%whoamiexe%`) DO SET "%~1=%%~I"
+	IF NOT DEFINED %1 FOR /F "usebackq" %%I IN (`%whoamiexe%`) DO SET "%~1=%%~I"
     )
+    IF NOT DEFINED %1 SET "%~1=%USERNAME%"
 EXIT /B
 )
