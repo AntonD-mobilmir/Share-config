@@ -8,7 +8,7 @@ CALL "%~dp0..\..\config\_Scripts\find7zexe.cmd"
 FOR /D %%D IN ("%~dp0*.*") DO CALL :unpackAllArchives "%%~D"
 )
 (
-START "" /B /WAIT /D "%~dp0" %exe7z% a -sdel -mx=9 -m0=LZMA2:a=2:fb=273 -mqs=on -x!"*.7z" -x!"%~nx0" -x!"board-dumps" -- "%today%.7z"
+START "" /B /WAIT /D "%~dp0" %exe7z% a -sdel -mx=9 -m0=LZMA2:a=2:fb=273 -mqs=on -x!"*.7z" -x!"%~nx0" -x!"board-dumps" -- "%~dp0%today%.7z"
 EXIT /B
 )
 
