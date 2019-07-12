@@ -21,9 +21,10 @@ FileDelete %A_ScriptFullPath%
 ;Yes/No 0x4
 ;Icon Question 0x20
 ;Makes the 2nd button the default 0x100
-MsgBox 0x124, Открыть справку?, Открыть справку о доступе в 1С?`n`nЕсли у Вас нет пароля для доступа в 1С`, Вы узнаете`, как его получить.
-IfMsgBox Yes
-    Run http://help.mobilmir.ru/rules/access-to-1cv8-offce
+;MsgBox 0x124, Открыть справку?, Открыть справку о доступе в 1С?`n`nЕсли у Вас нет пароля для доступа в 1С`, Вы узнаете`, как его получить.
+;IfMsgBox Yes
+;    Run http://help.mobilmir.ru/rules/access-to-1cv8-offce
+ExitApp
 
 MsgError(txt := "") {
     If (!txt)
