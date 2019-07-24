@@ -13,6 +13,12 @@ REGEDIT4
 ; WARNINGS ISSUED: No - this REG file should work without problems
 ; --
 
+;[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+;"DisableThumbnailCache"=dword:00000001
+ 
+;[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+;"NoThumbnailCache"=dword:00000001
+
 ;also
 ;This registry file will disable the generation of thumbs.db files in Windows 7.
 ;This method works for all editions, including Home Premium and below.
@@ -27,12 +33,21 @@ REGEDIT4
 ;// www.tolon.net
 ;// Thanks to jeff for pointing out an error in this read me file.
 
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-"DisableThumbnailCache"=dword:00000001
- 
+;[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer]
+;"DisableThumbsDBOnNetworkFolders"=dword:00000001
+
+;from https://answers.microsoft.com/en-us/windows/forum/windows_8-files/windows-10-how-to-stop-thumbsdb-file-being-created/2b9c098b-014d-4207-9bcf-123da0c42b14?page=2
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
 "NoThumbnailCache"=dword:00000001
+"DisableThumbnailCache"=dword:00000001
 
 [HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer]
 "DisableThumbsDBOnNetworkFolders"=dword:00000001
 
+;[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+;"NoThumbnailCache"=dword:00000001
+;"DisableThumbnailCache"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"DisableThumbnailCache"=dword:00000001
+"NoThumbnailCache"=dword:00000001

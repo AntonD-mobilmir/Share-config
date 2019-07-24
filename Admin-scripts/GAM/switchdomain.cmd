@@ -48,7 +48,8 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
     IF NOT EXIST "%GAMpath%\client_secrets.json" xln.exe "%authpath%\client_secrets.json" "%GAMpath%\client_secrets.json"
 
-    CALL "%~dp0gam.cmd" info user
+    rem CALL "%~dp0gam.cmd" info user
+    rem CALL "%~dp0gam.cmd" info domain
 EXIT /B
 )
 

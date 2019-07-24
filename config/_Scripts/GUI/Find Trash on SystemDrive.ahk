@@ -42,7 +42,11 @@ bootTel.dat
 TrashDirs =
 (LTrim
 Intel
+)
 
+TrashFiles =
+(LTrim
+UkLog.dat
 )
 
 Loop
@@ -53,6 +57,17 @@ Loop
     showList=
 
     flog.WriteLine(A_Now . " Запущен поиск мусора на " . SystemDrive)
+    Loop Parse, TrashDirs, `n, `r
+        If (InStr(FileExist(SystemDrive "\" A_LoopField), "D")) {
+            FileSetAttrib -R -S -H, %SystemDrive%\%A_LoopField%
+            FileRemoveDir %SystemDrive%\%A_LoopField%, 1
+        }
+    Loop Parse, TrashFiles, `n, `r
+        If (FileExist(SystemDrive "\" A_LoopField)) {
+            FileSetAttrib -R -S -H, %SystemDrive%\%A_LoopField%
+            FileDelete %SystemDrive%\%A_LoopField%
+        }
+    
     Loop Files, %SystemDrive%\*.*, D
     {
 	If (!InStr(GoodDirs, A_LoopFileName . "`n")) {

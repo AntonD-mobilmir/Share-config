@@ -95,7 +95,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	rem H	Include Software Metering
 	rem G	Include User Logon Statistics
 	
-	FOR /F "usebackq tokens=1" %%I IN (`"%binDir%%smartctlexe%" --scan`) DO "%binDir%%smartctlexe%" -s on -x %%I >"%%~nI-smart.txt" 2>"%%~nI-smart.log"
+	FOR /F "usebackq tokens=1" %%I IN (`"%binDir%%smartctlexe%" --scan`) DO "%binDir%%smartctlexe%" -s on -x %%I >"%%~nI-smart.txt" 2>"%%~nI-smart.log" & CALL :RemoveIfEmpty "%%~nI-smart.log"
 	IF DEFINED tvID (ECHO %tvID%)>"TVID.txt"
 	FOR /F "usebackq %WMIListSkipLines% tokens=1* delims=	" %%A IN ("%~0") DO ECHO.|"%SystemRoot%\System32\Wbem\wmic.exe" path %%A get %%B >>wmi-description.txt 2>&1
 	
@@ -196,6 +196,11 @@ EXIT /B
 	SET %1=%2
     )
 EXIT /B
+:RemoveIfEmpty
+(
+    FOR %%A IN (%1) DO IF "%%~zA"=="0" DEL "%%~A"
+    EXIT /B
+)
 
 rem http://msdn.microsoft.com/en-us/library/aa394388.aspx
 rem http://msdn.microsoft.com/en-us/library/aa394105.aspx

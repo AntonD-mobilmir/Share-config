@@ -310,7 +310,11 @@ If (ReRunAsAdmin) {
 
 RemoveDirsWithLog(A_AppDataCommon "\dpn0")
 
-RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir.ru\backup_1S_base" /F,, Min UseErrorLevel
+RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "DreamkasAgentService" /F,, Min UseErrorLevel
+RunWait %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir\1S Rarus DispatchFiles" /F,, Min UseErrorLevel
+For taskDirSuffix in {"": "", ".ru": ""}
+    For taskName in {"backup_1S_base": "", "getmail.cmd - Rarus Mail Loader": "", "stunnel": ""}
+        Run %SystemRoot%\System32\schtasks.exe /Delete /TN "mobilmir%taskDirSuffix%\%taskName%" /F,, Min UseErrorLevel
 
 For i,regview in regViews {
     SetRegView %regview%

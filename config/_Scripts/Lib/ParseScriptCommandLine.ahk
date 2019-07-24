@@ -16,22 +16,19 @@ ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:
     CommandLine := DllCall( "GetCommandLine", "Str" )
     
     removeQuotes := cmdlPrms==""""
-    If (removeQuotes || IsByRef(cmdlPrms)) {
-	argc := 0
-	cmdlArgs := Object()
-    } Else
-	argc := ""
+    If (removeQuotes || IsByRef(cmdlPrms))
+        argc := 0, cmdlArgs := Object()
+    Else
+        argc := ""
     If (IsByRef(ahkArgs) && !IsObject(ahkArgs))
-	ahkArgs := Object()
-
+        ahkArgs := Object()
+    
     inQuote := 0
     currFragmentEnd := 1
     Loop Parse, CommandLine, %A_Space%%A_Tab%
     {
-        If (!inQuote) {
-            currArgStart := currFragmentEnd
-            argNo++
-        }
+        If (!inQuote)
+            currArgStart := currFragmentEnd, argNo++
         currFragmentEnd += StrLen(A_LoopField)+1
         
         outerLoopField := A_LoopField
@@ -41,7 +38,7 @@ ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:
         
         If (!inQuote) { ; this substring is not part of quote (starting at currArgStart), or the quote has just ended
             currArg := SubStr(CommandLine, currArgStart, currFragmentEnd - currArgStart)
-
+            
             If (cmdlScriptPath) { ; script name found in cmdline, script args following
                 If(argc == "")
                     break
