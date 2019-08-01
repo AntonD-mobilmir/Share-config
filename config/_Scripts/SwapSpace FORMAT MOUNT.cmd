@@ -3,6 +3,8 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 SETLOCAL ENABLEEXTENSIONS
 
+    %SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
+
     SET "t=%TEMP%\%~n0.%DATE:/=_%.tmp"
 )
 (
