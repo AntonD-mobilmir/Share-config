@@ -10,8 +10,6 @@
 	EXIT /B
     )
     SETLOCAL ENABLEEXTENSIONS
-    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
     
     FOR /f "usebackq tokens=3*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED PassFilePath (
@@ -33,13 +31,14 @@
         SET "wbAdminQuiet=-quiet"
     )
 )
+@IF /I "%dstBaseDir%" NEQ "R:" IF NOT DEFINED copyBackup (
+        IF NOT DEFINED copyToR IF EXIST "R:\WindowsImageBackup\%Hostname%\*" (
+            ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
+            SET "copyToR=0"
+        ) ELSE IF EXIST R:\ SET /P "copyToR=Сделать копию образа на R: ? [1=да] "
+)
 @(
-    IF /I "%dstBaseDir%"=="R:" SET "CopyToR=0"
-    IF NOT DEFINED CopyToR IF EXIST "R:\WindowsImageBackup\%Hostname%\*" (
-	ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
-	SET "CopyToR=0"
-    ) ELSE IF EXIST R:\ SET /P "CopyToR=Сделать копию образа на R: ? [1=да] "
-    
+    IF /I "%dstBaseDir%" NEQ "R:" IF NOT DEFINED copyBackup IF "%copyToR%"=="1" SET "copyBackup=R:"
     IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd"
 )
 @(
@@ -58,13 +57,23 @@
     ECHO Запись контрольных сумм
     rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла
     
-    IF DEFINED exe7z START "Запись контрольных сумм" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%dstDirWIB%\%Hostname%\*" >"%dstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%dstDirWIB%\%Hostname%-7zchecksums.txt" "%dstDirWIB%\%Hostname%\7zchecksums.txt""
+    IF DEFINED exe7z START "Расчет контрольных сумм для %dstDirWIB%\%Hostname%" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%dstDirWIB%\%Hostname%\*" >"%dstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%dstDirWIB%\%Hostname%-7zchecksums.txt" "%dstDirWIB%\%Hostname%\7zchecksums.txt""
     
-    IF "%CopyToR%"=="1" (
-	CALL :CopyImageTo R:
-	CALL :CompressAndDefrag R:
-    )
     CALL :CompressAndDefrag "%dstBaseDir%"
+    IF DEFINED copyBackup (
+	CALL :CopyImageTo "%copyBackup%"
+	CALL :CompressAndDefrag "%copyBackup%"
+    )
+    
+)
+ECHO %DATE% %TIME% Ожидание окончания записи контрольных сумм "%dstDirWIB%\%Hostname%\7zchecksums.txt"
+:waitmore
+@(
+    @IF NOT EXIST "%dstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%dstDirWIB%\%Hostname%-7zchecksums.txt" (
+        PING 127.0.0.1 -n 15 >NUL
+        GOTO :waitmore
+    )
+    IF DEFINED copyBackup COPY /Y /D /B "%dstDirWIB%\%Hostname%\7zchecksums.txt" "%copyBackup%\WindowsImageBackup\%Hostname%\7zchecksums.txt"
     
     EXIT /B
 )
@@ -76,16 +85,14 @@ IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
     CALL :DirToPassFile "%dstDirWIB%\%Hostname%\Backup*"
 EXIT /B
 )
-
 :CompressAndDefrag <target>
 (
     CALL :IfUNC %1 && (
 	START "Сжатие %~1" %SystemRoot%\System32\compact.exe /C /EXE:LZX /S:%1
-	EXIT /B
+    ) ELSE IF NOT "%DontCompressLocal%"=="1" (
+        ECHO Запуск сжатия и дефрагментации %1
+        START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C ""%~dp0compress and defrag WindowsImageBackup.cmd" %1"
     )
-    IF "%DontCompressLocal%"=="1" EXIT /B
-    ECHO Запуск сжатия и дефрагментации %1
-    START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C ""%~dp0compress and defrag WindowsImageBackup.cmd" %1"
 EXIT /B
 )
 :IfUNC <path>
@@ -99,15 +106,16 @@ EXIT /B
     EXIT /B 1
 )
 :CopyImageTo <path>
-(
+@(
+    ECHO Копирование образа в "%~1\WindowsImageBackup\%Hostname%"
     IF EXIST "%~1\WindowsImageBackup\%Hostname%" (
 	ECHO Папка "%~1\WindowsImageBackup\%Hostname%" уже существует. Она будет переименована.
-	MOVE /Y "%~1\WindowsImageBackup\%Hostname%" "%~1\WindowsImageBackup\%Hostname%.%RANDOM%"
+	CALL :AppendTimeToDirName "%~1\WindowsImageBackup\%Hostname%"
+    ) ELSE IF NOT EXIST "%~1\WindowsImageBackup" (
+        MKDIR "%~1\WindowsImageBackup" || CALL :SetErrorCheckdstDirWIB "MKDIR %~1\WindowsImageBackup"
     )
-    
-    ECHO Копирование образа в "%~1\WindowsImageBackup\%Hostname%"
-    MKDIR "%~1\WindowsImageBackup\%Hostname%" 2>NUL
-    XCOPY "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
+    MKDIR "%~1\WindowsImageBackup\%Hostname%" || CALL :SetErrorCheckdstDirWIB "MKDIR %~1\WindowsImageBackup\%Hostname%"
+    START "Копирование образа в %~1\WindowsImageBackup\%Hostname%" /MIN XCOPY "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
     IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
     
     rem when making local backup, WindowsImageBackup gets inherited permissions from root, and subfolder with actual backup: http://imgur.com/a/ttyqJ
@@ -123,15 +131,6 @@ EXIT /B
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /grant "*S-1-5-32-544:(OI)(CI)F" /grant "*S-1-5-18:(OI)(CI)F" /grant "*S-1-5-32-551:(OI)(CI)F" /grant "*S-1-3-0:(OI)(CI)F" /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /inheritance:r /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
-    
-    ECHO Ожидание окончания записи контрольных сумм
-)
-@(
-    ECHO %DATE% %TIME% Waiting for "%dstDirWIB%\%Hostname%\7zchecksums.txt"
-    :waitmore
-    @PING 127.0.0.1 -n 2 >NUL
-    @IF NOT EXIST "%dstDirWIB%\%Hostname%\7zchecksums.txt" IF EXIST "%dstDirWIB%\%Hostname%-7zchecksums.txt" GOTO :waitmore
-    COPY /Y /D /B "%dstDirWIB%\%Hostname%\7zchecksums.txt" "%~1\WindowsImageBackup\%Hostname%\7zchecksums.txt"
 EXIT /B
 )
 :DirToPassFile <path>
@@ -179,7 +178,7 @@ EXIT /B 0
 )
 :SetErrorCheckdstDirWIB
 @(
-    SET "ErrorCheckdstDirWIB=, %~1 Error: %ERRORLEVEL%"
+    SET "ErrorCheckdstDirWIB=%ErrorCheckdstDirWIB%, %~1 Error: %ERRORLEVEL%"
 EXIT /B
 )
 :SplitNetPath <hostVar> <shareVar> <path>
@@ -203,6 +202,21 @@ EXIT /B 3
     ECHO Скрипт был запущен со следующими параметрами: %*
     IF NOT DEFINED wbAdminQuiet PAUSE
     EXIT /B %ErrorLevel%
+)
+:AppendTimeToDirName
+@(SETLOCAL
+    @SET "suffix="
+    FOR /D %%A IN (%1) DO @SET "dtime=%%~tA"
+)
+    @SET "dtime=%dtime::=%"
+    @SET "dtime=%dtime:/=%"
+:AppendTimeToDirName_TryAnotherSuffix
+    @IF EXIST "%~1.%dtime%" SET "suffix=.%RANDOM%"
+@(
+    IF EXIST "%~1.%dtime%%suffix%" GOTO :AppendTimeToDirName_TryAnotherSuffix
+    MOVE /Y %1 "%~1\WindowsImageBackup\%Hostname%%suffix%"
+ENDLOCAL
+EXIT /B
 )
 
 rem Синтаксис: WBADMIN START BACKUP
@@ -304,5 +318,4 @@ rem                 пользователя.
 
 rem Пример:
 
-rem WBADMIN START BACKUP -backupTarget:f: -include:e:,d:\mountpoint,
-rem \\?\Volume{cc566d14-44a0-11d9-9d93-806e6f6e6963}\
+rem WBADMIN START BACKUP -backupTarget:f: -include:e:,d:\mountpoint, \\?\Volume{cc566d14-44a0-11d9-9d93-806e6f6e6963}\
