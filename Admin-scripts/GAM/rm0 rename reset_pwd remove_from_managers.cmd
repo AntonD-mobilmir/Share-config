@@ -26,7 +26,7 @@ SETLOCAL ENABLEEXTENSIONS
         CIPHER /E "%TEMP%\%~n0.e"
     )
     IF DEFINED recordpwd (
-        ECHO %DATE% %TIME% new password: %pwd%
+        ECHO %pwd%
     )>>"%TEMP%\%~n0.e\password %domain% %emailid%.txt"
     
     CALL "%~dp0switchdomain.cmd" "%domain%"
