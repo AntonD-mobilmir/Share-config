@@ -2,29 +2,33 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 ECHO OFF
-SETLOCAL ENABLEEXTENSIONS
-%SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
-IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    SETLOCAL ENABLEEXTENSIONS
+    %SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
+    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
+    IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
+    
+    rem Init
+    IF NOT DEFINED ErrorCmd SET "ErrorCmd=PAUSE"
+    IF NOT DEFINED GNUPGHOME (
+        SET "RemoveGPGHomeTemp=1"
+        SET "GNUPGHOME=%TEMP%\gnupg"
+        MKDIR "%TEMP%\gnupg"
+    )
+    FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
+    FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain"`) DO SET "Domain=%%~J"
+    IF NOT DEFINED Domain FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DhcpDomain"`) DO SET "Domain=%%~J"
 
-rem Init
-IF NOT DEFINED ErrorCmd SET "ErrorCmd=PAUSE"
-IF NOT DEFINED GNUPGHOME (
-    SET "RemoveGPGHomeTemp=1"
-    SET "GNUPGHOME=%TEMP%\gnupg"
-    MKDIR "%TEMP%\gnupg"
-)
-FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
-FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain"`) DO SET "Domain=%%~J"
-IF NOT DEFINED Domain FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DhcpDomain"`) DO SET "Domain=%%~J"
-rem Read file, and for each line add corresponding user
-FOR /F "usebackq eol=; tokens=1,2,3,4* delims=	" %%I IN ("%~dpn0.txt") DO CALL :SetupAdmin "%%~I" "%%~J" "%%~K" "%%~L"
-IF DEFINED RemoveGPGHomeTemp RD /S /Q "%TEMP%\gnupg"
-IF NOT "%RunInteractiveInstalls%"=="0" START "" %SystemRoot%\System32\control.exe userpasswords2
+    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+
+    rem Read file, and for each line add corresponding user
+    FOR /F "usebackq eol=; tokens=1,2,3,4* delims=	" %%I IN ("%~dpn0.txt") DO CALL :SetupAdmin "%%~I" "%%~J" "%%~K" "%%~L"
+    IF DEFINED RemoveGPGHomeTemp RD /S /Q "%TEMP%\gnupg"
+    IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+    IF NOT DEFINED Unattended START "" %SystemRoot%\System32\control.exe userpasswords2
 EXIT /B
 )
-:SetupAdmin
+:SetupAdmin <username/flags> <fullName> <gpgUserID> <DirForPlaintext>
 (
     SETLOCAL ENABLEEXTENSIONS
     FOR /F "delims=/ tokens=1*" %%A IN ("%~1") DO (
@@ -46,7 +50,7 @@ EXIT /B
 	NET USER Пользователь >NUL 2>&1 && EXIT /B
 	NET USER Продавец >NUL 2>&1 && EXIT /B
     )
-    IF NOT DEFINED flag_f IF "%RunInteractiveInstalls%"=="0" EXIT /B
+    IF NOT DEFINED flag_f IF DEFINED Unattended EXIT /B
     IF NOT DEFINED flag_f CALL :AskCreateUser || EXIT /B
     IF DEFINED flag_p (
 	%SystemRoot%\System32\net.exe USER "%newUsername%" /ADD /LOGONPASSWORDCHG:NO /PASSWORDCHG:NO /PASSWORDREQ:NO /USERCOMMENT:"Пользователь создан %DATE% в %TIME% скриптом %~f0" /fullName:"%fullName%"
@@ -59,27 +63,26 @@ EXIT /B
 
     IF DEFINED gpgUserID (
 	IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
-	IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 	IF NOT DEFINED dirGPGout SET "dirGPGout=%ProgramData%\mobilmir.ru\%~n0"
     )
 
     REM IF NOT DEFINED flag_p
     rem Generate new password
-    SET "PasswdPart1=0000%RANDOM%"
-    SET "PasswdPart2=0000%RANDOM%"
-    SET "PasswdPart3=0000%RANDOM%"
+    FOR /F "usebackq delims=" %%A IN (`%AutoHotkeyExe% "%~dp0..\Lib\GenPassword.ahk") DO SET "newPasswd=%%~A"
+    IF NOT DEFINED newPasswd SET /A "PasswdPart1=%RANDOM% * 10000 / 32767" & SET /A "PasswdPart2=%RANDOM% * 10000 / 32767" & SET /A "PasswdPart3=%RANDOM% * 10000 / 32767"
     rem if password is longer than 14 chars, NET USER /ADD asks stupid question
 )
+@IF NOT DEFINED newPasswd SET "PasswdPart1=0000%PasswdPart1%" & SET "PasswdPart2=0000%PasswdPart2%" & SET "PasswdPart3=0000%PasswdPart3%"
 @(
-    SET "pwd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
-    SET "PasswdPart1="
-    SET "PasswdPart2="
-    SET "PasswdPart3="
+    IF NOT DEFINED newPasswd (
+        SET "newPasswd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
+        SET "PasswdPart1=" & SET "PasswdPart2=" & SET "PasswdPart3="
+    )
 
     SET "outPlainFName=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt"
     IF NOT EXIST "%dirPlainOut%" MKDIR "%dirPlainOut%"
     IF NOT "%dirPlainOut:~0,2%"=="\\" %SystemRoot%\System32\cipher.exe /E "%dirPlainOut%"
-    IF DEFINED gpgUserID (
+    IF DEFINED gpgexe IF DEFINED gpgUserID (
 	MKDIR "%dirGPGout%"
 	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
 	IF NOT EXIST "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\new\%newUsername%" MKDIR "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\new\%newUsername%"
@@ -91,20 +94,30 @@ EXIT /B
     rem Create new user
     (
 	rem Write password to file
-	ECHO %Hostname%\%newUsername%	%pwd%
-	NET USER "%newUsername%" "%pwd%" /ADD /LOGONPASSWORDCHG:NO /fullName:"%fullName%" || CALL :SetUserAddError
+	ECHO %Hostname%\%newUsername%
+	NET USER "%newUsername%" "%newPasswd%" /ADD /LOGONPASSWORDCHG:NO /fullName:"%fullName%" || CALL :SetUserAddError
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
+    IF DEFINED UserAddError DEL "%dirPlainOut%\%outPlainFName%" <NUL & EXIT /B
     
-    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
-    
-    IF DEFINED gpgexe (
+    IF DEFINED gpgexe IF DEFINED gpgUserID (
 	DEL %gpgencOut% 2>NUL
-	%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%"
-	DEL "%dirPlainOut%\%outPlainFName%"
-	RD "%dirPlainOut%"
+	REM %gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%" >>"%dirPlainOut%\%~n0.log" 2>&1
+	ECHO %newPasswd%|%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% >>"%dirPlainOut%\%~n0.log" 2>&1
+	IF ERRORLEVEL 1 (
+            ECHO Error encrypting password!
+            ECHO Error encrypting password! Leaving it intact.>>"%dirPlainOut%\%~n0.log"
+	) ELSE (
+            DEL "%dirPlainOut%\%outPlainFName%" <NUL
+            DEL "%dirPlainOut%\%~n0.log" <NUL
+            RD "%dirPlainOut%"
+	)
 	START "Copying gpg-encrypted password to Srv1S-B" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
-	IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
-	START "" %AutoHotkeyExe% "%~dp0submitEncryptedPassword.ahk" "%newUsername%" %gpgencOut%
+	IF DEFINED AutoHotkeyExe IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
+	IF DEFINED AutoHotkeyExe START "" %AutoHotkeyExe% "%~dp0submitEncryptedPassword.ahk" "%newUsername%" %gpgencOut%
+    )
+    IF EXIST "%dirPlainOut%\%outPlainFName%" (
+        rem curl -F "file=@%dirPlainOut%\%outPlainFName%"
+        START "Posting temporary password to file.io" /MIN %comspec% /C "(curl --data "text=%newPasswd%" https://file.io || curl -x 192.168.127.1:3128 --data "text=%newPasswd%" https://file.io) >>"%dirPlainOut%\%outPlainFName%" 2>>"%dirPlainOut%\%~n0.log""
     )
 )
 :setupgroups
