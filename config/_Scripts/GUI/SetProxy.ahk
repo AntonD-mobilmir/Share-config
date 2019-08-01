@@ -6,8 +6,11 @@
 SetRegView 64
 
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
-EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-RunInteractiveInstalls := RunInteractiveInstalls != "0"
+EnvGet Unattended, Unattended
+If (!Unattended) {
+    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+    Unattended := RunInteractiveInstalls=="0"
+}
 regrootsProxy	:= ["HKEY_LOCAL_MACHINE", "HKEY_CURRENT_USER"]
 regKeysEnv	:= ["SYSTEM\CurrentControlSet\Control\Session Manager\Environment", "Environment"]
 proxyIEKey	= Software\Microsoft\Windows\CurrentVersion\Internet Settings
@@ -30,7 +33,10 @@ If %0%
 { ; %0% – var with name "0", contains nr. of command line arguments
     proxy=%1%
     ProxySettingsPerUser=%2%
-} Else If (RunInteractiveInstalls) {
+} Else If (Unattended) {
+    proxy=
+    FileAppend No command line args`, turning off proxy.`n, *, CP1
+} Else {
     For i, regrootProxy in regrootsProxy {
         RegRead ProxyEnable, %regrootProxy%\%proxyIEKey%, ProxyEnable
         If (ProxyEnable) {
@@ -62,28 +68,25 @@ If %0%
     InputBox proxy, Адрес прокси сервера, Будет записан в %ProxyQueryText%.`nПустая строка = без прокси.п`nформат: сервер:порт%proxySrc%, , , , , , , 300, %proxy%
     If (ErrorLevel)
 	Exit
-} Else {
-    proxy=
-    FileAppend No command line args`, turning off proxy.`n, *
 }
 
 If (proxy) {
     If ( !InStr(proxy,":") ) {
-	If (RunInteractiveInstalls) {
+	If (Unattended) {
+	    FileAppend Unattended but there's no port in proxy string "%proxy%". Won't continue.`n,*,CP1
+	    Exit
+	} Else {
 	    MsgBox 35, В строке прокси не указан порт, В адресе прокси-сервера "%proxy%" не указан порт через двоеточие.`nБез номера порта работать не будет!`n`nДобавить :3128 к адресу?
 	    IfMsgBox Cancel
 		Exit
 	    IfMsgBox Yes
 		proxy=%proxy%:3128
-	} Else {
-	    FileAppend RunInteractiveInstalls=0 but there's no port in proxy string "%proxy%". Won't continue.`n,*
-	    Exit
 	}
 	
     }
 } else { ; No proxy
     If (ProxySettingsPerUser == "0") {
-	If (RunInteractiveInstalls) {
+	If (!Unattended) {
 	    MsgBox 35, Системные настройки прокси.,Сейчас системный прокси будет выключен`, но включенный режим общесистемных настроек не позволит пользователям указать свои адреса прокси.`n`nВыключить переопределение пользовательских настроек?
 	    IfMsgBox Cancel
 		Exit

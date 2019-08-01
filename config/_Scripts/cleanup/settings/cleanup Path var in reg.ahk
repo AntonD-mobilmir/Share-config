@@ -4,13 +4,16 @@
 
 #NoEnv
 #Include <Expand>
-EnvGet RunInteractiveInstalls,RunInteractiveInstalls
-
-If (RunInteractiveInstalls!="0" && !A_IsAdmin) {
-    ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
-    Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
-    if ErrorLevel = ERROR
-	MsgBox Без прав администратора ничего не выйдет.
+If (!A_IsAdmin) {
+    EnvGet Unattended, Unattended
+    If (!Unattended) {
+        EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+        Unattended := RunInteractiveInstalls=="0"
+    }
+    If (!Unattended) {
+        ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+        Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
+    }
     ExitApp
 }
 

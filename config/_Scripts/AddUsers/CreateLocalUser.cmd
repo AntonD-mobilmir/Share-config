@@ -40,9 +40,10 @@ EXIT /B
 
 :SetOrAsk <varName> <description> <value>
 (
+    IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
     IF NOT "%~3"=="" (
 	SET "%~1=%~3"
-    ) ELSE IF NOT "%RunInteractiveInstalls%"=="0" (
+    ) ELSE IF NOT DEFINED Unattended (
 	SET /P "%~1=%~2: "
     ) ELSE EXIT /B 1
 EXIT /B

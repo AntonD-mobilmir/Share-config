@@ -31,6 +31,7 @@ SET /A "lock_file_idx=1"
 
     SETLOCAL
     SET "RunInteractiveInstalls=0"
+    SET "Unattended=1"
 
     REM Set up security policy and add admin users
     CALL :ParallelRunCmd "%~dp0Security\import_policy.cmd"

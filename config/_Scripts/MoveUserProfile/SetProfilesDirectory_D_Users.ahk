@@ -4,11 +4,18 @@
 #NoEnv
 EnvGet SystemDrive, SystemDrive
 EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
-EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+EnvGet Unattended, Unattended
+If (!Unattended) {
+    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+    Unattended := RunInteractiveInstalls=="0"
+}
 SetRegView 64
 
-If (RunInteractiveInstalls!="0" && !A_IsAdmin) {
-    Func("InteractiveRunAs").Call()
+If (!A_IsAdmin) {
+    If (!Unattended) {
+        ScriptRunCommand:=DllCall( "GetCommandLine", "Str" )
+        Run *RunAs %ScriptRunCommand%,,UseErrorLevel  ; Requires v1.0.92.01+
+    }
     ExitApp
 }
 

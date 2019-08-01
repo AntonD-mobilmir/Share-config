@@ -58,8 +58,14 @@ SelectMTProfileFolder(mtProfileDir, showDialogueBeforeChecking:=0) {
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     mtProfileDir := FindThunderbirdProfile()
-    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-    If (RunInteractiveInstalls != "0") {
+    EnvGet Unattended, Unattended
+    If (!Unattended) {
+        EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+        Unattended := RunInteractiveInstalls == "0"
+    }
+    If (Unattended) {
+        ExitApp 1
+    } Else {
 	If (!mtProfileDir) {
 	    EnvGet UserProfile, USERPROFILE
 	    mtProfileDir = %UserProfile%\Mail\Thunderbird\profile

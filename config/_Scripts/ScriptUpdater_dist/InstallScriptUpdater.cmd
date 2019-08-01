@@ -105,7 +105,8 @@ EXIT /B
     ) ELSE (
         ECHO Не удалось создать папку "%pubkeysDest%"
         ECHO Открытые ключи не сохранятся, выход.
-        IF NOT "%RunInteractiveInstalls%"=="0" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\GUI\MsgBox.ahk" 16 "%~nx0" "Не удалось создать папку %pubkeysDest%."
+        IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+        IF NOT DEFINED Unattended CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\GUI\MsgBox.ahk" 16 "%~nx0" "Не удалось создать папку %pubkeysDest%."
         PING -n 15 >NUL
         EXIT /B 1
     )

@@ -32,8 +32,13 @@ GetTrelloAuthToken(ByRef reqAPIkey := "", ByRef interactively := -1, ByRef scope
     }
     
     If (interactively==-1) {
-	EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-	interactively := RunInteractiveInstalls != "0"
+        EnvGet Unattended, Unattended
+        If (Unattended) {
+            interactively := 0
+        } Else {
+            EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+            interactively := RunInteractiveInstalls!="0"
+        }
     }
     
     While (!(APIkey && authToken)) {

@@ -8,11 +8,14 @@ Panic(except := "", msg := "", errCode := "") {
         errMsg := msg . ", код системной ошибки: " Format("0x{:X}", errCode) . (IsObject(except) ? ", исключение: " ObjectToText(except) : "")
     Else
         errMsg := ( IsObject(except) ? except.Extra . ", ошибка " except.What : "Ошибка в " A_ScriptName ) ", код системной ошибки: " errCode
-    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
-    If (RunInteractiveInstalls!="0")
+    EnvGet Unattended, Unattended
+    If (!Unattended) {
+        EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+        Unattended := RunInteractiveInstalls=="0"
+    }
+    FileAppend %errMsg%`n, **, CP1
+    If (!Unattended)
         MsgBox %errMsg%
-    Else
-        FileAppend %errMsg%`n, **, CP1
     ExitApp errCode ? errCode : 1
 }
 

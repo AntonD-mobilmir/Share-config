@@ -23,7 +23,6 @@ ExtendedFindTrelloCard(ByRef query, Byref cards, ByRef nMatches := 0, ByRef fp :
 }
 
 FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef RegexSearches := "") {
-    allMatches := Object()
     ; SearchParams = {Hostname: {(Hostname): "Hostname"
     ;			      , (Hostname): "NV Hostname", (Hostname): "ComputerName", (Hostname): "Hostname name", …}
     ;   	      , Hostname: (Hostname) ; alt to previous
@@ -37,6 +36,7 @@ FindTrelloCard(ByRef SearchParams, ByRef cards, ByRef nMatches := 0, ByRef Regex
     ;		      , any_other_field_name: (value)
     ;		      , any_other_field_name: {value: "match description", value: "match description", …}, …}
     ; key is query, and value is name because there can be duplicate names (and duplicate values), but no duplicate keys (neither reason for duplicate queries)
+    allMatches := Object()
     For k, card in cards {
 	cardTVID := cardHostname := match := ""
 	For pName, pData in SearchParams {

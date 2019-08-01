@@ -162,7 +162,8 @@ EXIT /B
 )
 :AskRestoreACL <path> <backup-name>
 (
-    IF "%RunInteractiveInstalls%"=="0" EXIT /B 1
+    IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+    IF DEFINED Unattended EXIT /B 1
     SETLOCAL ENABLEEXTENSIONS
     rem ENABLEDELAYEDEXPANSION
     FOR %%A IN ("%ACLBackupDir%\%~2.flag") DO (

@@ -8,9 +8,10 @@ IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
 IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
 
     SET "key=%~1"
-    IF NOT DEFINED key IF NOT "%RunInteractiveInstalls%"=="0" SET /P "key=«ξη: "
+    IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+    IF NOT DEFINED key IF NOT DEFINED Unattended SET /P "key=«ξη: "
     IF NOT DEFINED ErrorCmd (
-	IF "%RunInteractiveInstalls%"=="0" (
+	IF DEFINED Unattended (
 	    SET "ErrorCmd=ping -n 30 127.0.0.1 >nul"
 	) ELSE SET "ErrorCmd=(ECHO &PAUSE)"
     )

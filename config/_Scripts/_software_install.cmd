@@ -33,7 +33,8 @@ IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
     rem Checking this after processing switches to allow passing RunInteractiveInstalls as an argument
     IF NOT DEFINED ErrorCmd (
 	SET "ErrorCmd=ECHO Error!"
-	IF "%RunInteractiveInstalls%"=="1" SET "ErrorCmd=ECHO "
+	IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+	IF NOT DEFINED Unattended SET "ErrorCmd=ECHO "
     )
 )
 

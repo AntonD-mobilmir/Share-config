@@ -11,7 +11,8 @@ SET "DistributivesHost=Srv0.office0.mobilmir"
 SET "syncFlagMasks=.sync*"
 
 IF NOT DEFINED ErrorCmd (
-    IF "%RunInteractiveInstalls%"=="0" (
+    IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+    IF DEFINED Unattended (
 	SET "ErrorCmd=(ECHO  & PING -n 30 127.0.0.1 >NUL & EXIT /B)"
     ) ELSE (
 	SET "ErrorCmd=(PAUSE & EXIT /B)"

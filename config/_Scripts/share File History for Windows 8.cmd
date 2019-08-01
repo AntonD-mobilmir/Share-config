@@ -28,7 +28,8 @@ SETLOCAL ENABLEEXTENSIONS
 )
 :AskAnotherDir
 (SETLOCAL
-    IF "%RunInteractiveInstalls%"=="0" EXIT /B 1
+    IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
+    IF DEFINED Unattended EXIT /B 1
     ECHO Не удалось создать "%targetDir%".
     ECHO Укажите другую папку, к которой требуется предоставить общий доступ и настроить параметры безопасности, или укажите пустую строку ^(нажмите Enter^) для отмены.
     SET /P "targetDir=> "

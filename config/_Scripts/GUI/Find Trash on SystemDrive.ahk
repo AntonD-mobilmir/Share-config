@@ -59,12 +59,12 @@ Loop
     flog.WriteLine(A_Now . " Запущен поиск мусора на " . SystemDrive)
     Loop Parse, TrashDirs, `n, `r
         If (InStr(FileExist(SystemDrive "\" A_LoopField), "D")) {
-            FileSetAttrib -R -S -H, %SystemDrive%\%A_LoopField%
+            FileSetAttrib -RSH, %SystemDrive%\%A_LoopField%
             FileRemoveDir %SystemDrive%\%A_LoopField%, 1
         }
     Loop Parse, TrashFiles, `n, `r
         If (FileExist(SystemDrive "\" A_LoopField)) {
-            FileSetAttrib -R -S -H, %SystemDrive%\%A_LoopField%
+            FileSetAttrib -RSH, %SystemDrive%\%A_LoopField%
             FileDelete %SystemDrive%\%A_LoopField%
         }
     
