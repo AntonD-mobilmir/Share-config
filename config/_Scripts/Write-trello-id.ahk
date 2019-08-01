@@ -10,14 +10,8 @@ FileEncoding UTF-8
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 
-dirTmp = %A_Temp%\%A_ScriptName%
 pathTrelloIDtxt = %A_AppDataCommon%\mobilmir.ru\trello-id.txt
 pathTrelloCardDesctxt = %A_AppDataCommon%\mobilmir.ru\trello-card.txt
-
-boardDumpDirs := [ A_LineFile "\..\..\..\Inventory\trello-accounting\board-dump"
-	         , A_ScriptDir "\board-dump"
-	         , A_ScriptDir
-	         , "\\Srv1S-B.office0.mobilmir\profiles$\Share\Inventory\trello-accounting\board-dump" ]
 
 pathTrelloID=%A_AppDataCommon%\mobilmir.ru\trello-id.txt
 regpathAutorun=HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
@@ -58,31 +52,15 @@ If (A_Args.Length() && !nag) {
 	query.TVID := TVID
 }
 
-For i, boardDumpDir in boardDumpDirs {
-    If (!FileExist(boardDumpDir "\computer-accounting.json") && FileExist(boardDumpDir "\dump.7z") && (exe7z || exe7z := TryCallFunc("find7zexe") || exe7z := TryCallFunc("find7zaexe"))) {
-	RunWait %exe7z% x -y -aoa -o"%dirTmp%" -- "%boardDumpDir%\dump.7z" "computer-accounting.json" "lists.json", %dirTmp%, Min UseErrorLevel
-	boardDumpDir := dirTmp
-    }
-    FileRead jsonboard, %boardDumpDir%\computer-accounting.json
-    FileRead jsonLists, %boardDumpDir%\lists.json
-    If (jsonboard && IsObject(cards := JSON.Load(jsonboard)), jsonLists && (boardlists := JSON.Load(jsonLists)))
-	break
-}
-If (!IsObject(cards))
-    Throw Exception("Cards didn't load",, boardDumpDir)
-
-jsonboard:=jsonLists:=""
-
-If (IsObject(boardlists)) {
-    lists := Object()
-    For i, list in boardlists
-	lists[list.id] := list.name
-    boardlists :=
-}
-
+cards := LoadComputerAccountingCards(lists := "")
 lastMatch := ExtendedFindTrelloCard(query, cards, nMatches, fp, Func("CountSearchRuns"))
 
-EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+EnvGet Unattended, Unattended
+If (!Unattended) {
+    EnvGet RunInteractiveInstalls, RunInteractiveInstalls
+    Unattended := RunInteractiveInstalls=="0"
+}
+
 If (writeSavedID && nMatches==1) {
     For i, match in lastMatch {
         card := cards[i]
@@ -105,7 +83,7 @@ If (writeSavedID && nMatches==1) {
 	    If (!(CutTrelloCardURL(oldurl, 1) == card.shortLink && oldID == card.id)) {
 		newcardname = %pathTrelloIDtxt%.%A_Now%.txt
 		FileMove %newpathTrelloIDtxt%, %newcardname%
-		If (!(RunInteractiveInstalls == "0"))
+		If (!Unattended)
 		    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%A_AppDataCommon%\mobilmir.ru" "Карточка`, найденная для компьютера`, отличается ссылкой или ID от уже сохранённой. Найденная карточка записана в %newcardname%`, а файл %pathTrelloIDtxt% остался без изменений."
 		ExitApp
 	    }
@@ -116,7 +94,7 @@ If (writeSavedID && nMatches==1) {
             fhDesc.Close()
 	}
         RegDelete %regpathAutorun%, %regKNAutorun%
-	If (!(RunInteractiveInstalls == "0"))
+	If (!Unattended)
 	    Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk"
     }
 } Else {
@@ -133,17 +111,13 @@ If (writeSavedID && nMatches==1) {
 	ffc.WriteLine("`nУ карточки " card.name " " card.shortUrl "/" card.idShort "`n`tсовпало " JSON.Dump(match) "`n`t" card.desc)
     }
     ffc.Close()
-    If (!(RunInteractiveInstalls == "0"))
+    If (!Unattended)
 	Run "%A_AhkPath%" "%A_ScriptDir%\GUI\Write-trello-id-showmsg.ahk" "%pathffc%" "Подходящих карточек: %nMatches% (когда всё в порядке`, должна быть одна)"
 }
 ; если nMatches = 1, найдена всего одна карточка, всё в порядке → выход без ошибок (код 0)
 ; если nMatches = 0, карточек не найдено → код ошибки 1
 ; если nMatches > 1, найдено больше 1 подходящей карточки → код ошибки = количеству найденных карточек
 ExitApp nMatches==1 ? 0 : (nMatches==0 ? 1 : nMatches)
-
-TryCallFunc(funcName, optns*) {
-    Try return %funcName%(optns*)
-}
 
 CountSearchRuns(ByRef matches := "", ByRef cards := "", ByRef extSearch := "") {
     static timesInvoked := 0, extSearchMemory
@@ -154,8 +128,8 @@ CountSearchRuns(ByRef matches := "", ByRef cards := "", ByRef extSearch := "") {
     return {(timesInvoked): extSearchMemory}
 }
 
-#include <find7zexe>
 #include <JSON>
 #include <CutTrelloCardURL>
 #include <EscapeRegex>
 #include <FindTrelloCard>
+#include <LoadComputerAccountingCards>
