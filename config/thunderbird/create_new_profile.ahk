@@ -23,13 +23,10 @@ mailProfileDir=
 mailFullName=
 
 Try {
-    defaultConfig := getDefaultConfigFileName()
-    retailDept := defaultConfig = "Apps_dept.7z"
+    retailDept := Func("getDefaultConfigFileName").Call() = "Apps_dept.7z"
 }
 
-Loop %0%
-{
-    argv := %A_Index%
+For i, argv in A_Args {
     If (mailProfileDir=="" && InStr(argv,"\")) {
 	mailProfileDir := argv
     } Else {
@@ -45,7 +42,7 @@ Loop %0%
 	} Else If (!mailProfileDir) {
 	    mailProfileDir := argv
 	} Else {
-	    Throw Exception("Лишний аргумент в командной строке", A_Index, argv)
+	    Throw Exception("Лишний аргумент в командной строке", i, argv)
 	}
     }
 }
@@ -93,9 +90,9 @@ If (!skipCreatingProfile) {
     Run %SystemRoot%\System32\compact.exe /C /S:"%mailProfileDir%\ImapMail" /I, %mailProfileDir%, Min UseErrorLevel
 
     If (retailDept) {
-        If (InStr(FileExist("d:\Mail\Thunderbird\AddressBook"), "D")
-            && appendprefsjs := fRead(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_retail.js")) {
-            If (RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) ; this only replaces hostname in comments, which is borderline superflous
+        If (appendprefsjs := fRead(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_retail.js")) {
+            If (!InStr(FileExist("d:\Mail\Thunderbird\AddressBook"), "D"))
+              && RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) ; this only replaces hostname in comments, which is borderline superflous
                 appendprefsjs := StrReplace(appendprefsjs, "{$HostNameDeptPrefix$}", HostnameMatch1)
             ; otherwise appendprefsjs may stay as is
 	} Else If (InStr(FileExist("\\localhost\AddressBook$"), "D")
@@ -106,33 +103,25 @@ If (!skipCreatingProfile) {
         If (appendprefsjs)
             prefsjs .= (   SubStr(appendprefsjs, 1, 1) == "`n"
                            || SubStr(prefsjs, 0, 1) == "`n"
-                         ? ""
-                         : "`n" )
-                       . appendprefsjs
-    } Else {
+                         ? "" : "`n" ) . appendprefsjs
+    } Else Try {
 	mailFullName := Func("WMIGetUserFullname").Call(2)
     }
     
     ;prefsjs := RegExReplace(prefsjs, "\{\$\w+\$\}", )
     prefsjs := StrReplace( StrReplace(prefsjs, "{$MailUserId$}", MailUserId), "{$MailDomain$}", MailDomain )
-    If (mailFullName) {
-	searchStr := "//user_pref(""mail.identity.id1.fullName"", ""{$MailFullName$}"");"
-	newStr := "user_pref(""mail.identity.id1.fullName"", """ mailFullName """);"
-	StringReplace prefsjs, prefsjs, %searchStr%, %newStr%, 1
-	;//user_pref("mail.identity.id1.fullName", "{$MailFullName$}");
-    }
+    If (mailFullName)
+        prefsjs := StrReplace(prefsjs
+                            , "//user_pref(""mail.identity.id1.fullName"", ""{$MailFullName$}"");"
+                            , "user_pref(""mail.identity.id1.fullName"", """ mailFullName """);")
     prefsJsHndl := FileOpen(mailProfileDir "\prefs.js", "w-", "UTF-8"), prefsJsHndl.Write(prefsjs), prefsJsHndl.Close()
 
     RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%mailProfileDir%\extensions"
 }
 
-findexefunc:="findexe"
-If(IsFunc(findexefunc)) {
-    Try xlnexe := %findexefunc%(SystemDrive . "\SysUtils\xln.exe")
-    If (xlnexe) {
-	FileMoveDir %A_APPDATA%\gnupg, %mailProfileDir%\gnupg, R
-	RunWait "%xlnexe%" -n "%mailProfileDir%\gnupg" "%A_APPDATA%\gnupg",,Min UseErrorLevel
-    }
+If (FileExist(A_APPDATA "\gnupg") {
+    FileMoveDir %A_APPDATA%\gnupg, %mailProfileDir%\gnupg, R
+    RunWait %comspec% /C "MKLINK /J "%A_APPDATA%\gnupg" "%mailProfileDir%\gnupg"",,Min UseErrorLevel
 }
 
 If (skipCreatingProfile || StartsWith(mailProfileDir,UserProfile)) {
@@ -153,7 +142,6 @@ fRead(ByRef path, encoding := "UTF-8", mode := "r-wd") {
         return fo.Read(), fo.Close()
 }
 
-#Include *i %A_LineFile%\..\..\_Scripts\Lib\getDefaultConfig.ahk
-#Include *i %A_LineFile%\..\..\_Scripts\Lib\findexe.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\getDefaultConfig.ahk
 #include *i %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk
 #include <IniFilesUnicode>
