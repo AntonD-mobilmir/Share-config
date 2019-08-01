@@ -2,6 +2,8 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
 If (A_LineFile==A_ScriptFullPath) {
+    GetSecretURLs(0)
+    FileEncoding CP1
     passwd = %1%
     If(!passwd) {
 	InputBox passwd
@@ -12,16 +14,19 @@ If (A_LineFile==A_ScriptFullPath) {
 	    ExitApp
 	}
     }
-    WriteAndShowPassword(passwd)
+    FileAppend % (passwordID := WriteAndShowPassword(passwd)) "`n", *
+    If (passwordID)
+        Exit
     ExitApp
 }
 
-WriteAndShowPassword(passwd) {
+WriteAndShowPassword(ByRef passwd, ByRef fileToAppendPassword := -1) {
     global SystemRoot
     If (!SystemRoot)
 	EnvGet SystemRoot, SystemRoot ; not same as A_WinDir on Windows Server
     
     passwordID := RecordPassword(passwd)
+    ;Соответствия в https://docs.google.com/a/mobilmir.ru/spreadsheets/d/1lUGVjDWEG3znDUKy-l59Ewt95eFrIgUO-L8dy3lxNWQ
     
     Gui Add, Button, xm section gCopypasswordID, Скопировать
     Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwordID%
@@ -32,10 +37,14 @@ WriteAndShowPassword(passwd) {
     Gui Add, Button, xm section gReload, Получить ещё один код&.
     Gui Show
     
-    ;Соответствия в https://docs.google.com/a/mobilmir.ru/spreadsheets/d/1lUGVjDWEG3znDUKy-l59Ewt95eFrIgUO-L8dy3lxNWQ
-    FileCreateDir %A_Temp%\Numbered Passwords.e
-    RunWait %SystemRoot%\System32\cipher.exe /E /S "%A_Temp%\Numbered Passwords.e",,Min
-    FileAppend %passwordID%: %passwd%`n, %A_Temp%\Numbered Passwords.e\%A_ScriptName%.txt
+    If (fileToAppendPassword) {
+        If (fileToAppendPassword==-1)
+            fileToAppendPassword = %A_Temp%\Numbered Passwords.e\%A_ScriptName%.txt
+        SplitPath fileToAppendPassword,, outDir
+        FileCreateDir %outDir%
+        RunWait %SystemRoot%\System32\cipher.exe /E /S "%outDir%",,Min
+        FileAppend %passwd%`n, %fileToAppendPassword%
+    }
     
     return passwordID
 }
@@ -69,10 +78,17 @@ GetPswDbLocation() {
     return "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\Ограниченный доступ\4. Организационно-управленческий департамент\Служба ИТ\Отдел информационных технологий\Группа системного администрирования\генерируемые идентификаторы.txt"
 }
 
-GetPasswordsIDListURL(full := 0) {
-    fullListURL := "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCXLQqDsEsBNX1JqgilonnjkZtVMHN0ZCxMl7nap7jNvd7nqV_hvLcZUS0C_PFzaJgsPbusOUf1Elk/pub?gid=0&single=true&output=csv" 
-    shortListURL := "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCXLQqDsEsBNX1JqgilonnjkZtVMHN0ZCxMl7nap7jNvd7nqV_hvLcZUS0C_PFzaJgsPbusOUf1Elk/pub?gid=1648593057&single=true&output=csv"
-    return full ? fullListURL : shortListURL
+GetSecretURLs(which) {
+    static urls := ""
+    If (!urls) {
+        urls := {}
+        ; , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+        SplitPath A_LineFile, , , , OutNameNoExt
+        Loop Read, %A_LineFile%\..\..\pseudo-secrets\%OutNameNoExt%.txt
+            If (A_Index)
+                urls[A_Index] := A_LoopReadLine
+    }
+    return urls[which]
 }
 
 GenPasswordUID() {
@@ -106,23 +122,25 @@ RecordPassword(passwd) {
     {
         found := 0, passwordID := GenPasswordUID()
         ; проверка дубликатов
-        Loop Parse, % GetURL(GetPasswordsIDListURL()), `n`r
+        Loop Parse, % GetURL(GetSecretURLs(1)), `n`r
         {
-            Loop Parse, A_LoopReadLine, CSV ; timestamp, passwordID
-            {
-                If (A_Index==1) {
-                    lasttimestamp := A_LoopField
-                } Else If (A_Index==2) {
-                    found := passwordID == A_LoopField
-                    break ; only need 2nd column
+            If (A_LoopField) {
+                Loop Parse, A_LoopField, CSV ; timestamp, passwordID
+                {
+                    If (A_Index==1) {
+                        lasttimestamp := A_LoopField
+                    } Else If (A_Index==2) {
+                        found := passwordID == A_LoopField
+                        break ; only need 2nd column
+                    }
                 }
+                If (found)
+                    break
             }
-            If (found)
-                break
         }
     } Until !found
     
-    While !XMLHTTP_Request("POST", "https://zapier.com/hooks/catch/bj32o2/", "ID=" UriEncode(passwordID) "&pwd=" UriEncode(passwd), response := "", {"Content-Type": "application/x-www-form-urlencoded"}) {
+    While !XMLHTTP_Request("POST", GetSecretURLs(3), "ID=" UriEncode("'" passwordID) "&pwd=" UriEncode("'" passwd), response := "", {"Content-Type": "application/x-www-form-urlencoded"}) {
         MsgBox 53, Запись пароля с ID %postID% в таблицу, При отправке пароля произошла ошибка.`n`n[Попытка %A_Index%`, автоповтор – 5 минут]`n`n%response%, 300
         IfMsgBox Cancel
             Throw Exception("Отправка пароля отменена")
