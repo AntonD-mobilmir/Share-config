@@ -1,8 +1,6 @@
 @(REM coding:CP866
     REM by LogicDaemon <www.logicdaemon.ru>
     REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-    ECHO OFF
-    
     %SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
     
     IF DEFINED PROCESSOR_ARCHITEW6432 (
@@ -10,6 +8,7 @@
 	EXIT /B
     )
     SETLOCAL ENABLEEXTENSIONS
+    IF NOT "%~2"=="" SET "copyBackup=%~2"
     
     FOR /f "usebackq tokens=3*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED PassFilePath (
@@ -35,7 +34,8 @@
         IF NOT DEFINED copyToR IF EXIST "R:\WindowsImageBackup\%Hostname%\*" (
             ECHO Копия на R: не будет создана, т.к. в месте назначения уже есть образ %Hostname%.
             SET "copyToR=0"
-        ) ELSE IF EXIST R:\ SET /P "copyToR=Сделать копию образа на R: ? [1=да] "
+    )
+    IF NOT DEFINED copyToR IF EXIST R:\ SET /P "copyToR=Сделать копию образа на R: ? [1=да] "
 )
 @(
     IF /I "%dstBaseDir%" NEQ "R:" IF NOT DEFINED copyBackup IF "%copyToR%"=="1" SET "copyBackup=R:"
@@ -55,16 +55,14 @@
     rem 	C:\WINDOWS\system32>    DIR /AD /B "R:\WindowsImageBackup\IT-Test-E7500lga775\Backup*">>
     
     ECHO Запись контрольных сумм
-    rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла
-    
+    rem копирование параллельно с расчётом: запуск через START, и после копирования директорий проверка: когда 7-zip закончил записывать контрольные суммы, копирование файла   
     IF DEFINED exe7z START "Расчет контрольных сумм для %dstDirWIB%\%Hostname%" /MIN %comspec% /C "%exe7z% h -sccUTF-8 -scrc* -r "%dstDirWIB%\%Hostname%\*" >"%dstDirWIB%\%Hostname%-7zchecksums.txt" 2>&1 && MOVE /Y "%dstDirWIB%\%Hostname%-7zchecksums.txt" "%dstDirWIB%\%Hostname%\7zchecksums.txt""
     
     CALL :CompressAndDefrag "%dstBaseDir%"
     IF DEFINED copyBackup (
 	CALL :CopyImageTo "%copyBackup%"
 	CALL :CompressAndDefrag "%copyBackup%"
-    )
-    
+    ) 
 )
 ECHO %DATE% %TIME% Ожидание окончания записи контрольных сумм "%dstDirWIB%\%Hostname%\7zchecksums.txt"
 :waitmore
@@ -86,10 +84,12 @@ IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
 EXIT /B
 )
 :CompressAndDefrag <target>
-(
+@(
     CALL :IfUNC %1 && (
-	START "Сжатие %~1" %SystemRoot%\System32\compact.exe /C /EXE:LZX /S:%1
-    ) ELSE IF NOT "%DontCompressLocal%"=="1" (
+        START "Сжатие %~1" /MIN /LOW %SystemRoot%\System32\compact.exe /C /EXE:LZX /S:%1
+        EXIT /B
+    )
+    IF NOT "%DontCompressLocal%"=="1" (
         ECHO Запуск сжатия и дефрагментации %1
         START "Compressing and Defragging %~1" /LOW /MIN %comspec% /C ""%~dp0compress and defrag WindowsImageBackup.cmd" %1"
     )
@@ -115,9 +115,6 @@ EXIT /B
         MKDIR "%~1\WindowsImageBackup" || CALL :SetErrorCheckdstDirWIB "MKDIR %~1\WindowsImageBackup"
     )
     MKDIR "%~1\WindowsImageBackup\%Hostname%" || CALL :SetErrorCheckdstDirWIB "MKDIR %~1\WindowsImageBackup\%Hostname%"
-    START "Копирование образа в %~1\WindowsImageBackup\%Hostname%" /MIN XCOPY "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /I /G /H /R /E /K /O /B
-    IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
-    
     rem when making local backup, WindowsImageBackup gets inherited permissions from root, and subfolder with actual backup: http://imgur.com/a/ttyqJ
     rem 	owned by SYSTEM
     rem 	Full access for Administrators, Backup Operators and CREATOR OWNER
@@ -131,6 +128,8 @@ EXIT /B
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /grant "*S-1-5-32-544:(OI)(CI)F" /grant "*S-1-5-18:(OI)(CI)F" /grant "*S-1-5-32-551:(OI)(CI)F" /grant "*S-1-3-0:(OI)(CI)F" /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /inheritance:r /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
+    START "Копирование образа в %~1\WindowsImageBackup\%Hostname%" /MIN %SystemRoot%\System32\robocopy.exe "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /MIR /DCOPY:DAT /TBD /ETA
+    IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
 EXIT /B
 )
 :DirToPassFile <path>
@@ -149,7 +148,7 @@ EXIT /B
 :SetAndCheckDstDirWIB
 @IF "%dstBaseDir:~-1%"=="\" SET "dstBaseDir=%dstBaseDir:~0,-1%"
 @(
-    @IF "%dstBaseDir:~0,2%"=="\\" (
+    IF "%dstBaseDir:~0,2%"=="\\" (
         CALL :SplitNetPath netHost netShare "%dstBaseDir%" || EXIT /B
     ) ELSE IF NOT "%dstBaseDir:~1,2%"==":" EXIT /B 1
     SET "dstDirWIB=%dstBaseDir%\WindowsImageBackup"
