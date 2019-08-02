@@ -6,6 +6,10 @@ PostGoogleForm(URL, ByRef kv, tries:=20, retryDelay:=20000) {
     If (!IsObject(kv))
 	Throw Exception("Keys and Values should be passed as an object", A_ThisFunc, kv)
     
+    If (!(URL ~= "/formResponse$")) {
+        If (!RegexReplace(URL, "/(edit|viewform)([\?#].*)?", "/formResponse"))
+            URL .= (SubStr(URL, 0) == "/" ? "" : "/" ) . "/formResponse"
+    }
     ;url looks like: "https://docs.google.com/a/mobilmir.ru/forms/d/e/***/formResponse"
     ;expected post data format: "entry.615879702=test&entry.67493091=dept&entry.1721746842=ver&fvv=1&draftResponse=%5B%2C%2C%227974343457504139194%22%5D%0D%0A&pageHistory=0&fbzx=7974343457504139194",
     

@@ -2,7 +2,7 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 
 GetPseudoSecrets(lineNo := "") {
-    static secretsPath := %A_LineFile%\..\..\pseudo-secrets\%A_ScriptName%.txt
+    static secretsPath := A_LineFile "\..\..\pseudo-secrets\" A_ScriptName ".txt"
          , data := "", fullDataRead := 0
     If (!fullDataRead) { ; reading
         If (!data)
