@@ -46,6 +46,9 @@ IF "%Inst1S%"=="1" (
     %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
 )
 (
+MKDIR d:\Distributives\Drivers\Canon
+START "Copying Drivers\Canon\Laser MF" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Drivers\Canon\Laser MF" "d:\Distributives\Drivers\Canon\" /MIR /DCOPY:DAT /ETA
+
 START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 
 TITLE Writing DefaultsSource
@@ -107,8 +110,9 @@ SET "srcpath="
         
         IF NOT DEFINED instSoftUpdScripts SET "instSoftUpdScripts=1"
     )
-
     IF NOT DEFINED instSoftUpdScripts CALL :Ask_SetupLocalDownloader
+)
+(
     IF /I "%instSoftUpdScripts%"=="1" (
         START "Установка скрипта авто-обновления ПО" %comspec% /C "%~dp0_Scripts\software_update_autodist\SetupLocalDownloader.cmd"
         START "Copying distributives" /MIN %comspec% /C "%~dp0_Scripts\CopyDistributives_AllSoft.cmd"
