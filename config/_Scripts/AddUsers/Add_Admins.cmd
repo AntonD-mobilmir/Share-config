@@ -1,7 +1,6 @@
 @(REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-ECHO OFF
     SETLOCAL ENABLEEXTENSIONS
     %SystemRoot%\System32\fltmc.exe >nul 2>&1 || ( ECHO Скрипт "%~f0" без прав администратора не работает & PING -n 30 127.0.0.1 >NUL & EXIT /B )
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
@@ -18,14 +17,16 @@ ECHO OFF
     FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
     FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Domain"`) DO SET "Domain=%%~J"
     IF NOT DEFINED Domain FOR /F "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DhcpDomain"`) DO SET "Domain=%%~J"
-
-    IF EXIST "D:\Users\*.*" CALL "%~dp0..\FindAutoHotkeyExe.cmd" "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 
     rem Read file, and for each line add corresponding user
     FOR /F "usebackq eol=; tokens=1,2,3,4* delims=	" %%I IN ("%~dpn0.txt") DO CALL :SetupAdmin "%%~I" "%%~J" "%%~K" "%%~L"
     IF DEFINED RemoveGPGHomeTemp RD /S /Q "%TEMP%\gnupg"
     IF NOT DEFINED Unattended IF "%RunInteractiveInstalls%"=="0" SET "Unattended=1"
     IF NOT DEFINED Unattended START "" %SystemRoot%\System32\control.exe userpasswords2
+)
+(
+IF DEFINED AutoHotkeyExe IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
 EXIT /B
 )
 :SetupAdmin <username/flags> <fullName> <gpgUserID> <DirForPlaintext>
@@ -60,19 +61,25 @@ EXIT /B
     
     IF DEFINED saveDir IF EXIST "%saveDir%" SET "dirPlainOut=%saveDir%\%Hostname%"
     IF NOT DEFINED dirPlainOut SET "dirPlainOut=%TEMP%\%~n0.e"
-
+    
+    SET "dirGPGout="
     IF DEFINED gpgUserID (
 	IF NOT DEFINED gpgexe CALL "%~dp0..\preparegpgexe.cmd"
-	IF NOT DEFINED dirGPGout SET "dirGPGout=%ProgramData%\mobilmir.ru\%~n0"
+	IF DEFINED gpgexe SET "dirGPGout=%ProgramData%\mobilmir.ru\%~n0"
     )
-
+    
     REM IF NOT DEFINED flag_p
     rem Generate new password
-    FOR /F "usebackq delims=" %%A IN (`%AutoHotkeyExe% "%~dp0..\Lib\GenPassword.ahk") DO SET "newPasswd=%%~A"
+    SET "newPasswd="
+    rem since Autohotkey is quoted, and FOR uses CMD /C syntax, another set of quotes required around whole command including parameters
+    IF DEFINED AutoHotkeyExe FOR /F "usebackq delims=" %%A IN (`"%AutoHotkeyExe% "%~dp0..\Lib\GenPassword.ahk""`) DO IF NOT DEFINED newPasswd SET "newPasswd=%%~A"
     IF NOT DEFINED newPasswd SET /A "PasswdPart1=%RANDOM% * 10000 / 32767" & SET /A "PasswdPart2=%RANDOM% * 10000 / 32767" & SET /A "PasswdPart3=%RANDOM% * 10000 / 32767"
     rem if password is longer than 14 chars, NET USER /ADD asks stupid question
 )
-@IF NOT DEFINED newPasswd SET "PasswdPart1=0000%PasswdPart1%" & SET "PasswdPart2=0000%PasswdPart2%" & SET "PasswdPart3=0000%PasswdPart3%"
+@(
+    SET "outlog=%dirPlainOut%\%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2%.log"
+    IF NOT DEFINED newPasswd SET "PasswdPart1=0000%PasswdPart1%" & SET "PasswdPart2=0000%PasswdPart2%" & SET "PasswdPart3=0000%PasswdPart3%"
+)
 @(
     IF NOT DEFINED newPasswd (
         SET "newPasswd=%PasswdPart1:~-4%-%PasswdPart2:~-4%-%PasswdPart3:~-4%"
@@ -82,8 +89,10 @@ EXIT /B
     SET "outPlainFName=%DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt"
     IF NOT EXIST "%dirPlainOut%" MKDIR "%dirPlainOut%"
     IF NOT "%dirPlainOut:~0,2%"=="\\" %SystemRoot%\System32\cipher.exe /E "%dirPlainOut%"
-    IF DEFINED gpgexe IF DEFINED gpgUserID (
-	MKDIR "%dirGPGout%"
+    SET "gpgencOut="
+    SET "gpgServerCopy="
+    IF DEFINED dirGPGout (
+	IF NOT EXIST "%dirGPGout%" MKDIR "%dirGPGout%"
 	SET gpgencOut="%dirGPGout%\%gpgUserID%.txt.gpg"
 	IF NOT EXIST "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\new\%newUsername%" MKDIR "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\new\%newUsername%"
 	SET gpgServerCopy="\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Administrators\new\%newUsername%\%Hostname%.%Domain% %DATE:~-4,4%-%DATE:~-7,2%-%DATE:~-10,2% %TIME::=% %RANDOM%.txt.gpg"
@@ -97,31 +106,19 @@ EXIT /B
 	ECHO %Hostname%\%newUsername%
 	NET USER "%newUsername%" "%newPasswd%" /ADD /LOGONPASSWORDCHG:NO /fullName:"%fullName%" || CALL :SetUserAddError
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
-    IF DEFINED UserAddError DEL "%dirPlainOut%\%outPlainFName%" <NUL & EXIT /B
+    TYPE "%dirPlainOut%\%outPlainFName%"
+    IF DEFINED UserAddError EXIT /B
+    IF DEFINED gpgencOut CALL :GpgEncryptPassword
     
-    IF DEFINED gpgexe IF DEFINED gpgUserID (
-	DEL %gpgencOut% 2>NUL
-	REM %gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% -e "%dirPlainOut%\%outPlainFName%" >>"%dirPlainOut%\%~n0.log" 2>&1
-	ECHO %newPasswd%|%gpgexe% --batch -a -r "%gpgUserID%" -o %gpgencOut% >>"%dirPlainOut%\%~n0.log" 2>&1
-	IF ERRORLEVEL 1 (
-            ECHO Error encrypting password!
-            ECHO Error encrypting password! Leaving it intact.>>"%dirPlainOut%\%~n0.log"
-	) ELSE (
-            DEL "%dirPlainOut%\%outPlainFName%" <NUL
-            DEL "%dirPlainOut%\%~n0.log" <NUL
-            RD "%dirPlainOut%"
-	)
-	START "Copying gpg-encrypted password to Srv1S-B" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
-	IF DEFINED AutoHotkeyExe IF NOT EXIST "%ProgramData%\mobilmir.ru\trello-id.txt" %AutoHotkeyExe% "%~dp0..\Write-trello-id.ahk"
-	IF DEFINED AutoHotkeyExe START "" %AutoHotkeyExe% "%~dp0submitEncryptedPassword.ahk" "%newUsername%" %gpgencOut%
-    )
-    IF EXIST "%dirPlainOut%\%outPlainFName%" (
+    IF DEFINED AutohotkeyExe IF EXIST "%dirPlainOut%\%outPlainFName%" (
         rem curl -F "file=@%dirPlainOut%\%outPlainFName%"
-        START "Posting temporary password to file.io" /MIN %comspec% /C "(curl --data "text=%newPasswd%" https://file.io || curl -x 192.168.127.1:3128 --data "text=%newPasswd%" https://file.io) >>"%dirPlainOut%\%outPlainFName%" 2>>"%dirPlainOut%\%~n0.log""
+        (
+            ECHO %newPasswd%
+        ) | %AutohotkeyExe% "%~dp0storeTemporaryPassword.ahk" "%newUsername%" >>"%dirPlainOut%\%outPlainFName%"
     )
 )
 :setupgroups
-(
+@(
 REM END IF [DEFINED flag_p]
     rem Add to admin group. Its name differs depending on Windows language.
     (
@@ -130,19 +127,43 @@ REM END IF [DEFINED flag_p]
 	NET LOCALGROUP Users "%newUsername%" /Delete
 	NET LOCALGROUP Пользователи "%newUsername%" /Delete
     ) >NUL 2>&1
+    
+    IF DEFINED AutoHotkeyExe IF EXIST "D:\Users\*.*" %AutoHotkeyExe% "%~dp0..\MoveUserProfile\SetProfilesDirectory_D_Users.ahk"
     ENDLOCAL
-    IF NOT [%AutoHotkeyExe%]==[] SET AutoHotkeyExe=%AutoHotkeyExe%
+    IF NOT [%GNUPGHOME%]==[] SET GNUPGHOME=%GNUPGHOME%
     IF NOT [%gpgexe%]==[] SET gpgexe=%gpgexe%
     IF NOT [%exe7z%]==[] SET exe7z=%exe7z%
 EXIT /B
 )
+:GpgEncryptPassword
+@(
+    DEL %gpgencOut% 2>NUL
+    REM %gpgexe% -e --batch -a -r "%gpgUserID%" -o %gpgencOut% "%dirPlainOut%\%outPlainFName%" >>"%outlog%" 2>&1
+    (
+        ECHO %newPasswd%
+    )|%gpgexe% -e --batch -a -r "%gpgUserID%" -o %gpgencOut% >>"%outlog%" 2>&1
+    IF ERRORLEVEL 1 GOTO :ErrorGPGEncrypting
+    DEL "%dirPlainOut%\%outPlainFName%" <NUL
+    DEL "%outlog%" <NUL
+    RD "%dirPlainOut%" 2>NUL
+    START "Copying gpg-encrypted password to Srv1S-B" /MIN %comspec% /C "COPY /Y /B %gpgencOut% %gpgServerCopy%"
+    IF DEFINED AutoHotkeyExe START "" %AutoHotkeyExe% "%~dp0submitEncryptedPassword.ahk" "%newUsername%" %gpgencOut%
+EXIT /B
+)
+:ErrorGPGEncrypting
+@(
+    ECHO Error encrypting password! Leaving it intact.>>"%outlog%"
+    TYPE "%outlog%"
+    ECHO 
+EXIT /B 1
+)
 :GetValue <targetvarname> <sourcevarname>
-(
+@(
     FOR /F "usebackq delims=" %%I IN (`ECHO %%%~2%%`) DO SET "%~1=%%~I"
 EXIT /B
 )
 :ParseFlags
-(
+@(
     SET /A "i=0"
     REM reset flags
     SET "flag_f="
@@ -151,11 +172,11 @@ EXIT /B
     SET "flag_n="
 )
 :ParseNextFlag
-(
+@(
     SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
     SET "curFlag=!flags:~%i%,1!"
 )
-(
+@(
     ENDLOCAL
     IF "%curFlag%"=="" EXIT /B
     IF NOT DEFINED flag_%curFlag% SET "flag_%curFlag%=1"
@@ -163,15 +184,15 @@ EXIT /B
     GOTO :ParseNextFlag
 )
 :AskCreateUser
-    SET /P "doit=Создать пользователя %newUsername% (%fullName%)? [0=N=нет, остальное = да]"
-(
+@SET /P "doit=Создать пользователя %newUsername% (%fullName%)? [0=N=нет, остальное = да]"
+@(
     IF "%doit%"=="0" EXIT /B 1
     IF /I "%doit:~0,1%" EQU "n" EXIT /B 1
     IF /I "%doit:~0,1%" EQU "н" EXIT /B 1
 EXIT /B 0
 )
 :SetUserAddError
-(
+@(
     rem ERRORLEVEL:
     rem 2	The account already exist
     SET "UserAddError=%ERRORLEVEL%"
