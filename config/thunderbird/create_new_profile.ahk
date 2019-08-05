@@ -91,8 +91,8 @@ If (!skipCreatingProfile) {
 
     If (retailDept) {
         If (appendprefsjs := fRead(A_ScriptDir "\prefs-parts\prefs_AddressBookSync_retail.js")) {
-            If (!InStr(FileExist("d:\Mail\Thunderbird\AddressBook"), "D"))
-              && RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) ; this only replaces hostname in comments, which is borderline superflous
+            If (!InStr(FileExist("d:\Mail\Thunderbird\AddressBook"), "D")
+                && RegExMatch(A_ComputerName, "^([.+])-[K0-9]$", HostnameMatch)) ; this only replaces hostname in comments, which is borderline superflous
                 appendprefsjs := StrReplace(appendprefsjs, "{$HostNameDeptPrefix$}", HostnameMatch1)
             ; otherwise appendprefsjs may stay as is
 	} Else If (InStr(FileExist("\\localhost\AddressBook$"), "D")
@@ -119,7 +119,7 @@ If (!skipCreatingProfile) {
     RunWait "%A_AhkPath%" "%A_ScriptDir%\unpack_extensions.ahk" "%mailProfileDir%\extensions"
 }
 
-If (FileExist(A_APPDATA "\gnupg") {
+If (InStr(FileExist(A_APPDATA "\gnupg"), "D")) {
     FileMoveDir %A_APPDATA%\gnupg, %mailProfileDir%\gnupg, R
     RunWait %comspec% /C "MKLINK /J "%A_APPDATA%\gnupg" "%mailProfileDir%\gnupg"",,Min UseErrorLevel
 }

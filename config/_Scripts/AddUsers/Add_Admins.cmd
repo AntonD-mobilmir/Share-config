@@ -72,7 +72,7 @@ EXIT /B
     rem Generate new password
     SET "newPasswd="
     rem since Autohotkey is quoted, and FOR uses CMD /C syntax, another set of quotes required around whole command including parameters
-    IF DEFINED AutoHotkeyExe FOR /F "usebackq delims=" %%A IN (`"%AutoHotkeyExe% "%~dp0..\Lib\GenPassword.ahk""`) DO IF NOT DEFINED newPasswd SET "newPasswd=%%~A"
+    IF DEFINED AutoHotkeyExe FOR /F "usebackq delims=" %%A IN (`"%AutoHotkeyExe% "%~dp0..\Lib\GenPassword.ahk""`) DO @IF NOT DEFINED newPasswd SET "newPasswd=%%~A"
     IF NOT DEFINED newPasswd SET /A "PasswdPart1=%RANDOM% * 10000 / 32767" & SET /A "PasswdPart2=%RANDOM% * 10000 / 32767" & SET /A "PasswdPart3=%RANDOM% * 10000 / 32767"
     rem if password is longer than 14 chars, NET USER /ADD asks stupid question
 )
@@ -159,7 +159,7 @@ EXIT /B 1
 )
 :GetValue <targetvarname> <sourcevarname>
 @(
-    FOR /F "usebackq delims=" %%I IN (`ECHO %%%~2%%`) DO SET "%~1=%%~I"
+    FOR /F "usebackq delims=" %%I IN (`ECHO %%%~2%%`) DO @SET "%~1=%%~I"
 EXIT /B
 )
 :ParseFlags

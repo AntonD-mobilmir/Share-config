@@ -47,7 +47,7 @@ IF "%Inst1S%"=="1" (
 )
 (
 MKDIR d:\Distributives\Drivers\Canon
-START "Copying Drivers\Canon\Laser MF" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Drivers\Canon\Laser MF" "d:\Distributives\Drivers\Canon\" /MIR /DCOPY:DAT /ETA
+START "Copying Drivers\Canon\Laser MF" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Drivers\Canon\Laser MF" "d:\Distributives\Drivers\Canon" /MIR /DCOPY:DAT /ETA
 
 START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 

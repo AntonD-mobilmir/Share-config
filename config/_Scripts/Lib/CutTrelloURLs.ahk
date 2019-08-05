@@ -20,7 +20,6 @@ GetTrelloURLRegex(type := "") {
 }
 
 CutTrelloBoardURL(ByRef url, ByRef trelloBoardURLRegex) {
-    ;If (RegexMatch(url, "(?:https?://)?(trello\.com/b/[^/]+)", m))
     If (RegexMatch(url, trelloBoardURLRegex, m))
         return m1
     Else
