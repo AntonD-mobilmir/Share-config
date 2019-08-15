@@ -41,14 +41,23 @@ AppXSupported := OSVersionObj[2] > 6 || (OSVersionObj[2] = 6 && OSVersionObj[3] 
 
 ReRunAsAdmin := !(A_IsAdmin || A_Args[1] = "/NoAdminRun")
 
-dirProfilesShare := FirstExisting( "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share"
-			   	 , "\\Srv0.office0.mobilmir\profiles$\Share"
-			   	 , "D:\Distributives" )
+LocationsProfilesShare := [ "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share"
+			  , "\\Srv0.office0.mobilmir\profiles$\Share"
+			  , "D:\Distributives" ]
+
+dirProfilesShare := FirstExisting( LocationsProfilesShare* )
+For i, baseDir_software_update in LocationsProfilesShare {
+    If (InStr(FileExist(software_update_client_exec := baseDir_software_update "\software_update\client_exec"), "D"))
+        break
+    Else
+        software_update_client_exec := ""
+}
+
 If (!dirProfilesShare)
     Throw "Папка с файлами и скриптами настройки не найдена"
 
-officeDistSrvNetName := FirstContaining( "Distributives", "\\Srv0.office0.mobilmir"
-                                                        , "\\Srv1S-B.office0.mobilmir"
+officeDistSrvNetName := FirstContaining( "Distributives", "\\Srv1S-B.office0.mobilmir"
+                                                        , "\\Srv0.office0.mobilmir"
                                                         , "D:" )
 If (!officeDistSrvNetName)
     Throw "Папка дистрибутивов не найдена"
@@ -135,9 +144,9 @@ runningScript := AddLog("Работающий скрипт", TimeFormat(timestam
 Loop Files, %serverScriptPath%
 {
     If (A_LoopFileLongPath = A_ScriptFullPath) {
-	SetLastRowStatus("запущен с Srv0")
+	SetLastRowStatus("запущен с сервера")
     } Else {
-	AddLog("Скрипт на Srv0")
+	AddLog("Скрипт на сервере")
 	FileGetTime timestampServerScript, %serverScriptPath%
 	SetLastRowStatus(TimeFormat(timestampServerScript))
 
@@ -396,7 +405,7 @@ If (gsussScript) {
 Distributives := EnvGetAfterScript(gsussScript, "Distributives")
 SetLastRowStatus(SubStr(Distributives, 1, -StrLen("\Distributives")), InStr(FileExist(Distributives), "D"))
 If (!FileExist(Distributives "\Soft\PreInstalled\utils\7za.exe")) {
-    AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с Srv0")
+    AddLog("В локальной папке дистрибутивов нет 7za.exe", "будут исп. дистрибутивы с сервера")
     Distributives := officeDistSrvPath
     usingOfficeSrv := 1
 }
@@ -407,7 +416,7 @@ FileGetVersion ver7z, %exe7z%
 ver7z_ := StrSplit(ver7z, ".")
 If (ver7z_[1] < 15) {
     SetLastRowStatus(ver7z, 0)
-    AddLog("Требуется 7-Zip версии ≥15. Запуск обновления с Srv0.office0.mobilmir.")
+    AddLog("Требуется 7-Zip версии ≥15. Запуск обновления с сервера (office0)")
     RunWait %comspec% /C "%officeDistSrvPath%\Soft\Archivers Packers\7Zip\install.cmd",,Min UseErrorLevel
     If (ErrorLevel) {
 	MsgBox Ошибка "%ErrorLevel%" при обновлении 7-Zip. Автоматическое продолжение невозможно.
@@ -437,18 +446,14 @@ cmdupdateDefaultConfig := runConfUpdScript.path
 RunWait %comspec% /C "%cmdupdateDefaultConfig%",,Min UseErrorLevel
 SetRowStatus(runConfUpdScript.line, ErrorLevel)
 
-If (FileExist("D:\Credit")) {
-    AddLog("Перемещение ""D:\Credit"" в ""D:\Program Files\Credit""")
-    FileMoveDir D:\Credit, D:\Program Files\Credit, 2
-    SetLastRowStatus(ErrorLevel,!ErrorLevel)
-}
-
-Loop Files, \\Srv0.office0.mobilmir\profiles$\Share\software_update\client_exec\_TeamViewerSecurityPasswordAES *.ahk
-{
-    tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
-    tvPassChangeErr := RunScript(A_LoopFileFullPath, "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
-    Loop Read, %tvPassChangeLog%
-	SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
+If (software_update_client_exec) {
+    Loop Files, %software_update_client_exec%\_TeamViewerSecurityPasswordAES *.ahk
+    {
+        tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
+        tvPassChangeErr := RunScript(A_LoopFileFullPath, "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
+        Loop Read, %tvPassChangeLog%
+            SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
+    }
 }
 
 ;tv5settingsSubPath	:= "\Soft\Network\Remote Control\Remote Desktop\TeamViewer 5\settings.cmd"
@@ -456,6 +461,12 @@ Loop Files, \\Srv0.office0.mobilmir\profiles$\Share\software_update\client_exec\
 ;tv5settingscmd := FirstExisting(Distributives . tv5settingsSubPath, officeDistSrvPath . tv5settingsSubPath)
 ;RunWait %comspec% /C "%tv5settingscmd%", %A_Temp%, Min UseErrorLevel
 ;SetLastRowStatus(ErrorLevel ? ErrorLevel : "",!ErrorLevel)
+
+If (FileExist("D:\Credit")) {
+    AddLog("Перемещение ""D:\Credit"" в ""D:\Program Files\Credit""")
+    FileMoveDir D:\Credit, D:\Program Files\Credit, 2
+    SetLastRowStatus(ErrorLevel,!ErrorLevel)
+}
 
 If (FileExist("c:\squid")) {
     FileGetTime mtimeSquidConf, c:\squid\etc\squid.conf
@@ -1055,7 +1066,7 @@ FindLatest(mask, loopOptn := "", ByRef latestTime := 0) { ; FindLatest(,, -1) to
 AbbreviatePath(path) {
     global DefaultConfigDir
     path := RegExReplace(path, "i)^\\\\Srv0(\.office0\.mobilmir)?\\(profiles\$(\\Share)?|Distributives)?\\","{Srv0}")
-    path := RegExReplace(path, "i)^\\\\Srv1S-B(\.office0\.mobilmir)?\\(Users\\Public\\Shares\\profiles\$(\\Share)?|Distributives)?\\","{Srv0}")
+    path := RegExReplace(path, "i)^\\\\Srv1S-B(\.office0\.mobilmir)?\\(Users\\Public\\Shares\\profiles\$(\\Share)?|Distributives)?\\","{Srv1S-B}")
     If (DefaultConfigDir)
 	path := RegExReplace(path,"\Q" . DefaultConfigDir . "\E", "{configDir}")
     return path
