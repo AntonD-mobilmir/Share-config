@@ -28,7 +28,7 @@ Status("gpg.exe imports keys into keyring…", "Loading keys")
 RunWait "%gpgexe%" --homedir "%GNUPGHOME%" --batch --import pubkeys.asc, %tmp%, Hide, cmdPID
 
 Status("Encrypting addressbook for all recipients")
-FileCopy \\Srv0.office0.mobilmir\profiles$\Share\adrbooks\business_contacts.mab, %tmp%
+FileCopy \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\adrbooks\business_contacts.mab, %tmp%
 SetTimer ShowCMDWindow, -3000
 RunWait "%gpgexe%" --homedir "%GNUPGHOME%" --trust-model always %rcptList% -e business_contacts.mab, %tmp%, Hide, cmdPID
 FileCopy %tmp%\business_contacts.mab.gpg, %UserProfile%\Dropbox\it.mobilmir.ru Team Folder\pub\*.*, 1

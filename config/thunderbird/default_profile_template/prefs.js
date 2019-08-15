@@ -108,7 +108,7 @@ user_pref("extensions.addressbookssync.ldap_2.servers.history.down", false);
 user_pref("extensions.addressbookssync.ldap_2.servers.history.up", false);
 user_pref("extensions.addressbookssync.ldap_2.servers.pab.down", false);
 user_pref("extensions.addressbookssync.ldap_2.servers.pab.up", false);
-user_pref("extensions.addressbookssync.localpath", "\\\\Srv0.office0.mobilmir\\profiles$\\Share\\adrbooks");
+user_pref("extensions.addressbookssync.localpath", "\\\\Srv1S-B.office0.mobilmir\\Users\\Public\\Shares\\profiles$\\Share\\adrbooks");
 //user_pref("extensions.addressbookssync.localpath", "c:\\ProgramData\\mobilmir.ru\\AddressBook");
 //user_pref("extensions.addressbookssync.localpath", "\\\\{$MailUserId$}-K\\AddressBook$");
 user_pref("extensions.addressbookssync.noupload", true);

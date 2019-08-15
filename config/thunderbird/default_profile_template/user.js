@@ -7,8 +7,6 @@ user_pref("calendar.registry.b7471ab3-9c48-42b9-92e5-bf7f96b21d32.type", "thunde
 user_pref("calendar.registry.b7471ab3-9c48-42b9-92e5-bf7f96b21d32.uri", "moz-abdirectory://");
 user_pref("extensions.addressbookssync.ldap_2.servers.businesscontacts.down", true);
 user_pref("extensions.addressbookssync.ldap_2.servers.businesscontacts.up", false);
-//user_pref("extensions.addressbookssync.localpath", "\\\\Srv0\\profiles$\\Share\\adrbooks\\");
-//user_pref("extensions.addressbookssync.localpath", "D:\\Mail\\Thunderbird\\AddressBook\\");
 user_pref("ldap_2.servers.businesscontacts.description", "business_contacts");
 user_pref("ldap_2.servers.businesscontacts.dirType", 2);
 //user_pref("ldap_2.servers.businesscontacts.filename", "business_contacts.mab");

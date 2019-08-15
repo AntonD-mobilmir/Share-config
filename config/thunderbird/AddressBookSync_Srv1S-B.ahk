@@ -10,15 +10,17 @@ Catch {
     ExitApp
 }
 
-MsgBox 36, Заменить настройки адресной книги business_contacts?,Заменить параметры адресной книги business_contacts указанными в профиле по умолчанию?`nЕсли адресной книги нет`, она будет создана.`n`nБудет обработан профиль в папке "%MTProfilePath%", 60
+MsgBox 36, Заменить путь для синхронизации адресной книги?,Указать для загрузки адресной книги путь к серверу в офисе?`n`nБудет обработан профиль в папке "%MTProfilePath%", 60
 IfMsgBox Yes
 {
     CloseThunderbirdAndWaitProfileUnlock()
 
-    ToolTip,, Изменение настроек Business_contacts
-    FileCopy %A_ScriptDir%\default_profile_template\business_contacts.mab, %MTProfilePath%\business_contacts.mab, 1
-    FileRead prefs_BusinessContacts, %A_ScriptDir%\prefs-parts\prefs_BusinessContacts.js
-    FileAppend `n%prefs_BusinessContacts%,*%MTProfilePath%\prefs.js
+    ToolTip,, Изменение настроек addressbookssync
+    FileAppend,
+    (
+    user_pref("extensions.addressbookssync.localpath", "\\\\Srv1S-B.office0.mobilmir\\Users\\Public\\Shares\\profiles$\\Share\\adrbooks");
+    
+    ),*%MTProfilePath%\prefs.js
     ToolTip
 
     SplashTextOn 200, 50, Настройки выполнены, Запускается Thunderbird`, подождите
