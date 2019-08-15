@@ -4,61 +4,66 @@
 #SingleInstance ignore
 
 EnvGet UserProfile,UserProfile
-EnvGet MailUserId,MailUserId
-destPath = %1%
-mailDomain = mobilmir.ru
+EnvGet mailUserId,mailUserId
+destPath := A_Args[1]
+mailDomain := A_Args[2]
 
-If (!MailUserId) {
-    EnvGet GetSharedMailUserIdScript,GetSharedMailUserIdScript
-    If Not GetSharedMailUserIdScript
-	GetSharedMailUserIdScript := A_AppDataCommon "\mobilmir.ru\_get_SharedMailUserId.cmd"
+If (!mailUserId) {
+    EnvGet GetSharedmailUserIdScript,GetSharedmailUserIdScript
+    If (!GetSharedmailUserIdScript)
+	GetSharedmailUserIdScript := A_AppDataCommon "\mobilmir.ru\_get_SharedmailUserId.cmd"
     
-    If (FileExist(GetSharedMailUserIdScript))
-	Try MailUserId := Func("ReadSetVarFromBatchFile").Call(GetSharedMailUserIdScript, "MailUserId")
+    If (FileExist(GetSharedmailUserIdScript))
+	Try mailUserId := Func("ReadSetVarFromBatchFile").Call(GetSharedmailUserIdScript, "mailUserId")
     
-    If (!MailUserId && RegexMatch(A_ComputerName, "i)(.+)-[0-9k]"), m)
-	MailUserId := Format("{:Ls}", m1)
+    If (!mailUserId && RegexMatch(A_ComputerName, "i)(.+)-[0-9k]"), m)
+	mailUserId := Format("{:Ls}", m1)
 }
 
-If (MailUserId) { ; Компьютер в рознице либо другой общий с общим профилем почты
+If (mailUserId) { ; Компьютер в рознице либо другой общий с общим профилем почты
     If (!destPath) {
         destPath = D:\Mail\Thunderbird\profile
+        testfname = %destPath%\test.%A_Now%.%A_TickCount%.tmp
         FileCreateDir %destPath%
-        FileDelete %destPath%\test.tmp
-        FileAppend,,%destPath%\test.tmp
-        If (!FileExist(destPath "\test.tmp"))
+        FileDelete %testfname%
+        FileAppend,,%testfname%
+        If (!FileExist(testfname))
             destPath := ""
-        FileDelete %destPath%\test.tmp
+        FileDelete %testfname%
     }
     
-    If (!fullName) {
-        Try {
-            senderNameCommentSuffix := A_ComputerName ~= "-K$" ? ", касса" : ""
-            deptsList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vS1VdSPrtzh81PwFn--mytpZqsgjmTZBtAEzhEINXBnOt-b8gSuD3s5xqyj5-bC1uLw1RhZgwPxFzyV/pub?gid=0&single=true&output=tsv")
-            Loop Parse, deptsList, `n, `r
-            {
-                If (RegexMatch(A_LoopField, "A)(?P<Name>.+) (?P<ID>[^ ]+)@", dept)) {
-                    If (deptID=MailUserId) {
-                        fullName = %deptName% (отдел%senderNameCommentSuffix%)
-                        break
-                    }
-                }
+    Try { ;for GetURL
+        senderNameCommentSuffix := A_ComputerName ~= "-K$" ? ", касса" : ""
+        ;https://docs.google.com/spreadsheets/d/1VPfguqo2fBt5a23Fu8cl_KtOSrMLQOiDuxs17YdmKyg/
+        deptsList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vS1VdSPrtzh81PwFn--mytpZqsgjmTZBtAEzhEINXBnOt-b8gSuD3s5xqyj5-bC1uLw1RhZgwPxFzyV/pub?gid=0&single=true&output=tsv")
+        Loop Parse, deptsList, `n, `r
+        {
+            ;dept-name email-ID@	mailUserId	email	alias...
+            line := StrSplit(A_LoopField, "`t",,4)
+            If (line[2]=mailUserId && RegexMatch(line[1], "A)(?P<Name>.+) (?P<ID>[^ ]+)@", dept)) {
+                fullName = %deptName% (отдел%senderNameCommentSuffix%)
+                atPos := InStr(line[3], "@")
+                mailUserId := SubStr(line[3], 1, atPos-1)
+                mailDomain := SubStr(line[3], atPos+1)
+                break
             }
         }
     }
 } Else {
-    MailUserId := A_UserName
-    
+    mailUserId := A_UserName
     Try fullName := Func("WMIGetUserFullname").Call(2)
     If (!fullName)
-	fullName = (не удалось разобрать: %userFIO%)
+        fullName = (не удалось разобрать: %userFIO%)
 }
+    
 If (!destPath)
     destPath = %UserProfile%\Mail\Thunderbird\profile
+If (!mailDomain)
+    mailDomain = mobilmir.ru
 
 Gui -Resize -MaximizeBox  
 Gui Add, Text, Section, Полный адрес email: 
-Gui Add, Edit, ys-2 vfullEmail, %MailUserId%@%mailDomain%
+Gui Add, Edit, ys-2 vfullEmail, %mailUserId%@%mailDomain%
 Gui Add, Text, xm Section, Папка профиля:
 Gui Add, Edit, ys-2 w300 vdestPath, %destPath%
 Gui Add, Text, xm Section, Имя отправителя (в формате: «Имя Фамилия»):
