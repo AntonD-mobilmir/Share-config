@@ -1,6 +1,6 @@
 ﻿{
- "distribution" : {
-    "msi":true,"system_level":true,"verbose_logging":true,
+  "distribution" : {
+    "msi":true,"system_level":true,"verbose_logging":false,
     "skip_first_run_ui" : true,
     "show_welcome_page" : true,
     "import_search_engine" : false,
@@ -10,14 +10,76 @@
     "make_chrome_default" : true,
     "import_bookmarks": false,
     "import_bookmarks_from_file": "{ProgramFiles}\\Google\\Chrome\\Application\\bookmarks_office.html"
- },
- "first_run_tabs" : [
-   "https://sites.google.com/a/mobilmir.ru/help/rules/info-for-newbies",
-   "new_tab_page",
-   "welcome_page"
- ],
-
- "extensions": {
+  },
+  "profile" : {
+    "content_settings" : {
+      "exceptions" : {
+        "notifications" : {
+          "https://calendar.google.com:443,*" : {
+            "setting" : 1
+          },
+          "https://chat.google.com:443,*" : {
+            "setting" : 1
+          },
+          "https://mail.google.com:443,*" : {
+            "setting" : 1
+          },
+          "https://meet.google.com:443,*" : {
+            "setting" : 1
+          },
+          "https://drive.google.com:443,*" : {
+            "setting" : 1
+          },
+          "https://itmobilmirru.freshservice.com:443,*" : {
+            "setting" : 1
+          },
+          "https://desk.zoho.com:443,*" : {
+            "setting" : 1
+          },
+          "https://1ccg26.freshdesk.com:443,*" : {
+            "setting" : 1
+          },
+          "https://itmobilmirru.freshdesk.com:443,*" : {
+            "setting" : 1
+          },
+          "https://mail.protonmail.com:443,*" : {
+            "setting" : 1
+          },
+          "https://mail.yandex.ru:443,*" : {
+            "setting" : 1
+          },
+          "https://trello.com:443,*" : {
+            "setting" : 1
+          },
+          "https://web.skype.com:443,*" : {
+            "setting" : 1
+          },
+          "https://web.telegram.org:443,*" : {
+            "setting" : 1
+          },
+          "https://web.whatsapp.com:443,*" : {
+            "setting" : 1
+          }
+        }
+      }
+    },
+    "default_content_setting_values" : {
+      "notifications" : 2
+    }
+  },
+  "bookmark_bar" : {
+    "show_apps_shortcut" : false,
+    "show_on_all_tabs" : false
+  },
+  "first_run_tabs" : [
+    "chrome://flags/#account-consistency",
+    "chrome://welcome/?variant=everywhere",
+    "chrome://settings/content/notifications",
+    "chrome://extensions/",
+    "chrome://apps",
+    "https://sites.google.com/a/mobilmir.ru/help/rules/info-for-newbies"
+  ],
+  "extensions": {
     "settings": {
        "pgphcomnlaojlmmcjmiddhdapjpbgeoc": {
           "location": 1,
@@ -71,5 +133,20 @@
           "state": 1
        }
     }
- }
+  },
+  "custom_handlers" : {
+    "enabled" : false,
+    "registered_protocol_handlers": [
+      {
+        "default": true,
+        "protocol": "mailto",
+        "url": "https://mail.google.com/mail/?extsrc=mailto&url=%s"
+      },
+      {
+        "default": true,
+        "protocol": "webcal",
+        "url": "https://calendar.google.com/calendar/r?cid=%s"
+      }
+    ]
+  }
 }
