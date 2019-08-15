@@ -32,14 +32,6 @@ rem FOR /F "usebackq tokens=* delims=" %%I IN (`ECHO %ProfilesDirectory%`) DO SE
     rem %SetACLexe% -on "%ProfilesDirectory%" -ot file -actn clear -clr dacl -actn ace -ace "n:%UIDAuthenticatedUsers%;p:FILE_ADD_SUBDIRECTORY;i:np;m:set" -ignoreerr -silent
     FOR /D %%I IN ("%ProfilesDirectory%\*.*") DO CALL :AskIfToProcessHomeDir "%%~nxI" && CALL "%~dp0FSACL_Homedir.cmd" "%%~I"
     
-    IF EXIST "d:\1S\Rarus\ShopBTS" PUSHD "d:\1S\Rarus\ShopBTS" && (
-	CALL :ResetACL .
-	%SetACLexe% -on . -ot file -actn ace -ace "n:%UIDUsers%;p:change" -ignoreerr -silent
-	rem TODO: MOdifyNoExecute *.*; ReadExecute *.DLL *.EXE
-	rem     CALL "%srcpath%FSACL_AdmFullUserModifyNoExecute.cmd" Users Flags Jobs SYSLOG
-	POPD
-    )
-
     ECHO Разрешение чтения и выполнения для системных папок 
     CALL :MakeDirsReadOnlyForUsers "%UIDAuthenticatedUsers%" "%UIDUsers%"
     ECHO Разрешение чтения и выполнения для Thunderbird\AddressBook и Distributives
