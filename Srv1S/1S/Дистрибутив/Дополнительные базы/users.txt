@@ -1,6 +1,5 @@
 Anton.Derbenev
 Karina.Razuvaeva
 1S-contractor
-Vladimir.Krotov
-Anton.Mixajlov
 Sergej.Golik
+petr.gavrilko
