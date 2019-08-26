@@ -3,7 +3,7 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 SETLOCAL ENABLEEXTENSIONS
 
-    IF "%~1"="" (
+    IF "%~1"=="" (
         ECHO Сбрасывает пароль пользователя, переименовывает его и удаляет из группы managers@mobilmir.ru
         ECHO Использование:
         ECHO     %0 ^<email^> [новый_пароль]
@@ -24,10 +24,10 @@ SETLOCAL ENABLEEXTENSIONS
     IF DEFINED recordpwd (
         MKDIR "%TEMP%\%~n0.e"
         CIPHER /E "%TEMP%\%~n0.e"
+        (
+            ECHO %pwd%
+        )>>"%TEMP%\%~n0.e\password %domain% %emailid%.txt"
     )
-    IF DEFINED recordpwd (
-        ECHO %pwd%
-    )>>"%TEMP%\%~n0.e\password %domain% %emailid%.txt"
     
     CALL "%~dp0switchdomain.cmd" "%domain%"
     CALL "%~dp0gam.cmd" update user %1 firstname "-" lastname "(пользователь удален)" gal off username "-rm-%emailid%" password "%pwd%" nohash changepassword off
@@ -40,7 +40,11 @@ SETLOCAL ENABLEEXTENSIONS
         ECHO %DATE% %TIME%
         CALL "%~dp0gam.cmd" info user "-rm-%~1"
     ) >>"%~dp0userinfo %domain% %emailid%.txt"
+    CHCP 1251
+)
+(
     TYPE "%~dp0userinfo %domain% %emailid%.txt"
+    CHCP 866
 EXIT /B
 )
 :GeneratePassword

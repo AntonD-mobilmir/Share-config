@@ -105,12 +105,10 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     (
         IF DEFINED errors (
             CALL :EchoErrors
-            ECHO ! %deptLogin%	%newPasswd%
-        ) ELSE (
-            ECHO %deptLogin%	%newPasswd%
-        )
+            EXIT /B 1
+        ) ELSE ECHO [+]	%deptLogin%@%mailboxDomain%	%newPasswd%
     )>>"%~dpn0.log"
-EXIT /B %errors%
+EXIT /B 0
 )
 
 :SetOrAsk <varname> <prompt> <value>
@@ -137,6 +135,6 @@ EXIT /B
 )
 :EchoErrors
 @(
-    ECHO %errors:~2%
+    ECHO !%deptLogin%@%mailboxDomain%	%errors:~2%
 EXIT /B
 )
