@@ -38,10 +38,7 @@ Loop Parse, A_UserName
 ; Non-shared user actions
 
 ; https://redbooth.com/a/#!/projects/59756/tasks/33304584
-If (InStr(SubStr(A_UserName, 2, 3), "."))
-    RunCreateMTProfile("thunderbird\create_new_profile_askparm.ahk")
-Else
-    RunCreateMTProfile("thunderbird\create_new_profile.ahk")
+RunCreateMTProfile("thunderbird\create_new_profile_askparm.ahk")
 Finish()
 
 SharedUserActions() {
