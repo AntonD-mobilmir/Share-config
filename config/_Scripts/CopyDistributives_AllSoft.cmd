@@ -3,8 +3,12 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 SETLOCAL ENABLEEXTENSIONS
 
+    SET "robocopyDcopy=DAT"
+    CALL "%~dp0CheckWinVer.cmd" 8 || SET "robocopyDcopy=T"
+)
+(
     IF NOT EXIST "D:\Distributives\Soft" MKDIR "D:\Distributives\Soft"
-    %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Soft" "D:\Distributives\Soft" /MIR /DCOPY:DAT /SL /XO /ETA /XD "\\Srv1S-B.office0.mobilmir\Distributives\Soft\AntiViruses AntiTrojans\Microsoft Security Essentials" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\Network\Chat Messengers" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\Office Text Publishing\Text Documents" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\PreInstalled\manual"
+    %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Soft" "D:\Distributives\Soft" /MIR /DCOPY:%robocopyDcopy% /SL /XO /ETA /XD "\\Srv1S-B.office0.mobilmir\Distributives\Soft\AntiViruses AntiTrojans\Microsoft Security Essentials" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\Network\Chat Messengers" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\Office Text Publishing\Text Documents" "\\Srv1S-B.office0.mobilmir\Distributives\Soft\PreInstalled\manual"
 EXIT /B
 )
 rem IF NOT DEFINED exe7z CALL "%~dp0find7zexe.cmd" || PAUSE

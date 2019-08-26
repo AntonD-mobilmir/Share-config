@@ -33,11 +33,15 @@ IF /I "%argflag%"==":" (
     SET "arg="
     GOTO :%argvalue%
 )
-
+(
 TITLE Initial config
+
+SET "robocopyDcopy=DAT"
+CALL "%~dp0_Scripts\CheckWinVer.cmd" 8 || SET "robocopyDcopy=T"
 %AutoHotkeyExe% /ErrorStdOut "%~dp0_Scripts\GUI\AcquireAndRecordMailUserId.ahk"
 IF NOT DEFINED instSoftUpdScripts CALL :Ask_SetupLocalDownloader
 IF NOT DEFINED Inst1S CALL :AskAbout1S
+)
 IF "%Inst1S%"=="1" (
     %SystemRoot%\System32\NET.exe USER Продавец /ADD /passwordchg:no /passwordreq:no
     %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Продавец' set PasswordExpires=false
@@ -46,8 +50,8 @@ IF "%Inst1S%"=="1" (
     %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
 )
 (
-MKDIR d:\Distributives\Drivers\Canon
-START "Copying Drivers\Canon\Laser MF" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Drivers\Canon\Laser MF" "d:\Distributives\Drivers\Canon" /MIR /DCOPY:DAT /ETA
+MKDIR "d:\Distributives\Drivers\Canon"
+START "Copying Drivers\Canon\Laser MF" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Drivers\Canon\Laser MF" "d:\Distributives\Drivers\Canon" /MIR /DCOPY:%robocopyDcopy% /ETA
 
 START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
 

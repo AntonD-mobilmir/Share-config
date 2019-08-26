@@ -9,6 +9,9 @@
     )
     SETLOCAL ENABLEEXTENSIONS
     IF NOT "%~2"=="" SET "copyBackup=%~2"
+
+    SET "robocopyDcopy=DAT"
+    CALL "%~dp0CheckWinVer.cmd" 8 || SET "robocopyDcopy=T"
     
     FOR /f "usebackq tokens=3*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname"`) DO SET "Hostname=%%~J"
     IF NOT DEFINED PassFilePath (
@@ -128,7 +131,7 @@ EXIT /B
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /grant "*S-1-5-32-544:(OI)(CI)F" /grant "*S-1-5-18:(OI)(CI)F" /grant "*S-1-5-32-551:(OI)(CI)F" /grant "*S-1-3-0:(OI)(CI)F" /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /inheritance:r /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
-    START "Копирование образа в %~1\WindowsImageBackup\%Hostname%" /MIN %SystemRoot%\System32\robocopy.exe "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /MIR /DCOPY:DAT /TBD /ETA
+    START "Копирование образа в %~1\WindowsImageBackup\%Hostname%" /MIN %SystemRoot%\System32\robocopy.exe "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /MIR /DCOPY:%robocopyDcopy% /TBD /ETA
     IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
 EXIT /B
 )

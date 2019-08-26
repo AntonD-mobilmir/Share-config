@@ -12,11 +12,14 @@ SETLOCAL ENABLEEXTENSIONS
         IF NOT DEFINED configDir CALL "%~dp0_Scripts\copy_defaultconfig_to_localhost.cmd"
         IF NOT DEFINED configDir ECHO Место назначения не определено. Сначала стоит установить _get_defaultconfig_source.cmd & PAUSE & EXIT /B
     )
+    
+    SET "robocopyDcopy=DAT"
+    CALL "%~dp0_Scripts\CheckWinVer.cmd" 8 || SET "robocopyDcopy=T"
 )
 (
     IF "%configDir:~0,2%"=="\\" ECHO Папка конфигурации - в сети, обновлять можно только локальную папку! & PAUSE & EXIT /B
     IF NOT EXIST "%configDir%" MKDIR "%configDir%" || EXIT /B
-    IF EXIST "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\*.*" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config" "%configDir%" /MIR /DCOPY:DAT /SL /XO && EXIT /B
+    IF EXIST "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\*.*" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config" "%configDir:~0,-1%" /MIR /DCOPY:%robocopyDcopy% /SL /XO && EXIT /B
     
     ECHO Локальная конфигурация не обновлена!>&2
 EXIT /B 1
