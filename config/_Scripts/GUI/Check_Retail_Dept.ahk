@@ -29,7 +29,8 @@ WinBuildToName := {"10.0": { 10586: "1511"
                            , 14393: "1607"
                            , 15063: "1703"
                            , 17134: "1709"
-                           , 17763: "1809" } }
+                           , 17763: "1809"
+                           , 18362: "1903" } }
 OSVersionMinor := OSVersionObj[2] "." OSVersionObj[3]
 If (WinBuildToName.HasKey(OSVersionMinor)) {
         OSVersionNameForLog := " " WinBuildToName[OSVersionMinor][OSVersionObj[4]]

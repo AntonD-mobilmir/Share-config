@@ -108,14 +108,13 @@ EXIT /B
     )>>"%dirPlainOut%\%outPlainFName%" 2>&1
     TYPE "%dirPlainOut%\%outPlainFName%"
     IF DEFINED UserAddError EXIT /B
-    IF DEFINED gpgencOut CALL :GpgEncryptPassword
-    
     IF DEFINED AutohotkeyExe IF EXIST "%dirPlainOut%\%outPlainFName%" (
         rem curl -F "file=@%dirPlainOut%\%outPlainFName%"
         (
             ECHO %newPasswd%
         ) | %AutohotkeyExe% "%~dp0storeTemporaryPassword.ahk" "%newUsername%" >>"%dirPlainOut%\%outPlainFName%"
     )
+    IF DEFINED gpgencOut CALL :GpgEncryptPassword
 )
 :setupgroups
 @(
