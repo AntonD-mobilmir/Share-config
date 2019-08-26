@@ -1,7 +1,7 @@
 ﻿;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-PostWithProxies(URL,ByRef POSTDATA,tries:=20,retryDelay:=1000, debug:=0) {
+PostWithProxies(URL,ByRef POSTDATA,tries:=20,retryDelay:=1000) {
     protoFound := RegexMatch(URL, "([^:]{3,6})://", URLproto)
     
     ; Очень странно: в Windows 7 префикс протокола ("https://") нужен для отправки через HTTPS, в Windows 10 – наоборот мешает :(
@@ -18,7 +18,7 @@ PostWithProxies(URL,ByRef POSTDATA,tries:=20,retryDelay:=1000, debug:=0) {
     {
 	For i,proxy in proxies
 	{
-	    Try If (success := SendWebRequest(URL, POSTDATA, proxy, debug))
+	    Try If (success := WinHttpPOST(URL, POSTDATA, proxy))
 		return success
 	}
 	Sleep retryDelay
@@ -27,11 +27,21 @@ PostWithProxies(URL,ByRef POSTDATA,tries:=20,retryDelay:=1000, debug:=0) {
     return 0
 }
 
-SendWebRequest(URL, POSTDATA, proxy:="", debug:=0) {
-    If (IsObject(debug)) {
+;formerly SendWebRequest
+WinHttpPOST(URL, POSTDATA, proxy:="") {
+    global debug
+    static WinHttpRequestObjectName
+    If (IsObject(debug))
 	FileAppend Отправка через %proxy% на адрес %URL%`nзапроса`n%POSTDATA%`n, **
+    If (WinHttpRequestObjectName) {
+        WebRequest := ComObjCreate(WinHttpRequestObjectName)
+    } Else {
+        For i, WinHttpRequestObjectName in ["WinHttp.WinHttpRequest.5.1", "WinHttp.WinHttpRequest"] {
+            Try WebRequest := ComObjCreate(WinHttpRequestObjectName)
+            If (IsObject(WebRequest))
+                break
+        }
     }
-    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     WebRequest.Open("POST", URL, false)
     WebRequest.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
     If (proxy!="")
@@ -111,7 +121,7 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 	    EchoWrongArg(arg)
 	}
     }
-    ExitApp !PostWithProxies(URL,POSTDATA,tries,retryDelay,debug)
+    ExitApp !PostWithProxies(URL,POSTDATA,tries,retryDelay)
 }
 
 EchoWrongArg(arg) {

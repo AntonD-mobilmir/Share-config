@@ -6,7 +6,9 @@
 EnvGet UserProfile,UserProfile
 EnvGet mailUserId,mailUserId
 destPath := A_Args[1]
-mailDomain := A_Args[2]
+mailUserID := A_Args[2]
+If (atPos := InStr(mailUserID, "@"))
+    mailDomain := SubStr(mailUserID, atPos+1), mailUserID := SubStr(mailUserID, 1, atPos-1)
 
 If (!mailUserId) {
     EnvGet GetSharedmailUserIdScript,GetSharedmailUserIdScript
@@ -32,15 +34,16 @@ If (mailUserId) { ; Компьютер в рознице либо другой �
         FileDelete %testfname%
     }
     
-    Try { ;for GetURL
-        senderNameCommentSuffix := A_ComputerName ~= "-K$" ? ", касса" : ""
-        ;https://docs.google.com/spreadsheets/d/1VPfguqo2fBt5a23Fu8cl_KtOSrMLQOiDuxs17YdmKyg/
-        deptsList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vS1VdSPrtzh81PwFn--mytpZqsgjmTZBtAEzhEINXBnOt-b8gSuD3s5xqyj5-bC1uLw1RhZgwPxFzyV/pub?gid=0&single=true&output=tsv")
+    ;https://docs.google.com/spreadsheets/d/1VPfguqo2fBt5a23Fu8cl_KtOSrMLQOiDuxs17YdmKyg/
+    Try deptsList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vS1VdSPrtzh81PwFn--mytpZqsgjmTZBtAEzhEINXBnOt-b8gSuD3s5xqyj5-bC1uLw1RhZgwPxFzyV/pub?gid=0&single=true&output=tsv")
+    
+    If (deptsList) {
         Loop Parse, deptsList, `n, `r
         {
             ;dept-name email-ID@	mailUserId	email	alias...
             line := StrSplit(A_LoopField, "`t",,4)
             If (line[2]=mailUserId && RegexMatch(line[1], "A)(?P<Name>.+) (?P<ID>[^ ]+)@", dept)) {
+                senderNameCommentSuffix := A_ComputerName ~= "-K$" ? ", касса" : ""
                 fullName = %deptName% (отдел%senderNameCommentSuffix%)
                 atPos := InStr(line[3], "@")
                 mailUserId := SubStr(line[3], 1, atPos-1)
@@ -88,4 +91,4 @@ ButtonCancel:
 
 #include *i %A_LineFile%\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
 #include *i %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk
-#include *i %A_LineFile%\..\..\_Scripts\Lib\XMLHTTP_Request.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\GetURL.ahk

@@ -57,4 +57,4 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
 }
 
 #include %A_LineFile%\..\..\Lib\GetMailUserId.ahk
-#include %A_LineFile%\..\..\Lib\XMLHTTP_Request.ahk
+#include %A_LineFile%\..\..\Lib\GetURL.ahk

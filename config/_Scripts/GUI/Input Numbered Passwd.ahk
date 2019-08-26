@@ -140,7 +140,7 @@ RecordPassword(passwd) {
         }
     } Until !found
     
-    While !XMLHTTP_Request("POST", GetSecretURLs(3), "ID=" UriEncode("'" passwordID) "&pwd=" UriEncode("'" passwd), response := "", {"Content-Type": "application/x-www-form-urlencoded"}) {
+    While !HTTPReq("POST", GetSecretURLs(3), "ID=" UriEncode("'" passwordID) "&pwd=" UriEncode("'" passwd), response := "", {"Content-Type": "application/x-www-form-urlencoded"}) {
         MsgBox 53, Запись пароля с ID %postID% в таблицу, При отправке пароля произошла ошибка.`n`n[Попытка %A_Index%`, автоповтор – 5 минут]`n`n%response%, 300
         IfMsgBox Cancel
             Throw Exception("Отправка пароля отменена")
@@ -196,4 +196,5 @@ CheckPasswordFileLine(ByRef line, ByRef passwd) {
 }
 
 #include %A_LineFile%\..\..\Lib\URIEncodeDecode.ahk
-#include %A_LineFile%\..\..\Lib\XMLHTTP_Request.ahk
+#include %A_LineFile%\..\..\Lib\HTTPReq.ahk
+#include %A_LineFile%\..\..\Lib\GetURL.ahk

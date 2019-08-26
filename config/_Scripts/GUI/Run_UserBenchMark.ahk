@@ -388,7 +388,7 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
     Menu Tray, Tip, %stageDetails%`n
     FileAppend %A_Now% %stageDetails%`n,*,CP866
     
-    While (!XMLHTTP_Post("https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse", POSTDATA)) {
+    While (!HTTPReq("POST", "https://docs.google.com/a/mobilmir.ru/forms/d/1O6UrS9qArvi8r7Pi9LeL79KfrZNIv9eDBVGfCI9zCUo/formResponse", POSTDATA)) {
 	Progress Off
 	errText = При отправке произошла ошибка`, HTTP-код %statusHTTP%
 	FileAppend %A_Now% %errText%`n,*,CP866
@@ -492,7 +492,8 @@ FillGroups() {
 ;Could not initialize Direct3D 10. This application requires a Direct3D 10 class
 ;device (hardware or reference rasterizer) running on Windows Vista (or later).
 
-#include %A_LineFile%\..\..\Lib\XMLHTTP_Post.ahk
+#include %A_LineFile%\..\..\Lib\HTTPReq.ahk
+#include %A_LineFile%\..\..\Lib\GetURL.ahk
 #include %A_LineFile%\..\..\Lib\URIEncodeDecode.ahk
 #include %A_LineFile%\..\..\Lib\CutTrelloCardURL.ahk
 #include %A_LineFile%\..\..\Lib\GetKnownFolder.ahk

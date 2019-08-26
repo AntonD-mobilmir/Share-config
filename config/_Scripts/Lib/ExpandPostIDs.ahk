@@ -125,5 +125,5 @@ Cached_GetTcpipParameters(prmName) {
     return val
 }
 
-#include %A_LineFile%\..\XMLHTTP_Request.ahk
 #include %A_LineFile%\..\ReadTrelloIdFromTxt.ahk
+#include %A_LineFile%\..\GetURL.ahk

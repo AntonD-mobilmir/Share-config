@@ -17,7 +17,7 @@ PostGoogleForm(URL, ByRef kv, tries:=20, retryDelay:=20000) {
 	POSTDATA .= k . "=" . UriEncode(v) . "&"
     POSTDATA := SubStr(POSTDATA,1,-1)
     
-    While !(lastResult := XMLHTTP_Post(URL, POSTDATA)) && tries-- ; URL, POSTDATA, response
+    While !(lastResult := HTTPReq("POST", URL, POSTDATA)) && tries-- ; URL, POSTDATA, response
 	Sleep retryDelay
     return lastResult
 }
@@ -39,5 +39,5 @@ If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
     ExitApp !PostGoogleForm(URL,kv)
 }
 
-#include %A_LineFile%\..\XMLHTTP_Post.ahk
+#include %A_LineFile%\..\HTTPReq.ahk
 #include %A_LineFile%\..\URIEncodeDecode.ahk

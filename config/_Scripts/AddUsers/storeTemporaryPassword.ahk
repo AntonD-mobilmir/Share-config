@@ -9,7 +9,7 @@ stdin.Close()
 
 accname := A_Args[1]
 
-If (XMLHTTP_Post("https://file.io/", "text=" pw, response := "")) {
+If (HTTPReq("POST", "https://file.io/", "text=" pw, response := "")) {
     ;{"success":true,"key":"6lL5lq","link":"https://file.io/6lL5lq","expiry":"14 days"}
     ;https://temporary.pw/?key=6lL5lq
     resp := JSON.Load(response)
@@ -35,7 +35,7 @@ If (XMLHTTP_Post("https://file.io/", "text=" pw, response := "")) {
     ExitApp 2
 }
 
+#include %A_LineFile%\..\..\Lib\HTTPReq.ahk
 #include %A_LineFile%\..\..\Lib\JSON.ahk
 #include %A_LineFile%\..\..\Lib\GetPseudoSecrets.ahk
 #include %A_LineFile%\..\..\Lib\PostGoogleFormWithPostID.ahk
-;#include %A_LineFile%\..\..\Lib\XMLHTTP_Post.ahk
