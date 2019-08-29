@@ -43,7 +43,7 @@ WinHTTPReqWithProxies(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef respons
     }
     
     For i,proxy in proxies
-        If (success := WinHttpRequest(method, URL, POSTDATA, response, moreHeaders, proxy))
+        Try If (success := WinHttpRequest(method, URL, POSTDATA, response, moreHeaders, proxy))
             return success
     
     return 0

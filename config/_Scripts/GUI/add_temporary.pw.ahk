@@ -17,7 +17,7 @@ If (!HTTPReq("POST", "https://file.io/", "text=" pw, response := ""))
 ;https://temporary.pw/?key=6lL5lq
 resp := JSON.Load(response)
 FileAppend % resp.key "`n" response "`n", *
-url = "https://temporary.pw/?key=" resp.key
+url := "https://temporary.pw/?key=" resp.key
 Clipboard := url
 MsgBox Ссылка %url% скопирована.
 ExitApp 0

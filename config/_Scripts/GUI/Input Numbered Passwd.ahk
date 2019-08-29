@@ -28,11 +28,13 @@ WriteAndShowPassword(ByRef passwd, ByRef fileToAppendPassword := -1) {
     passwordID := RecordPassword(passwd)
     ;Соответствия в https://docs.google.com/a/mobilmir.ru/spreadsheets/d/1lUGVjDWEG3znDUKy-l59Ewt95eFrIgUO-L8dy3lxNWQ
     
-    Gui Add, Button, xm section gCopypasswordID, Скопировать
-    Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwordID%
-    Gui Add, Button, xm section gCopypasswd, Скопировать
+    Gui Add, Button, xm section gCopypasswordID, Скопировать (&n)
     Gui Font, , Consolas
-    Gui Add, Edit, ys ReadOnly gSelectAllCopy , %passwd%
+    Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwordID%
+    Gui Font
+    Gui Add, Button, xm section gCopypasswd, Скопировать (&p)
+    Gui Font, , Consolas
+    Gui Add, Edit, ys ReadOnly gSelectAllCopy, %passwd%
     Gui Font
     Gui Add, Button, xm section gReload, Получить ещё один код&.
     Gui Show
@@ -47,28 +49,28 @@ WriteAndShowPassword(ByRef passwd, ByRef fileToAppendPassword := -1) {
     }
     
     return passwordID
+
+    CopypasswordID:
+    Copypasswd:
+        copyVarName:=SubStr(A_ThisLabel,5)
+        Clipboard:=%copyVarName%
+        return
+
+    SelectAllCopy:
+        EM_SETSEL := 0x00B1
+        ;A_Gui, A_GuiControl, A_GuiEvent, and A_EventInfo.
+        Gui +LastFound
+        ControlFocus %CtrlHwnd%
+        ;https://autohotkey.com/board/topic/39793-how-to-select-the-text-in-an-edit-control/
+        SendMessage %EM_SETSEL%, 0, -1, %CtrlHwnd%
+    ;    MsgBox %ERRORLEVEL%
+    return
 }
 
 GuiEscape:
 GuiClose:
 ButtonCancel:
     ExitApp
-
-CopypasswordID:
-Copypasswd:
-    copyVarName:=SubStr(A_ThisLabel,5)
-    clipboard:=%copyVarName%
-    return
-
-SelectAllCopy:
-    EM_SETSEL := 0x00B1
-    ;A_Gui, A_GuiControl, A_GuiEvent, and A_EventInfo.
-    Gui +LastFound
-    ControlFocus %CtrlHwnd%
-    ;https://autohotkey.com/board/topic/39793-how-to-select-the-text-in-an-edit-control/
-    SendMessage %EM_SETSEL%, 0, -1, %CtrlHwnd%
-;    MsgBox %ERRORLEVEL%
-return
 
 Reload:
     Reload

@@ -149,51 +149,6 @@ ExtractSNsFromCardText() {
 	  , "SerialNumber": "\w+" }
 }
 
-CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "", ByRef othersw := "") {
-    If (!IsObject(query))
-	query := Object()
-    
-    args := ParseScriptCommandLine("""")
-    Loop % args[""]
-    {
-	argv := args[A_Index]
-	If (option) {
-	    options[option] := argv
-	    option=
-	} Else If (parmName) {
-	    parmValue := argv
-	} Else {
-	    If (SubStr(argv, 1, 1) == "/") {
-		option := SubStr(argv, 2)
-		continue
-	    } Else {
-		If (!colon := InStr(argv, ":")) {
-                    If (IsByRef(othersw)) {
-                        If(IsObject(othersw))
-                            othersw[A_Index] := argv
-                        Else
-                            othersw .= argv " "
-                    } Else
-                        Throw Exception("Param name should end with a colon", A_LineFile ": " A_ThisFunc, argv)
-                } Else {
-                    parmName := Trim(SubStr(argv, 1, colon-1))
-                    parmValue := Trim(SubStr(argv, colon+1)) ; if "", this arg is just a param name, next arg is parm value
-                }
-	    }
-	}
-	If (parmValue) { 
-	    If (query.HasKey(parmName)) {
-		If (!IsObject(query[parmName]))
-		    query[parmName] := {query[parmName]: parmName "0"}
-		query[parmName][parmValue] := parmName A_Index
-	    } Else
-		query[parmName] := parmValue
-	    parmName=
-	}
-    }
-    return query
-}
-
 ExtendedFindTrelloCard_LogMatches(delimCardMatch, ByRef lastMatch, ByRef cards, ByRef extSearch:="", ByRef path := "", ByRef coding := "") {
     If (path=="") {
 	path := "*"
@@ -214,4 +169,4 @@ ExtendedFindTrelloCard_LogMatches(delimCardMatch, ByRef lastMatch, ByRef cards, 
 
 #include %A_LineFile%\..\EscapeRegex.ahk
 #include %A_LineFile%\..\ExtractHostnameFromTrelloCardName.ahk
-#include %A_LineFile%\..\ParseScriptCommandLine.ahk
+#include *i %A_LineFile%\..\JSON.ahk

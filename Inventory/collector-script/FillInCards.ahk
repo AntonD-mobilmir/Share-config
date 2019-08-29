@@ -237,3 +237,4 @@ LogError(ByRef msg, ByRef morepaths*) {
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\TrelloAPI1.ahk
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\GetFingerprint.ahk
 #include %A_ScriptDir%\..\..\config\_Scripts\Lib\Expand.ahk
+#include %A_ScriptDir%\..\..\config\_Scripts\Lib\CommandLineArgs_to_FindTrelloCardQuery.ahk

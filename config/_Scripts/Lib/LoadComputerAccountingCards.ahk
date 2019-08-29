@@ -38,5 +38,5 @@ LoadComputerAccountingCards(ByRef lists := "") {
     return cards
 }
 
+#include %A_LineFile%\..\JSON.ahk
 #include *i %A_LineFile%\..\find7zexe.ahk
-#include *i %A_LineFile%\..\JSON.ahk

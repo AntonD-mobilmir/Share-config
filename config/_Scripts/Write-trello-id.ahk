@@ -133,3 +133,4 @@ CountSearchRuns(ByRef matches := "", ByRef cards := "", ByRef extSearch := "") {
 #include <EscapeRegex>
 #include <FindTrelloCard>
 #include <LoadComputerAccountingCards>
+#include <CommandLineArgs_to_FindTrelloCardQuery>

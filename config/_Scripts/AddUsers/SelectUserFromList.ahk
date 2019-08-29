@@ -10,7 +10,7 @@ EnvGet SystemRoot,SystemRoot
 rowCount:=0
 usersData := {}
 currentBlock := {}
-Loop Read, \\Srv0.office0.mobilmir\Документы\IT\Справочники\Srv0-users-list.txt
+Loop Read, \\Srv1S-B.office0.mobilmir\Users\Public\Shares\Документы\IT\Справочники\Srv0-users-list.txt
 {
     If (line := Trim(A_LoopReadLine)) {
         sep := InStr(line, "=")

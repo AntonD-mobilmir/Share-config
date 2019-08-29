@@ -22,4 +22,4 @@ Run %pathReport%
 ExitApp
 
 #include <InvReportsToSpreadsheet>
-#include <XMLHTTP_Request>
+#include <GetURL>

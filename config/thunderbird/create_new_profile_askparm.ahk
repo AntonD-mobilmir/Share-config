@@ -34,24 +34,9 @@ If (mailUserId) { ; Компьютер в рознице либо другой �
         FileDelete %testfname%
     }
     
-    ;https://docs.google.com/spreadsheets/d/1VPfguqo2fBt5a23Fu8cl_KtOSrMLQOiDuxs17YdmKyg/
-    Try deptsList := GetURL("https://docs.google.com/spreadsheets/d/e/2PACX-1vS1VdSPrtzh81PwFn--mytpZqsgjmTZBtAEzhEINXBnOt-b8gSuD3s5xqyj5-bC1uLw1RhZgwPxFzyV/pub?gid=0&single=true&output=tsv")
-    
-    If (deptsList) {
-        Loop Parse, deptsList, `n, `r
-        {
-            ;dept-name email-ID@	mailUserId	email	alias...
-            line := StrSplit(A_LoopField, "`t",,4)
-            If (line[2]=mailUserId && RegexMatch(line[1], "A)(?P<Name>.+) (?P<ID>[^ ]+)@", dept)) {
-                senderNameCommentSuffix := A_ComputerName ~= "-K$" ? ", касса" : ""
-                fullName = %deptName% (отдел%senderNameCommentSuffix%)
-                atPos := InStr(line[3], "@")
-                mailUserId := SubStr(line[3], 1, atPos-1)
-                mailDomain := SubStr(line[3], atPos+1)
-                break
-            }
-        }
-    }
+    fullName := FindDeptById(mailUserId, line) " (отдел" (A_ComputerName ~= "i)-K$" ? ", касса" : "") ")"
+    If (!mailDomain)
+        mailDomain := line["mailDomain"]
 } Else {
     mailUserId := A_UserName
     Try fullName := Func("WMIGetUserFullname").Call(2)
@@ -91,4 +76,4 @@ ButtonCancel:
 
 #include *i %A_LineFile%\..\..\_Scripts\Lib\ReadSetVarFromBatchFile.ahk
 #include *i %A_LineFile%\..\..\_Scripts\Lib\WMIGetUserFullname.ahk
-#include *i %A_LineFile%\..\..\_Scripts\Lib\GetURL.ahk
+#include *i %A_LineFile%\..\..\_Scripts\Lib\FindDeptById.ahk

@@ -25,4 +25,6 @@ CutTrelloBoardURL(ByRef url, ByRef trelloBoardURLRegex) {
     Else
         return url
 }
-#include <CutTrelloCardURL>
+
+#include %A_LineFile%\..\CutTrelloCardURL.ahk
+#include %A_LineFile%\..\RegexProcess.ahk

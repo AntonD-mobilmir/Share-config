@@ -86,6 +86,7 @@ If (A_IsAdmin) {
     AddLog("Скрипт запущен с правами администратора",A_UserName,1)
     Run %SystemRoot%\System32\net.exe user Aleksandr.Gladkov /delete,,Min
     Run %SystemRoot%\System32\net.exe user Aleksej.Olejnikov /delete,,Min
+    Run %SystemRoot%\System32\net.exe user Nikolaj.Kravchenko /delete,,Min
 
     If (usingOfficeSrv && FileExist("D:\Distributives\Soft\PreInstalled\auto\SysUtils\*.7z")) {
         lDistributives := "D:\Distributives"

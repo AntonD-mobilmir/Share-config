@@ -11,9 +11,9 @@ Loop 20
     passwd .= SubStr(AllowedChars,charNo,1)
 }
 
-passwdNo := WriteAndShowPassword(passwd)
+passwordID := WriteAndShowPassword(passwd)
 
-Run % "https://docs.google.com/forms/d/1Wy8ZFhfnV1VGYN_vHabQvr6Ziy9E9GTbgaua64CcORU/viewform?entry.287789183=" . URIEncode(passwdNo)
+Run % "https://docs.google.com/forms/d/1Wy8ZFhfnV1VGYN_vHabQvr6Ziy9E9GTbgaua64CcORU/viewform?entry.287789183=" . URIEncode(passwordID)
 Run https://docs.google.com/spreadsheets/d/179XOMsXbLEOoGIaN6_4gE43RVJ8fyQ57dw1DLe6XnF8/preview#gid=913963513
 
 Exit

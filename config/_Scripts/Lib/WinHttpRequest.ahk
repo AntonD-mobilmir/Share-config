@@ -44,8 +44,6 @@ WinHttpRequest(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, B
 	    debug.What := e.What
 	    debug.Message := e.Message
 	    debug.Extra := e.Extra
-	    debug.Headers := WebRequest.GetAllResponseHeaders
-	    debug.Status := WebRequest.Status
             If (IsFunc(debug.cbError))
                 Func(debug.cbError).Call(e)
             Else
