@@ -50,7 +50,7 @@ IF "%Inst1S%"=="1" (
     %SystemRoot%\System32\wbem\wmic.exe path Win32_UserAccount where Name='Пользователь' set PasswordExpires=false
 )
 (
-MKDIR "d:\Distributives\Drivers\Canon"
+MKDIR "d:\Distributives\Drivers\Canon\Laser MF"
 START "Copying Drivers\Canon\Laser MF" %SystemRoot%\System32\robocopy.exe "\\Srv1S-B.office0.mobilmir\Distributives\Drivers\Canon\Laser MF" "d:\Distributives\Drivers\Canon" /MIR /DCOPY:%robocopyDcopy% /ETA
 
 START "Добавление стандартных администраторов" %comspec% /C "%~dp0_Scripts\AddUsers\Add_Admins.cmd"
