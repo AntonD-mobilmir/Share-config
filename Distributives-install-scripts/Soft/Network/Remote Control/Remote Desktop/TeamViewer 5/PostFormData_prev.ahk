@@ -27,7 +27,7 @@ If (FileExist(trelloIDpath)) {
 If (!configPost) { ; it may be defined when this script is included in "%USERPROFILE%\Dropbox\Developement\TeamViewer\Host\install_script\install.ahk"
     EnvGet configPost, DefaultsSource
     If (!configPost)
-	Try configPost := getDefaultConfig()
+	configPost := getDefaultConfig()
     If (configPost)
 	configPost .= "\TeamViewer\"
     If %1%
@@ -41,6 +41,8 @@ If (!configPost) { ; it may be defined when this script is included in "%USERPRO
 
 TrayTip %ahkName%, Запрос внешнего IP адреса через api.ipify.org
 Try extIP := getURL("https://api.ipify.org")
+If (!extIP)
+    getURLWinHTTP("https://api.ipify.org", , reqStatus, extIP)
 TrayTip
 
 SetRegView 32
@@ -77,7 +79,7 @@ Loop
 {
     If (A_TimeIdle < 5000)
         TrayTip %ahkName%, Отправка информации об установке в таблицу Google…,,1
-    success := HTTPReq("POST", URL, POSTDATA)
+    success := XMLHTTP_Post(URL, POSTDATA) || tryPOSTWithProxies(URL, POSTDATA)
     lastErr := A_LastError
     TrayTip
     If (!success)
@@ -90,6 +92,83 @@ Loop
 } Until success
 
 ExitApp !success
+
+tryPOSTWithProxies(URL, POSTDATA, ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
+    return ( sendWinHttpPOSTRequest(URL, POSTDATA, ReadProxy("HKEY_LOCAL_MACHINE"), aStatus, aResponse, aResponseHeaders)
+	  || sendWinHttpPOSTRequest(URL, POSTDATA, ReadProxy("HKEY_CURRENT_USER"), aStatus, aResponse, aResponseHeaders)
+	  || sendWinHttpPOSTRequest(URL, POSTDATA, "192.168.127.1:3128", aStatus, aResponse, aResponseHeaders)
+	  || sendWinHttpPOSTRequest(URL, POSTDATA, "", aStatus, aResponse, aResponseHeaders) )
+}
+
+getURLWinHTTP(URL, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
+    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    WebRequest.Open("GET", URL, false)
+    If (proxy!="")
+	WebRequest.SetProxy(2,proxy)
+    Try {
+	WebRequest.Send()
+	aResponseHeaders := WebRequest.GetAllResponseHeaders
+	aResponse := WebRequest.ResponseText
+	aStatus:=WebRequest.Status	;can be 200, 404 etc., including proxy responses
+    } catch e {
+	global err
+	err:=e
+    }
+    WebRequest := ""
+    If proxy
+	proxyText := %A_Space%(over proxy %proxy%)
+    FileAppend GET %URL%%proxyText%`n%aStatus%`n%aResponseHeaders%`n%aResponse%,*
+    return !err
+}
+
+sendWinHttpPOSTRequest(URL, POSTDATA, proxy="", ByRef aStatus:=false, ByRef aResponse:="", ByRef aResponseHeaders:="") {
+    global debug
+
+    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    WebRequest.Open("POST", URL, false)
+    WebRequest.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    If (proxy!="")
+	WebRequest.SetProxy(2,proxy)
+    Try {
+	WebRequest.Send(POSTDATA)
+	aResponseHeaders := WebRequest.GetAllResponseHeaders
+	aResponse := WebRequest.ResponseText
+	aStatus:=WebRequest.Status	;can be 200, 404 etc., including proxy responses
+    } catch e {
+	err:=e
+    }
+    WebRequest := ""
+    FileAppend POST %URL%`n%aStatus%`n%aResponseHeaders%`n%aResponse%,*
+    
+    If (debug==1) {
+	;http://www.autohotkey.com/board/topic/56987-com-object-reference-autohotkey-l/#entry358974
+;	static document
+;	Gui Add, ActiveX, w750 h550 vdocument, MSHTML:%aResponse%
+;	Gui Show
+	
+	MsgText := "Over proxy=" . proxy
+	    . "`nStatus=" . aStatus
+	    . "`nerror:`nWhat=" . err.What
+	    . "`nMessage=" . err.Message
+	    . "`nExtra=" . err.Extra
+	    . "`n`nResponse Headers: " . aResponseHeaders
+
+	MsgBox %MsgText%
+    }
+    
+    If err
+	return 0
+    Else
+	return 1
+}
+
+ReadProxy(ProxySettingsRegRoot="HKEY_CURRENT_USER") {
+    static ProxySettingsIEKey:="Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+    RegRead ProxyEnable, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyEnable
+    If ProxyEnable
+	RegRead ProxyServer, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyServer
+    return ProxyServer
+}
 
 ;GuiClose:
 ;GuiEscape:
@@ -462,92 +541,32 @@ GetFingerprintTransactWriteout(ByRef text, ByRef fname := "*", encoding := "UTF-
 }
 ; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\GetFingerprint.ahk
 
+
 ; --FlatternAhk-- #include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\GetURL.ahk
+
+; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\GetURL.ahk
+
+; --FlatternAhk-- #include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Post.ahk
 ;by LogicDaemon <www.logicdaemon.ru>
-;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
+;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
-GetURL(ByRef URL, tries := 20, delay := 3000) {
-    While (!HTTPReq("GET", URL,, resp))
-	If (A_Index > tries)
-	    Throw Exception("Error downloading URL", A_ThisFunc, resp.status)
-	Else
-	    sleep delay
-    
-    return resp
+XMLHTTP_PostForm(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef moreHeaders:=0) {
+    ;wrapper for older scripts
+    return XMLHTTP_Post(URL, POSTDATA, response, moreHeaders)
 }
 
-; --FlatternAhk-- #include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\HTTPReq.ahk
-;by LogicDaemon <www.logicdaemon.ru>
-;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
-
-HTTPReq(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef reqmoreHeaders:=0) {
-    If (method = "POST") {
-        If (reqmoreHeaders==0) {
-            moreHeaders := {"Content-Type": "application/x-www-form-urlencoded"}
-        } Else If (IsObject(reqmoreHeaders)) {
-            If (reqmoreHeaders.HasKey("Content-Type")) {
-                moreHeaders := reqmoreHeaders
-            } Else {
-                moreHeaders := reqmoreHeaders.Clone()
-                moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
-            }
-        }
+XMLHTTP_Post(ByRef URL, ByRef POSTDATA, ByRef response:=0, ByRef reqmoreHeaders:=0) {
+    If (IsObject(reqmoreHeaders)) {
+	If (reqmoreHeaders.HasKey("Content-Type")) {
+	    moreHeaders := reqmoreHeaders
+	} Else {
+	    moreHeaders := reqmoreHeaders.Clone()
+	    moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
+	}
+    } Else {
+	moreHeaders := {"Content-Type": "application/x-www-form-urlencoded"}
     }
-    ;ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef moreHeaders:=0
-    return XMLHTTP_Request(method, URL, POSTDATA, response, moreHeaders) || WinHTTPReqWithProxies(method, URL, POSTDATA, response, moreHeaders)
-}
-
-WinHTTPReqWithProxies(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef moreHeaders:=0, ByRef TryProxies := "") {
-    static proxies := ""
-    ;URLprotoInURL := RegexMatch(URL, "([^:]{3,6})://", URLproto)
-    
-    If (!IsObject(proxies)) {
-        proxies := {}
-        If (IsObject(TryProxies)) {
-            HTTPReq_PushMissingItems(proxies, TryProxies)
-        } Else If (TryProxies) {
-            Loop Parse, TryProxies, `n`r`,
-                HTTPReq_PushMissingItems(proxies, [A_LoopField])
-        }
-            
-        HTTPReq_PushMissingItems(proxies, [ ""
-                                          , cuProxy := HTTPReq_ReadProxy("HKEY_CURRENT_USER")
-                                          , lmProxy := HTTPReq_ReadProxy("HKEY_LOCAL_MACHINE")
-                                          , "192.168.127.1:3128" ] )
-                                          ; Очень странно: в Windows 7 префикс протокола ("https://") нужен для отправки через HTTPS, в Windows 10 – наоборот мешает :(
-        HTTPReq_PushMissingItems(proxies, [ "https://" cuProxy
-                                          , "http://" cuProxy
-                                          , "https://" lmProxy
-                                          , "http://" lmProxy
-                                          , "https://192.168.127.1:3128"
-                                          , "http://192.168.127.1:3128"] )
-    }
-    
-    For i,proxy in proxies
-        Try If (success := WinHttpRequest(method, URL, POSTDATA, response, moreHeaders, proxy))
-            return success
-    
-    return 0
-}
-
-HTTPReq_PushMissingItems(ByRef listToAppendTo, listToAppendFrom, ByRef newSetOfAllItems := 0) {
-    static setOfAllItems
-    If (IsByRef(newSetOfAllItems))
-        setOfAllItems := newSetOfAllItems
-    If (!IsObject(setOfAllItems))
-        For i, v in listToAppendTo
-            setOfAllItems[v] := ""
-    For i, v in listToAppendFrom
-        If (!setOfAllItems.HasKey(v))
-            listToAppendTo.Push(v), setOfAllItems[v] := ""
-}
-
-HTTPReq_ReadProxy(ProxySettingsRegRoot) {
-    static ProxySettingsIEKey:="Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-    RegRead ProxyEnable, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyEnable
-    If ProxyEnable
-	RegRead ProxyServer, %ProxySettingsRegRoot%, %ProxySettingsIEKey%, ProxyServer
-    return ProxyServer
+    return XMLHTTP_Request("POST", URL, POSTDATA, response, moreHeaders)
 }
 
 ; --FlatternAhk-- #include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Request.ahk
@@ -647,72 +666,52 @@ XMLHTTP_Request_ahk_ObjectToText(obj) {
 }
 ; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Request.ahk
 
-; --FlatternAhk-- #include \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\WinHttpRequest.ahk
-;by LogicDaemon <www.logicdaemon.ru>
-;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 
-WinHttpRequest(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef moreHeaders:=0, ByRef proxy:="") {
-    global debug
-    static WinHttpRequestObjectName
-    If (WinHttpRequestObjectName) {
-        WebRequest := ComObjCreate(WinHttpRequestObjectName)
-    } Else {
-        For i, WinHttpRequestObjectName in ["WinHttp.WinHttpRequest.5.1", "WinHttp.WinHttpRequest"] {
-            Try WebRequest := ComObjCreate(WinHttpRequestObjectName)
-            If (IsObject(WebRequest))
-                break
-        }
-    }
-    WebRequest.Open(method, URL, false)
-    For name, value in moreHeaders
-        WebRequest.SetRequestHeader(name, value)
-    ;WebRequest.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-    If (proxy)
-	WebRequest.SetProxy(2,proxy)
-    
-    Try {
-	WebRequest.Send(POSTDATA)
-	st := WebRequest.Status
-        If (IsByRef(response)) {
-	    response := IsObject(response)
-                        ? {status: st, headers: WebRequest.getAllResponseHeaders, responseText: WebRequest.responseText}
-                        : WebRequest.ResponseText
-	}
-	If (IsObject(debug)) {
-	    debug.Headers := WebRequest.GetAllResponseHeaders
-	    debug.Status := st	;can be 200, 404 etc., including proxy responses
-	    
-	    If (IsFunc(debug.cbStatus))
-                Func(debug.cbStatus).Call( "`nStatus: " debug.Status "`n"
-                                         . "Headers: " debug.Headers "`n"
-                                         . response "`n")
-	}
-	
-	return st >= 200 && st < 300
-    } catch e {
-	If (IsObject(debug)) {
-	    debug.What := e.What
-	    debug.Message := e.Message
-	    debug.Extra := e.Extra
-            If (IsFunc(debug.cbError))
-                Func(debug.cbError).Call(e)
-            Else
-                Throw e
-	}
-    } Finally {
-	WebRequest := ""
-	If (IsObject(debug)) {
-	    ;http://www.autohotkey.com/board/topic/56987-com-object-reference-autohotkey-l/#entry358974
-	    ;static document
-	    ;Gui Add, ActiveX, w750 h550 vdocument, % "MSHTML:" . debug.Response
-	    ;Gui Show
-	    If (IsFunc(debug.cbStatus))
-                Func(debug.cbStatus).Call()
+If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
+    tries:=20
+    retryDelay:=1000
+    Loop %0%
+    {
+	arg:=%A_Index%
+	argFlag:=SubStr(arg,1,1)
+	If (argFlag=="/" || argFlag=="-") {
+	    arg:=SubStr(arg,2)
+	    foundPos := RegexMatch(arg, "([^=]+)=(.+)", argkv)
+	    If (foundPos) {
+		If (argkv1 = "tries") {
+		    tries := argkv2
+		} Else If (argkv1 = "retryDelay") {
+		    retryDelay := argkv2
+		} Else {
+		    XMLHTTP_EchoWrongArg(arg)
+		}
+	    } Else {
+		If (arg="debug") {
+		    debug := Object()
+		    FileAppend Включен режим отладки`n, **
+		} Else {
+		    XMLHTTP_EchoWrongArg(arg)
+		}
+	    }
+	} Else If (!URL) {
+	    URL:=arg
+	} Else If (!POSTDATA) {
+	    POSTDATA:=arg
+	} Else {
+	    XMLHTTP_EchoWrongArg(arg)
 	}
     }
+    Loop %tries%
+    {
+	response := Object()
+	If (XMLHTTP_PostForm(URL,POSTDATA, response))
+	    Exit 0
+	sleep %retryDelay%
+    }
+    ExitApp response.status
 }
-; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\WinHttpRequest.ahk
 
-; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\HTTPReq.ahk
-
-; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\GetURL.ahk
+XMLHTTP_EchoWrongArg(arg) {
+    FileAppend Неправильный аргумент: %arg%`n, **
+}
+; --FlatternAhk-- end of: \\Srv1S-B.office0.mobilmir\Users\Public\Shares\profiles$\Share\config\_Scripts\Lib\XMLHTTP_Post.ahk
