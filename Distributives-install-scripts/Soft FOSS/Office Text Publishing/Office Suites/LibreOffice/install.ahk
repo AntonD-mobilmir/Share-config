@@ -37,7 +37,7 @@ If (!DistributiveMask)
 EnvGet logPath,logmsi
 
 RemoveLangpacks 	:= ReadListFromFile(A_ScriptDir . "\remove_langpacks.txt")
-RemoveDictionaries 	:= ReadListFromFile(A_ScriptDir . "\remove_langpacks.txt")
+RemoveDictionaries 	:= ReadListFromFile(A_ScriptDir . "\remove_dictionaries.txt")
 RemoveOtherComponents 	:= ReadListFromFile(A_ScriptDir . "\remove_OtherComponents.txt")
 
 Remove=%RemoveOtherComponents%`,%RemoveLangpacks%
@@ -80,21 +80,18 @@ If (restartWuauserv)
 FileSetAttrib +H, %A_DesktopCommon%\LibreOffice *
 
 If (!ErrorsOccured) {
-    If HelpDistr
-    {
+    If (HelpDistr) {
 	TrayTip %textTrayTip%, Offline Help MSI (HelpDistr)
 	ErrorsOccured := ErrorsOccured || InstallMSI(HelpDistr, QuietInstall)
     }
-    IfExist Install_Extensions.ahk
-    {
-	Menu Tray, Tip, Installing Extensions
-	TrayTip %textTrayTip%, Extensions
-	RunWait "%A_AhkPath%" %AhkParm% "%A_ScriptDir%\Install_Extensions.ahk", %A_ScriptDir%, Min UseErrorLevel
-	ErrorsOccured := ErrorsOccured || ErrorLevel
+    If FileExist(A_ScriptDir "\Install_Extensions.ahk") {
+        Menu Tray, Tip, Installing Extensions
+        TrayTip %textTrayTip%, Extensions
+        RunWait "%A_AhkPath%" %AhkParm% "%A_ScriptDir%\Install_Extensions.ahk", %A_ScriptDir%, Min UseErrorLevel
+        ErrorsOccured := ErrorsOccured || ErrorLevel
     }
 
-    IfExist %A_ScriptDir%\SetDefaults.cmd
-    {
+    If (FileExist(A_ScriptDir "\SetDefaults.cmd")) {
 	Menu Tray, Tip, Setting up defaults
 	TrayTip %textTrayTip%, Setting up defaults
 	RunWait %comspec% /C "%A_ScriptDir%\SetDefaults.cmd",%A_ScriptDir%,Min UseErrorLevel
