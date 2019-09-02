@@ -58,9 +58,9 @@ SETLOCAL ENABLEEXTENSIONS
             IF "%%~B"=="SwapSpace" SET "volnum=%%~A" & GOTO :foundvol
             IF "%%~C"=="SwapSpace" SET "volnum=%%~A" & GOTO :foundvol
             
-            IF "%%~С"=="NTFS" IF "%%~E"=="2048" CALL :IfInList "%%~F" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
-            IF "%%~С"=="RAW" IF "%%~E"=="2048" CALL :IfInList "%%~F" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
-            
+            REM без метки, но с буквой
+            IF "%%~E"=="2048" CALL :IfInList "%%~F" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
+            IF "%%~F"=="2048" CALL :IfInList "%%~E" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
             REM с меткой и буквой, без ФС быть не может ибо откуда иначе метка
             IF "%%~D"=="NTFS" IF "%%~F"=="2048" CALL :IfInList "%%~G" "MB" "Mб" && (SET "volnum=%%~A" & GOTO :foundvol)
         )
