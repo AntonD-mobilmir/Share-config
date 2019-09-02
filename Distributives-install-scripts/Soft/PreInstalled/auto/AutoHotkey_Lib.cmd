@@ -21,7 +21,7 @@ REM                                                        logicdaemon.ru
     )
 )
 (
-    IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exe7za%"
+    IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exename7za%"
 
     IF %AutoHotkey_Lib_reentrance% LSS 0 SET /A "AutoHotkey_Lib_reentrance=0"
     IF EXIST "%ProgramFiles%\AutoHotkey" (
