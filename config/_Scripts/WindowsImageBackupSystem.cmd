@@ -79,7 +79,7 @@ ECHO %DATE% %TIME% Ожидание окончания записи контрольных сумм "%dstDirWIB%\%Host
     EXIT /B
 )
 :CopyEchoPassFilePath
-IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
+CALL "%~dp0FindAutoHotkeyExe.cmd"
 (
     COPY /B /Y "%PassFilePath%" "%dstDirWIB%\%Hostname%\password.txt"
     IF DEFINED AutohotkeyExe START "" %AutohotkeyExe% "%~dp0AddUsers\ReadPwd_PostToFormWithBackupName.ahk" "%PassFilePath%" "%dstDirWIB%\%Hostname%"
@@ -127,10 +127,10 @@ EXIT /B
     rem Backup Operators=S-1-5-32-551
     rem CREATOR OWNER=S-1-3-0
     %SystemRoot%\System32\takeown.exe /A /R /D Y /F "%~1\WindowsImageBackup\%Hostname%"
-    %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /reset /T /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /grant "*S-1-5-32-544:(OI)(CI)F" /grant "*S-1-5-18:(OI)(CI)F" /grant "*S-1-5-32-551:(OI)(CI)F" /grant "*S-1-3-0:(OI)(CI)F" /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /inheritance:r /C /L
     %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%" /setowner "*S-1-5-18" /T /C /L
+    %SystemRoot%\System32\icacls.exe "%~1\WindowsImageBackup\%Hostname%\*" /reset /T /C /L
     START "Копирование образа в %~1\WindowsImageBackup\%Hostname%" /MIN %SystemRoot%\System32\robocopy.exe "%dstDirWIB%\%Hostname%" "%~1\WindowsImageBackup\%Hostname%" /MIR /DCOPY:%robocopyDcopy% /TBD /ETA
     IF DEFINED PassFilePath CALL :DirToPassFile "%~1\WindowsImageBackup\%Hostname%\Backup*"
 EXIT /B
@@ -164,6 +164,7 @@ EXIT /B
     MKDIR "%dstDirWIB%\checkdir.tmp" 2>NUL || CALL :SetErrorCheckdstDirWIB "create dir"
     ECHO.>"%dstDirWIB%\checkdir.tmp\checkflag.tmp" || CALL :SetErrorCheckdstDirWIB "create file"
     IF NOT EXIST "%dstDirWIB%\checkdir.tmp\checkflag.tmp" (
+        RD "%dstDirWIB%\checkdir.tmp"
         IF DEFINED netHost IF DEFINED netShare IF NOT DEFINED netShareRemounted (
             SET "netShareRemounted=1"
             NET USE "\\%netHost%" /DELETE
@@ -171,7 +172,6 @@ EXIT /B
             NET USE "\\%netHost%\%destShare%" /PERSISTENT:NO && GOTO :CheckdstDirWIBRetry
         )
         ECHO Невозможно создать "%dstDirWIB%\checkdir.tmp\checkflag.tmp", поэтому указанный путь "%dstDirWIB%" нельзя использовать для сохранения образа.
-        RD "%dstDirWIB%\checkdir.tmp"
         EXIT /B 1
     )
     DEL "%dstDirWIB%\checkdir.tmp\checkflag.tmp"
