@@ -3,9 +3,9 @@ IF NOT DEFINED logfile SET logfile="%SystemRoot%\Logs\%~n0.log"
 IF NOT DEFINED configDir CALL :GetConfigDir
 ECHO %DATE% %TIME% Run UserBenchmark
 )
-IF NOT DEFINED AutoHotkeyExe CALL "%configDir%\_Scripts\FindAutoHotkeyExe.cmd"
+IF NOT DEFINED AutoHotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 (
-START "" /LOW %AutoHotkeyExe% "%configDir%\_Scripts\GUI\Run_UserBenchMark.ahk"
+START "" /LOW %AutoHotkeyExe% "%configDir%_Scripts\GUI\Run_UserBenchMark.ahk"
 rem  >>%logfile% 2>&1
 EXIT /B
 )

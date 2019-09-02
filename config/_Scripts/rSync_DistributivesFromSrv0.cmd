@@ -136,8 +136,6 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 CALL :GetDir configDir "%DefaultsSource%"
 (
 IF NOT DEFINED exe7z CALL "%configDir%_Scripts\find7zexe.cmd"
-rem IF NOT DEFINED SetACLexe CALL "%configDir%_Scripts\find_exe.cmd" SetACLexe SetACL.exe
-rem IF NOT DEFINED AutohotkeyExe CALL "%configDir%_Scripts\FindAutoHotkeyExe.cmd"
 EXIT /B
 )
 :GetDir

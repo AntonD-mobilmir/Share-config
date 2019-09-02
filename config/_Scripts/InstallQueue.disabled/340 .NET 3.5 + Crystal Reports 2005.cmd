@@ -31,7 +31,7 @@ EXIT /B
 	GOTO :BreakImageSearch
     )
     IF NOT DEFINED netfx35sourceFound (
-	CALL "%configDir%\_Scripts\find7zexe.cmd"
+	CALL "%configDir%_Scripts\find7zexe.cmd"
 	FOR /F "usebackq delims=" %%A IN (`DIR /B /AD /O-D "%WinISODir%\10*"`) DO FOR %%B IN ("%WinISODir%\%%~A\*_%OSbcSuf%.iso") DO (
 	    CALL :TryInstallNetfxFromWinImage "%%~B"
 	    GOTO :BreakImageSearch

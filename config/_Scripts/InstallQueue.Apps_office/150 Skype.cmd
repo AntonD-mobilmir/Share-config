@@ -4,7 +4,7 @@ IF NOT DEFINED configDir CALL :GetConfigDir
 )
 (
 REM В Windows 10 есть AppX/Metro приложение, без десктопной версии можно обойтись
-CALL "%configDir%\_Scripts\CheckWinVer.cmd" 10 && EXIT /B
+CALL "%configDir%_Scripts\CheckWinVer.cmd" 10 && EXIT /B
 
 IF NOT DEFINED DistSourceDir CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
 )
