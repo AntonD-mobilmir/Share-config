@@ -5,7 +5,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-    IF NOT DEFINED AutohotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd"
     IF NOT DEFINED SetACLexe CALL "%~dp0..\find_exe.cmd" SetACLexe SetACL.exe "%SystemDrive%\SysUtils\SetACL.exe"
     IF NOT DEFINED SetACLexe (
 	ECHO SetACL.exe не найден, продолжение невозможно.

@@ -43,7 +43,7 @@ IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "OS64bit=1"
 	)
     )
 
-    IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
+    CALL "%~dp0FindAutoHotkeyExe.cmd"
     IF DEFINED AutohotkeyExe (
 	FOR /f "usebackq tokens=2*" %%I IN (`reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname"`) DO SET "Hostname=%%~J"
 	CALL "%ProgramData%\mobilmir.ru\_get_SharedMailUserId.cmd"

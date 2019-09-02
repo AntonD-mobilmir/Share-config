@@ -26,8 +26,7 @@
     CALL :ensureRsyncReady
     IF NOT DEFINED SetACLexe CALL "%~dp0..\find_exe.cmd" SetACLexe "%SystemDrive%\SysUtils\SetACL.exe" || GOTO :SysutilsFail
 
-    IF NOT DEFINED AutohotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
-    
+    CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 )
 (
     "%SystemRoot%\System32\schtasks.exe" /End /TN "mobilmir.ru\Update_Distributives" /F

@@ -11,7 +11,7 @@ IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%U
 
 CALL "%~dp0FindSoftwareSource.cmd"
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd"
-IF NOT DEFINED AutohotkeyExe CALL "%~dp0FindAutoHotkeyExe.cmd"
+CALL "%~dp0FindAutoHotkeyExe.cmd"
 
 IF NOT EXIST "%ProgramData%\mobilmir.ru\Logs" MKDIR "%ProgramData%\mobilmir.ru\Logs"
 IF NOT DEFINED logfile SET logfile="%ProgramData%\mobilmir.ru\Logs\%~n0.log"

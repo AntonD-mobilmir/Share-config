@@ -9,7 +9,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     IF DEFINED Distributives IF DEFINED SoftSourceDir GOTO :skipSoftSourceDir
     CALL "%~dp0..\..\..\FindSoftwareSource.cmd"
 :skipSoftSourceDir
-    IF NOT DEFINED AutohotkeyExe CALL "%~dp0..\..\..\FindAutoHotkeyExe.cmd"
+    CALL "%~dp0..\..\..\FindAutoHotkeyExe.cmd"
     
     IF DEFINED ProgramFiles^(x86^) ( SET "ProgramFiles32=%ProgramFiles(x86)%" ) ELSE SET "ProgramFiles32=%ProgramFiles%"
     IF DEFINED ProgramW6432 ( SET "ProgramFiles64=%ProgramW6432%" ) ELSE SET "ProgramFiles64=%ProgramFiles%"

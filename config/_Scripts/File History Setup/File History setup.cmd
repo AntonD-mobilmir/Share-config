@@ -13,7 +13,7 @@ REM and http://superuser.com/questions/1044050/configuring-windows-8-8-1-10-file
 SET "localconfigpath=%LOCALAPPDATA%\Microsoft\Windows\FileHistory\Configuration"
 SET "remoteconfigpath=\\localhost\File History$\%USERNAME%\%COMPUTERNAME%\Configuration"
 
-IF NOT DEFINED AutoHotkeyExe CALL "%~dp0..\FindAutoHotkeyExe.cmd"
+CALL "%~dp0..\FindAutoHotkeyExe.cmd"
 )
 (
 rem as user:
