@@ -4,8 +4,6 @@
 #NoTrayIcon
 #SingleInstance force
 #Persistent
-Thread NoTimers
-
 minAgeForSendLogs := 2 ; days
 idletimeDisconnectVPN := 30 * 60 * 1000 ; 30 min in ms
 idletimeRarusCheckAutoLoad := 3 * 60 * 1000 ; 3 min in ms
@@ -14,17 +12,30 @@ idletimeGiftomanNonOnTop := 30 * 1000 ; 30 s in ms
 rebootOfferDelay := 60 * 60 * 1000 ; 1h in ms
 maxIdleForMsgbox := timerPeriod := 3000 ; ms
 startDay := A_DD
-wintitle1s=ahk_exe 1cv7s.exe
+sizeLimitLog1S := 500 ; MB
+dirLog1S := "d:\1S\1С8_Розница\Действующая\1Cv8Log"
+pathLog1S := dirLog1S "\1Cv8.lgd"
 
 EnvGet SystemRoot,SystemRoot
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet lProgramFiles, ProgramFiles(x86)
 lProgramFiles := lProgramFiles ? lProgramFiles : A_ProgramFiles
+Thread NoTimers
+If (A_IsAdmin)
+    Menu Tray, Icon
+
 If (FileExist(lProgramFiles "\Canon\MF Scan Utility\MFSCANUTILITY.exe"))
     checkCanonMFScan := -1 ; PID скрипта исправления ACL. Скрипт будет запущен при обнаружении MFSCANUTILITY.exe, если процесса с таким PID нет.
 
-If (A_IsAdmin)
-    Menu Tray, Icon
+If (InStr(FileExist(dirLog1S), "D")) {
+    FileGetSize sizeLog1S, %pathLog1S%, M
+    If (sizeLog1S > sizeLimitLog1S) {
+        FileMove %pathLog1S%, %pathLog1S%.bak, 1
+        If (A_OSVersion != "WIN_7" && A_OSVersion != "WIN_VISTA" && A_OSVersion != "WIN_2003" && A_OSVersion != "WIN_XP" && A_OSVersion != "WIN_2000")
+            Run %SystemRoot%\System32\compact.exe /C /F /EXE:LZX "%pathLog1S%.bak", %dirLog1S%, Hide UseErrorLevel
+    }
+    Run %SystemRoot%\System32\compact.exe /C /S /I "%dirLog1S%", %dirLog1S%, Hide UseErrorLevel
+}
 
 ;ahk_class HwndWrapper[KKMGMSuite.exe;;ec6679dd-7266-4fe0-8880-fd566da471b0]
 ;ahk_exe KKMGMSuite.exe
