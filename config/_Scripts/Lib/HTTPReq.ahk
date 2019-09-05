@@ -2,15 +2,17 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 
 HTTPReq(ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef reqmoreHeaders:=0) {
-    If (IsObject(reqmoreHeaders)) {
-	If (reqmoreHeaders.HasKey("Content-Type")) {
-	    moreHeaders := reqmoreHeaders
-	} Else {
-	    moreHeaders := reqmoreHeaders.Clone()
-	    moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
-	}
-    } Else {
-	moreHeaders := {"Content-Type": "application/x-www-form-urlencoded"}
+    If (method = "POST") {
+        If (reqmoreHeaders==0) {
+            moreHeaders := {"Content-Type": "application/x-www-form-urlencoded"}
+        } Else If (IsObject(reqmoreHeaders)) {
+            If (reqmoreHeaders.HasKey("Content-Type")) {
+                moreHeaders := reqmoreHeaders
+            } Else {
+                moreHeaders := reqmoreHeaders.Clone()
+                moreHeaders["Content-Type"] := "application/x-www-form-urlencoded"
+            }
+        }
     }
     ;ByRef method, ByRef URL, ByRef POSTDATA:="", ByRef response:=0, ByRef moreHeaders:=0
     return XMLHTTP_Request(method, URL, POSTDATA, response, moreHeaders) || WinHTTPReqWithProxies(method, URL, POSTDATA, response, moreHeaders)
