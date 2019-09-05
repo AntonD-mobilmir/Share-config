@@ -6,24 +6,33 @@ FileEncoding UTF-16
 EnvGet LocalAppData,LOCALAPPDATA
 EnvGet SystemRoot,SystemRoot
 
+usersList = \\Srv1S-B.office0.mobilmir\Users\Public\Shares\Документы\IT\Справочники\Srv0-users-list.txt
 
-rowCount:=0
-usersData := {}
-currentBlock := {}
-Loop Read, \\Srv1S-B.office0.mobilmir\Users\Public\Shares\Документы\IT\Справочники\Srv0-users-list.txt
+Loop
 {
-    If (line := Trim(A_LoopReadLine)) {
-        sep := InStr(line, "=")
-        currentBlock[SubStr(line, 1, sep-1)] := SubStr(line, sep+1)
-    } Else If (currentBlock.HasKey("Name")) {
-        Name := currentBlock.Name
-        While (usersData.HasKey(Name))
-            Name := currentBlock.Name " (" A_Index ")"
-        usersData[Name] := currentBlock.Clone()
-        currentBlock := {}
-        rowCount++
-        
+    rowCount:=0
+    usersData := {}
+    currentBlock := {}
+    Loop Read, %usersList%
+    {
+        If (line := Trim(A_LoopReadLine)) {
+            sep := InStr(line, "=")
+            currentBlock[SubStr(line, 1, sep-1)] := SubStr(line, sep+1)
+        } Else If (currentBlock.HasKey("Name")) {
+            Name := currentBlock.Name
+            While (usersData.HasKey(Name))
+                Name := currentBlock.Name " (" A_Index ")"
+            usersData[Name] := currentBlock.Clone()
+            currentBlock := {}
+            rowCount++
+        }
     }
+
+    If (rowCount)
+        break
+    MsgBox 0x15, Выбор пользователя из списка, Список пользователей не прочитался из файла "%usersList%". Либо сервер недоступен`, либо у Вас нет доступа к файлу.
+    IfMsgBox Cancel
+        ExitApp 1
 }
 
 Gui Add, Edit, vFilterText gEditEvent
