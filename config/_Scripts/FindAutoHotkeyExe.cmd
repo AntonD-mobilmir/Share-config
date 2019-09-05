@@ -1,11 +1,12 @@
 (@REM coding:CP866
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
-    IF DEFINED AutohotkeyExe IF EXIST %AutohotkeyExe% CALL %AutohotkeyExe% /ErrorStdOut "%~dp0FindAutoHotkeyExe_CheckVer.ahk" && EXIT /B
-    SET AutohotkeyExe=
-    FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :CheckAutohotkeyExe %%I
-    rem continuing if AutoHotkeyScript type isn't defined or specified path points to incorect location
-    IF NOT DEFINED AutohotkeyExe CALL :FindAutohotkeyExeViaFindExe
+    IF DEFINED AutohotkeyExe IF EXIST %AutohotkeyExe% CALL %AutohotkeyExe% /ErrorStdOut "%~dp0FindAutoHotkeyExe_CheckVer.ahk" || SET AutohotkeyExe=
+    IF NOT DEFINED AutohotkeyExe (
+        FOR /F "usebackq tokens=2 delims==" %%I IN (`ftype AutoHotkeyScript`) DO CALL :CheckAutohotkeyExe %%I
+        rem continuing if AutoHotkeyScript type isn't defined or specified path points to incorect location
+        IF NOT DEFINED AutohotkeyExe CALL :FindAutohotkeyExeViaFindExe
+    )
     IF NOT "%~1"=="" IF DEFINED AutohotkeyExe GOTO :RunAhkScript
 EXIT /B
 )
@@ -18,6 +19,10 @@ EXIT /B
     rem 	D:\Users\*\Documents\AutoHotkey.ahk
     SET "findExeTestExecutionOptions=/ErrorStdOut "%~dp0FindAutoHotkeyExe_CheckVer.ahk" 9009"
     CALL "%~dp0find_exe.cmd" AutohotkeyExe AutoHotkey.exe
+    IF NOT DEFINED AutohotkeyExe ( REM find any already
+        SET "findExeTestExecutionOptions=/ErrorStdOut ."
+        CALL "%~dp0find_exe.cmd" AutohotkeyExe AutoHotkey.exe
+    )
     REM explicit backup not needed in same parethensis scope
     SET "findExeTestExecutionOptions=%findExeTestExecutionOptions%"
     EXIT /B
