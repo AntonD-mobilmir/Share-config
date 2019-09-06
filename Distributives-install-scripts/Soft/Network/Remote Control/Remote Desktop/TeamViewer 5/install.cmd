@@ -34,7 +34,8 @@ IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig
 )
 (
     SET "TempExtractPath=%TEMP%\%TempDirName%"
-    IF %exe7z%=="" (
+    IF [%exe7z%]==[""] SET "exe7z="
+    IF NOT DEFINED exe7z (
 	ECHO 7-Zip не найден скриптом установки TeamViewer, возможна только локальная установка вручную.
 	ECHO Все параметры командной строки игнорируются.
 	%ErrorCmd%
