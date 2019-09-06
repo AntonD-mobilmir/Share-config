@@ -4,9 +4,11 @@ IF NOT DEFINED configDir CALL :GetConfigDir
 )
 IF NOT DEFINED DistSourceDir CALL "%ConfigDir%_Scripts\FindSoftwareSource.cmd"
 (
+    SETLOCAL
     (
     CALL "%SoftSourceDir%\Network\Remote Control\Remote Desktop\TeamViewer 5\install.cmd" TeamViewer_Host.MSI
     ) >>%logfile% 2>&1
+    ENDLOCAL
     PING 127.0.0.1 -n 10>NUL
     %SystemRoot%\System32\sc.exe start TeamViewer5
 
