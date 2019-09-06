@@ -21,7 +21,7 @@ REM                                                        logicdaemon.ru
     )
 )
 (
-    IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exename7za%"
+    IF NOT DEFINED exe7z SET exe7z="%utilsdir%%exename7za%"
 
     IF %AutoHotkey_Lib_reentrance% LSS 0 SET /A "AutoHotkey_Lib_reentrance=0"
     IF EXIST "%ProgramFiles%\AutoHotkey" (
@@ -38,7 +38,7 @@ IF NOT DEFINED PrimaryDestination (
     IF NOT DEFINED ErrorPresence EXIT /B 0
 ) ELSE (
     IF EXIST "%PrimaryDestination%" IF NOT EXIST "%PrimaryDestination%\*.*" RD "%PrimaryDestination%"
-    "%exe7z%" x -aoa -y -o"%PrimaryDestination%" -- "%srcpath%%~n0.7z"||%ErrorCmd%
+    %exe7z% x -aoa -y -o"%PrimaryDestination%" -- "%srcpath%%~n0.7z"||%ErrorCmd%
     IF NOT DEFINED ErrorPresence EXIT /B 0
 )
 EXIT /B %ErrorPresence%

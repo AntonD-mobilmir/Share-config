@@ -6,14 +6,14 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 SET "lProgramFiles=%ProgramFiles%"
 IF DEFINED ProgramFiles^(x86^) SET "lProgramFiles=%ProgramFiles(x86)%"
 
-SET "exegetver=%SystemDrive%\SysUtils\lbrisar\getver.exe"
+SET exegetver="%SystemDrive%\SysUtils\lbrisar\getver.exe"
 
 CALL "%~dp0find_distributive.cmd" || EXIT /B
 CALL :find7zexe
 )
-SET "exeMT=%lProgramFiles%\Mozilla Thunderbird\thunderbird.exe"
-IF NOT EXIST "%exeMT%" EXIT /B 2
-IF NOT EXIST "%exegetver%" GOTO :skipVerCheck
+SET exeMT="%lProgramFiles%\Mozilla Thunderbird\thunderbird.exe"
+IF NOT EXIST %exeMT% EXIT /B 2
+IF NOT EXIST %exegetver% GOTO :skipVerCheck
 
 SET "tempdir=%TEMP%\Thunderbird-update %DATE% %TIME::=%"
 %exe7z% e -aoa -y -o"%tempdir%" -- "%distFullPath%" core\thunderbird.exe

@@ -18,8 +18,8 @@ SETLOCAL ENABLEEXTENSIONS
     IF NOT DEFINED exenameAutohotkey IF DEFINED OS64Bit ( SET "exenameAutohotkey=AutoHotkeyU64.exe" ) ELSE ( SET "exenameAutohotkey=AutoHotkey.exe" )
 )
 (
-    IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exename7za%"
-    IF NOT DEFINED AutohotkeyExe SET "AutohotkeyExe=%utilsdir%%exenameAutohotkey%"
+    IF NOT DEFINED exe7z SET exe7z="%utilsdir%%exename7za%"
+    IF NOT DEFINED AutohotkeyExe SET AutohotkeyExe="%utilsdir%%exenameAutohotkey%"
 
     FOR /F "usebackq delims=" %%I IN (`DIR /B /ON "%~dp0auto\*.cmd"`) DO (
 	ECHO %%~nI

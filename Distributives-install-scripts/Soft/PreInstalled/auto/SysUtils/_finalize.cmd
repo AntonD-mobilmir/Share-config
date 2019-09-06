@@ -4,7 +4,7 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
     IF DEFINED pathString (
-	"%AutohotkeyExe%" "%utilsdir%pathman.ahk" /as "%pathString%"
+	%AutohotkeyExe% "%utilsdir%pathman.ahk" /as "%pathString%"
 	CALL :FilterPaths
 	IF DEFINED filteredPathString CALL :AddEnvPath
     )

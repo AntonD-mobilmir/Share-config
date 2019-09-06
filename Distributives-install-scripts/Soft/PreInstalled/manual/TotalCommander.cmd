@@ -19,8 +19,8 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED exenameAutohotkey IF DEFINED OS64Bit ( SET "exenameAutohotkey=AutoHotkeyU64.exe" ) ELSE ( SET "exenameAutohotkey=AutoHotkey.exe" )
 )
 (
-    IF NOT DEFINED exe7z SET "exe7z=%utilsdir%%exename7za%"
-    rem IF NOT DEFINED AutohotkeyExe SET "AutohotkeyExe=%utilsdir%%exenameAutohotkey%"
+    IF NOT DEFINED exe7z SET exe7z="%utilsdir%%exename7za%"
+    rem IF NOT DEFINED AutohotkeyExe SET AutohotkeyExe="%utilsdir%%exenameAutohotkey%"
     IF NOT DEFINED AutohotkeyExe CALL :FindAutoHotkeyExe || (CALL "%~dp0..\..\Keyboard Tools\AutoHotkey\install.cmd" & CALL :FindAutoHotkeyExe)
 
     SET "distNotepad2Mask=Notepad2-mod.*"

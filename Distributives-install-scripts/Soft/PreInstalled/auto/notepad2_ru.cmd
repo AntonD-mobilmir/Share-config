@@ -8,15 +8,17 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
         SET "ErrorPresence="
     )
 
-    SET "utilsdir=%~dp0..\utils\"
-    IF NOT DEFINED exename7za (
-        SET "exename7za=7za.exe"
-        IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "exename7za=7za64.exe"
-        IF DEFINED PROCESSOR_ARCHITEW6432 SET "exename7za=7za64.exe"
+    IF NOT DEFINED exe7z (
+        SET "utilsdir=%~dp0..\utils\"
+        IF NOT DEFINED exename7za (
+            SET "exename7za=7za.exe"
+            IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "exename7za=7za64.exe"
+            IF DEFINED PROCESSOR_ARCHITEW6432 SET "exename7za=7za64.exe"
+        )
     )
 )
 (
-    SET "exe7z=%utilsdir%%exename7za%"
+    IF NOT DEFINED exe7z SET exe7z="%utilsdir%%exename7za%"
 
     SET "RunPathVar=ProgramFiles"
     SET "lProgramFiles=%ProgramFiles%"
@@ -26,7 +28,7 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
     )
 )
 (
-    "%exe7z%" x -aoa -y -o"%lProgramFiles%\Notepad2" -- "%srcpath%%~n0.7z" || %ErrorCmd%
+    %exe7z% x -aoa -y -o"%lProgramFiles%\Notepad2" -- "%srcpath%%~n0.7z" || %ErrorCmd%
 
     ASSOC .txt=notepad2-txtfile
     FTYPE notepad2-txtfile=^"%%%RunPathVar%%%\Notepad2\Notepad2.exe^" %%1
