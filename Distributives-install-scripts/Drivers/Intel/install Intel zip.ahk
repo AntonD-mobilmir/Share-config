@@ -102,50 +102,43 @@ Install(pathSrc,args="") {
 	MsgBox "%pathSrc%" не распаковался в "%TempExtractPath%"!
 	return
     }
-
-    Loop Files, %TempExtractPath%\SetupChipset.exe, R ; newer inf driver has different executable name and command line arguments
-    {
-	SetupPath:=A_LoopFileLongPath
-	SetupDir:=A_LoopFileDir
-	If (!args) {
-	    args=-s -norestart -log "%A_Temp%\%SrcZipNamewoExt% Install.log"
-	}
-    }
-    If (!SetupPath) {
-	Loop Files, %TempExtractPath%\Setup.exe, R
-	{
-	    SetupPath=%A_LoopFileLongPath%
-	    SetupDir=%A_LoopFileDir%
-	    If (!args) {
-		args=-s -overwrite -report "%A_Temp%\%SrcZipNamewoExt% Install.log"
-	    }
-	}
-    }
     
-    If (SetupPath) {
-	TrayTip Установка Intel'овского zip'а, Запуск %SetupPath%
-	RunWait "%SetupPath%" %args%,%SetupDir%,UseErrorLevel
-	Sleep 1000
-	If (ErroLevel=="ERROR") {
-	    ErrorText = Win32: %A_LastError%`, "%SetupPath%" не запустился!
-	} Else {
-	    ErrorText := ErrorTextForCode(ErrorLevel)
-	    If (ErrorText)
-		ErrorText := ErrorLevel . " – " . ErrorText
-	    Else
-		ErrorText := ErrorLevel . " (ищите описание в интернете)"
-	}
-	; 14 = reboot required, 5 = no matching devices found, 3010 = reboot required
-	If ErrorLevel in 0,5,14,3010
-	{
-	    TrayTip,, Установка закончена с кодом %ErrorText% (всё нормально).`nУдаление временной папки.
-	    FileRemoveDir %TempExtractPath%, 1
-	} Else {
-	    MsgBox При установке произошел сбой`, код ошибки %ErrorText%. Временная папка "%TempExtractPath%" не будет удалена автоматически.
-	}
+    setupExeData := FindSetupExe(TempExtractPath, """" A_Temp "\" SrcZipNamewoExt " Install.log""")
+    setupExePath := setupExeData[1], setupDir := setupExeData[3]
+    If (!args)
+        args := setupExeData[2]
+    
+    TrayTip Установка Intel'овского zip'а, Запуск %setupExePath%
+    RunWait "%setupExePath%" %args%,%setupDir%,UseErrorLevel
+    If (ErrorLevel=="ERROR") {
+        ErrorText = Win32: %A_LastError%`, "%setupExePath%" не запустился!
     } Else {
-	MsgBox Не найден исполняемый файл`, который надо запускать для установки. Архив распаковывался в папку "%TempExtractPath%"`, можно проверить в ней и исправить скрипт.
+        ErrorText := ErrorTextForCode(ErrorLevel)
+        If (ErrorText)
+            ErrorText := ErrorLevel . " – " . ErrorText
+        Else
+            ErrorText := ErrorLevel . " (ищите описание в интернете)"
     }
+    ; 14 = reboot required, 5 = no matching devices found, 3010 = reboot required
+    If ErrorLevel in 0,5,14,3010
+    {
+        TrayTip,, Установка закончена с кодом %ErrorText% (всё нормально).`nУдаление временной папки.
+        FileRemoveDir %TempExtractPath%, 1
+    } Else {
+        Throw Exception("При работе """ setupExePath """ произошел сбой, код ошибки " ErrorText,, "Временная папка """ TempExtractPath """ не будет удалена автоматически.")
+    }
+}
+
+FindSetupExe(ByRef TempExtractPath, ByRef logPathQuoted) {
+    For i, setupType in [ {"SetupChipset.exe": "-s -norestart -log " logPathQuoted} ; newer inf driver has different executable name and command line arguments
+                        , {"Setup.exe": "-s -overwrite -report " logPathQuoted}
+                        , {"igxpin.exe": "-s"} ] {
+        For setupExeName, setupargs in setupType {
+            Loop Files, %TempExtractPath%\%setupExeName%, R
+                return [A_LoopFileLongPath, setupargs, A_LoopFileDir]
+        }
+    } Until setupExePath
+    Throw Exception("Не найден исполняемый файл, который надо запускать для установки.",, "Архив распаковывался в папку """ TempExtractPath """, можно проверить в ней и исправить скрипт.")
 }
 
 ErrorTextForCode(code) {
