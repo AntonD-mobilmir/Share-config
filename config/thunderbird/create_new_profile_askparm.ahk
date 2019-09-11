@@ -66,7 +66,6 @@ return
 ButtonOK:
     Gui Submit
     Run %A_ScriptDir%\create_new_profile.ahk %fullEmail% "%fullName%" "%destPath%"
-;     "%destPath%"
     ExitApp
 
 GuiEscape:

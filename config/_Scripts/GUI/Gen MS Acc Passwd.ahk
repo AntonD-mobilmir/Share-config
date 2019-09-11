@@ -13,6 +13,10 @@ Loop 16
 
 passwordID := WriteAndShowPassword(passwd)
 
+Run % "https://docs.google.com/forms/d/e/1FAIpQLSdzrlHq1JCyHJM1V0tvoFd5MfX0NItCKECzypQ2h0BApFI3iw/viewform?usp=pp_url"
+    . "&entry.1761089494=" ; PC_trello_ID 
+    . "&entry.556722314=" ; ms-acc-email@something.domain
+    . "&entry.1884091747=" UriEncode(passwordID)
 ;Run % "https://docs.google.com/forms/d/1Wy8ZFhfnV1VGYN_vHabQvr6Ziy9E9GTbgaua64CcORU/viewform?entry.287789183=" . URIEncode(passwordID)
 ;Run https://docs.google.com/spreadsheets/d/179XOMsXbLEOoGIaN6_4gE43RVJ8fyQ57dw1DLe6XnF8/preview#gid=913963513
 
