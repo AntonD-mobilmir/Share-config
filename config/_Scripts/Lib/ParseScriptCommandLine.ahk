@@ -11,17 +11,25 @@ ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:
     ;     returns cmdlArgs  – array with all script arguments,
     ;                         with cmdlArgs[""] = number of arguments, and
     ;                         cmdlArgs[0] := script path from command line
+    ;     cmdlPrms positive Int → parse and return only specific number of arguments, cmdlPrms will still have all args
+    ;     cmdlPrms negative Int → parse and return only specific number of arguments, cmdlPrms will have remaining args
     ; Else
     ;     returns all script parameters as one string (unparsed)
     CommandLine := DllCall( "GetCommandLine", "Str" )
     
-    removeQuotes := cmdlPrms==""""
-    If (removeQuotes || IsByRef(cmdlPrms))
-        argc := 0, cmdlArgs := Object()
-    Else
-        argc := ""
+    If cmdlPrms is Integer
+    {
+        cmdlArgs := [], argc := cmdlPrms >= 0 ? -cmdlPrms-1 : cmdlPrms-1
+    } Else {
+        argsMax := ""
+        removeQuotes := cmdlPrms==""""
+        If (removeQuotes || IsByRef(cmdlPrms))
+            argc := 0, cmdlArgs := []
+        Else
+            argc := ""
+    }
     If (IsByRef(ahkArgs) && !IsObject(ahkArgs))
-        ahkArgs := Object()
+        ahkArgs := []
     
     inQuote := 0
     currFragmentEnd := 1
@@ -43,8 +51,11 @@ ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:
                 If(argc == "")
                     break
                 ; on first entrance, %1% should be = %currArg%
-                If (currArg)
-                    cmdlArgs[++argc] := Trim(removeQuotes ? StrReplace(currArg, """") : currArg)
+                If (currArg) {
+                    cmdlArgs[argc++] := Trim(removeQuotes ? StrReplace(currArg, """") : currArg)
+                    If (argc==-1) ; last arg with limited amount of args
+                        break
+                }
             } Else {
                 If (argNo==1) {
                     ;First arg is always AhkPath (dir is optional, for example, if started via cmdline: try «cmd /c ahk.exe script.ahk»; even extension may not be there; also can be partial, repeating ahk-name: «".\script.ahk\ahk.exe\ahk" .\script.ahk\ahk.exe\script.ahk»).
@@ -67,7 +78,7 @@ ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:
         }
     }
     
-    cmdlPrms := SubStr(CommandLine, skipChars)
+    cmdlPrms := SubStr(CommandLine, ((argc < 0 && cmdlPrms < 0) ? currFragmentEnd : skipChars))
     If (argc) {
 	cmdlArgs[""] := argc
 	return cmdlArgs
