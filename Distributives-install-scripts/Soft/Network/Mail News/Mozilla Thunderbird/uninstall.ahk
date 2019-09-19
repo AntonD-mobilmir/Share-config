@@ -3,14 +3,18 @@
 #NoEnv
 
 uninstKey = SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
-SetRegView 32
-Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
-{
-    RegRead DisplayName, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, DisplayName
-    
-    If (StartsWith(DisplayName, "Mozilla Thunderbird ")) {
-	RegRead UninstallString, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, UninstallString
-	RunWait %UninstallString% /s
+
+For i, v in [32, 64] {
+    SetRegView %v%
+    Loop Reg, HKEY_LOCAL_MACHINE\%uninstKey%, K
+    {
+        RegRead DisplayName, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, DisplayName
+        RegRead Publisher, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, Publisher
+        
+        If (Publisher == "Mozilla" && StartsWith(DisplayName, "Mozilla Thunderbird ")) {
+            RegRead UninstallString, %A_LoopRegKey%\%A_LoopRegSubKey%\%A_LoopRegName%, UninstallString
+            RunWait %UninstallString% /s
+        }
     }
 }
 

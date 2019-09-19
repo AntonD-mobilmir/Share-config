@@ -2,11 +2,15 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     IF NOT DEFINED PROGRAMDATA SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-    IF DEFINED ProgramFiles^(x86^) (SET "lProgramFiles=%ProgramFiles(x86)%") ELSE SET "lProgramFiles=%ProgramFiles%"
+
+    SET "distSubdir=32-bit\"
+    IF /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" SET "distSubdir=64-bit\"
+    IF DEFINED PROCESSOR_ARCHITEW6432 SET "distSubdir=64-bit\"
+    IF DEFINED ProgramW6432 ( SET "lProgramFiles=%ProgramW6432%" ) ELSE SET "lProgramFiles=%ProgramFiles%"
+    SET "ErrorMemory="
 
     SET "TempIni=%TEMP%\FirefoxInstall.ini"
     FOR /F "usebackq delims=" %%I IN (`ver`) DO SET "winVer=%%~I"
@@ -20,7 +24,7 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
 	IF EXIST "%srcpath%Vista\Firefox Setup *.exe" (
 	    SET "InstDistributive=%srcpath%Vista\Firefox Setup *.exe"
 	) ELSE SET "InstDistributive=%srcpath:\Distributives\Soft\=\Distributives\Soft_old\%Vista\Firefox Setup *.exe"
-    ) ELSE SET "InstDistributive=%srcpath%Firefox Setup *.exe"
+    ) ELSE SET "InstDistributive=%srcpath%%distSubdir%Firefox Setup *.exe"
     SET "MozMainSvcUninst=%lProgramFiles%\Mozilla Maintenance Service\Uninstall.exe"
     SET "cProgramFiles=%lProgramFiles:\=\\%"
 )
@@ -29,16 +33,17 @@ IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
     COPY /B /Y "%srcpath%install.ini" "%TempIni%"
 
     IF DEFINED configDir SET "pathAppendSubpath=libs" & CALL "%configDir%_Scripts\find_exe.cmd" sedexe "%SystemDrive%\SysUtils\sed.exe"
-    )
 )
-IF DEFINED sedexe %sedexe% "s/;InstallDirectoryPath={InstallDirectoryPath}/InstallDirectoryPath=%cProgramFiles%\\Mozilla Firefox/" "%srcpath%install.ini">"%TempIni%"
-"%InstDistributive%" /S /INI="%TempIni%" || CALL :SetErrorMemory
+(
+    IF DEFINED sedexe %sedexe% "s/;InstallDirectoryPath={InstallDirectoryPath}/InstallDirectoryPath=%cProgramFiles%\\Mozilla Firefox/" "%srcpath%install.ini">"%TempIni%"
+    "%InstDistributive%" /S /INI="%TempIni%" || CALL :SetErrorMemory
 
-REM Copying defaults and fixed
-IF EXIST "%DefaultsSource%" CALL :UnpackDefaults
-IF EXIST "%MozMainSvcUninst%" "%MozMainSvcUninst%" /S
+    REM Copying defaults and fixed
+    IF EXIST "%DefaultsSource%" CALL :UnpackDefaults
+    IF EXIST "%MozMainSvcUninst%" "%MozMainSvcUninst%" /S
 
-CALL :HideDesktopShortcut
+    CALL :HideDesktopShortcut
+    IF NOT DEFINED ErrorMemory EXIT /B 0
 )
 EXIT /B %ErrorMemory%
 

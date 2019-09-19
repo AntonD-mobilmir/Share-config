@@ -2,23 +2,27 @@
 REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 SETLOCAL ENABLEEXTENSIONS
-IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
-SET "lProgramFiles=%ProgramFiles%"
-IF DEFINED ProgramFiles^(x86^) SET "lProgramFiles=%ProgramFiles(x86)%"
-
-SET exegetver="%SystemDrive%\SysUtils\lbrisar\getver.exe"
-
-CALL "%~dp0find_distributive.cmd" || EXIT /B
-CALL :find7zexe
+    IF "%~dp0"=="" (SET "srcpath=%CD%\") ELSE SET "srcpath=%~dp0"
+    SET exegetver="%SystemDrive%\SysUtils\lbrisar\getver.exe"
+    
+    SET "inst32biton64sys="
+    REM 32-bit cmd.exe on 64-bit system, 64-bit Program Files
+    IF DEFINED ProgramW6432 CALL :CheckExeMT "%ProgramW6432%\Mozilla Thunderbird\thunderbird.exe"
+    REM 64-bit cmd.exe on 64-bit system, 32-bit Program Files
+    IF NOT DEFINED exeMT IF DEFINED ProgramFiles^(x86^) CALL :CheckExeMT "%ProgramFiles(x86)%\Mozilla Thunderbird\thunderbird.exe" && SET "inst32biton64sys=1"
+    REM Default: 32 on 32 or 64 on 64
+    IF NOT DEFINED exeMT CALL :CheckExeMT "%ProgramFiles%\Mozilla Thunderbird\thunderbird.exe"
+    
+    CALL "%~dp0find_distributive.cmd" || EXIT /B
+    CALL :find7zexe
 )
-SET exeMT="%lProgramFiles%\Mozilla Thunderbird\thunderbird.exe"
 IF NOT EXIST %exeMT% EXIT /B 2
 IF NOT EXIST %exegetver% GOTO :skipVerCheck
 
 SET "tempdir=%TEMP%\Thunderbird-update %DATE% %TIME::=%"
 %exe7z% e -aoa -y -o"%tempdir%" -- "%distFullPath%" core\thunderbird.exe
 
-FOR /F "usebackq tokens=1" %%V IN (`%exegetver% "%exeMT%"`) DO SET "mtversion=%%~V"
+FOR /F "usebackq tokens=1" %%V IN (`%exegetver% %exeMT%`) DO SET "mtversion=%%~V"
 FOR /F "usebackq tokens=1" %%V IN (`%exegetver% "%tempdir%\thunderbird.exe"`) DO SET "distversion=%%~V"
 RD /S /Q %tempdir%
 
@@ -26,7 +30,14 @@ CALL :VersionGreater "%distversion%" "%mtversion%" && EXIT /B 1
 :skipVerCheck
 CALL "%~dp0install.cmd"
 EXIT /B
-
+:CheckExeMT
+(
+    IF EXIST "%~1" (
+        SET exeMT="%~1"
+        EXIT /B 0
+    )
+    EXIT /B 1
+)
 :find7zexe
 IF NOT DEFINED DefaultsSource CALL "%ProgramData%\mobilmir.ru\_get_defaultconfig_source.cmd" || CALL "%SystemDrive%\Local_Scripts\_get_defaultconfig_source.cmd"
 CALL :GetDir ConfigDir "%DefaultsSource%"
