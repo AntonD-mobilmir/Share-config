@@ -17,7 +17,7 @@ Arg1 = %1%
 If (Arg1="/PostURLFromBrowser" || Arg1="-PostURLFromBrowser" || Arg1="-PostURLFromBrowser.lnk") {
     sendModes := {0: "Play", 1: "Input", 2: "Event"}
     
-    SetTitleMatchMode 2
+    SetTitleMatchMode 2 ; A window's title can contain WinTitle anywhere inside it to be a match
     actnList := "_;^f;_;Copy results{Esc};_;{Enter};_4;-+;-1;{Esc}^l;_2;-0;--"
     wantUserIdle := 10000 ; ms
 
@@ -201,11 +201,28 @@ FillGroups()
 Loop
 {
     Sleep 300
-    IfWinExist ahk_group ErrorMessagesEN
-	ControlClick OK
-    IfWinExist ahk_group ErrorMessagesRU
-	ControlClick ОК
-
+    ; If unspecified, TitleMatchMode defaults to 1 and fast.
+    For title, actnOrBtn in { "ahk_group ErrorMessagesEN": "OK"
+                            , "ahk_group ErrorMessagesRU": "ОК"
+                            , "https://www.userbenchmark.com/UserRun/": ["SaveTitleAsURL", "click OK"] } {
+        If (WinExist(title)) {
+            If (IsObject(actnOrBtn)) {
+                For i, actn in actnOrBtn {
+                    If (actn=="SaveTitleAsURL") {
+                        WinGetTitle ResultsURL
+                        FileAppend [InternetShortcut]`nURL=%ResultsURL%`n, %A_Desktop%\UserBenchmark could open browser %A_Now%.URL, UTF-16
+                        Run %browserexe% %ResultsURL%
+                    } Else If (actn=="click OK") {
+                        ControlClick Button1 ; a guess, not verified
+                        ControlClick ОК ; Ru
+                        ControlClick OK ; En
+                    }
+                }
+            } Else {
+                ControlClick %actnOrBtn%
+            }
+        }
+    }
     Process Exist, %pidUBM%
 } Until (ErrorLevel!=pidUBM)
 
@@ -395,7 +412,7 @@ PostResults(ByRef ResultsURL, perfResultsObj:="") {
 	MsgBox 53, %stageTitle%, %errText%.`n`n[Попытка %A_Index%`, автоповтор – 5 минут], 300
 	IfMsgBox Cancel
 	{
-	    FileAppend % ResultsURL "`n" POSTDATA "`n",%A_Desktop%\UserBenchmark unposted %A_Now%.txt
+	    FileAppend % ResultsURL "`n" POSTDATA "`n",%A_Desktop%\UserBenchmark unposted %A_Now%.txt, UTF-8
 	    return 0
 	}
     }
