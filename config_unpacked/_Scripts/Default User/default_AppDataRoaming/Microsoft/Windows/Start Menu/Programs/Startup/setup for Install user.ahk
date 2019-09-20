@@ -1,3 +1,11 @@
+﻿;by LogicDaemon <www.logicdaemon.ru>
+;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
+#NoEnv
+FileEncoding UTF-8
+
+EnvGet LocalAppData,LOCALAPPDATA
+EnvGet SystemRoot,SystemRoot
+
 ;by LogicDaemon <www.logicdaemon.ru>
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 #NoEnv
@@ -12,10 +20,13 @@ Sleep 1000
 
 ConfigPathsList=
 (
+\\Srv1S-B.office0.mobilmir\profiles$\Share\config
 \\Srv0.office0.mobilmir\profiles$\Share\config
 \\192.168.1.80\profiles$\Share\config
 D:\Distributives\config
 )
+
+Run "%A_AhkPath%" "%A_AppDataCommon%\mobilmir.ru\Common_Scripts\Lock on TeamViewer Disconnect.ahk" /s
 
 Loop Parse, ConfigPathsList, `n
     If (FileExist(A_LoopField)) {
@@ -36,7 +47,7 @@ If (!ConfigPath) {
 If (ConfigPath)
     Run %comspec% /C "%ConfigPath%\_Scripts\AddUsers\AddUser_Install.cmd", %A_Temp%, Min
 Else
-    Throw "ConfigPath not found"
+    Throw Exception("Путь к файлу конфигурации не найден")
 
 ExitApp
 
