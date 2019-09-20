@@ -26,7 +26,9 @@ user_pref("attachmentextractor.filenamepattern.cleansubject", true);
 user_pref("attachmentextractor.filenamepattern.countpattern", "#%");
 user_pref("attachmentextractor.filenamepattern.datepattern", "Y_m_d");
 user_pref("attachmentextractor.overwritepolicy", 2);
-user_pref("browser.cache.memory.capacity", 16384);
+
+user_pref("browser.cache.disk.capacity", 0);
+//user_pref("browser.cache.memory.capacity", 16384);
 
 user_pref("calendar.alarms.onforevents", 1);
 user_pref("calendar.alarms.onfortodos", 1);
