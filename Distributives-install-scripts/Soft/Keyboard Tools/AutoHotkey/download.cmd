@@ -43,7 +43,7 @@ FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
 	rem -R, --remote-time   Set the remote file's time on the local output
 	rem -z, --time-cond TIME   Transfer based on a time condition
 
-	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe "%url%" -LpR --remote-name-all %timeCond% || CALL :ExitWithError running CURL & EXIT /B 1
+	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe "%url%" -LpR --remote-name-all %timeCond% || (CALL :ExitWithError running CURL & EXIT /B 1)
     )
     
     rem without -o for CURL and -O for wget, filename is unknown

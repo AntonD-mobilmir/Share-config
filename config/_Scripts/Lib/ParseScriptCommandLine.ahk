@@ -78,7 +78,7 @@ ParseScriptCommandLine(ByRef cmdlPrms:="", ByRef cmdlAhkPath:="", ByRef ahkArgs:
         }
     }
     
-    cmdlPrms := SubStr(CommandLine, ((argc < 0 && cmdlPrms < 0) ? currFragmentEnd : skipChars))
+    cmdlPrms := SubStr(CommandLine, ((argc != "" && argc < 0 && cmdlPrms < 0) ? currFragmentEnd : skipChars))
     If (argc) {
 	cmdlArgs[""] := argc
 	return cmdlArgs

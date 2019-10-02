@@ -5,18 +5,21 @@ CommandLineArgs_to_FindTrelloCardQuery(ByRef options := "", query := "", ByRef o
     If (!IsObject(query))
 	query := Object()
     
-    args := ParseScriptCommandLine("""")
-    Loop % args[""]
+    optionParams := options, args := ParseScriptCommandLine("""")
+    Loop % args[""]-1
     {
 	argv := args[A_Index]
 	If (option) {
-	    options[option] := argv
-	    option=
+	    options[option] := argv, option := ""
 	} Else If (parmName) {
 	    parmValue := argv
 	} Else {
+            If (!argv)
+                continue
 	    If (SubStr(argv, 1, 1) == "/") {
 		option := SubStr(argv, 2)
+		If (!optionParams[option])
+                    options[option] := "", option := ""
 		continue
 	    } Else {
 		If (!colon := InStr(argv, ":")) {

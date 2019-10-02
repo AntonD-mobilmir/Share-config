@@ -39,13 +39,13 @@ ECHO s_UScripts: %s_UScripts%
 ECHO.
 
 ECHO Running scripts from baseDistributives...
-FOR /R "%baseDistributives%" %%I IN (".Distributives_Update_Run.All.*") DO CALL "%~dp0rund.cmd" "%%~fI"
+FOR /R "%baseDistributives%" %%I IN (".Distributives_Update_Run.All.*") DO START /B %comspec% /C ""%~dp0rund.cmd" "%%~fI""
 ECHO Running scripts from baseDistUpdateScripts...
-FOR /R "%baseDistUpdateScripts%" %%I IN (".Distributives_Update_Run.All.*") DO CALL "%~dp0rund.cmd" "%%~fI"
+FOR /R "%baseDistUpdateScripts%" %%I IN (".Distributives_Update_Run.All.*") DO START /B %comspec% /C ""%~dp0rund.cmd" "%%~fI""
 
 IF EXIST "%~dpn0.OfficeOnly.cmd" (
     ECHO Running "%~dpn0.OfficeOnly.cmd"...
-    CALL "%~dpn0.OfficeOnly.cmd"
+    START /B %comspec% /C "%~dpn0.OfficeOnly.cmd"
 )
 ECHO Cleanup...
 CALL "%~dp0cleanup_status_logs.cmd"
