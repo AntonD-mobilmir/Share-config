@@ -10,11 +10,11 @@ Try {
     query=
     argc = %0%
     If (argc) {
-        query := CommandLineArgs_to_FindTrelloCardQuery(options := Object())
+        query := CommandLineArgs_to_FindTrelloCardQuery(options := {"log": 1})
         If (options.HasKey("log"))
             options.log := Expand(options.log)
         If (options.HasKey("silent"))
-            RunInteractiveInstalls := !options.silent
+            RunInteractiveInstalls := 0
         Else
             RunInteractiveInstalls := options.interactive
     }
@@ -88,8 +88,17 @@ ProcessDir(ByRef srcDirs*) {
                 } Catch e {
                     LogError(e, options.log)
                 }
-        } Else
-            Throw Exception("FillInCard returned fail")
+        } Else {
+            FileCreateDir %srcDir%_failed
+            For i, srcDir in srcDirs
+                Try {
+                    FileMove %srcDir%\%Hostname% *, %srcDir%_failed
+                    FileMove %srcDir%\%Hostname%.*, %srcDir%_failed
+                } Catch e {
+                    LogError(e, options.log)
+                }
+            Throw Exception("FillInCard failed")
+        }
     }
 }
 

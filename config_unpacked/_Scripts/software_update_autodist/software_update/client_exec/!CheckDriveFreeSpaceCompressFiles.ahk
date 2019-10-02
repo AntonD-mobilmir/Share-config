@@ -83,8 +83,15 @@ If (GetAndLogFreeSpace(SystemDrive) < FreeSpaceLowMarginMB && InStr(FileExist(Sy
 
 If (GetAndLogFreeSpace(A_ProgramFiles) < FreeSpaceLowMarginMB) {
     ; – закрывает explorer.exe и перезапускает от администратора – RunWait %comspec% /C "\\Srv0.office0.mobilmir\profiles$\Share\config\_Scripts\cleanup\BleachBit-auto.cmd"
+
+    For i, dirProgFiles in GetProgramFilesDirs()
+        If (FileExist(ClickToRunsUpdatesDir := dirProgFiles "\Common Files\Microsoft Shared\ClickToRun\Updates")) {
+            FileRemoveDir %ClickToRunsUpdatesDir%, 1
+            GetAndLogFreeSpace(SystemDrive, "after """ ClickToRunsUpdatesDir """ removal")
+        }
     
     For i, compactArgs in [ "K-Lite Codec Pack"
+                            , "Common Files\Microsoft Shared\ClickToRun"
 			    , ["Adobe","*.api *.dll"]
 			    , "Canon"
 			    , "foobar2000"
@@ -142,7 +149,7 @@ GetAndLogFreeSpace(ByRef path, ByRef textnote := "") {
     return FreeSpace
 }
 
-CallCompactProgramFiles(ByRef subdir, ByRef masks := "") {
+GetProgramFilesDirs() {
     static oProgramFiles := ""
     If (!IsObject(oProgramFiles)) {
 	If (A_Is64bitOS) {
@@ -152,8 +159,11 @@ CallCompactProgramFiles(ByRef subdir, ByRef masks := "") {
 	} Else
 	    oProgramFiles := [A_ProgramFiles]
     }
-    
-    For i, baseDir in oProgramFiles
+    return oProgramFiles
+}
+
+CallCompactProgramFiles(ByRef subdir, ByRef masks := "") {
+    For i, baseDir in GetProgramFilesDirs()
 	CallCompact(baseDir "\" subdir, masks)
 }
 

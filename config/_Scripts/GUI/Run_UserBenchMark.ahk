@@ -124,7 +124,7 @@ While (!FileExist(exeName)) {
     If Not dlDir
 	dlDir = %A_MyDocuments%\Downloads
 
-    delay := 15
+    delay := 45
     While !FileExist(archiveName) {
 	IfExist %dlDir%\UserBenchMark.zip
 	{

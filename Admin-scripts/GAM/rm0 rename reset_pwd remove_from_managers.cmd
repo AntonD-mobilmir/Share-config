@@ -34,6 +34,7 @@ SETLOCAL ENABLEEXTENSIONS
     
     CALL "%~dp0switchdomain.cmd" "mobilmir.ru"
     CALL "%~dp0gam.cmd" update group "managers@mobilmir.ru" remove user "%~1"
+    CALL "%~dp0gam.cmd" update group "managers-mobilmir@mobilmir.ru" remove user "%~1"
     rem CALL "%~dp0gam.cmd" update group managers@mobilmir.ru remove user "-rm-%~1"
         
     (

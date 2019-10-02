@@ -1,1 +1,1 @@
-1.1.30.3	AutoHotkey_1.1.30.03_setup.exe
+1.1.31.0	AutoHotkey_1.1.31.00_setup.exe

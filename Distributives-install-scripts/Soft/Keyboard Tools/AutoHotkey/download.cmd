@@ -26,9 +26,9 @@ FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
     IF NOT DEFINED logsDir SET "logsDir=%workdir%"
     IF EXIST "%workdir%new.tmp" RD /S /Q "%workdir%new.tmp"
     MKDIR "%workdir%new.tmp"
-    xln.exe "%curDistPath%" "%workdir%new.tmp\%curDistName%"
+    rem xln.exe "%curDistPath%" "%workdir%new.tmp\%curDistName%"
     rem START "" /B /WAIT /D "%workdir%new.tmp" wget.exe -N %url%
-    START "" /B /WAIT /D "%workdir%new.tmp" curl "%url%" %timeCond% -OJR -H "authority: autohotkey.com" -H "upgrade-insecure-requests: 1" -H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36" -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" -H "accept-encoding: gzip, deflate, br" -H "accept-language: ru,en-GB;q=0.9,en;q=0.8,en-US;q=0.7" || CALL :ExitWithError running CURL & EXIT /B
+    START "" /B /WAIT /D "%workdir%new.tmp" curl "%url%" %timeCond% -OJR -H "authority: autohotkey.com" -H "upgrade-insecure-requests: 1" -H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36" -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" -H "accept-encoding: gzip, deflate, br" -H "accept-language: ru,en-GB;q=0.9,en;q=0.8,en-US;q=0.7" || CALL :ExitWithError running CURL
     
     IF NOT EXIST "%workdir%new.tmp\*.*" (
 	rem CURL still ignores server filename. Have no idea what to do with it. So it'll be only used as backup.
@@ -43,21 +43,23 @@ FOR /F "usebackq delims=" %%A IN (`DIR /B /O-D "%srcpath%%distfmask%"`) DO (
 	rem -R, --remote-time   Set the remote file's time on the local output
 	rem -z, --time-cond TIME   Transfer based on a time condition
 
-	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe "%url%" -LpR --remote-name-all %timeCond% || CALL :ExitWithError running CURL & EXIT /B
+	START "" /B /WAIT /D "%workdir%new.tmp" c:\SysUtils\curl.exe "%url%" -LpR --remote-name-all %timeCond% || CALL :ExitWithError running CURL & EXIT /B 1
     )
+    
     rem without -o for CURL and -O for wget, filename is unknown
     FOR %%A IN ("%workdir%new.tmp\*.exe") DO (	
+        ECHO Checking %%~nxA
 	SET "dlfname=%%~nxA"
-	FOR /F "usebackq tokens=1*" %%B IN (`c:\SysUtils\lbrisar\getver.exe "%%~A"`) DO (
-	    SET "ver=%%~B"
+	CALL :GetFileVer ver "%%~A" || SET "ver="
 	    
-	    IF "%%~nxA"=="%urlfname%" (
-		IF NOT DEFINED ver (
-		    ECHO Could not determine version of the executable, and it's used to define filename
-		) ELSE SET "dstfname=AutoHotkey_%%~B_setup.exe"
-	    )
-	    IF NOT DEFINED dstfname SET "dstfname=%%~nxA"
-	)
+        IF "%%~nxA"=="%urlfname%" (
+            IF NOT DEFINED ver (
+                ECHO Could not determine version of "%%~nxA", and it's used to define filename
+            ) ELSE (
+                SET "dstfname=AutoHotkey_%%~B_setup.exe"
+            )
+        )
+        IF NOT DEFINED dstfname SET "dstfname=%%~nxA"
 	IF DEFINED ver GOTO :ExitGetVerLoop
     )
     IF NOT DEFINED dlfname CALL :ExitWithError Nothing downloaded & EXIT /B 1
@@ -91,3 +93,15 @@ EXIT /B
     RD "%workdir%new.tmp"
 EXIT /B
 )
+:GetFileVer <varname> <path>
+(
+SETLOCAL
+SET "fileNameForWMIC=%~2"
+)
+SET fileNameForWMIC=%fileNameForWMIC:\=\\%
+FOR /F "usebackq skip=1" %%I IN (`wmic datafile where Name^="%fileNameForWMIC%" get Version`) DO (
+    ENDLOCAL
+    SET "%~1=%%~I"
+    EXIT /B 0
+)
+EXIT /B 1

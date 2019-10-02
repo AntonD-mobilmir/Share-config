@@ -132,3 +132,15 @@ EXIT /B 1
     set "%~1=%len%"
     exit /b
 )
+:GetFileVer <varname> <path>
+(
+SETLOCAL
+SET "fileNameForWMIC=%~2"
+)
+SET fileNameForWMIC=%fileNameForWMIC:\=\\%
+FOR /F "usebackq skip=1" %%I IN (`wmic datafile where Name^="%fileNameForWMIC%" get Version`) DO (
+    ENDLOCAL
+    SET "%~1=%%~I"
+    EXIT /B 0
+)
+EXIT /B 1

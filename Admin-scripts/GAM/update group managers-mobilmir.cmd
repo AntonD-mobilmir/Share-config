@@ -8,7 +8,6 @@ SETLOCAL ENABLEEXTENSIONS
 )
 @(
     head -n 1 managers-list.csv
-    rem FIND "@mobilmir.ru"",""MEMBER"",""USER""" managers-list.csv
     FIND "@mobilmir.ru,MEMBER,USER," managers-list.csv
 ) >managers-mobilmir.ru-list.csv
 (

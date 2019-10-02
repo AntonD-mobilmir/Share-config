@@ -3,9 +3,12 @@ REM by LogicDaemon <www.logicdaemon.ru>
 REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <https://creativecommons.org/licenses/by-sa/4.0/legalcode.ru>.
 SETLOCAL ENABLEEXTENSIONS
 
-    IF NOT DEFINED AutohotkeyExe CALL :RunFromConfig FindAutoHotkeyExe.cmd
-
-    IF DEFINED s_uscriptsOldLogs CALL :clean "%s_uscriptsOldLogs%\.." "%s_uscriptsStatus%\.."
+    CALL :RunFromConfig _Scripts\FindAutoHotkeyExe.cmd
+    IF NOT DEFINED s_uscriptsOldLogs CALL "%ProgramData%\mobilmir.ru\_get_SoftUpdateScripts_source.cmd"
+)
+(
+    IF DEFINED s_uscriptsOldLogs CALL :clean "%s_uscriptsOldLogs%\.."
+    IF DEFINED s_uscriptsStatus "%s_uscriptsStatus%\.."
     IF EXIST "%~dp0software_update" CALL :clean "%~dp0software_update\old\status" "%~dp0software_update\status" "%~dp0software_update\client_exec"
 EXIT /B
 )

@@ -2,25 +2,28 @@
 ;This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/deed.ru>.
 
 PostWithProxies(URL,ByRef POSTDATA,tries:=20,retryDelay:=1000) {
+    static proxies, lastProxy
     protoFound := RegexMatch(URL, "([^:]{3,6})://", URLproto)
-    
-    ; Очень странно: в Windows 7 префикс протокола ("https://") нужен для отправки через HTTPS, в Windows 10 – наоборот мешает :(
-    proxies := Object()
-    If (lmProxy := ReadProxy("HKEY_LOCAL_MACHINE")) {
-	proxies.Push(URLproto . lmProxy, lmProxy)
-    }
-    If (cuProxy := ReadProxy("HKEY_CURRENT_USER")) {
-	proxies.Push(URLproto . cuProxy, cuProxy)
-    }
-    proxies.Push(URLproto . "192.168.127.1:3128", "192.168.127.1:3128", "")
     
     Loop %tries%
     {
-	For i,proxy in proxies
-	{
-	    Try If (success := WinHttpPOST(URL, POSTDATA, proxy))
+        If (lastProxy)
+	    Try If (success := WinHttpPOST(URL, POSTDATA, lastProxy))
 		return success
-	}
+        
+        If (!proxies) {
+            proxies := {}
+            ; Очень странно: в Windows 7 префикс протокола ("https://") нужен для отправки через HTTPS, в Windows 10 – наоборот мешает :(
+            If (lmProxy := ReadProxy("HKEY_LOCAL_MACHINE"))
+                proxies.Push(URLproto . lmProxy, lmProxy)
+            If (cuProxy := ReadProxy("HKEY_CURRENT_USER"))
+                proxies.Push(URLproto . cuProxy, cuProxy)
+            proxies.Push(URLproto . "192.168.127.1:3128", "192.168.127.1:3128", "")
+        }
+        
+	For i,proxy in proxies
+	    Try If (success := WinHttpPOST(URL, POSTDATA, proxy))
+		return success, lastProxy := proxy
 	Sleep retryDelay
     }
     

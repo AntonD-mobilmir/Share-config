@@ -20,6 +20,7 @@ IF DEFINED baseLogsDir (
 )
 CALL :mkBaseDir "%runlog%"
 PUSHD "%runDir%" && (
+    ECHO Executing "%~1"...
     GOTO :rund%~x1.ext
     rem Extension unknown
     ECHO %DATE% %TIME% [Can't Run "*%~x1", skipped] %*

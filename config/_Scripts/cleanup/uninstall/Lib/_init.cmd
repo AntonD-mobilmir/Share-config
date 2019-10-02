@@ -6,9 +6,8 @@ REM This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 In
 	SET "PROGRAMDATA=%ALLUSERSPROFILE%\Application Data"
     )
     IF NOT DEFINED APPDATA IF EXIST "%USERPROFILE%\Application Data" SET "APPDATA=%USERPROFILE%\Application Data"
-    IF DEFINED Distributives IF DEFINED SoftSourceDir GOTO :skipSoftSourceDir
-    CALL "%~dp0..\..\..\FindSoftwareSource.cmd"
-:skipSoftSourceDir
+    IF DEFINED Distributives IF NOT DEFINED SoftSourceDir SET "Distributives="
+    IF NOT DEFINED Distributives CALL "%~dp0..\..\..\FindSoftwareSource.cmd"
     CALL "%~dp0..\..\..\FindAutoHotkeyExe.cmd"
     
     IF DEFINED ProgramFiles^(x86^) ( SET "ProgramFiles32=%ProgramFiles(x86)%" ) ELSE SET "ProgramFiles32=%ProgramFiles%"

@@ -4,16 +4,19 @@
 #SingleInstance force
 
 If (A_ScriptFullPath == A_LineFile) { ; this is direct call, not inclusion
-    MailUserId := GetMailUserId(GetMailUserIdScript)
+    Try MailUserId := GetMailUserId(GetMailUserIdScript)
+    If (!GetMailUserIdScript)
+        Throw Exception("GetMailUserIdScript not defined",,"GetMailUserId.ahk did not return path to the script")
     GetMailUserIdFile := FileOpen(GetMailUserIdScript, 0x3) ; lock file file
     If (!IsObject(GetMailUserIdFile)) {
+        If (A_IsAdmin)
+            Throw Exception("Cannot lock GetMailUserIdScript",,"Error " A_LastError " opening " GetMailUserIdScript)
 	Run % "*RunAs " . DllCall( "GetCommandLine", "Str" ),,UseErrorLevel  ; Requires v1.0.92.01+
 	ExitApp
     }
-    
     If (!MailUserId) {
 	SplitPath GetMailUserIdScript,,GetMailUserIdScriptDir
-
+        
 	If (RegexMatch(A_ComputerName, "i).+-([0-9k]|nb)")) {
 	    HostnamePrefix := Format("{:Ls}", SubStr(A_ComputerName,1,-2))
 	    

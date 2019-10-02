@@ -452,7 +452,7 @@ If (software_update_client_exec) {
     Loop Files, %software_update_client_exec%\_TeamViewerSecurityPasswordAES *.ahk
     {
         tvPassChangeLog = %A_Temp%\TeamViewerPasswordChange%A_Now%.log
-        tvPassChangeErr := RunScript(A_LoopFileFullPath, "Проверка/обновление пароля TeamViewer", "/warn /log """ tvPassChangeLog """", 0)
+        tvPassChangeErr := RunScript(A_LoopFileFullPath, "Проверка/обновление пароля TeamViewer", " /log """ tvPassChangeLog """", 0)
         Loop Read, %tvPassChangeLog%
             SetLastRowStatus(A_LoopReadLine, !tvPassChangeErr)
     }
@@ -563,11 +563,11 @@ If (IsObject(rsyncPreinstalled)) { ; pidRsyncPreinstalled
     RunRSyncWithAddLog(rsyncPreinstalled)
 }
 
-If (FileExist("D:\1S\Утилиты Вики-Принт\Fito 2.2.26")) {
-    AddLog("Fito 2.2.26", "уже установлен", 1)
-} Else If (FileExist("D:\Local_Scripts\software_update\client_exec\_Fito 2.2.26.ahk")) {
-        RunScript("D:\Local_Scripts\software_update\client_exec\_Fito 2.2.26.ahk", "Установка Fito 2.2.26")
-}
+;If (FileExist("D:\1S\Утилиты Вики-Принт\Fito 2.2.26")) {
+;    AddLog("Fito 2.2.26", "уже установлен", 1)
+;} Else If (FileExist("D:\Local_Scripts\software_update\client_exec\_Fito 2.2.26.ahk")) {
+;        RunScript("D:\Local_Scripts\software_update\client_exec\_Fito 2.2.26.ahk", "Установка Fito 2.2.26")
+;}
 
 If (!((gpgexist := FileExist("C:\SysUtils\gnupg\gpg.exe")) && IsObject(softUpdScripts))) ; Если IsObject(softUpdScripts), SysUtils уже были обновлены выше
     RunScriptFromNewestDistDir("Soft\PreInstalled\auto\SysUtils\*.7z", "Soft\PreInstalled\SysUtils-cleanup and reinstall.cmd", "PreInstalled", gpgexist ? SystemDrive . "\SysUtils" : "", loopOptn:="DFR")

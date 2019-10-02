@@ -13,12 +13,12 @@
 	SET GAMpy="%~dp0%%~A\src\gam.py"
 	GOTO :FoundPy
     )
+    EXIT /B
 )
-
 :FoundPy
 @(
-    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-N /AD "%LOCALAPPDATA%\Programs\WinPython3\python-*"`) DO @(
-	SET GAMexe="%LOCALAPPDATA%\Programs\WinPython3\%%~A\python.exe" %GAMpy%
+    FOR /F "usebackq delims=" %%A IN (`DIR /B /O-N /AD "%LOCALAPPDATA%\Programs\WinPython\python-*"`) DO @(
+	SET GAMexe="%LOCALAPPDATA%\Programs\WinPython\%%~A\python.exe" %GAMpy%
 	EXIT /B
     )
 )
