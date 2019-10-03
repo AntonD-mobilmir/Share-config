@@ -69,6 +69,8 @@ find7zaexe(paths*) {
 		, "\\Srv1S-B.office0.mobilmir\Distributives\Soft\PreInstalled\utils"
 		, "\\Srv0.office0.mobilmir\Distributives\Soft\PreInstalled\utils"
 		, A_LineFile "\..\..\..\..\Soft\PreInstalled\utils")
+    If (A_Is64bitOS)
+        Try return find7zexe("7za64.exe", paths*)
     return find7zexe("7za.exe", paths*)
 }
 
